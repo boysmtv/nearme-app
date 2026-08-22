@@ -1,0 +1,257 @@
+name: CD Pipeline
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+concurrency:
+  group: cd-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  JAVA_VERSION: '25'
+  FLUTTER_VERSION: '3.44.7'
+  NODE_VERSION: '24'
+  REGISTRY: ghcr.io
+  ORG: ${{ github.repository_owner }}
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+jobs:
+  # ──────────────────────── Metadata ────────────────────────
+  metadata:
+    runs-on: ubuntu-latest
+    outputs:
+      is_production: ${{ steps.meta.outputs.is_production }}
+      api_tag: ${{ steps.meta.outputs.api_tag }}
+      worker_tag: ${{ steps.meta.outputs.worker_tag }}
+      web_public_tag: ${{ steps.meta.outputs.web_public_tag }}
+      web_provider_tag: ${{ steps.meta.outputs.web_provider_tag }}
+      web_admin_tag: ${{ steps.meta.outputs.web_admin_tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "is_production=true" >> "$GITHUB_OUTPUT"
+            TAG="${{ github.ref_name }}"
+          else
+            echo "is_production=false" >> "$GITHUB_OUTPUT"
+            TAG="sha-$(echo ${{ github.sha }} | cut -c1-7)"
+          fi
+          echo "api_tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "worker_tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "web_public_tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "web_provider_tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "web_admin_tag=$TAG" >> "$GITHUB_OUTPUT"
+
+  # ──────────────────────── Build API ────────────────────────
+  build-api:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build API JAR
+        working-directory: services/platform_backend
+        run: ./gradlew :bootJar --no-daemon -x test
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and push API image
+        uses: docker/build-push-action@v5
+        with:
+          context: services/platform_backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.ORG }}/api:${{ needs.metadata.outputs.api_tag }}
+            ${{ env.REGISTRY }}/${{ env.ORG }}/api:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ──────────────────────── Build Worker ────────────────────────
+  build-worker:
+    needs: metadata
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build Worker JAR
+        working-directory: services/platform_backend
+        run: ./gradlew :worker:bootJar --no-daemon -x test
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and push Worker image
+        uses: docker/build-push-action@v5
+        with:
+          context: services/platform_backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.ORG }}/worker:${{ needs.metadata.outputs.worker_tag }}
+            ${{ env.REGISTRY }}/${{ env.ORG }}/worker:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ──────────────────────── Build Web Apps ────────────────────────
+  build-web:
+    needs: metadata
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        app:
+          - name: web-public
+            context: apps/web_public
+            tag_output: web_public_tag
+          - name: web-provider
+            context: apps/web_provider
+            tag_output: web_provider_tag
+          - name: web-admin
+            context: apps/web_admin
+            tag_output: web_admin_tag
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @dekat/${{ matrix.app.name }} build
+        env:
+          VITE_API_BASE_URL: ${{ secrets.API_BASE_URL }}
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/setup-buildx-action@v3
+      - name: Build and push ${{ matrix.app.name }} image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.context }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.ORG }}/${{ matrix.app.name }}:${{ needs.metadata.outputs[matrix.app.tag_output] }}
+            ${{ env.REGISTRY }}/${{ env.ORG }}/${{ matrix.app.name }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  # ──────────────────────── Deploy Staging ────────────────────────
+  deploy-staging:
+    needs:
+      - metadata
+      - build-api
+      - build-worker
+      - build-web
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: https://staging.dekat.id
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to staging VPS
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            cd /opt/dekat
+            docker compose -f compose.staging.yaml pull
+            docker compose -f compose.staging.yaml up -d api-blue worker caddy
+            sleep 30
+            curl -sf http://localhost:8080/actuator/health || exit 1
+            echo "Staging deployment successful"
+
+  # ──────────────────────── Deploy Production ────────────────────────
+  approve-production:
+    needs:
+      - metadata
+      - deploy-staging
+    if: needs.metadata.outputs.is_production == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+    steps:
+      - run: echo "Production deployment approved"
+
+  deploy-production:
+    needs:
+      - metadata
+      - approve-production
+    if: needs.metadata.outputs.is_production == 'true'
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://dekat.id
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Determine live slot
+        id: slot
+        run: |
+          LIVE=$(ssh -o StrictHostKeyChecking=no ${{ secrets.PROD_USER }}@${{ secrets.PROD_HOST }} \
+            "docker inspect --format='{{.Config.Image}}' dekat-api-blue 2>/dev/null | grep -o 'sha-[a-f0-9]*\|v[0-9]*' || echo 'none'")
+          if [[ "$LIVE" == *"${{ github.ref_name || format('sha-{0}', substr(github.sha, 0, 7)) }}"* ]]; then
+            echo "active=blue" >> "$GITHUB_OUTPUT"
+            echo "target=green" >> "$GITHUB_OUTPUT"
+          else
+            echo "active=green" >> "$GITHUB_OUTPUT"
+            echo "target=blue" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Deploy to inactive slot
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            cd /opt/dekat
+            TARGET="${{ steps.slot.outputs.target }}"
+            TAG="${{ needs.metadata.outputs.api_tag }}"
+            export API_TAG="$TAG"
+
+            echo "Deploying API to $TARGET slot with tag $TAG"
+            docker compose -f compose.production.yaml pull "api-$TARGET"
+            docker compose -f compose.production.yaml up -d "api-$TARGET"
+            sleep 60
+
+            echo "Health checking $TARGET slot..."
+            curl -sf http://localhost:8080/actuator/health || exit 1
+
+            echo "Switching Caddy upstream to $TARGET..."
+            sed -i "s|@api_active.*|@api_active backend api-$TARGET:8080|" Caddyfile
+            docker compose -f compose.production.yaml exec caddy caddy reload --config /etc/caddy/Caddyfile
+
+            echo "Production deployment to $TARGET complete"
+
+      - name: Notify deployment
+        if: always()
+        run: |
+          echo "Deployed ${{ github.ref_name || github.sha }} to production (${{ steps.slot.outputs.target }} slot)"

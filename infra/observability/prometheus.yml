@@ -1,0 +1,90 @@
+# DEKAT Booking Platform - Prometheus Configuration
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  scrape_timeout: 10s
+
+scrape_configs:
+  # --- Prometheus Self ---
+  - job_name: prometheus
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  # --- API Blue ---
+  - job_name: api-blue
+    static_configs:
+      - targets: ["api-blue:8080"]
+    metrics_path: /actuator/prometheus
+    scrape_interval: 10s
+
+  # --- API Green ---
+  - job_name: api-green
+    static_configs:
+      - targets: ["api-green:8080"]
+    metrics_path: /actuator/prometheus
+    scrape_interval: 10s
+
+  # --- Worker ---
+  - job_name: worker
+    static_configs:
+      - targets: ["worker:8080"]
+    metrics_path: /actuator/prometheus
+    scrape_interval: 10s
+
+  # --- PostgreSQL ---
+  - job_name: postgres
+    static_configs:
+      - targets: ["postgres:5432"]
+
+  # --- Redis ---
+  - job_name: redis
+    static_configs:
+      - targets: ["redis:6379"]
+
+  # --- Kafka ---
+  - job_name: kafka
+    static_configs:
+      - targets: ["kafka:9092"]
+
+  # --- Caddy ---
+  - job_name: caddy
+    static_configs:
+      - targets: ["caddy:2019"]
+
+  # --- MinIO ---
+  - job_name: minio
+    static_configs:
+      - targets: ["object-storage:9000"]
+    metrics_path: /minio/v2/metrics/cluster
+
+  # --- Grafana ---
+  - job_name: grafana
+    static_configs:
+      - targets: ["grafana:3000"]
+
+  # --- Loki ---
+  - job_name: loki
+    static_configs:
+      - targets: ["loki:3100"]
+
+  # --- Tempo ---
+  - job_name: tempo
+    static_configs:
+      - targets: ["tempo:3200"]
+
+  # --- Alloy ---
+  - job_name: alloy
+    static_configs:
+      - targets: ["alloy:12345"]
+
+  # --- Node Exporter (via Docker) ---
+  - job_name: docker
+    docker_sd_configs:
+      - host: unix:///var/run/docker.sock
+    relabel_configs:
+      - source_labels: ["__meta_docker_container_name"]
+        regex: "/(.*)"
+        target_label: "container"
+      - source_labels: ["__meta_docker_container_label_com_docker_compose_service"]
+        target_label: "service"

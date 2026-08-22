@@ -1,0 +1,12 @@
+{
+  "features": [
+    "approve",
+    "login",
+    "logout",
+    "reject",
+    "return",
+    "status"
+  ],
+  "commands": [],
+  "updated_at": "2026-08-22T17:03:16.683187+00:00"
+}

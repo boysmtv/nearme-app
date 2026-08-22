@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\services\\platform_backend",
+  "updated_at": "2026-08-22T17:03:17.775390+00:00",
+  "status": "attention",
+  "rows": [
+    {
+      "requirement": "approve",
+      "acceptance_criteria": [
+        "approve behavior is implemented and validated."
+      ],
+      "flows": [
+        "approve"
+      ],
+      "api_or_ui_paths": [],
+      "implementation_symbols": [
+        "src/main/java/id/dekat/payment/domain/Refund.java",
+        "src/main/java/id/dekat/staff/domain/TimeOffRepository.java",
+        "src/main/java/id/dekat/tenant/application/TenantService.java",
+        "src/main/java/id/dekat/tenant/web/TenantController.java",
+        "src/main/java/id/dekat/payment/domain/Refund.java:approve",
+        "src/main/java/id/dekat/payment/domain/Refund.java:getApprovedBy",
+        "src/main/java/id/dekat/staff/domain/TimeOffRepository.java:findApprovedOverlapping",
+        "src/main/java/id/dekat/tenant/application/TenantService.java:approveTenant",
+        "src/main/java/id/dekat/tenant/web/TenantController.java:approveTenant"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "login",
+      "acceptance_criteria": [
+        "login behavior is implemented and validated."
+      ],
+      "flows": [
+        "login"
+      ],
+      "api_or_ui_paths": [],
+      "implementation_symbols": [
+        "src/main/java/id/dekat/identity/application/AuthService.java",
+        "src/main/java/id/dekat/identity/web/AuthController.java",
+        "src/main/java/id/dekat/identity/web/dto/LoginRequest.java",
+        "src/main/java/id/dekat/identity/application/AuthService.java:login",
+        "src/main/java/id/dekat/identity/web/AuthController.java:login"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "logout",
+      "acceptance_criteria": [
+        "logout behavior is implemented and validated."
+      ],
+      "flows": [
+        "logout"
+      ],
+      "api_or_ui_paths": [],
+      "implementation_symbols": [
+        "src/main/java/id/dekat/identity/application/AuthService.java",
+        "src/main/java/id/dekat/identity/web/AuthController.java",
+        "src/main/java/id/dekat/identity/application/AuthService.java:logout",
+        "src/main/java/id/dekat/identity/application/AuthService.java:logoutAllDevices",
+        "src/main/java/id/dekat/identity/web/AuthController.java:logout"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "reject",
+      "acceptance_criteria": [
+        "reject behavior is implemented and validated."
+      ],
+      "flows": [
+        "reject"
+      ],
+      "api_or_ui_paths": [],
+      "implementation_symbols": [
+        "src/main/java/id/dekat/payment/domain/Refund.java",
+        "src/main/java/id/dekat/tenant/application/TenantService.java",
+        "src/main/java/id/dekat/tenant/web/TenantController.java",
+        "src/main/java/id/dekat/payment/domain/Refund.java:reject",
+        "src/main/java/id/dekat/tenant/application/TenantService.java:rejectTenant",
+        "src/main/java/id/dekat/tenant/web/TenantController.java:rejectTenant"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "return",
+      "acceptance_criteria": [
+        "return behavior is implemented and validated."
+      ],
+      "flows": [
+        "return"
+      ],
+      "api_or_ui_paths": [],
+      "implementation_symbols": [
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/config/SecurityConfig.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/config/SecurityConfig.java:return"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    },
+    {
+      "requirement": "status",
+      "acceptance_criteria": [
+        "status behavior is implemented and validated."
+      ],
+      "flows": [
+        "status"
+      ],
+      "api_or_ui_paths": [],
+      "implementation_symbols": [
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/MoneyStatus.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxStatus.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java:findByStatusOrderByCreatedAtAsc",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java:updateStatus",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java:countByStatus",
+        "src/main/java/id/dekat/booking/domain/Booking.java:getStatus",
+        "src/main/java/id/dekat/booking/domain/Booking.java:setStatus",
+        "src/main/java/id/dekat/booking/domain/BookingAssignment.java:getStatus",
+        "src/main/java/id/dekat/booking/domain/BookingHold.java:getStatus",
+        "src/main/java/id/dekat/booking/domain/BookingHoldRepository.java:findByStatus"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "attention",
+      "evidence": [
+        {
+          "path": "flow_map.json"
+        },
+        {
+          "path": "api_contracts.json"
+        }
+      ]
+    }
+  ],
+  "blockers": [
+    {
+      "requirement": "approve",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "login",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "logout",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "reject",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "return",
+      "reason": "flow_has_no_test_evidence"
+    },
+    {
+      "requirement": "status",
+      "reason": "flow_has_no_test_evidence"
+    }
+  ],
+  "release_readiness": {
+    "blocked": false,
+    "blocking_rules": [
+      "flow_has_no_test_evidence",
+      "flow_has_no_test_evidence",
+      "flow_has_no_test_evidence",
+      "flow_has_no_test_evidence",
+      "flow_has_no_test_evidence",
+      "flow_has_no_test_evidence"
+    ]
+  },
+  "coverage": {
+    "requirement_count": 6,
+    "mapped_requirement_count": 6,
+    "test_mapped_requirement_count": 0
+  }
+}

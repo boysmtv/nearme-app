@@ -1,0 +1,140 @@
+name: dekat-dev
+
+services:
+  caddy:
+    ports:
+      - "8080:80"
+      - "8443:443"
+    environment:
+      - CADDY_FILE=/etc/caddy/Caddyfile.dev
+
+  web-public:
+    build:
+      context: ../../web-public
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../../web-public/src:/app/src
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+      - VITE_WS_URL=ws://localhost:8080/ws
+      - VITE_STORAGE_URL=http://localhost:8080/storage
+
+  web-provider:
+    build:
+      context: ../../web-provider
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../../web-provider/src:/app/src
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+      - VITE_WS_URL=ws://localhost:8080/ws
+      - VITE_STORAGE_URL=http://localhost:8080/storage
+
+  web-admin:
+    build:
+      context: ../../web-admin
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ../../web-admin/src:/app/src
+    environment:
+      - VITE_API_URL=http://localhost:8080/api
+      - VITE_WS_URL=ws://localhost:8080/ws
+      - VITE_STORAGE_URL=http://localhost:8080/storage
+
+  api-blue:
+    build:
+      context: ../../api
+      dockerfile: Dockerfile.dev
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgbouncer:6432/${POSTGRES_DB:-dekat}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-dekat}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    volumes:
+      - ../../api/src:/app/src
+    ports:
+      - "8080:8080"
+
+  api-green:
+    build:
+      context: ../../api
+      dockerfile: Dockerfile.dev
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgbouncer:6432/${POSTGRES_DB:-dekat}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-dekat}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    volumes:
+      - ../../api/src:/app/src
+    ports:
+      - "8081:8080"
+
+  worker:
+    build:
+      context: ../../worker
+      dockerfile: Dockerfile.dev
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://pgbouncer:6432/${POSTGRES_DB:-dekat}
+      - SPRING_DATASOURCE_USERNAME=${POSTGRES_USER:-dekat}
+      - SPRING_DATASOURCE_PASSWORD=${POSTGRES_PASSWORD}
+      - SPRING_DATA_REDIS_HOST=redis
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - JAVA_OPTS=-Xms256m -Xmx512m
+    volumes:
+      - ../../worker/src:/app/src
+
+  postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-devpassword}
+
+  redis:
+    ports:
+      - "6379:6379"
+
+  kafka:
+    ports:
+      - "9092:9092"
+
+  object-storage:
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+
+  alloy:
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "12345:12345"
+
+  prometheus:
+    ports:
+      - "9090:9090"
+
+  loki:
+    ports:
+      - "3100:3100"
+
+  tempo:
+    ports:
+      - "3200:3200"
+
+  grafana:
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_ALLOW_embedding=true
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer

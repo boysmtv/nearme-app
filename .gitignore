@@ -1,0 +1,61 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend
+services/platform_backend/build/
+services/platform_backend/.gradle/
+services/platform_backend/out/
+*.class
+*.jar
+*.war
+
+# Flutter
+apps/mobile_customer/build/
+apps/mobile_customer/.dart_tool/
+apps/mobile_partner/build/
+apps/mobile_partner/.dart_tool/
+packages/*/build/
+packages/*/.dart_tool/
+*.iml
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# React
+apps/web_public/node_modules/
+apps/web_public/dist/
+apps/web_provider/node_modules/
+apps/web_provider/dist/
+apps/web_admin/node_modules/
+apps/web_admin/dist/
+packages/web-*/node_modules/
+packages/web-*/dist/
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Docker
+infra/compose/.env
+
+# Secrets
+*.pem
+*.key
+secrets/
+
+# Test
+coverage/
+.pytest_cache/
+test-results/
+
+# Build artifacts
+*.log
+*.tmp

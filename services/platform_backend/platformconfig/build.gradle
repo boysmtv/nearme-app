@@ -1,0 +1,12 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Platform Config - platform-wide settings & feature flags'
+
+dependencies {
+    api project(':sharedkernel')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

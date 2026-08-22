@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Payment - invoicing & payment gateway integration'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':booking')
+    api project(':tenant')
+    api project(':subscription')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

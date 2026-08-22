@@ -1,0 +1,13 @@
+{
+  "session_id": "mcp-29356",
+  "created_at": "2026-08-22T18:34:57.676631+00:00",
+  "last_active": "2026-08-22T18:34:57.677631+00:00",
+  "tool_call_count": 1,
+  "context": {
+    "client_info": "{'name': 'opencode', 'version': '1.16.2'}",
+    "client_name": "opencode",
+    "last_tool": "initialize",
+    "last_args": "{'protocolVersion': '2025-11-25', 'capabilities': {}, 'clientInfo': {'name': 'opencode', 'version': '1.16.2'}}"
+  },
+  "stream_buffer": []
+}

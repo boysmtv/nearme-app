@@ -1,0 +1,78 @@
+// DEKAT Booking Platform - Grafana Alloy Configuration
+// Receives OTLP traces/metrics/logs and forwards to backends
+
+// --- OTLP Receiver ---
+otelcol.receiver.otlp "default" {
+  output {
+    metrics = [otelcol.exporter.prometheus.default.input]
+    logs    = [loki.write.default.input]
+    traces  = [tempo.write.default.input]
+  }
+
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+}
+
+// --- Prometheus Exporter (metrics -> Prometheus) ---
+otelcol.exporter.prometheus "default" {
+  forward_to = [prometheus.remote_write.default.receiver]
+
+  resource_to_telemetry_conversion {
+    enabled = true
+  }
+}
+
+// --- Loki Exporter (logs -> Loki) ---
+loki.write "default" {
+  endpoint {
+    url = "http://loki:3100/loki/api/v1/push"
+  }
+}
+
+// --- Tempo Exporter (traces -> Tempo) ---
+tempo.write "default" {
+  endpoint {
+    url = "http://tempo:3200"
+  }
+}
+
+// --- Prometheus Remote Write ---
+prometheus.remote_write "default" {
+  endpoint {
+    url = "http://prometheus:9090/api/v1/write"
+  }
+}
+
+// --- Discovered Targets (auto-scrape containers) ---
+discovery.docker "default" {
+  host = "unix:///var/run/docker.sock"
+  refresh_interval = "30s"
+}
+
+// --- Scrape Prometheus Metrics from containers ---
+prometheus.scrape "default" {
+  targets    = discovery.docker.default.targets
+  forward_to = [prometheus.remote_write.default.receiver]
+
+  scrape_interval = "15s"
+  scrape_timeout  = "10s"
+}
+
+// --- Log Collection from Docker ---
+loki.source.docker "default" {
+  host             = "unix:///var/run/docker.sock"
+  targets          = discovery.docker.default.targets
+  forward_to       = [loki.write.default.input]
+  refresh_interval = "30s"
+}
+
+// --- Alloy Self-Metrics ---
+prometheus.scrape "alloy" {
+  targets    = [{"__address__" = "localhost:12345"}]
+  forward_to = [prometheus.remote_write.default.receiver]
+}

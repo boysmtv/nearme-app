@@ -1,0 +1,12 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Audit - audit trail & compliance'
+
+dependencies {
+    api project(':sharedkernel')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

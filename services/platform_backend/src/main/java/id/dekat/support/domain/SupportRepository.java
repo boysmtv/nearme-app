@@ -1,0 +1,17 @@
+package id.dekat.support.domain;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface SupportRepository extends JpaRepository<SupportCase, UUID> {
+
+    List<SupportCase> findByTenantIdAndStatus(UUID tenantId, SupportCase.CaseStatus status);
+
+    List<SupportCase> findByOwnerIdAndStatus(UUID ownerId, SupportCase.CaseStatus status);
+
+    List<SupportCase> findByBookingId(UUID bookingId);
+}

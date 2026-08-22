@@ -1,0 +1,14 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Tenant - multi-tenancy, store/workspace management'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':identity')
+    api project(':access')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

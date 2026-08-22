@@ -1,0 +1,137 @@
+groups:
+  - name: dekat_alerts
+    rules:
+      - alert: HighErrorRate
+        expr: sum(rate(http_server_requests_total{status=~"5.."}[5m])) / sum(rate(http_server_requests_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: high
+        annotations:
+          summary: "High API error rate"
+          description: "Error rate is {{ $value | humanizePercentage }} (threshold: 5%)"
+
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: high
+        annotations:
+          summary: "High API latency"
+          description: "p95 latency is {{ $value }}s (threshold: 2s)"
+
+      - alert: BookingConflictDetected
+        expr: increase(dekat_booking_conflict_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Booking conflict detected"
+          description: "{{ $value }} booking conflicts in last 5 minutes"
+
+      - alert: PaymentWebhookFailure
+        expr: sum(rate(dekat_payment_webhook_errors_total[10m])) / sum(rate(dekat_payment_webhook_total[10m])) > 0.01
+        for: 10m
+        labels:
+          severity: high
+        annotations:
+          summary: "Payment webhook failure rate high"
+          description: "Webhook failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: KafkaConsumerLag
+        expr: kafka_consumer_lag > 300
+        for: 5m
+        labels:
+          severity: high
+        annotations:
+          summary: "Kafka consumer lag high"
+          description: "Consumer lag for {{ $labels.topic }} is {{ $value }}"
+
+      - alert: PostgreSQLDiskUsage
+        expr: (node_filesystem_size_bytes{mountpoint="/var/lib/postgresql/data"} - node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql/data"}) / node_filesystem_size_bytes{mountpoint="/var/lib/postgresql/data"} > 0.8
+        for: 10m
+        labels:
+          severity: high
+        annotations:
+          summary: "PostgreSQL disk usage high"
+          description: "Disk usage is {{ $value | humanizePercentage }}"
+
+      - alert: PostgreSQLDiskCritical
+        expr: (node_filesystem_size_bytes{mountpoint="/var/lib/postgresql/data"} - node_filesystem_avail_bytes{mountpoint="/var/lib/postgresql/data"}) / node_filesystem_size_bytes{mountpoint="/var/lib/postgresql/data"} > 0.9
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "PostgreSQL disk usage critical"
+          description: "Disk usage is {{ $value | humanizePercentage }}"
+
+      - alert: BackupStale
+        expr: time() - pg_backup_last_success_timestamp > 86400
+        for: 0m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Backup is stale"
+          description: "Last successful backup was {{ $value | humanizeDuration }} ago"
+
+      - alert: CertificateExpiry
+        expr: (cert_expiry_timestamp - time()) < 1209600
+        for: 0m
+        labels:
+          severity: high
+        annotations:
+          summary: "TLS certificate expiring soon"
+          description: "Certificate expires in {{ $value | humanizeDuration }}"
+
+      - alert: RedisMemoryHigh
+        expr: redis_memory_used_bytes / redis_memory_max_bytes > 0.9
+        for: 10m
+        labels:
+          severity: high
+        annotations:
+          summary: "Redis memory usage high"
+          description: "Redis memory usage is {{ $value | humanizePercentage }}"
+
+      - alert: APIAvailabilityLow
+        expr: avg_over_time(up{job="dekat-api"}[5m]) < 0.995
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API availability below SLO"
+          description: "API availability is {{ $value | humanizePercentage }} (SLO: 99.5%)"
+
+      - alert: JVMHeapHigh
+        expr: jvm_memory_used_bytes{area="heap"} / jvm_memory_max_bytes{area="heap"} > 0.85
+        for: 10m
+        labels:
+          severity: high
+        annotations:
+          summary: "JVM heap usage high"
+          description: "Heap usage is {{ $value | humanizePercentage }}"
+
+      - alert: ContainerRestarting
+        expr: increase(container_restart_count[1h]) > 3
+        for: 0m
+        labels:
+          severity: high
+        annotations:
+          summary: "Container restarting frequently"
+          description: "Container {{ $labels.name }} restarted {{ $value }} times in 1h"
+
+      - alert: OutboxEventStuck
+        expr: dekat_outbox_pending_count > 100
+        for: 15m
+        labels:
+          severity: high
+        annotations:
+          summary: "Outbox events stuck"
+          description: "{{ $value }} pending outbox events"
+
+      - alert: DLTMessagesPresent
+        expr: dekat_kafka_dlt_messages_total > 0
+        for: 0m
+        labels:
+          severity: high
+        annotations:
+          summary: "Dead letter queue messages detected"
+          description: "{{ $value }} messages in DLT"

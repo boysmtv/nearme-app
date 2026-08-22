@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary-50: oklch(0.96 0.03 250);
+  --color-primary-100: oklch(0.92 0.06 250);
+  --color-primary-200: oklch(0.84 0.12 250);
+  --color-primary-300: oklch(0.74 0.18 250);
+  --color-primary-400: oklch(0.64 0.22 250);
+  --color-primary-500: oklch(0.55 0.25 250);
+  --color-primary-600: oklch(0.47 0.25 250);
+  --color-primary-700: oklch(0.40 0.22 250);
+  --color-primary-800: oklch(0.33 0.18 250);
+  --color-primary-900: oklch(0.27 0.14 250);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: "Inter", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji",
+      "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  }
+}
+
+@layer utilities {
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+}

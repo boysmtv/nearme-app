@@ -1,0 +1,142 @@
+{
+	auto_https off
+	log {
+		output stdout
+		format json
+	}
+}
+
+# ──────────────────────── Public App ────────────────────────
+{$PUBLIC_DOMAIN} {
+	encode gzip zstd
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Permissions-Policy "accelerometer=(), camera=(), geolocation=(), microphone=(), payment=()"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://{$MINIO_HOST}; font-src 'self'; connect-src 'self' https://{$API_DOMAIN} wss://{$API_DOMAIN}; frame-ancestors 'none'"
+		Server "DEKAT"
+		-X-Powered-By
+	}
+	reverse_proxy web-public:80 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}
+
+# ──────────────────────── Provider App ────────────────────────
+{$PROVIDER_DOMAIN} {
+	encode gzip zstd
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://{$MINIO_HOST}; font-src 'self'; connect-src 'self' https://{$API_DOMAIN} wss://{$API_DOMAIN}; frame-ancestors 'none'"
+		Server "DEKAT"
+		-X-Powered-By
+	}
+	reverse_proxy web-provider:80 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}
+
+# ──────────────────────── Admin App ────────────────────────
+{$ADMIN_DOMAIN} {
+	encode gzip zstd
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://{$MINIO_HOST}; font-src 'self'; connect-src 'self' https://{$API_DOMAIN} wss://{$API_DOMAIN}; frame-ancestors 'none'"
+		Server "DEKAT"
+		-X-Powered-By
+	}
+	reverse_proxy web-admin:80 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+}
+
+# ──────────────────────── API (Blue-Green) ────────────────────────
+{$API_DOMAIN} {
+	encode gzip zstd
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		X-XSS-Protection "1; mode=block"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		Server "DEKAT"
+		-X-Powered-By
+	}
+
+	# Blue-Green routing via header
+	@blue header X-Deploy-Target blue
+	handle @blue {
+		reverse_proxy api-blue:8080 {
+			header_up X-Real-IP {remote_host}
+			header_up X-Forwarded-For {remote_host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+	reverse_proxy api-green:8080 {
+		header_up X-Real-IP {remote_host}
+		header_up X-Forwarded-For {remote_host}
+		header_up X-Forwarded-Proto {scheme}
+	}
+
+	# Rate limiting
+	@api_rate_limit {
+		rate_limit 100r/s
+	}
+	handle @api_rate_limit {
+		respond "Rate limit exceeded" 429
+	}
+
+	# Health check passthrough
+	handle /health* {
+		reverse_proxy api-green:8080
+	}
+
+	# WebSocket support
+	handle /ws* {
+		reverse_proxy api-green:8080 {
+			header_up Connection {>Connection}
+			header_up Upgrade {>Upgrade}
+		}
+	}
+}
+
+# ──────────────────────── Object Storage ────────────────────────
+{$MINIO_HOST:storage.{$DOMAIN}} {
+	encode gzip zstd
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "SAMEORIGIN"
+		Cache-Control "public, max-age=86400"
+	}
+	reverse_proxy object-storage:9000 {
+		header_up X-Real-IP {remote_host}
+	}
+}
+
+# ──────────────────────── Default (catch-all) ────────────────────────
+:80 {
+	encode gzip zstd
+	header {
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Server "DEKAT"
+	}
+	redir https://{$PUBLIC_DOMAIN}{uri} permanent
+}

@@ -1,0 +1,14 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Review - ratings & reviews'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':customer')
+    api project(':tenant')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

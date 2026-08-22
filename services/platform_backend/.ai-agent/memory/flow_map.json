@@ -1,0 +1,139 @@
+{
+  "flows": [
+    {
+      "name": "approve",
+      "entrypoints": [
+        "src/main/java/id/dekat/payment/domain/Refund.java",
+        "src/main/java/id/dekat/payment/domain/Refund.java",
+        "src/main/java/id/dekat/staff/domain/TimeOffRepository.java",
+        "src/main/java/id/dekat/tenant/application/TenantService.java",
+        "src/main/java/id/dekat/tenant/web/TenantController.java"
+      ],
+      "domain_functions": [
+        "src/main/java/id/dekat/payment/domain/Refund.java:approve",
+        "src/main/java/id/dekat/payment/domain/Refund.java:getApprovedBy",
+        "src/main/java/id/dekat/staff/domain/TimeOffRepository.java:findApprovedOverlapping",
+        "src/main/java/id/dekat/tenant/application/TenantService.java:approveTenant",
+        "src/main/java/id/dekat/tenant/web/TenantController.java:approveTenant"
+      ],
+      "tests": [],
+      "docs": [
+        "src/main/resources/application-dev.yml",
+        "src/main/resources/application-prod.yml",
+        "src/main/resources/application-staging.yml",
+        "src/main/resources/application.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "login",
+      "entrypoints": [
+        "src/main/java/id/dekat/identity/application/AuthService.java",
+        "src/main/java/id/dekat/identity/web/AuthController.java",
+        "src/main/java/id/dekat/identity/web/dto/LoginRequest.java",
+        "src/main/java/id/dekat/identity/web/dto/LoginRequest.java"
+      ],
+      "domain_functions": [
+        "src/main/java/id/dekat/identity/application/AuthService.java:login",
+        "src/main/java/id/dekat/identity/web/AuthController.java:login"
+      ],
+      "tests": [],
+      "docs": [
+        "src/main/resources/application-dev.yml",
+        "src/main/resources/application-prod.yml",
+        "src/main/resources/application-staging.yml",
+        "src/main/resources/application.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "logout",
+      "entrypoints": [
+        "src/main/java/id/dekat/identity/application/AuthService.java",
+        "src/main/java/id/dekat/identity/application/AuthService.java",
+        "src/main/java/id/dekat/identity/web/AuthController.java"
+      ],
+      "domain_functions": [
+        "src/main/java/id/dekat/identity/application/AuthService.java:logout",
+        "src/main/java/id/dekat/identity/application/AuthService.java:logoutAllDevices",
+        "src/main/java/id/dekat/identity/web/AuthController.java:logout"
+      ],
+      "tests": [],
+      "docs": [
+        "src/main/resources/application-dev.yml",
+        "src/main/resources/application-prod.yml",
+        "src/main/resources/application-staging.yml",
+        "src/main/resources/application.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "reject",
+      "entrypoints": [
+        "src/main/java/id/dekat/payment/domain/Refund.java",
+        "src/main/java/id/dekat/tenant/application/TenantService.java",
+        "src/main/java/id/dekat/tenant/web/TenantController.java"
+      ],
+      "domain_functions": [
+        "src/main/java/id/dekat/payment/domain/Refund.java:reject",
+        "src/main/java/id/dekat/tenant/application/TenantService.java:rejectTenant",
+        "src/main/java/id/dekat/tenant/web/TenantController.java:rejectTenant"
+      ],
+      "tests": [],
+      "docs": [
+        "src/main/resources/application-dev.yml",
+        "src/main/resources/application-prod.yml",
+        "src/main/resources/application-staging.yml",
+        "src/main/resources/application.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "return",
+      "entrypoints": [
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/config/SecurityConfig.java"
+      ],
+      "domain_functions": [
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/config/SecurityConfig.java:return"
+      ],
+      "tests": [],
+      "docs": [
+        "src/main/resources/application-dev.yml",
+        "src/main/resources/application-prod.yml",
+        "src/main/resources/application-staging.yml",
+        "src/main/resources/application.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "status",
+      "entrypoints": [
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/MoneyStatus.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/MoneyStatus.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxStatus.java"
+      ],
+      "domain_functions": [
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java:findByStatusOrderByCreatedAtAsc",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java:updateStatus",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java:countByStatus",
+        "src/main/java/id/dekat/booking/domain/Booking.java:getStatus",
+        "src/main/java/id/dekat/booking/domain/Booking.java:setStatus",
+        "src/main/java/id/dekat/booking/domain/BookingAssignment.java:getStatus",
+        "src/main/java/id/dekat/booking/domain/BookingHold.java:getStatus",
+        "src/main/java/id/dekat/booking/domain/BookingHoldRepository.java:findByStatus"
+      ],
+      "tests": [],
+      "docs": [
+        "src/main/resources/application-dev.yml",
+        "src/main/resources/application-prod.yml",
+        "src/main/resources/application-staging.yml",
+        "src/main/resources/application.yml"
+      ],
+      "notes": []
+    }
+  ],
+  "updated_at": "2026-08-22T17:03:17.520674+00:00"
+}

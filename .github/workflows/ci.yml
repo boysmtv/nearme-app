@@ -1,0 +1,285 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  JAVA_VERSION: '25'
+  FLUTTER_VERSION: '3.44.7'
+  NODE_VERSION: '24'
+  REGISTRY: ghcr.io
+  ORG: ${{ github.repository_owner }}
+
+permissions:
+  contents: read
+  pull-requests: read
+  security-events: write
+
+jobs:
+  # ──────────────────────── Change Detection ────────────────────────
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      flutter: ${{ steps.filter.outputs.flutter }}
+      web: ${{ steps.filter.outputs.web }}
+      infra: ${{ steps.filter.outputs.infra }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'services/platform_backend/**'
+            flutter:
+              - 'apps/mobile_*/**'
+              - 'packages/flutter_*/**'
+            web:
+              - 'apps/web_*/**'
+              - 'packages/web_*/**'
+            infra:
+              - 'infra/**'
+              - 'docker-compose*.yml'
+
+  # ──────────────────────── Backend CI ────────────────────────
+  lint-backend:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: services/platform_backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v4
+      - run: ./gradlew checkstyleMain checkstyleTest --no-daemon
+      - run: ./gradlew spotlessCheck --no-daemon
+
+  test-backend:
+    needs: lint-backend
+    if: needs.detect-changes.outputs.backend == 'true'
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18.6-alpine
+        env:
+          POSTGRES_DB: dekat_test
+          POSTGRES_USER: dekat
+          POSTGRES_PASSWORD: test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U dekat -d dekat_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:8.2-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    defaults:
+      run:
+        working-directory: services/platform_backend
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/dekat_test
+      SPRING_DATASOURCE_USERNAME: dekat
+      SPRING_DATASOURCE_PASSWORD: test_password
+      SPRING_DATA_REDIS_HOST: localhost
+      SPRING_DATA_REDIS_PORT: 6379
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: 'temurin'
+      - uses: gradle/actions/setup-gradle@v4
+      - uses: actions/cache@v4
+        with:
+          path: |
+            services/platform_backend/.gradle/caches
+            services/platform_backend/.gradle/wrapper
+          key: gradle-${{ runner.os }}-${{ hashFiles('services/platform_backend/**/*.gradle*') }}
+          restore-keys: gradle-${{ runner.os }}-
+      - run: ./gradlew test --no-daemon --ci
+      - run: ./gradlew flywayValidate --no-daemon -Pflyway.url=jdbc:postgresql://localhost:5432/dekat_test -Pflyway.user=dekat -Pflyway.password=test_password
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results
+          path: services/platform_backend/**/build/reports/tests/
+
+  # ──────────────────────── Flutter CI ────────────────────────
+  lint-flutter:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.flutter == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+        working-directory: apps/mobile_partner
+      - run: flutter pub get
+        working-directory: apps/mobile_customer
+      - run: flutter analyze
+        working-directory: apps/mobile_partner
+      - run: flutter analyze
+        working-directory: apps/mobile_customer
+
+  test-flutter:
+    needs: lint-flutter
+    if: needs.detect-changes.outputs.flutter == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - run: flutter pub get
+        working-directory: apps/mobile_partner
+      - run: flutter pub get
+        working-directory: apps/mobile_customer
+      - run: flutter test --coverage
+        working-directory: apps/mobile_partner
+      - run: flutter test --coverage
+        working-directory: apps/mobile_customer
+      - uses: codecov/codecov-action@v4
+        with:
+          files: apps/mobile_partner/coverage/lcov.info,apps/mobile_customer/coverage/lcov.info
+          flags: flutter
+          fail_ci_if_error: false
+
+  # ──────────────────────── Web CI ────────────────────────
+  lint-web:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r lint
+      - run: pnpm -r typecheck
+
+  test-web:
+    needs: lint-web
+    if: needs.detect-changes.outputs.web == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -r test -- --passWithNoTests
+      - run: pnpm -r build
+        env:
+          VITE_API_BASE_URL: http://localhost:8080
+
+  # ──────────────────────── Infrastructure Validation ────────────────────────
+  validate-compose:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate compose files
+        run: |
+          for f in infra/compose/compose.yaml infra/compose/compose.staging.yaml infra/compose/compose.production.yaml; do
+            echo "--- Validating $f ---"
+            docker compose -f "$f" config --quiet
+          done
+      - name: Lint Dockerfiles
+        uses: hadolint/hadolint-action@v3.1.0
+        with:
+          recursive: true
+          ignore: DL3008,DL3013,DL3018
+
+  # ──────────────────────── Security Scanning ────────────────────────
+  secret-scanning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependency-scanning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          ignore-unfixed: true
+
+  # ──────────────────────── Summary Gate ────────────────────────
+  ci-gate:
+    if: always()
+    needs:
+      - detect-changes
+      - lint-backend
+      - test-backend
+      - lint-flutter
+      - test-flutter
+      - lint-web
+      - test-web
+      - validate-compose
+      - secret-scanning
+      - dependency-scanning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check all jobs
+        run: |
+          echo "Backend: ${{ needs.lint-backend.result }} / ${{ needs.test-backend.result }}"
+          echo "Flutter: ${{ needs.lint-flutter.result }} / ${{ needs.test-flutter.result }}"
+          echo "Web: ${{ needs.lint-web.result }} / ${{ needs.test-web.result }}"
+          echo "Compose: ${{ needs.validate-compose.result }}"
+          echo "Secrets: ${{ needs.secret-scanning.result }}"
+          echo "Deps: ${{ needs.dependency-scanning.result }}"
+          if [[ "${{ needs.test-backend.result }}" == "failure" ]] || \
+             [[ "${{ needs.test-flutter.result }}" == "failure" ]] || \
+             [[ "${{ needs.test-web.result }}" == "failure" ]] || \
+             [[ "${{ needs.secret-scanning.result }}" == "failure" ]] || \
+             [[ "${{ needs.dependency-scanning.result }}" == "failure" ]]; then
+            exit 1
+          fi

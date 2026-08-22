@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Marketplace - multi-tenant marketplace & discovery'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':tenant')
+    api project(':catalog')
+    api project(':review')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

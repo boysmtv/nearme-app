@@ -1,0 +1,76 @@
+{
+  "updated_at": "2026-08-22T17:03:17.579992+00:00",
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\services\\platform_backend",
+  "final_project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\services\\platform_backend",
+  "dominant_language": "java",
+  "dominant_platform": "",
+  "languages": [
+    {
+      "language": "java",
+      "file_count": 149,
+      "modeling_guidance": "Prefer enums, records, dedicated service types, and explicit interfaces instead of string switches spread across the codebase.",
+      "localization_guidance": "Keep user-facing copy behind a resource, catalog, or message boundary suitable for the platform.",
+      "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
+      "documentation_topics": [
+        "Java language guide",
+        "Java enums, records, and interface design",
+        "JUnit and build-tool testing patterns",
+        "Gradle project structure and task guidance"
+      ],
+      "next_checks": [
+        "Confirm new java changes follow idiomatic modeling and naming conventions.",
+        "Review java test layout and update the closest existing test surface first.",
+        "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+        "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern."
+      ]
+    }
+  ],
+  "platforms": [],
+  "framework_hints": [
+    "gradle"
+  ],
+  "documentation_topics": [
+    "Java language guide",
+    "Java enums, records, and interface design",
+    "JUnit and build-tool testing patterns",
+    "Gradle project structure and task guidance"
+  ],
+  "next_checks": [
+    "Confirm new java changes follow idiomatic modeling and naming conventions.",
+    "Review java test layout and update the closest existing test surface first.",
+    "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+    "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern.",
+    "Model commands, routes, and events with typed abstractions native to the language/platform.",
+    "Externalize user-facing copy, status text, and errors behind a localization/resource strategy.",
+    "Keep configuration, secrets, and environment handling aligned with the platform's standard settings model.",
+    "Verify tests and docs cover the latest feature flow before promoting the next brief version.",
+    "Only promote a new brief version after the final output is runnable, tested, and safe to review or roll back.",
+    "Preserve the last known-good active version when a newer brief version still has unresolved gaps.",
+    "Do not create the next brief version until the current project version is fully implemented and has no open gaps.",
+    "If a brief still has gaps, close them in the same brief version instead of pushing them into a newer brief.",
+    "When the project supports Docker review, make the latest promoted version runnable in Docker before asking for review."
+  ],
+  "active_goals": [
+    "approve",
+    "login",
+    "logout",
+    "reject",
+    "return",
+    "status"
+  ],
+  "current_focus": {
+    "problem_statement": "",
+    "entrypoints": [
+      "src/main/java/id/dekat/access/web/RoleController.java",
+      "src/main/java/id/dekat/booking/web/BookingController.java",
+      "src/main/java/id/dekat/catalog/web/CatalogController.java",
+      "src/main/java/id/dekat/identity/web/AuthController.java",
+      "src/main/java/id/dekat/payment/web/PaymentController.java",
+      "src/main/java/id/dekat/review/web/ReviewController.java",
+      "src/main/java/id/dekat/scheduling/web/AvailabilityController.java",
+      "src/main/java/id/dekat/staff/web/StaffController.java"
+    ],
+    "contracts": [],
+    "feature_count": 6
+  }
+}

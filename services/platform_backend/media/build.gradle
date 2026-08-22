@@ -1,0 +1,12 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Media - file uploads, images, CDN'
+
+dependencies {
+    api project(':sharedkernel')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Catalog - service & product listings'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':tenant')
+    api project(':staff')
+    api project(':media')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

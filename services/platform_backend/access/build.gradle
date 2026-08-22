@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Access - RBAC, permissions, role management'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':identity')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

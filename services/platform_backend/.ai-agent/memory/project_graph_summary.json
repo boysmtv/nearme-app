@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\services\\platform_backend",
+  "updated_at": "2026-08-22T17:03:17.892965+00:00",
+  "node_count": 2243,
+  "edge_count": 4886,
+  "node_types": {
+    "Class": 73,
+    "Dto": 15,
+    "Entity": 2,
+    "Enum": 30,
+    "Field": 650,
+    "File": 149,
+    "Flow": 6,
+    "Interface": 29,
+    "Method": 1043,
+    "Module": 179,
+    "Object": 1,
+    "Package": 65,
+    "Project": 1
+  },
+  "edge_types": {
+    "DEFINED_IN": 2141,
+    "IMPLEMENTS": 6,
+    "IMPORTS": 697,
+    "PART_OF_FLOW": 56,
+    "READS": 58,
+    "USES": 1870,
+    "WRITES": 58
+  },
+  "top_flows": [
+    "approve",
+    "login",
+    "logout",
+    "reject",
+    "return",
+    "status"
+  ],
+  "top_api_routes": [],
+  "metrics": {
+    "schema_version": 1,
+    "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\services\\platform_backend",
+    "updated_at": "2026-08-22T17:03:17.775390+00:00",
+    "memory_completeness_score": 0.474,
+    "graph_coverage_score": 1.0,
+    "symbol_extraction_confidence": 1.0,
+    "api_contract_coverage": 1.0,
+    "flow_completeness_score": 1.0,
+    "test_mapping_score": 0.0,
+    "runtime_proof_score": 0.0,
+    "security_readiness_score": 0.4,
+    "hotspot_risk": "medium",
+    "blast_radius_risk": "high",
+    "release_readiness_score": 0.629,
+    "release_readiness": "ready"
+  }
+}

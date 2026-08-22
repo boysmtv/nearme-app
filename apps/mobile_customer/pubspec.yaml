@@ -1,0 +1,84 @@
+name: mobile_customer
+description: DEKAT Booking Platform - Customer Mobile App
+version: 1.0.0+1
+publish_to: 'none'
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.44.7'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Internal Packages
+  flutter_core:
+    path: ../../packages/flutter_core
+  flutter_design_system:
+    path: ../../packages/flutter_design_system
+  flutter_api_client:
+    path: ../../packages/flutter_api_client
+
+  # State Management
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+
+  # Navigation
+  go_router: ^14.8.1
+
+  # Networking
+  dio: ^5.7.0
+
+  # Serialization
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+  # Secure Storage
+  flutter_secure_storage: ^9.2.4
+
+  # Push Notifications
+  firebase_core: ^3.8.1
+  firebase_messaging: ^15.1.6
+
+  # Local Storage
+  shared_preferences: ^2.3.3
+  hive_flutter: ^1.0.0
+
+  # Image Handling
+  image_picker: ^1.1.2
+  flutter_cache_manager: ^3.4.1
+  cached_network_image: ^3.4.1
+
+  # UI Components
+  flutter_svg: ^2.0.16
+  shimmer: ^3.0.0
+  google_fonts: ^6.2.1
+  flutter_staggered_animations: ^1.1.1
+  flutter_rating_bar: ^4.0.1
+  badges: ^3.1.2
+  percent_indicator: ^4.2.3
+
+  # Utilities
+  intl: ^0.19.0
+  uuid: ^4.5.1
+  equatable: ^2.0.7
+  dartz: ^0.10.1
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.13
+  freezed: ^2.5.7
+  json_serializable: ^6.8.0
+  riverpod_generator: ^2.6.2
+  mockito: ^5.4.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/
+    - assets/icons/
+    - assets/animations/

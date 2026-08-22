@@ -1,0 +1,885 @@
+{
+  "project_name": "platform_backend",
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\services\\platform_backend",
+  "final_project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\services\\platform_backend",
+  "problem_file": "",
+  "problem_statement": "",
+  "stack": [],
+  "stack_id": "",
+  "template_id": "",
+  "platform": "",
+  "domain": "",
+  "project_type": "",
+  "build_commands": [],
+  "run_commands": [],
+  "features": [
+    "approve",
+    "login",
+    "logout",
+    "reject",
+    "return",
+    "status"
+  ],
+  "packages": [
+    "id.dekat",
+    "id.dekat.access",
+    "id.dekat.access.application",
+    "id.dekat.access.domain",
+    "id.dekat.access.web",
+    "id.dekat.audit",
+    "id.dekat.audit.application",
+    "id.dekat.audit.domain",
+    "id.dekat.booking",
+    "id.dekat.booking.application",
+    "id.dekat.booking.domain",
+    "id.dekat.booking.web",
+    "id.dekat.booking.web.dto",
+    "id.dekat.catalog",
+    "id.dekat.catalog.application",
+    "id.dekat.catalog.domain",
+    "id.dekat.catalog.web",
+    "id.dekat.catalog.web.dto",
+    "id.dekat.common",
+    "id.dekat.customer",
+    "id.dekat.identity",
+    "id.dekat.identity.application",
+    "id.dekat.identity.domain",
+    "id.dekat.identity.web",
+    "id.dekat.identity.web.dto",
+    "id.dekat.marketplace",
+    "id.dekat.media",
+    "id.dekat.notification",
+    "id.dekat.notification.application",
+    "id.dekat.notification.domain",
+    "id.dekat.payment",
+    "id.dekat.payment.application",
+    "id.dekat.payment.domain",
+    "id.dekat.payment.web",
+    "id.dekat.payment.web.dto",
+    "id.dekat.platformconfig",
+    "id.dekat.promotion",
+    "id.dekat.reporting",
+    "id.dekat.review",
+    "id.dekat.review.application",
+    "id.dekat.review.domain",
+    "id.dekat.review.web",
+    "id.dekat.scheduling",
+    "id.dekat.scheduling.application",
+    "id.dekat.scheduling.domain",
+    "id.dekat.scheduling.web",
+    "id.dekat.sharedkernel",
+    "id.dekat.sharedkernel.config",
+    "id.dekat.sharedkernel.outbox",
+    "id.dekat.staff",
+    "id.dekat.staff.application",
+    "id.dekat.staff.domain",
+    "id.dekat.staff.web",
+    "id.dekat.subscription",
+    "id.dekat.subscription.application",
+    "id.dekat.subscription.domain",
+    "id.dekat.support",
+    "id.dekat.support.application",
+    "id.dekat.support.domain",
+    "id.dekat.support.web",
+    "id.dekat.tenant",
+    "id.dekat.tenant.application",
+    "id.dekat.tenant.domain",
+    "id.dekat.tenant.web",
+    "id.dekat.tenant.web.dto"
+  ],
+  "languages": [
+    "java"
+  ],
+  "entrypoints": [
+    "src/main/java/id/dekat/access/web/RoleController.java",
+    "src/main/java/id/dekat/booking/web/BookingController.java",
+    "src/main/java/id/dekat/catalog/web/CatalogController.java",
+    "src/main/java/id/dekat/identity/web/AuthController.java",
+    "src/main/java/id/dekat/payment/web/PaymentController.java",
+    "src/main/java/id/dekat/review/web/ReviewController.java",
+    "src/main/java/id/dekat/scheduling/web/AvailabilityController.java",
+    "src/main/java/id/dekat/staff/web/StaffController.java",
+    "src/main/java/id/dekat/support/web/SupportController.java",
+    "src/main/java/id/dekat/tenant/web/TenantController.java"
+  ],
+  "final_status": "registered",
+  "mode": "factory_managed",
+  "updated_at": "2026-08-22T17:03:17.579992+00:00",
+  "source_fingerprint": {
+    "updated_at": "2026-08-22T17:03:17.637938+00:00",
+    "file_count": 153,
+    "digest": "551c33b760879670496fcf54a42ca2c396de7f1f436e73172d58a1a42565b67c",
+    "files": [
+      {
+        "path": "access/src/main/java/id/dekat/access/package-info.java",
+        "hash": "a6a4f9a382e2788ecd9d4391e85d29dd2052eae43de27b2ff3d31381e630643a",
+        "size_bytes": 508
+      },
+      {
+        "path": "audit/src/main/java/id/dekat/audit/package-info.java",
+        "hash": "e00ee54e763dc072adad0cd1f100fe28a91cade5c8b5faebe0367a79b4460fb8",
+        "size_bytes": 505
+      },
+      {
+        "path": "booking/src/main/java/id/dekat/booking/package-info.java",
+        "hash": "344fe6de49037a5227ef7971627ad236974faa93634215512bba79ef1c790818",
+        "size_bytes": 511
+      },
+      {
+        "path": "catalog/src/main/java/id/dekat/catalog/package-info.java",
+        "hash": "3d07b95a08569257b370ef217be7a4932f349c8d486721b3cfa6fe5a254f33cf",
+        "size_bytes": 511
+      },
+      {
+        "path": "customer/src/main/java/id/dekat/customer/package-info.java",
+        "hash": "d72d4b6282a12f69423117883f04c9f2e6e00407118f1f1c2021386de6826a65",
+        "size_bytes": 514
+      },
+      {
+        "path": "identity/src/main/java/id/dekat/identity/package-info.java",
+        "hash": "c0c890e33c08915f88cc78e399c30eb05dafd180bbd96eef0d94a6c021bd2b91",
+        "size_bytes": 514
+      },
+      {
+        "path": "marketplace/src/main/java/id/dekat/marketplace/package-info.java",
+        "hash": "61b6e564e79e5bd339a06f703a97fbf09b434bcd24de862f261d0a1e96c89f03",
+        "size_bytes": 523
+      },
+      {
+        "path": "media/src/main/java/id/dekat/media/package-info.java",
+        "hash": "b22aae6392b99ce2ad23adbb3d37db7f41bc760c104346f819d8d3aaf2119cef",
+        "size_bytes": 505
+      },
+      {
+        "path": "notification/src/main/java/id/dekat/notification/package-info.java",
+        "hash": "4d89fb8ed949976619ddaa1d7f4d998aa8235babb1b608c781bfa6ec0fb5912b",
+        "size_bytes": 526
+      },
+      {
+        "path": "payment/src/main/java/id/dekat/payment/package-info.java",
+        "hash": "c46b13aaaee648bd55da0dce61be516972a1be179af9a2ca243985cbdaed4af4",
+        "size_bytes": 511
+      },
+      {
+        "path": "platformconfig/src/main/java/id/dekat/platformconfig/package-info.java",
+        "hash": "e0359e122e12fc19c013ff6beebdd97e9d649de246d65b065dfb156af4db2287",
+        "size_bytes": 532
+      },
+      {
+        "path": "promotion/src/main/java/id/dekat/promotion/package-info.java",
+        "hash": "6fc67a17f30e372a3205761aa25698473276c5015b790e7e1927c456e5f4d595",
+        "size_bytes": 517
+      },
+      {
+        "path": "reporting/src/main/java/id/dekat/reporting/package-info.java",
+        "hash": "3b97f659b090d6ca5e8fe3ca2c5ad3667bc0a98d98dfd89e3f796ad295533a5f",
+        "size_bytes": 517
+      },
+      {
+        "path": "review/src/main/java/id/dekat/review/package-info.java",
+        "hash": "84d76a1590ff2ce3403f137f7471602bb2227f6232d041df7954bcb65c06d048",
+        "size_bytes": 508
+      },
+      {
+        "path": "scheduling/src/main/java/id/dekat/scheduling/package-info.java",
+        "hash": "f4041c6bc4417efff29586684cf9f2085b67dc220819a8e4ed6bfb7687e8fb13",
+        "size_bytes": 520
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/AbstractAggregateRoot.java",
+        "hash": "29a6b289ec8b59616ad4582f3ed6b4fcae71e1153faa6134cbaa9dac7e46fe57",
+        "size_bytes": 451
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/BaseEntity.java",
+        "hash": "1453c7fb131c4604c56e374f596e2e7b4be0a1db877eac4fb9333252b82961b6",
+        "size_bytes": 1605
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/Currency.java",
+        "hash": "13834ce92ab6a27af2e554b1f3c4a17d5d81066dc4f66c73ca74cf7096b18d24",
+        "size_bytes": 356
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/DomainEvent.java",
+        "hash": "0b275a560e4b8fb8fb9841d1ab9d041928e4e99a10a29c2b07c54a2d84de8f46",
+        "size_bytes": 444
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/DomainEventPublisher.java",
+        "hash": "46ecc33b85e4c9279c14e4e43da437113c87d62a3044e9617a6a4ebf28692fa5",
+        "size_bytes": 769
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/EntityId.java",
+        "hash": "24d11b376b72a2dddc8d6ef772b1786e0b25c1df377210d8d7bd8d11e58ff91f",
+        "size_bytes": 892
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/MoneyStatus.java",
+        "hash": "cad011a6bb5b0d04e51651a0ac50f3511390dc6561c167729ae53efde37fd21c",
+        "size_bytes": 198
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/ValueObject.java",
+        "hash": "4e1fc82a01e90a7b2ec10c1cc70f336243d8a35e5fcddaab7d3667785d3f90a6",
+        "size_bytes": 479
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/config/CacheConfig.java",
+        "hash": "36d15aeb56d41971ce3c015c794e01fdac6605519075e040f1a123804eacd35f",
+        "size_bytes": 1228
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/config/SecurityConfig.java",
+        "hash": "fa7c7f62dd34ea12222ca380616a8d844fdad66c26dd0a240c285174047175d5",
+        "size_bytes": 1523
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/config/WebConfig.java",
+        "hash": "593ad5ee1edaaed49bef72f30ebe90c5e739e6f94e753c9ddc02e90929fdef88",
+        "size_bytes": 1007
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEvent.java",
+        "hash": "90928e654db18e750b93a6c096648c69137d5c2d536911a9e19603e972149a9d",
+        "size_bytes": 1354
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxEventRepository.java",
+        "hash": "8cc5d5e53f5044ad13a2ff31e8ee3309a227b4e18940251b9716e481a1606218",
+        "size_bytes": 923
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxPublisher.java",
+        "hash": "f85caed610840ddf4298d108feed7798da5d93e3fbd9354f1a92a5bc5bb4b23d",
+        "size_bytes": 2292
+      },
+      {
+        "path": "sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxStatus.java",
+        "hash": "34eabfe16c85c261a9dadf4651d39acaef45fd626e40562c5de8c13493242229",
+        "size_bytes": 123
+      },
+      {
+        "path": "src/main/java/id/dekat/DeKatApplication.java",
+        "hash": "1fb115a6bb6cec53c7b3313017cd0a13deb54600802a519cd91289c55cd556b5",
+        "size_bytes": 469
+      },
+      {
+        "path": "src/main/java/id/dekat/access/application/AuthorizationService.java",
+        "hash": "2816bf9811735163c9cf3e9d6ab150b19cffd194b7dbb138b376587e3c09b91d",
+        "size_bytes": 2179
+      },
+      {
+        "path": "src/main/java/id/dekat/access/domain/Permission.java",
+        "hash": "bf3b864888fcdab22feab433268f5dfd38b0c02242fb3e60b9a80a5a9086e90a",
+        "size_bytes": 768
+      },
+      {
+        "path": "src/main/java/id/dekat/access/domain/PermissionRepository.java",
+        "hash": "d2e0b0f56b91cfad87f6d81d49f3f8cf3e171561039cbbed53376fd60cc576ca",
+        "size_bytes": 413
+      },
+      {
+        "path": "src/main/java/id/dekat/access/domain/Role.java",
+        "hash": "ae87b541de7f966de003799210127754d89475c193bc7e0d185e898864a615ef",
+        "size_bytes": 854
+      },
+      {
+        "path": "src/main/java/id/dekat/access/domain/RoleAssignment.java",
+        "hash": "c41ba14987dde32fd1264dcfb626201cec95c07a2f30b88d745ef565ecaeaef8",
+        "size_bytes": 896
+      },
+      {
+        "path": "src/main/java/id/dekat/access/domain/RoleRepository.java",
+        "hash": "5e1896295f1eef42776cf229150db04c551aae51ab3a108e583855a6e5d8e490",
+        "size_bytes": 364
+      },
+      {
+        "path": "src/main/java/id/dekat/access/web/RoleController.java",
+        "hash": "271b2fe54f8f301f8da18c23db489ba13dd6a2719b786fd271ddb984d409c3e3",
+        "size_bytes": 1710
+      },
+      {
+        "path": "src/main/java/id/dekat/audit/application/AuditService.java",
+        "hash": "7f9e344b075197a2fb72950c1cd0007aab3584922b6fa767b6a935650c1d0cb9",
+        "size_bytes": 1949
+      },
+      {
+        "path": "src/main/java/id/dekat/audit/domain/AuditLog.java",
+        "hash": "445fe504156c032c615df0aa6983fa3dfb6690fc850522c9ef1ab003c7590c53",
+        "size_bytes": 1497
+      },
+      {
+        "path": "src/main/java/id/dekat/audit/domain/AuditRepository.java",
+        "hash": "755d434d94de3d834d425941711d4b2dc0c44dd1801d724a81cb1f8160ec7fcc",
+        "size_bytes": 875
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/application/BookingService.java",
+        "hash": "e6b4bdc99aee39811de4143d7a9b11109fc92685b9a9b806a14dbc9b8bf85baf",
+        "size_bytes": 6566
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/Booking.java",
+        "hash": "34b0c6cf6ff314dfcc68053b21fcce5251fef0cdfcfa5cd7bf51ec24424aabf0",
+        "size_bytes": 8309
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/BookingAssignment.java",
+        "hash": "a3bf202dcf229c7f608ce90442a88ed2816af5342d0b4c6be6b96f863590fda2",
+        "size_bytes": 1786
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/BookingHold.java",
+        "hash": "1770c38bd36ae580cc970a351507cf443d98dbc1aac85405a281508f501412f1",
+        "size_bytes": 2474
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/BookingHoldRepository.java",
+        "hash": "4bc961289b7754f3bbfadc5acba08edb94768342a190bbff7b9dbefe0d975e13",
+        "size_bytes": 1304
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/BookingItem.java",
+        "hash": "04c70fb36b7469d2c348dfcb81c894f32358db0dc355c654def213da243ced97",
+        "size_bytes": 1782
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/BookingRepository.java",
+        "hash": "d6b6c70317b7f149c592e858cd614d7728c170fbbea891dde884b0aefa7f3fbe",
+        "size_bytes": 1820
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/BookingStatus.java",
+        "hash": "dacd1359d2942abadfdca23261acee3301d1e36f5be630c027e913f7f3f48d08",
+        "size_bytes": 261
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/BookingStatusHistory.java",
+        "hash": "fb8af4668c60c7ff7b6e1717b47bb4a55fdc0e4d14debc64c41545a99e0d99ab",
+        "size_bytes": 1781
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/BookingStatusHistoryRepository.java",
+        "hash": "ba498a6c7e18f65215a8fcd8d806a0b8a8df57afda6bcdc6596f63e3c0e8e58c",
+        "size_bytes": 392
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/domain/ServiceMode.java",
+        "hash": "148f7ea7d763df20ed3a656f8b718f19dd5c090cff486c2223431715ff4bf441",
+        "size_bytes": 107
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/web/BookingController.java",
+        "hash": "f35aaeb290873eea9680843c5b6bf6139c68d7f9b440e4958d64dfe48823a6fb",
+        "size_bytes": 3772
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/web/dto/BookingResponse.java",
+        "hash": "12645a3c572f87bdf4c88a8477f48d626902497d04a23adb28112697d4510a4d",
+        "size_bytes": 4590
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/web/dto/CreateBookingRequest.java",
+        "hash": "f6718645d4ef2b6d8cb2e5d64f8380d5faee697572dff2b67374155f0ceefd05",
+        "size_bytes": 1949
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/web/dto/CreateHoldRequest.java",
+        "hash": "1eb8a04d7a065007299cc7242333fd7cb0049a903af89e399884a1a4ee6d70a6",
+        "size_bytes": 1544
+      },
+      {
+        "path": "src/main/java/id/dekat/booking/web/dto/RescheduleRequest.java",
+        "hash": "1a96c69799cfce3d0b5db7076a0e45c3f0dd911cf1a9c8f08ae4dd0842ef07bb",
+        "size_bytes": 984
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/application/CatalogService.java",
+        "hash": "cce67de549393846c69bd93702a3319ab1b1fb3f55e480e89b811a28b15d96a7",
+        "size_bytes": 6850
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/domain/CategoryRepository.java",
+        "hash": "d7a84977631b75555fa54e5b88bdf0a7a33b412d77ea29076b0101a391d9a544",
+        "size_bytes": 527
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/domain/PriceType.java",
+        "hash": "1df1a71e4e11252f2b0f7b12a6b2a6099aefaa0709b52b6d0cc92e28d4c8fc8d",
+        "size_bytes": 145
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/domain/ServiceAddon.java",
+        "hash": "d9c5cc96ceca456544a616d57f93c34a5e5409969ad46a4ce2a8c0ee11b3cb40",
+        "size_bytes": 3227
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/domain/ServiceCategory.java",
+        "hash": "d4264c4b6e261fd03b34e1af2bb6c283435dd6564892d133f34360063db7e7dc",
+        "size_bytes": 3217
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/domain/ServiceItem.java",
+        "hash": "bb003039d2534adfcceae554522dfeefeb61c3962656a4090cc304e1251cd365",
+        "size_bytes": 7586
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/domain/ServiceRepository.java",
+        "hash": "2c962913b3aab5e0db5cbdbccaafacf2467a4e18fa144275d835bdf8825de58d",
+        "size_bytes": 680
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/domain/ServiceVariant.java",
+        "hash": "663e3718c5d545d1a1981b2e66a14fe40074f238f1423cdad32b26ce0e185f35",
+        "size_bytes": 2818
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/web/CatalogController.java",
+        "hash": "378c569c2f40a56703896c32eac755ab80fb7a453c465e7853c63203edf3dec1",
+        "size_bytes": 2366
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/web/dto/ServiceRequest.java",
+        "hash": "9a59ceb4588826ecfc8b0e8a1f136b49d13aea2198ab6295d90b54d29a466d65",
+        "size_bytes": 2911
+      },
+      {
+        "path": "src/main/java/id/dekat/catalog/web/dto/ServiceResponse.java",
+        "hash": "217d72a5966f04565008bbcc548d51a99b7f4e0fff90978cb3186b8f5be7bbed",
+        "size_bytes": 3382
+      },
+      {
+        "path": "src/main/java/id/dekat/common/IdempotencyException.java",
+        "hash": "a83deccef7349668f355839d544eb68adaa449f01aa383a5ff3ed4092affb949",
+        "size_bytes": 169
+      },
+      {
+        "path": "src/main/java/id/dekat/common/JsonbMapConverter.java",
+        "hash": "0297d3bcc3d027bd64fc7d031c3ca807e1abf5c6d91883997bd51fa2344400a1",
+        "size_bytes": 1119
+      },
+      {
+        "path": "src/main/java/id/dekat/common/NotFoundException.java",
+        "hash": "59fb62cfc07a5ca248b4af208c81829a3256b2b6f7d047bcc179ea470a45bc15",
+        "size_bytes": 163
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/application/AuthService.java",
+        "hash": "0fa7fcd6b038add9fc46fd689fb54cb53a583c4212357e45040c2b4482eb417c",
+        "size_bytes": 4060
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/application/JwtTokenProvider.java",
+        "hash": "ce22fcc3dc82fa5496376c4764b50e311a20bd76000b94a29ee1f01ce74a832c",
+        "size_bytes": 2850
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/domain/MfaFactor.java",
+        "hash": "2d0fa633a5fef6df48e3d1c9e43b7a611280cca2cc5f2981d47ff2e2fe579f0e",
+        "size_bytes": 1054
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/domain/OtpPurpose.java",
+        "hash": "c3ac64b95327d4c59038310d40982735561399f36989757c3f71084c52f59282",
+        "size_bytes": 126
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/domain/Session.java",
+        "hash": "29233d9da5ad4aea9ee934820884d34bc188e462ef5c200e2a480cbc20afcfb3",
+        "size_bytes": 1151
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/domain/SessionRepository.java",
+        "hash": "2774e1a474454f166f3b06849479c85ae13549ab8ef849dd9d4b4752252b100c",
+        "size_bytes": 432
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/domain/User.java",
+        "hash": "b020be128a42729405e2577b11b79679e5d75760cc92bc4884ad2a61fffe0333",
+        "size_bytes": 1231
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/domain/UserRepository.java",
+        "hash": "ff3aa026f59e4eda5a7ffeefea88bda8b7ae73492d5da38293fb265ed0e85922",
+        "size_bytes": 459
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/domain/UserStatus.java",
+        "hash": "31d987e55dbdaace425e45dd7f5dae0fdd1b75d3bb998b6ab31ec95f387423fb",
+        "size_bytes": 102
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/web/AuthController.java",
+        "hash": "d6bd247f537f1bec3ee28703e7e85879df9aca5fa6e245a0271f8cd58df4a93f",
+        "size_bytes": 1876
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/web/dto/LoginRequest.java",
+        "hash": "9affde06a0c8b49fc03877708dbeddde6eebc8af912589c26012fd4b995f2812",
+        "size_bytes": 519
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/web/dto/OtpRequest.java",
+        "hash": "e66693c67a46ef51cc8e69bba07ec76ab92c81980d48f668f390c24ca22dcf03",
+        "size_bytes": 635
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/web/dto/RegisterRequest.java",
+        "hash": "183564fb94c1ff0a470f6dbc7f7854114efdce139f4a71e74537ff14fc820306",
+        "size_bytes": 953
+      },
+      {
+        "path": "src/main/java/id/dekat/identity/web/dto/TokenResponse.java",
+        "hash": "4787bf1e02ee1ad5520a10b53bb868d0d32677806bccf0b58e0ea0a6a9f0e711",
+        "size_bytes": 356
+      },
+      {
+        "path": "src/main/java/id/dekat/notification/application/NotificationService.java",
+        "hash": "073014183b93e392e1f1bb7fcd44fed164d8660abf017e8ec8ea432eb805d48e",
+        "size_bytes": 2927
+      },
+      {
+        "path": "src/main/java/id/dekat/notification/application/NotificationWorker.java",
+        "hash": "d147b8073c83438d898d9cc05baa6fda8b06fd568f99f5f52dc9187b4934723d",
+        "size_bytes": 1802
+      },
+      {
+        "path": "src/main/java/id/dekat/notification/domain/DeviceToken.java",
+        "hash": "540dbc801685c06479e61ad824b6483f082ac636a2a7c07a69d302eb15ff150e",
+        "size_bytes": 1086
+      },
+      {
+        "path": "src/main/java/id/dekat/notification/domain/DeviceTokenRepository.java",
+        "hash": "cc73a3f345ff4d489f618e8e3eb6193b0cde4d4aed081e1c6f95a28b900733ca",
+        "size_bytes": 408
+      },
+      {
+        "path": "src/main/java/id/dekat/notification/domain/NotificationDelivery.java",
+        "hash": "e90ca7230bd39c543ad410ff06e0083ffd847a04da4f82e9d68850980c2309d9",
+        "size_bytes": 1464
+      },
+      {
+        "path": "src/main/java/id/dekat/notification/domain/NotificationRepository.java",
+        "hash": "75717ac245767a689d1d65d65ca3ec66849fec205b1dfd7495c61f70f50d4400",
+        "size_bytes": 843
+      },
+      {
+        "path": "src/main/java/id/dekat/notification/domain/NotificationTemplate.java",
+        "hash": "7fb2193aa74eeb7b59c445bfa5ed1e055cbf67fdd18fcab540f5510954bd14bf",
+        "size_bytes": 1262
+      },
+      {
+        "path": "src/main/java/id/dekat/notification/domain/NotificationTemplateRepository.java",
+        "hash": "52ce07db80d146c6940dd79c86a1ea2e92eb9f9b10233c372ceef1aaebf7cf09",
+        "size_bytes": 452
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/application/PaymentService.java",
+        "hash": "2369485b5bc641d7cef1319c3580197e755df6e1c8b6ecb5ee438638944d62b1",
+        "size_bytes": 6758
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/LedgerEntry.java",
+        "hash": "79947181a4ada1a98d3fcc69ce92579ae69dce4b1ce3bbaa7bc824f7c69a682c",
+        "size_bytes": 1736
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/LedgerEntryRepository.java",
+        "hash": "d11657448daad4bcfea30cf6b1efd5acd4feea08074907cdd1acda733331370f",
+        "size_bytes": 398
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/PaymentIntent.java",
+        "hash": "9f64a34bf9a857ede89adc85025a21436bc5df8a0002d6f31afda758dddf3f96",
+        "size_bytes": 3326
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/PaymentRepository.java",
+        "hash": "23a12d023f919b04eb4916a5dbdbcf5603c73b9164d48b9dee9babcab8a03f53",
+        "size_bytes": 544
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/PaymentStatus.java",
+        "hash": "ed64610143a1fb05319f54ab324100393f3eab1b6f101734609b8ca0e71b09cb",
+        "size_bytes": 173
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/PaymentTransaction.java",
+        "hash": "42af63b90703f26f42275bdf10866583d767cfc59b430a9914aa5bc1bf9efd48",
+        "size_bytes": 2252
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/PaymentTransactionRepository.java",
+        "hash": "f82c83900a9bd931212f87df264d3ab744038c5c3ba24d8103772c901efd8d46",
+        "size_bytes": 378
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/Refund.java",
+        "hash": "42e4571acbaf67f273cb972d78442f60840d41ff4eb3d6346833a0f2ae0dd4b2",
+        "size_bytes": 2191
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/domain/RefundRepository.java",
+        "hash": "ed25d62110abeb83691b1a1dc28e7a15e0daac6acc68f0e37cf1ea657ebd2907",
+        "size_bytes": 454
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/web/PaymentController.java",
+        "hash": "8a8fa593493c6444e6a7318f8c239c4311a2f8b3b05bf40ef516117eb35a16c5",
+        "size_bytes": 1749
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/web/dto/PaymentIntentRequest.java",
+        "hash": "d14dc824536ebf265e9be1dc86f08072427ef29e0e59ef74ae0aca8ec23c682a",
+        "size_bytes": 823
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/web/dto/PaymentResponse.java",
+        "hash": "cb968c68f843514c86cc8884a985d24d4038a668fd2a9785af9649781ba79d7a",
+        "size_bytes": 1912
+      },
+      {
+        "path": "src/main/java/id/dekat/payment/web/dto/WebhookEvent.java",
+        "hash": "8a733b7f91ce159342558b3394325c1082bc575820700e1b7721fbcac33ff8f7",
+        "size_bytes": 928
+      },
+      {
+        "path": "src/main/java/id/dekat/review/application/ReviewService.java",
+        "hash": "9124873dcbc7cd6d51831453d3bf925c163491951c01c75e371574282f59a5ef",
+        "size_bytes": 2314
+      },
+      {
+        "path": "src/main/java/id/dekat/review/domain/Review.java",
+        "hash": "d594d88362dd38193d4babad4621d039949f9ebe0c8ced7bc8f3271fae5ed788",
+        "size_bytes": 1409
+      },
+      {
+        "path": "src/main/java/id/dekat/review/domain/ReviewRepository.java",
+        "hash": "57164e635d5c0fed27328f33866e420851e8619d387f2231bc73e98f39066905",
+        "size_bytes": 797
+      },
+      {
+        "path": "src/main/java/id/dekat/review/web/ReviewController.java",
+        "hash": "99e688696cd5c159cdeb10b8927f203ac2f24be7fca2a09b4e838dfdfe3bdef9",
+        "size_bytes": 1450
+      },
+      {
+        "path": "src/main/java/id/dekat/scheduling/application/AvailabilityService.java",
+        "hash": "0b0265aefadcff384e6762201ee99b14d42d1eb4ec08d93c00cf3bcad0211785",
+        "size_bytes": 4173
+      },
+      {
+        "path": "src/main/java/id/dekat/scheduling/domain/AvailabilityRule.java",
+        "hash": "13912b74707f2a938c3a471908f216ebdf44dff151aca41fce2c32495115e0c6",
+        "size_bytes": 1207
+      },
+      {
+        "path": "src/main/java/id/dekat/scheduling/domain/AvailabilitySlot.java",
+        "hash": "35662b54e62ce9975ff35fe5634a2f2b1db07e3e2b148a937663da3f3cab136e",
+        "size_bytes": 348
+      },
+      {
+        "path": "src/main/java/id/dekat/scheduling/domain/SchedulingRepository.java",
+        "hash": "ecb8b3e8bf7f6f7636193d49d54072c14166db08c51676bbebcce6782c0f1346",
+        "size_bytes": 1304
+      },
+      {
+        "path": "src/main/java/id/dekat/scheduling/web/AvailabilityController.java",
+        "hash": "fde29a59fb0dca408697d3d6d939a16523c3e1c35f93df9c9e8c94c046005aa4",
+        "size_bytes": 1615
+      },
+      {
+        "path": "src/main/java/id/dekat/staff/application/StaffService.java",
+        "hash": "14d2aed2748e0dbb867361c2d28a9449e939de08019d187c23199191153591f1",
+        "size_bytes": 2773
+      },
+      {
+        "path": "src/main/java/id/dekat/staff/domain/Staff.java",
+        "hash": "f75b7597267e32b2aa7d7215bde9bf478e08e6be9834bbadc22beb81c254b66b",
+        "size_bytes": 1594
+      },
+      {
+        "path": "src/main/java/id/dekat/staff/domain/StaffRepository.java",
+        "hash": "6115ff05124fadc3c9da543464b7142ea2c883f92677aac2f8323e46e8bbe7f5",
+        "size_bytes": 865
+      },
+      {
+        "path": "src/main/java/id/dekat/staff/domain/StaffSchedule.java",
+        "hash": "282aeda072ae129278bee496768c0c268928b42fe39685d7be253f3a777bc919",
+        "size_bytes": 1042
+      },
+      {
+        "path": "src/main/java/id/dekat/staff/domain/StaffScheduleRepository.java",
+        "hash": "3e81edfbf017a30045cf2bc1ea185f0561cd9188f3a6e002b2220f32244b1e97",
+        "size_bytes": 530
+      },
+      {
+        "path": "src/main/java/id/dekat/staff/domain/TimeOff.java",
+        "hash": "1e37de5f5479a319994d805110620790d190b50cf74f7bb8a33f1da2a1f8b770",
+        "size_bytes": 1211
+      },
+      {
+        "path": "src/main/java/id/dekat/staff/domain/TimeOffRepository.java",
+        "hash": "8d590c33d3c45dee85a74df300ce597a6f624133115bae7b08c28b983c52cfe4",
+        "size_bytes": 902
+      },
+      {
+        "path": "src/main/java/id/dekat/staff/web/StaffController.java",
+        "hash": "af60b2f8bbcc8b2fe07a6908afb78783a0236584e2673b8cdf5b827de85318a6",
+        "size_bytes": 1969
+      },
+      {
+        "path": "src/main/java/id/dekat/subscription/application/SubscriptionService.java",
+        "hash": "70dbde23ae7963c4226b28ada0cfa24eb21750bb5ac2ee273f6c993362d7a26a",
+        "size_bytes": 2585
+      },
+      {
+        "path": "src/main/java/id/dekat/subscription/domain/Plan.java",
+        "hash": "84cf0baaba35d55f0793c316bf6130d45e5ad1e0b4114f588fe19cb7943196e7",
+        "size_bytes": 1548
+      },
+      {
+        "path": "src/main/java/id/dekat/subscription/domain/PlanRepository.java",
+        "hash": "54cbffeee549c741819bff44ecdf16100a9fe465aa1e37eb1605478075bbde58",
+        "size_bytes": 402
+      },
+      {
+        "path": "src/main/java/id/dekat/subscription/domain/Subscription.java",
+        "hash": "bbc3fa42bdde28d5be3f37c0e8587e23cffc9db10262795ffa8ad8d030aabfd0",
+        "size_bytes": 1480
+      },
+      {
+        "path": "src/main/java/id/dekat/subscription/domain/SubscriptionRepository.java",
+        "hash": "4200486c007866b721dcdea0eb91c783e511a3ab99bdd16f384323fcfc96f226",
+        "size_bytes": 716
+      },
+      {
+        "path": "src/main/java/id/dekat/support/application/SupportService.java",
+        "hash": "e399e74d5ecd37c4be9f95f1d6b016bdf4138cb6a476bcbb586cc3577a205562",
+        "size_bytes": 3007
+      },
+      {
+        "path": "src/main/java/id/dekat/support/domain/CaseEvent.java",
+        "hash": "890d400f8eaecee3cc6e7247420d0f84d46927c15ce654aa92110fda1b8f4a7a",
+        "size_bytes": 1100
+      },
+      {
+        "path": "src/main/java/id/dekat/support/domain/CaseEventRepository.java",
+        "hash": "5561278970b05f020b76382cccf6f51759d0ab7e138245897dbb90ba732260a4",
+        "size_bytes": 353
+      },
+      {
+        "path": "src/main/java/id/dekat/support/domain/SupportCase.java",
+        "hash": "38e2a350e30a6263005a2e1873fba7d1498477efd3510761bde8c9e72a1572a7",
+        "size_bytes": 1687
+      },
+      {
+        "path": "src/main/java/id/dekat/support/domain/SupportRepository.java",
+        "hash": "7b71dda69abe3f8b3e6830f5ac587b5349ac44fc5e9ace559c9da796025934da",
+        "size_bytes": 528
+      },
+      {
+        "path": "src/main/java/id/dekat/support/web/SupportController.java",
+        "hash": "cf4fa8b47cbb1426e60709522197ac62af76ad21c2f9fabf47f7fb06fb2173e3",
+        "size_bytes": 1738
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/application/TenantService.java",
+        "hash": "b9298b04235024ecef7638ab8b6a9821b89ef6dfe9d48f16339059f8d54a47b1",
+        "size_bytes": 7001
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/domain/Business.java",
+        "hash": "33f11f3252221bb28bb52f73b8a751eb65bce2065d6fd729a4e5eb03131654e2",
+        "size_bytes": 2811
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/domain/Location.java",
+        "hash": "91bf049d18111281ab90d9fd7dcf46190dae80ef61ca738cffb18975b1a3b654",
+        "size_bytes": 5128
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/domain/LocationRepository.java",
+        "hash": "fe604761f757cc9b6fe2584270ab3adf15866ea2e49b8ca8544baf1ee17316c4",
+        "size_bytes": 408
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/domain/Tenant.java",
+        "hash": "12bfb8d1b2098c88018e406fa6191da6d045d4cd20df14fd6305aca7aaf675d9",
+        "size_bytes": 4075
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/domain/TenantRepository.java",
+        "hash": "dc3da54f85d26cb634378cb2482159f05d116cdbb3e142a2eab037c5e1667e8a",
+        "size_bytes": 452
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/domain/VerificationStatus.java",
+        "hash": "50e62fe07bbe92dfdc583474bf9c247fdc6c39f6015806581b623bcb0cc459cd",
+        "size_bytes": 154
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/web/TenantController.java",
+        "hash": "4884bc53a69fe67e9b1a6a167b8ae746713c044a3d05947404088fa86979490a",
+        "size_bytes": 3874
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/web/dto/CreateTenantRequest.java",
+        "hash": "44b0958fb0555a4a99f8d693c089d26648a21b21ec512682e38b86ff1d2f8421",
+        "size_bytes": 1473
+      },
+      {
+        "path": "src/main/java/id/dekat/tenant/web/dto/LocationRequest.java",
+        "hash": "5a78efbda8bd33e4b4f1150a5ba5362545de3b13cc07618fc5c887d66e4b30b2",
+        "size_bytes": 1914
+      },
+      {
+        "path": "src/main/resources/application-dev.yml",
+        "hash": "15c8e20b6834ea173ef912735fb57051b22452c1a92b1e547ec10a3f9aef3fde",
+        "size_bytes": 1822
+      },
+      {
+        "path": "src/main/resources/application-prod.yml",
+        "hash": "91f6804d4213854095301dae18318efaf8e3c94d1f7e01450d3c1bbd25cde645",
+        "size_bytes": 1520
+      },
+      {
+        "path": "src/main/resources/application-staging.yml",
+        "hash": "f27c8a05b496eb7e779b7e560db6d4b78ed4708e1575a2a6bc9377d7c739451c",
+        "size_bytes": 931
+      },
+      {
+        "path": "src/main/resources/application.yml",
+        "hash": "b7aeefd981959570a2daa2a4d1586088596f7789a36028db9827467768fe3027",
+        "size_bytes": 2176
+      },
+      {
+        "path": "staff/src/main/java/id/dekat/staff/package-info.java",
+        "hash": "fe94ca31602cebf52682934806992044318d66a03b9f06a6bdcf0f3ed65d8af4",
+        "size_bytes": 505
+      },
+      {
+        "path": "subscription/src/main/java/id/dekat/subscription/package-info.java",
+        "hash": "15522bd0da9ad31e6e1614aa026398ed51b63aca366f1472db866d26a28f7ac4",
+        "size_bytes": 526
+      },
+      {
+        "path": "support/src/main/java/id/dekat/support/package-info.java",
+        "hash": "340ac710be153236c27f2ac786a126a6fc791252505ed4dc1ac2f8948582e3d4",
+        "size_bytes": 511
+      },
+      {
+        "path": "tenant/src/main/java/id/dekat/tenant/package-info.java",
+        "hash": "ccee751fb1e286ffccc369a767ceca8b314d0ea4f852a9a4e3b0a99d52408981",
+        "size_bytes": 508
+      }
+    ]
+  },
+  "registration": {
+    "source": "project_registration",
+    "actor": "",
+    "recorded_at": "2026-08-22T17:03:17.637938+00:00"
+  }
+}

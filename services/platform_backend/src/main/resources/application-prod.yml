@@ -1,0 +1,81 @@
+# ===== Production Profile =====
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT:5432}/${DB_NAME:dekat}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 50
+          fetch_size: 100
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD}
+      lettuce:
+        pool:
+          max-active: 32
+          max-idle: 16
+          min-idle: 4
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BROKERS}
+    producer:
+      acks: all
+      retries: 5
+      properties:
+        max.block.ms: 5000
+        linger.ms: 20
+        batch.size: 65536
+    consumer:
+      group-id: dekat-prod
+      auto-offset-reset: latest
+      properties:
+        max.poll.records: 500
+
+  cache:
+    type: redis
+    redis:
+      time-to-live: 300000
+
+logging:
+  level:
+    id.dekat: WARN
+    org.springframework.modulith: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: ERROR
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+      roles: ADMIN
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+server:
+  compression:
+    enabled: true
+  http2:
+    enabled: true

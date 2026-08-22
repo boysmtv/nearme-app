@@ -1,0 +1,138 @@
+{
+  "id": null,
+  "title": "DEKAT - Infrastructure",
+  "tags": ["dekat", "infrastructure"],
+  "timezone": "Asia/Jakarta",
+  "refresh": "30s",
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "API Request Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        { "expr": "sum(rate(http_server_requests_total[5m]))", "legendFormat": "req/s" }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "API Error Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        { "expr": "sum(rate(http_server_requests_total{status=~\"5..\"}[5m])) / sum(rate(http_server_requests_total[5m])) * 100", "legendFormat": "Error %" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "API Response Time p95",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le))", "legendFormat": "p95" },
+        { "expr": "histogram_quantile(0.50, sum(rate(http_server_requests_seconds_bucket[5m])) by (le))", "legendFormat": "p50" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "id": 4,
+      "title": "JVM Heap Memory",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        { "expr": "jvm_memory_used_bytes{area=\"heap\"}", "legendFormat": "Used" },
+        { "expr": "jvm_memory_max_bytes{area=\"heap\"}", "legendFormat": "Max" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "id": 5,
+      "title": "PostgreSQL Connections",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 16 },
+      "targets": [
+        { "expr": "pg_stat_activity_count", "legendFormat": "Active" },
+        { "expr": "pg_settings_max_connections", "legendFormat": "Max" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "PostgreSQL Cache Hit Ratio",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 16 },
+      "targets": [
+        { "expr": "sum(pg_stat_database_blks_hit) / (sum(pg_stat_database_blks_hit) + sum(pg_stat_database_blks_read)) * 100" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent", "thresholds": { "steps": [
+        { "value": 0, "color": "red" },
+        { "value": 95, "color": "yellow" },
+        { "value": 99, "color": "green" }
+      ]}}}
+    },
+    {
+      "id": 7,
+      "title": "Redis Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 16 },
+      "targets": [
+        { "expr": "redis_memory_used_bytes", "legendFormat": "Used" },
+        { "expr": "redis_memory_max_bytes", "legendFormat": "Max" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    },
+    {
+      "id": 8,
+      "title": "Redis Hit Ratio",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 24 },
+      "targets": [
+        { "expr": "redis_keyspace_hits_total / (redis_keyspace_hits_total + redis_keyspace_misses_total) * 100" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" } }
+    },
+    {
+      "id": 9,
+      "title": "Kafka Consumer Lag",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 24 },
+      "targets": [
+        { "expr": "kafka_consumer_lag", "legendFormat": "{{topic}}-{{group}}" }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Disk Usage",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 24 },
+      "targets": [
+        { "expr": "(node_filesystem_size_bytes - node_filesystem_avail_bytes) / node_filesystem_size_bytes * 100" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent", "thresholds": { "steps": [
+        { "value": 0, "color": "green" },
+        { "value": 70, "color": "yellow" },
+        { "value": 85, "color": "red" }
+      ]}}}
+    },
+    {
+      "id": 11,
+      "title": "Container CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 32 },
+      "targets": [
+        { "expr": "rate(container_cpu_usage_seconds_total[5m]) * 100", "legendFormat": "{{name}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" } }
+    },
+    {
+      "id": 12,
+      "title": "Container Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 32 },
+      "targets": [
+        { "expr": "container_memory_usage_bytes", "legendFormat": "{{name}}" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" } }
+    }
+  ]
+}

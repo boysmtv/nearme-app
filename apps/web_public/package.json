@@ -1,0 +1,35 @@
+{
+  "name": "@dekat/web-public",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@dekat/web-ui": "workspace:*",
+    "@dekat/web-api-client": "workspace:*",
+    "@dekat/web-config": "workspace:*",
+    "@tanstack/react-query": "^5.62.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-hook-form": "^7.54.0",
+    "react-router-dom": "^7.1.0",
+    "zod": "^3.24.0",
+    "@hookform/resolvers": "^3.9.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^4.4.0",
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.5.0",
+    "tailwindcss": "^4.3.0",
+    "typescript": "^5.7.0",
+    "vite": "^8.1.0"
+  }
+}

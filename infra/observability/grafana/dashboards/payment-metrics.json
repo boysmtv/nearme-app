@@ -1,0 +1,101 @@
+{
+  "id": null,
+  "title": "DEKAT - Payment Metrics",
+  "tags": ["dekat", "payment"],
+  "timezone": "Asia/Jakarta",
+  "refresh": "30s",
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Payment Success Rate",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(dekat_payment_status_total{status=\"PAID\"}[1h])) / sum(rate(dekat_payment_status_total[1h])) * 100"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": { "steps": [
+            { "value": 0, "color": "red" },
+            { "value": 95, "color": "yellow" },
+            { "value": 99, "color": "green" }
+          ]}
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Payment Processing Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 16, "x": 8, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, sum(rate(dekat_payment_processing_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p50"
+        },
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(dekat_payment_processing_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p95"
+        },
+        {
+          "expr": "histogram_quantile(0.99, sum(rate(dekat_payment_processing_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" } }
+    },
+    {
+      "id": 3,
+      "title": "Revenue by Day",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(increase(dekat_payment_amount_total{status=\"PAID\"}[1d]))",
+          "legendFormat": "Revenue (IDR)"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "currencyIDR" } }
+    },
+    {
+      "id": 4,
+      "title": "Refund Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(dekat_refund_created_total[1h])) / sum(rate(dekat_payment_status_total{status=\"PAID\"}[1h])) * 100",
+          "legendFormat": "Refund Rate %"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Payments by Gateway",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum by (gateway) (dekat_payment_status_total{status=\"PAID\"})",
+          "legendFormat": "{{gateway}}"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Failed Payments",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum(rate(dekat_payment_status_total{status=\"FAILED\"}[1h])) * 3600",
+          "legendFormat": "Failed/hour"
+        }
+      ]
+    }
+  ]
+}

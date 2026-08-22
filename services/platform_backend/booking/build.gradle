@@ -1,0 +1,17 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Booking - reservation lifecycle'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':tenant')
+    api project(':customer')
+    api project(':catalog')
+    api project(':scheduling')
+    api project(':staff')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

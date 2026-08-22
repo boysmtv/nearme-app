@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api.dekat.id/schemas/events/envelope.json",
+  "type": "object",
+  "required": ["event_id", "event_type", "event_version", "occurred_at", "producer", "tenant_id", "aggregate_type", "aggregate_id", "data"],
+  "properties": {
+    "event_id": {"type": "string", "format": "uuid"},
+    "event_type": {"type": "string"},
+    "event_version": {"type": "integer", "minimum": 1},
+    "occurred_at": {"type": "string", "format": "date-time"},
+    "producer": {"type": "string"},
+    "tenant_id": {"type": "string", "format": "uuid"},
+    "aggregate_type": {"type": "string", "enum": ["booking", "payment", "provider", "catalog", "schedule", "customer", "review", "subscription"]},
+    "aggregate_id": {"type": "string", "format": "uuid"},
+    "correlation_id": {"type": "string", "format": "uuid"},
+    "causation_id": {"type": "string", "format": "uuid"},
+    "traceparent": {"type": "string"},
+    "data": {"type": "object"}
+  }
+}

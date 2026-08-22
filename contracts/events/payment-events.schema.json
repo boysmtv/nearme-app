@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api.dekat.id/schemas/events/payment-events.json",
+  "definitions": {
+    "payment_status": {
+      "type": "string",
+      "enum": ["pending", "processing", "paid", "failed", "refunded", "partially_refunded"]
+    },
+    "payment_data": {
+      "type": "object",
+      "required": ["id", "booking_id", "amount", "currency", "status", "created_at", "updated_at"],
+      "properties": {
+        "id": {"type": "string", "format": "uuid"},
+        "booking_id": {"type": "string", "format": "uuid"},
+        "amount": {"type": "number", "minimum": 0},
+        "currency": {"type": "string", "default": "IDR"},
+        "status": {"$ref": "#/definitions/payment_status"},
+        "method": {"type": "string", "description": "Payment method (e.g. cash, credit_card, bank_transfer, ewallet)"},
+        "gateway": {
+          "type": "object",
+          "properties": {
+            "provider": {"type": "string", "description": "Gateway provider name (e.g. midtrans, xendit, manual)"},
+            "reference_id": {"type": "string", "description": "External gateway transaction ID"},
+            "response_code": {"type": "string"},
+            "response_message": {"type": "string"}
+          }
+        },
+        "refund": {
+          "type": "object",
+          "properties": {
+            "amount": {"type": "number", "minimum": 0},
+            "reason": {"type": "string"},
+            "refunded_at": {"type": "string", "format": "date-time"}
+          }
+        },
+        "metadata": {"type": "object"},
+        "created_at": {"type": "string", "format": "date-time"},
+        "updated_at": {"type": "string", "format": "date-time"},
+        "paid_at": {"type": "string", "format": "date-time"},
+        "failed_at": {"type": "string", "format": "date-time"},
+        "failure_reason": {"type": "string"}
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "$id": "https://api.dekat.id/schemas/events/payment.created.json",
+      "description": "Emitted when a payment record is created for a booking",
+      "type": "object",
+      "required": ["event_id", "event_type", "event_version", "occurred_at", "producer", "tenant_id", "aggregate_type", "aggregate_id", "data"],
+      "properties": {
+        "event_type": {"const": "payment.created"},
+        "event_version": {"const": 1},
+        "aggregate_type": {"const": "payment"},
+        "data": {"$ref": "#/definitions/payment_data"}
+      }
+    },
+    {
+      "$id": "https://api.dekat.id/schemas/events/payment.paid.json",
+      "description": "Emitted when a payment is successfully received",
+      "type": "object",
+      "required": ["event_id", "event_type", "event_version", "occurred_at", "producer", "tenant_id", "aggregate_type", "aggregate_id", "data"],
+      "properties": {
+        "event_type": {"const": "payment.paid"},
+        "event_version": {"const": 1},
+        "aggregate_type": {"const": "payment"},
+        "data": {
+          "allOf": [
+            {"$ref": "#/definitions/payment_data"},
+            {
+              "type": "object",
+              "required": ["paid_at", "gateway"],
+              "properties": {
+                "paid_at": {"type": "string", "format": "date-time"},
+                "gateway": {
+                  "type": "object",
+                  "required": ["provider", "reference_id"],
+                  "properties": {
+                    "provider": {"type": "string"},
+                    "reference_id": {"type": "string"}
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "$id": "https://api.dekat.id/schemas/events/payment.failed.json",
+      "description": "Emitted when a payment attempt fails",
+      "type": "object",
+      "required": ["event_id", "event_type", "event_version", "occurred_at", "producer", "tenant_id", "aggregate_type", "aggregate_id", "data"],
+      "properties": {
+        "event_type": {"const": "payment.failed"},
+        "event_version": {"const": 1},
+        "aggregate_type": {"const": "payment"},
+        "data": {
+          "allOf": [
+            {"$ref": "#/definitions/payment_data"},
+            {
+              "type": "object",
+              "required": ["failed_at", "failure_reason"],
+              "properties": {
+                "failed_at": {"type": "string", "format": "date-time"},
+                "failure_reason": {"type": "string"},
+                "gateway": {
+                  "type": "object",
+                  "properties": {
+                    "provider": {"type": "string"},
+                    "reference_id": {"type": "string"},
+                    "response_code": {"type": "string"},
+                    "response_message": {"type": "string"}
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "$id": "https://api.dekat.id/schemas/events/payment.refunded.json",
+      "description": "Emitted when a payment is refunded (full or partial)",
+      "type": "object",
+      "required": ["event_id", "event_type", "event_version", "occurred_at", "producer", "tenant_id", "aggregate_type", "aggregate_id", "data"],
+      "properties": {
+        "event_type": {"const": "payment.refunded"},
+        "event_version": {"const": 1},
+        "aggregate_type": {"const": "payment"},
+        "data": {
+          "allOf": [
+            {"$ref": "#/definitions/payment_data"},
+            {
+              "type": "object",
+              "required": ["refund"],
+              "properties": {
+                "refund": {
+                  "type": "object",
+                  "required": ["amount", "reason", "refunded_at"],
+                  "properties": {
+                    "amount": {"type": "number", "minimum": 0},
+                    "reason": {"type": "string"},
+                    "refunded_at": {"type": "string", "format": "date-time"}
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

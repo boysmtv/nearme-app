@@ -1,0 +1,84 @@
+# ===== Dev Profile =====
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dekat_dev
+    username: dekat
+    password: dekat_secret
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000
+      connection-timeout: 20000
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      properties:
+        spring.json.add.type.headers: false
+    consumer:
+      group-id: dekat-dev
+      auto-offset-reset: earliest
+      properties:
+        spring.json.trusted.packages: id.dekat.*
+
+# ===== Logging =====
+logging:
+  level:
+    id.dekat: DEBUG
+    org.springframework.modulith: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.kafka: DEBUG
+
+# ===== CORS (dev) =====
+dekat:
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:8081
+    allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
+    allowed-headers: '*'
+    allow-credentials: true
+    max-age: 3600
+
+# ===== Actuator (dev) =====
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,beans,mappings,configprops,auditevents
+  endpoint:
+    health:
+      show-details: always
+
+# ===== OpenAPI (dev) =====
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+
+# ===== File upload (dev) =====
+dekat:
+  storage:
+    base-path: ./uploads
+    allowed-types: image/jpeg,image/png,image/webp,application/pdf
+    max-size: 10MB

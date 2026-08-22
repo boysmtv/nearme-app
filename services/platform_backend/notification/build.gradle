@@ -1,0 +1,16 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Notification - push, email, SMS, in-app'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':tenant')
+    api project(':customer')
+
+    implementation 'org.springframework.boot:spring-boot-starter-mail'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

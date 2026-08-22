@@ -1,0 +1,44 @@
+{
+  "changes": [
+    {
+      "run_id": "bootstrap::platform-backend",
+      "final_status": "registered",
+      "summary": "Bootstrapped AI_AGENT_CORE memory from existing project registration (project_registration).",
+      "changed_artifacts": [
+        "access/src/main/java/id/dekat/access/package-info.java",
+        "audit/src/main/java/id/dekat/audit/package-info.java",
+        "booking/src/main/java/id/dekat/booking/package-info.java",
+        "catalog/src/main/java/id/dekat/catalog/package-info.java",
+        "customer/src/main/java/id/dekat/customer/package-info.java",
+        "identity/src/main/java/id/dekat/identity/package-info.java",
+        "marketplace/src/main/java/id/dekat/marketplace/package-info.java",
+        "media/src/main/java/id/dekat/media/package-info.java",
+        "notification/src/main/java/id/dekat/notification/package-info.java",
+        "payment/src/main/java/id/dekat/payment/package-info.java",
+        "platformconfig/src/main/java/id/dekat/platformconfig/package-info.java",
+        "promotion/src/main/java/id/dekat/promotion/package-info.java",
+        "reporting/src/main/java/id/dekat/reporting/package-info.java",
+        "review/src/main/java/id/dekat/review/package-info.java",
+        "scheduling/src/main/java/id/dekat/scheduling/package-info.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/AbstractAggregateRoot.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/BaseEntity.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/config/CacheConfig.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/config/SecurityConfig.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/config/WebConfig.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/Currency.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/DomainEvent.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/DomainEventPublisher.java",
+        "sharedkernel/src/main/java/id/dekat/sharedkernel/EntityId.java"
+      ],
+      "features": [
+        "approve",
+        "login",
+        "logout",
+        "reject",
+        "return",
+        "status"
+      ],
+      "recorded_at": "2026-08-22T17:03:17.637938+00:00"
+    }
+  ]
+}

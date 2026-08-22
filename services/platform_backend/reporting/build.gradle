@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Reporting - analytics & dashboard data'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':tenant')
+    api project(':booking')
+    api project(':payment')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

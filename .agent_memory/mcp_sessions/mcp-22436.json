@@ -1,0 +1,30 @@
+{
+  "session_id": "mcp-22436",
+  "created_at": "2026-08-22T14:59:46.150994+00:00",
+  "last_active": "2026-08-22T18:00:23.279499+00:00",
+  "tool_call_count": 3,
+  "context": {
+    "client_info": "{'name': 'opencode', 'version': '1.16.2'}",
+    "client_name": "opencode",
+    "last_tool": "tools/call",
+    "last_args": "{'goal': 'Create Payment Gateway adapters (Midtrans, Xendit), Notification adapters (FCM, SMTP, WhatsApp), and Outbox Publisher for DEKAT Booking Platform with complete Java implementations including "
+  },
+  "stream_buffer": [
+    {
+      "type": "tool_error",
+      "data": {
+        "tool": "project_ask",
+        "error": "Missing API key environment variable: DEEPSEEK_API_KEY"
+      },
+      "timestamp": "2026-08-22T17:03:17.948265+00:00"
+    },
+    {
+      "type": "tool_error",
+      "data": {
+        "tool": "coding_task_run",
+        "error": "AutonomousCodingRequest.__init__() got an unexpected keyword argument 'goal'"
+      },
+      "timestamp": "2026-08-22T18:00:23.279499+00:00"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Staff - staff/employee management within tenants'
+
+dependencies {
+    api project(':sharedkernel')
+    api project(':tenant')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}

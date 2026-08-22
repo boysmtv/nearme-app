@@ -1,0 +1,98 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_core/flutter_core.dart';
+import '../../features/authentication/presentation/pages/login_page.dart';
+import '../../features/authentication/presentation/pages/onboarding_page.dart';
+import '../../features/calendar/presentation/pages/calendar_page.dart';
+import '../../features/booking_management/presentation/pages/booking_list_page.dart';
+import '../../features/booking_management/presentation/pages/booking_detail_page.dart';
+import '../../features/payment/presentation/pages/earnings_page.dart';
+import '../../features/staff_management/presentation/pages/staff_list_page.dart';
+import '../../features/reports/presentation/pages/reports_page.dart';
+import '../../shared/widgets/main_scaffold.dart';
+
+final partnerAuthProvider = StateNotifierProvider<PartnerAuthNotifier, PartnerAuthState>((ref) {
+  return PartnerAuthNotifier();
+});
+
+class PartnerAuthState {
+  final bool isLoading;
+  final bool isLoggedIn;
+  final User? user;
+  final String? error;
+  const PartnerAuthState({this.isLoading = false, this.isLoggedIn = false, this.user, this.error});
+  PartnerAuthState copyWith({bool? isLoading, bool? isLoggedIn, User? user, String? error}) {
+    return PartnerAuthState(isLoading: isLoading ?? this.isLoading, isLoggedIn: isLoggedIn ?? this.isLoggedIn, user: user ?? this.user, error: error);
+  }
+}
+
+class PartnerAuthNotifier extends StateNotifier<PartnerAuthState> {
+  PartnerAuthNotifier() : super(const PartnerAuthState()) { _checkAuth(); }
+  final _apiService = ApiService();
+
+  Future<void> _checkAuth() async {
+    final token = await SecureStorageService.read(StorageKeys.accessToken);
+    if (token != null) {
+      state = state.copyWith(isLoading: true);
+      try {
+        final response = await _apiService.getProfile();
+        final user = User.fromJson(response.data['data']);
+        state = state.copyWith(isLoading: false, isLoggedIn: true, user: user);
+      } catch (_) {
+        await SecureStorageService.deleteAll();
+        state = state.copyWith(isLoading: false, isLoggedIn: false);
+      }
+    }
+  }
+
+  Future<void> login(String email, String password) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final response = await _apiService.login(email, password);
+      final data = response.data['data'];
+      await SecureStorageService.write(StorageKeys.accessToken, data['access_token']);
+      await SecureStorageService.write(StorageKeys.refreshToken, data['refresh_token']);
+      final user = User.fromJson(data['user']);
+      state = state.copyWith(isLoading: false, isLoggedIn: true, user: user);
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString().replaceAll('Exception: ', ''));
+    }
+  }
+
+  Future<void> logout() async {
+    try { await _apiService.logout(); } catch (_) {}
+    await SecureStorageService.deleteAll();
+    state = const PartnerAuthState();
+  }
+
+  void clearError() => state = state.copyWith(error: null);
+}
+
+final routerProvider = Provider<GoRouter>((ref) {
+  return GoRouter(
+    initialLocation: '/calendar',
+    debugLogDiagnostics: true,
+    routes: [
+      GoRoute(path: '/login', name: 'login', builder: (_, __) => const LoginPage()),
+      GoRoute(path: '/onboarding', name: 'onboarding', builder: (_, __) => const OnboardingPage()),
+      ShellRoute(builder: (context, state, child) => MainScaffold(child: child), routes: [
+        GoRoute(path: '/calendar', name: 'calendar', pageBuilder: (_, __) => const NoTransitionPage(child: CalendarPage())),
+        GoRoute(path: '/bookings', name: 'bookings', pageBuilder: (_, __) => const NoTransitionPage(child: BookingListPage())),
+        GoRoute(path: '/payments', name: 'payments', pageBuilder: (_, __) => const NoTransitionPage(child: EarningsPage())),
+        GoRoute(path: '/staff', name: 'staff', pageBuilder: (_, __) => const NoTransitionPage(child: StaffListPage())),
+        GoRoute(path: '/reports', name: 'reports', pageBuilder: (_, __) => const NoTransitionPage(child: ReportsPage())),
+      ]),
+      GoRoute(path: '/booking/:id', name: 'bookingDetail', builder: (_, state) => BookingDetailPage(bookingId: state.pathParameters['id']!)),
+    ],
+    redirect: (context, state) {
+      final auth = ref.read(partnerAuthProvider);
+      final isAuthRoute = state.matchedLocation == '/login' || state.matchedLocation == '/onboarding';
+      if (auth.isLoading) return null;
+      if (!auth.isLoggedIn && !isAuthRoute) return '/login';
+      if (auth.isLoggedIn && isAuthRoute) return '/calendar';
+      return null;
+    },
+  );
+});

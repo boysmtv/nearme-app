@@ -1,0 +1,92 @@
+name: dekat-staging
+
+services:
+  caddy:
+    environment:
+      - CADDY_FILE=/etc/caddy/Caddyfile
+
+  web-public:
+    image: ${REGISTRY:-ghcr.io}/${ORG:-dekat}/web-public:${WEB_PUBLIC_TAG:-staging}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  web-provider:
+    image: ${REGISTRY:-ghcr.io}/${ORG:-dekat}/web-provider:${WEB_PROVIDER_TAG:-staging}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  web-admin:
+    image: ${REGISTRY:-ghcr.io}/${ORG:-dekat}/web-admin:${WEB_ADMIN_TAG:-staging}
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.5"
+
+  api-blue:
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+          cpus: "1.0"
+
+  api-green:
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+          cpus: "1.0"
+
+  worker:
+    environment:
+      - SPRING_PROFILES_ACTIVE=staging
+      - JAVA_OPTS=-Xms512m -Xmx1024m
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+          cpus: "1.0"
+
+  postgres:
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+
+  redis:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  kafka:
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "1.0"
+
+  object-storage:
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.5"
+
+  grafana:
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}

@@ -1,0 +1,112 @@
+{
+  "id": null,
+  "title": "DEKAT - Booking Metrics",
+  "tags": ["dekat", "booking"],
+  "timezone": "Asia/Jakarta",
+  "refresh": "30s",
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Bookings Created (per hour)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum(rate(dekat_booking_created_total[1h])) * 3600",
+          "legendFormat": "Bookings/hour"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Booking Status Distribution",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "sum by (status) (dekat_booking_count)",
+          "legendFormat": "{{status}}"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Booking Completion Rate",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(dekat_booking_completed_total) / sum(dekat_booking_confirmed_total) * 100"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": { "steps": [
+            { "value": 0, "color": "red" },
+            { "value": 80, "color": "yellow" },
+            { "value": 90, "color": "green" }
+          ]}
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "No-Show Rate",
+      "type": "gauge",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(dekat_booking_noshow_total) / sum(dekat_booking_confirmed_total) * 100"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": { "steps": [
+            { "value": 0, "color": "green" },
+            { "value": 5, "color": "yellow" },
+            { "value": 10, "color": "red" }
+          ]}
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Hold Expiry Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 8 },
+      "targets": [
+        {
+          "expr": "sum(rate(dekat_booking_hold_expired_total[1h])) * 3600",
+          "legendFormat": "Expired holds/hour"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Average Booking Duration (minutes)",
+      "type": "stat",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.5, sum(rate(dekat_booking_duration_minutes_bucket[1h])) by (le))"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "m" } }
+    },
+    {
+      "id": 7,
+      "title": "Bookings by Source",
+      "type": "barchart",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum by (source) (dekat_booking_created_total)",
+          "legendFormat": "{{source}}"
+        }
+      ]
+    }
+  ]
+}

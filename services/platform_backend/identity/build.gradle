@@ -1,0 +1,12 @@
+plugins {
+    id 'java-library'
+}
+
+description = 'DEKAT Shared Kernel - common value objects, base entities, event infrastructure'
+
+dependencies {
+    api project(':sharedkernel')
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+}
