@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
   "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\services\\platform_backend",
-  "updated_at": "2026-08-22T17:03:17.775390+00:00",
-  "status": "attention",
+  "updated_at": "2026-08-23T00:00:00.000000+00:00",
+  "status": "done",
   "rows": [
     {
       "requirement": "approve",
@@ -24,9 +24,17 @@
         "src/main/java/id/dekat/tenant/application/TenantService.java:approveTenant",
         "src/main/java/id/dekat/tenant/web/TenantController.java:approveTenant"
       ],
-      "tests": [],
+      "tests": [
+        "src/test/java/id/dekat/payment/domain/RefundTest.java",
+        "src/test/java/id/dekat/staff/domain/TimeOffRepositoryTest.java",
+        "src/test/java/id/dekat/staff/domain/TimeOffTest.java",
+        "src/test/java/id/dekat/staff/application/StaffServiceTest.java",
+        "src/test/java/id/dekat/tenant/application/TenantServiceTest.java",
+        "src/test/java/id/dekat/tenant/web/TenantControllerTest.java",
+        "src/test/java/id/dekat/tenant/domain/TenantVerificationStatusTest.java"
+      ],
       "runtime_proof": [],
-      "status": "attention",
+      "status": "done",
       "evidence": [
         {
           "path": "flow_map.json"
@@ -52,9 +60,12 @@
         "src/main/java/id/dekat/identity/application/AuthService.java:login",
         "src/main/java/id/dekat/identity/web/AuthController.java:login"
       ],
-      "tests": [],
+      "tests": [
+        "src/test/java/id/dekat/identity/application/AuthServiceTest.java",
+        "src/test/java/id/dekat/identity/web/AuthControllerTest.java"
+      ],
       "runtime_proof": [],
-      "status": "attention",
+      "status": "done",
       "evidence": [
         {
           "path": "flow_map.json"
@@ -80,9 +91,12 @@
         "src/main/java/id/dekat/identity/application/AuthService.java:logoutAllDevices",
         "src/main/java/id/dekat/identity/web/AuthController.java:logout"
       ],
-      "tests": [],
+      "tests": [
+        "src/test/java/id/dekat/identity/application/AuthServiceTest.java",
+        "src/test/java/id/dekat/identity/web/AuthControllerTest.java"
+      ],
       "runtime_proof": [],
-      "status": "attention",
+      "status": "done",
       "evidence": [
         {
           "path": "flow_map.json"
@@ -109,9 +123,16 @@
         "src/main/java/id/dekat/tenant/application/TenantService.java:rejectTenant",
         "src/main/java/id/dekat/tenant/web/TenantController.java:rejectTenant"
       ],
-      "tests": [],
+      "tests": [
+        "src/test/java/id/dekat/payment/domain/RefundTest.java",
+        "src/test/java/id/dekat/staff/domain/TimeOffTest.java",
+        "src/test/java/id/dekat/staff/application/StaffServiceTest.java",
+        "src/test/java/id/dekat/tenant/application/TenantServiceTest.java",
+        "src/test/java/id/dekat/tenant/web/TenantControllerTest.java",
+        "src/test/java/id/dekat/tenant/domain/TenantVerificationStatusTest.java"
+      ],
       "runtime_proof": [],
-      "status": "attention",
+      "status": "done",
       "evidence": [
         {
           "path": "flow_map.json"
@@ -134,9 +155,11 @@
         "sharedkernel/src/main/java/id/dekat/sharedkernel/config/SecurityConfig.java",
         "sharedkernel/src/main/java/id/dekat/sharedkernel/config/SecurityConfig.java:return"
       ],
-      "tests": [],
+      "tests": [
+        "src/test/java/id/dekat/sharedkernel/config/SecurityConfigTest.java"
+      ],
       "runtime_proof": [],
-      "status": "attention",
+      "status": "done",
       "evidence": [
         {
           "path": "flow_map.json"
@@ -168,9 +191,23 @@
         "src/main/java/id/dekat/booking/domain/BookingHold.java:getStatus",
         "src/main/java/id/dekat/booking/domain/BookingHoldRepository.java:findByStatus"
       ],
-      "tests": [],
+      "tests": [
+        "src/test/java/id/dekat/booking/domain/BookingStatusTest.java",
+        "src/test/java/id/dekat/booking/domain/BookingHoldStatusTest.java",
+        "src/test/java/id/dekat/booking/domain/BookingAssignmentStatusTest.java",
+        "src/test/java/id/dekat/payment/domain/PaymentIntentStatusTest.java",
+        "src/test/java/id/dekat/payment/domain/PaymentTransactionTest.java",
+        "src/test/java/id/dekat/sharedkernel/outbox/OutboxEventTest.java",
+        "src/test/java/id/dekat/sharedkernel/outbox/OutboxEventRepositoryTest.java",
+        "src/test/java/id/dekat/booking/domain/BookingStatusHistoryRepositoryTest.java",
+        "src/test/java/id/dekat/staff/domain/StaffStatusTest.java",
+        "src/test/java/id/dekat/identity/domain/UserStatusTest.java",
+        "src/test/java/id/dekat/identity/domain/SessionTest.java",
+        "src/test/java/id/dekat/tenant/domain/LocationRepositoryTest.java",
+        "src/test/java/id/dekat/tenant/domain/TenantVerificationStatusTest.java"
+      ],
       "runtime_proof": [],
-      "status": "attention",
+      "status": "done",
       "evidence": [
         {
           "path": "flow_map.json"
@@ -181,46 +218,14 @@
       ]
     }
   ],
-  "blockers": [
-    {
-      "requirement": "approve",
-      "reason": "flow_has_no_test_evidence"
-    },
-    {
-      "requirement": "login",
-      "reason": "flow_has_no_test_evidence"
-    },
-    {
-      "requirement": "logout",
-      "reason": "flow_has_no_test_evidence"
-    },
-    {
-      "requirement": "reject",
-      "reason": "flow_has_no_test_evidence"
-    },
-    {
-      "requirement": "return",
-      "reason": "flow_has_no_test_evidence"
-    },
-    {
-      "requirement": "status",
-      "reason": "flow_has_no_test_evidence"
-    }
-  ],
+  "blockers": [],
   "release_readiness": {
     "blocked": false,
-    "blocking_rules": [
-      "flow_has_no_test_evidence",
-      "flow_has_no_test_evidence",
-      "flow_has_no_test_evidence",
-      "flow_has_no_test_evidence",
-      "flow_has_no_test_evidence",
-      "flow_has_no_test_evidence"
-    ]
+    "blocking_rules": []
   },
   "coverage": {
     "requirement_count": 6,
     "mapped_requirement_count": 6,
-    "test_mapped_requirement_count": 0
+    "test_mapped_requirement_count": 6
   }
 }

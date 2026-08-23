@@ -1,11 +1,14 @@
 plugins {
     id 'java-library'
+    id 'io.spring.dependency-management'
 }
 
 description = 'DEKAT Platform Config - platform-wide settings & feature flags'
 
 dependencies {
     api project(':sharedkernel')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

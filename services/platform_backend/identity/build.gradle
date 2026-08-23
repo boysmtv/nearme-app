@@ -1,11 +1,18 @@
 plugins {
     id 'java-library'
+    id 'io.spring.dependency-management'
 }
 
-description = 'DEKAT Shared Kernel - common value objects, base entities, event infrastructure'
+description = 'DEKAT Identity - authentication, JWT, OTP, MFA, sessions'
 
 dependencies {
     api project(':sharedkernel')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

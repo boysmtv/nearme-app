@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'io.spring.dependency-management'
 }
 
 description = 'DEKAT Access - RBAC, permissions, role management'
@@ -7,6 +8,9 @@ description = 'DEKAT Access - RBAC, permissions, role management'
 dependencies {
     api project(':sharedkernel')
     api project(':identity')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

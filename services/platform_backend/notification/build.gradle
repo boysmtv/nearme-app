@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'io.spring.dependency-management'
 }
 
 description = 'DEKAT Notification - push, email, SMS, in-app'
@@ -10,6 +11,7 @@ dependencies {
     api project(':customer')
 
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

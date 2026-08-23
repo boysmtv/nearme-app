@@ -2,7 +2,6 @@ package id.dekat.sharedkernel;
 
 import org.springframework.data.domain.AfterDomainEventPublication;
 import org.springframework.data.domain.DomainEvents;
-import org.springframework.data.jpa.domain.JpaAggregateRoot;
 
 import java.util.Collection;
 import java.util.List;

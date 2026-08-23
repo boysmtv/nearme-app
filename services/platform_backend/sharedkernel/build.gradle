@@ -1,13 +1,25 @@
+plugins {
+    id 'java-library'
+    id 'io.spring.dependency-management'
+}
+
+description = 'DEKAT Shared Kernel - common value objects, base entities, event infrastructure'
+
+repositories {
+    mavenCentral()
+}
+
 dependencies {
     api 'org.springframework.boot:spring-boot-starter-data-jpa'
     api 'org.springframework.boot:spring-boot-starter-data-redis'
     api 'org.springframework.boot:spring-boot-starter-validation'
-    api 'org.springframework.boot:spring-boot-starter-kafka'
-    api 'org.springframework.boot:spring-boot-starter-cache'
     api 'org.springframework.boot:spring-boot-starter-security'
     api 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
+    api 'org.springframework.boot:spring-boot-starter-web'  // for Jackson
+    // spring-kafka instead of spring-boot-starter-kafka (which has version issues in 3.x)
+    api 'org.springframework.kafka:spring-kafka'
 
-    implementation 'org.springframework.modulith:spring-modulith-starter-core'
+    implementation "org.springframework.modulith:spring-modulith-starter-core:${springModulithVersion}"
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

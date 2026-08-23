@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'io.spring.dependency-management'
 }
 
 description = 'DEKAT Review - ratings & reviews'
@@ -8,6 +9,8 @@ dependencies {
     api project(':sharedkernel')
     api project(':customer')
     api project(':tenant')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

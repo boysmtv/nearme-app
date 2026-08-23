@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'io.spring.dependency-management'
 }
 
 description = 'DEKAT Reporting - analytics & dashboard data'
@@ -9,6 +10,8 @@ dependencies {
     api project(':tenant')
     api project(':booking')
     api project(':payment')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

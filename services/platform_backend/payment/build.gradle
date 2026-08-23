@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'io.spring.dependency-management'
 }
 
 description = 'DEKAT Payment - invoicing & payment gateway integration'
@@ -9,6 +10,8 @@ dependencies {
     api project(':booking')
     api project(':tenant')
     api project(':subscription')
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

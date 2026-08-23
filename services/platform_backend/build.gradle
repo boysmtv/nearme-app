@@ -1,95 +1,41 @@
 plugins {
-    id 'java'
-    id 'org.springframework.boot' version '4.1.1'
+    id 'org.springframework.boot' version '3.3.4'
     id 'io.spring.dependency-management' version '1.1.7'
-    id 'org.springframework.modulith' version '1.4.1'
 }
 
 group = 'id.dekat'
 version = '0.1.0-SNAPSHOT'
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_25
-    targetCompatibility = JavaVersion.VERSION_25
-}
-
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
 
 repositories {
     mavenCentral()
 }
 
 ext {
-    set('springDocVersion', '2.8.6')
-    set('mapstructVersion', '1.6.3')
+    set('springDocVersion', '2.5.0')
+    set('mapstructVersion', '1.5.5.Final')
+    set('springModulithVersion', '1.3.2')
+    set('jjwtVersion', '0.12.5')
+    set('hypersistenceVersion', '3.16.0')
 }
 
-dependencies {
-    // Spring Boot Starters
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-kafka'
-    implementation 'org.springframework.boot:spring-boot-starter-cache'
-    implementation 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
-
-    // Spring Modulith
-    implementation 'org.springframework.modulith:spring-modulith-starter-core'
-    implementation 'org.springframework.modulith:spring-modulith-starter-jpa'
-    runtimeOnly 'org.springframework.modulith:spring-modulith-observability'
-
-    // Database
-    runtimeOnly 'org.postgresql:postgresql'
-    runtimeOnly 'org.flywaydb:flyway-core'
-    runtimeOnly 'org.flywaydb:flyway-database-postgresql'
-
-    // Redis
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-
-    // OpenAPI / Swagger
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${springDocVersion}"
-    implementation "org.springdoc:springdoc-openapi-starter-webflux-core:${springDocVersion}"
-
-    // MapStruct
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
-
-    // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-
-    // Test
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-    testImplementation 'org.springframework.modulith:spring-modulith-starter-test'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:postgresql'
-    testImplementation 'org.testcontainers:testcontainers'
-    testImplementation 'com.h2database:h2'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
-}
-
-// --- Submodule conventions (applied to every subproject) ---
-subprojects {
+// Common configuration for all subprojects
+configure(subprojects) {
     apply plugin: 'java-library'
     apply plugin: 'io.spring.dependency-management'
 
+    repositories {
+        mavenCentral()
+    }
+
     java {
-        sourceCompatibility = JavaVersion.VERSION_25
-        targetCompatibility = JavaVersion.VERSION_25
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.boot:spring-boot-dependencies:3.3.4"
+        }
     }
 
     dependencies {
@@ -100,5 +46,17 @@ subprojects {
 
         testCompileOnly 'org.projectlombok:lombok'
         testAnnotationProcessor 'org.projectlombok:lombok'
+
+        // Test dependencies
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testImplementation 'org.springframework.security:spring-security-test'
+        testImplementation "org.springframework.modulith:spring-modulith-starter-test:${springModulithVersion}"
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+        testImplementation 'org.mockito:mockito-core:5.11.0'
+        testImplementation 'org.mockito:mockito-junit-jupiter:5.11.0'
+        testImplementation 'org.assertj:assertj-core:3.24.2'
+        testImplementation 'org.testcontainers:junit-jupiter:1.19.7'
+        testImplementation 'org.testcontainers:postgresql:1.19.7'
+        testImplementation 'com.h2database:h2:2.2.224'
     }
 }

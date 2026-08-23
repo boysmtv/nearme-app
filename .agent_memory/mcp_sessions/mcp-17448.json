@@ -1,0 +1,38 @@
+{
+  "session_id": "mcp-17448",
+  "created_at": "2026-08-22T23:03:04.839634+00:00",
+  "last_active": "2026-08-22T23:04:05.423461+00:00",
+  "tool_call_count": 4,
+  "context": {
+    "client_info": "{'name': 'opencode', 'version': '1.16.2'}",
+    "client_name": "opencode",
+    "last_tool": "tools/call",
+    "last_args": "{'project_id': 'dekat-platform', 'query': 'dekat platform, recent work, completed tasks, next steps', 'limit': 10}"
+  },
+  "stream_buffer": [
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "project_status",
+        "success": true
+      },
+      "timestamp": "2026-08-22T23:03:49.195837+00:00"
+    },
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "memory_query",
+        "success": true
+      },
+      "timestamp": "2026-08-22T23:03:49.237986+00:00"
+    },
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "memory_query",
+        "success": true
+      },
+      "timestamp": "2026-08-22T23:04:05.423461+00:00"
+    }
+  ]
+}

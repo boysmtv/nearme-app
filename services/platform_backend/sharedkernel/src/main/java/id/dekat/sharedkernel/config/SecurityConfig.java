@@ -30,6 +30,8 @@ public class SecurityConfig {
     @Bean
     public OpaqueTokenIntrospector opaqueTokenIntrospector() {
         // TODO: configure introspection endpoint / JWT resource server
-        return (token) -> org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal::empty;
+        return token -> {
+            throw new UnsupportedOperationException("Opaque token introspection not configured");
+        };
     }
 }
