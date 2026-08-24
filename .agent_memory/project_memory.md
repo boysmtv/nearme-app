@@ -1,6 +1,6 @@
 # DEKAT Booking Platform - Project Memory
 
-## Last Updated: 2026-08-23
+## Last Updated: 2026-08-24
 
 ## Project Status
 - **Phase**: Foundation Complete (100%)
@@ -144,12 +144,42 @@ subscription → tenant
 
 ## Seed Data (V14)
 - 9 roles (Customer, Provider Owner/Manager/Staff, Platform Support/Finance/Content/Admin/Super Admin)
-- 50+ permissions
+- 50+ permissions (with module:action code format)
 - 3 plans (Free, Pro, Business)
-- 6 categories (Barbershop, Salon, Beauty, Spa, Massage, Fitness)
-- 1 admin user (admin@dekat.id)
-- 6 notification templates
-- 3 feature flags
+- 5 users with BCrypt hashes (admin123 for all)
+- 1 tenant (Barbershop Central), 2 locations, 2 staff, 6 services, 4 bookings
+- 6 notification templates, 3 feature flags
+
+## Session 2026-08-24 - Auth & API Integration
+
+### Completed
+- **SecurityConfig**: Replaced OpaqueTokenIntrospector stub with JWT JwtDecoder bean. `/auth/**` now permitAll.
+- **PasswordEncoder**: Added BCryptPasswordEncoder bean in SecurityConfig.
+- **JWT secrets**: Added `jwt.access-secret` and `jwt.refresh-secret` to application-dev.yml.
+- **DB schema**: V14 adds `password_hash` column to users table (DO $$ block). Users have real BCrypt hashes.
+- **Session entity**: Added `@Column(name = "refresh_token")` to match DB column name.
+- **UserStatus enum**: Added `PENDING_VERIFICATION` to match DB check constraint.
+- **AuthController**: Now returns `ApiResponse<TokenResponse>` wrapper.
+- **ApiResponse wrapper**: Created in `sharedkernel/src/main/java/id/dekat/sharedkernel/web/ApiResponse.java`.
+- **PublicController**: New controller at `src/main/java_root/id/dekat/api/web/PublicController.java` — handles `/public/*` endpoints.
+- **AdminController**: New controller — handles `/admin/*` endpoints.
+- **ProviderDashboardController**: New controller — handles `/provider/dashboard/*`, `/provider/bookings`, `/provider/services`, `/provider/staff`.
+- **Frontend fixes**: API base URL → `api/v1`, Vite proxy added to all 3 web apps, API paths fixed (`/auth/login` not `/auth/provider/login`), token key unified to `auth_token`.
+- **web_public auth**: Added LoginPage.tsx, RegisterPage.tsx, routes in App.tsx.
+- **web_config**: CORS origins added for ports 3000/3001/3002.
+- **Flyway**: V14 includes ALTER TABLE for password_hash, V15 deleted (merged into V14).
+
+### In Progress / Known Issues
+- **Gradle build FAILED** for `api` module: controllers in `src/main/java` can't find `ApiResponse` from sharedkernel. Controllers were moved to root `src/main/java_root/id/dekat/api/web/` but build still failing. Likely need to verify source set configuration.
+- **Backend running but still 401**: The Docker image has the OLD jar (before SecurityConfig fix). Need to rebuild after fixing the Gradle issue.
+- **Login untested**: Cannot test until build passes and Docker is rebuilt with new jar.
+
+### Next Session TODO
+1. Fix the Gradle build for api module (source set issue with `java_root` vs `java`)
+2. Rebuild Docker with working jar
+3. Test `POST /api/v1/auth/login` with `admin@dekat.id` / `admin123`
+4. Start web apps and test full login flow
+5. Verify all endpoints match frontend expectations
 
 ## Development Notes
 - Backend uses Gradle with wrapper

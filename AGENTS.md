@@ -26,8 +26,11 @@ dekat-platform/
 │   └── web_config/
 ├── services/
 │   └── platform_backend/    # Java Spring Boot (20 modules)
-├── contracts/               # OpenAPI + Event schemas
-├── infra/                   # Docker Compose + configs
+├── infra/
+│   └── compose/
+│       ├── compose.yaml         # Production compose (ghcr.io images)
+│       ├── compose.local.yaml   # Local dev compose (dekat- prefix)
+│       └── .env                 # Secrets (POSTGRES_PASSWORD=dekat123)
 ├── docs/                    # ADR + Runbooks
 └── .github/workflows/       # CI/CD
 ```
@@ -36,20 +39,19 @@ dekat-platform/
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | Java 25, Spring Boot 4.1.1, Spring Modulith |
-| Database | PostgreSQL 18.6 + PostGIS |
-| Cache | Redis 8.2 |
-| Messaging | Apache Kafka 4.3.1 (KRaft) |
-| Mobile | Flutter 3.44.7, Dart, Riverpod |
-| Web | React 19.2, TypeScript, Vite 8.1, Tailwind CSS 4.3 |
-| Infra | Docker Compose, Caddy 2.11+ |
-| Observability | OpenTelemetry, Prometheus, Loki, Tempo, Grafana |
+| Backend | Java 21, Spring Boot 3.3.4, Spring Modulith 1.3.2 |
+| Database | PostgreSQL 17 (postgis/postgis:17-3.4) + PostGIS |
+| Cache | Redis 8.2-alpine |
+| Messaging | Apache Kafka 4.3.1 (KRaft, no Zookeeper) |
+| Mobile | Flutter 3.x, Dart, Riverpod |
+| Web | React 19, TypeScript, Vite, Tailwind CSS |
+| Infra | Docker Compose (single VPS) |
 
 ## Backend Modules (20)
 
 | Module | Package | Responsibility |
 |--------|---------|----------------|
-| sharedkernel | id.dekat.sharedkernel | Base entities, outbox, security config |
+| sharedkernel | id.dekat.sharedkernel | Base entities, outbox, security config, ApiResponse wrapper |
 | identity | id.dekat.identity | Auth, JWT, OTP, MFA, Sessions |
 | access | id.dekat.access | RBAC, Roles, Permissions |
 | tenant | id.dekat.tenant | Business, Locations, Verification |
@@ -97,55 +99,125 @@ module/
 - Money: Integer minor units (sen for IDR)
 - Time: RFC 3339 with timezone
 - Errors: RFC 9457 ProblemDetail
+- Response wrapper: `{ success: boolean, data: T, message?: string }`
 - Idempotency: `Idempotency-Key` header
+
+## API Endpoints (Current State)
+
+### Auth (public - no token required)
+- `POST /auth/register` - Register new user
+- `POST /auth/login` - Login (returns accessToken + refreshToken)
+- `POST /auth/otp/request` - Request OTP
+- `POST /auth/otp/verify` - Verify OTP
+- `POST /auth/refresh` - Refresh access token
+- `POST /auth/logout` - Logout
+
+### Public (no token required)
+- `GET /public/categories` - List categories
+- `GET /public/providers` - Search providers
+- `GET /public/providers/featured` - Featured providers
+- `GET /public/providers/{slug}` - Provider detail
+- `GET /public/providers/{id}/services` - Provider services
+- `GET /public/providers/{id}/staff` - Provider staff
+- `GET /public/providers/{id}/availability` - Available slots
+- `GET /public/providers/{id}/reviews` - Provider reviews
+- `POST /public/bookings` - Create booking
+
+### Provider Dashboard (JWT required)
+- `GET /provider/dashboard/stats` - Dashboard stats
+- `GET /provider/dashboard/recent-bookings` - Recent bookings
+- `GET /provider/bookings` - List bookings
+- `GET /provider/services` - List services
+- `GET /provider/staff` - List staff
+
+### Admin (JWT required)
+- `GET /admin/dashboard/stats` - Platform stats
+- `GET /admin/users` - List users
+- `PUT /admin/users/{id}/status` - Update user status
+- `GET /admin/tenants` - List tenants
+- `PUT /admin/tenants/{id}/approve` - Approve tenant
+- `GET /admin/config/flags` - Feature flags
+
+### Core (JWT required)
+- `POST /bookings/holds` - Create booking hold
+- `POST /bookings` - Confirm booking
+- `POST /bookings/{id}/cancel` - Cancel booking
+- `GET /roles` - List roles
+- `GET /availability` - Get available slots
 
 ## Database
 
-- 80+ tables across 14 migrations (V1-V14)
-- Seed data in V14 (roles, permissions, plans, categories, admin user)
-- Flyway for migrations
+- 80+ tables, migrations V0-V14 (Flyway)
+- V14 includes seed data (roles, permissions, plans, users, tenant, services, bookings)
+- V14 adds `password_hash` column to users table
+- Seed password: `admin123` (BCrypt hashed)
+- Credentials stored in both `users.password_hash` and `credentials` table
 
 ## Common Commands
 
 ```bash
-# Backend
-cd services/platform_backend
-./gradlew build
-./gradlew test
-./gradlew flywayMigrate
+# Backend (from services/platform_backend/)
+.\gradlew.bat build -x test          # Build all 20 modules
+.\gradlew.bat clean build -x test    # Clean + build
 
-# Flutter
-cd apps/mobile_customer
-flutter pub get
-flutter run
-flutter test
+# Docker Local Dev (from project root/)
+docker compose -f infra/compose/compose.local.yaml up -d --build
+docker compose -f infra/compose/compose.local.yaml down -v
+docker logs dekat-api
 
-# React
-cd apps/web_public
-pnpm install
-pnpm dev
-pnpm build
+# Test login
+curl -X POST http://localhost:8080/api/v1/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@dekat.id","password":"admin123"}'
 
-# Docker
-docker compose -f infra/compose/compose.yaml up -d
-docker compose -f infra/compose/compose.yaml logs -f api-blue
+# Flutter (from apps/mobile_customer/)
+flutter pub get && flutter run
+
+# React Web (from apps/web_public/)
+pnpm install && pnpm dev
 ```
 
-## Environment Variables
+## Default Credentials
 
-Key env vars (see infra/compose/.env.example for full list):
-- `DATABASE_URL` - PostgreSQL connection
-- `REDIS_URL` - Redis connection
-- `KAFKA_BOOTSTRAP_SERVERS` - Kafka brokers
-- `JWT_PRIVATE_KEY_FILE` - JWT signing key
-- `PAYMENT_PROVIDER` - midtrans|xendit
-- `FCM_CREDENTIALS_FILE` - Firebase config
+| User | Email | Password | Role |
+|------|-------|----------|------|
+| Admin | admin@dekat.id | admin123 | ROLE_PLATFORM_ADMIN |
+| Provider Owner | budi@barbershopcentral.id | admin123 | ROLE_PROVIDER_OWNER |
+| Staff 1 | andi@barbershopcentral.id | admin123 | ROLE_PROVIDER_STAFF |
+| Staff 2 | rudi@barbershopcentral.id | admin123 | ROLE_PROVIDER_STAFF |
+| Customer | siti@gmail.com | admin123 | ROLE_CUSTOMER |
 
-## Testing
+## Known Issues & Gotchas
 
-- Backend: JUnit 5 + Testcontainers
-- Flutter: flutter_test + integration_test
-- Web: Vitest + Playwright
+### Build System
+- Backend source dirs: `src/main/java_root/` (module controllers) and `src/main/java/` (sharedkernel)
+- Kotlin incremental cache corruption on Windows: `org.gradle.daemon=false`, `org.gradle.parallel=false`
+- `freezed` code generation failed (Dart SDK 3.13.0 vs analyzer 3.9.0) — models are plain Dart classes
+
+### Flutter
+- Firebase not configured — all Firebase init wrapped in try-catch
+- `Provider` model renamed to `ProviderModel` to avoid conflict with Riverpod's `Provider`
+- `DEKATColorScheme.light`/`.dark` → `.lightColorScheme`/`.darkColorScheme`
+- `CardTheme` → `CardThemeData` (Flutter 3.x API change)
+
+### Docker
+- PostgreSQL: `postgis/postgis:17-3.4` (NOT `postgres:18-alpine` which needs `/var/lib/postgresql`)
+- Redis password: `dekat123` (in `infra/redis/redis.conf`)
+- Kafka: `apache/kafka:4.3.1` KRaft mode (no Zookeeper)
+- Flyway 10.x: `filesystem:` prefix (not `file:`) for locations
+- UUID hex: all UUIDs must be valid hex (0-9, a-f only)
+
+### Auth
+- JWT secrets: `jwt.access-secret` and `jwt.refresh-secret` in `application-dev.yml`
+- SecurityConfig: `/auth/**` is permitAll, all other endpoints require JWT
+- Password hashing: BCrypt (`$2a$10$...`)
+- `OpaqueTokenIntrospector` replaced with JWT `JwtDecoder` bean
+
+### Frontend
+- Web config API URL: `http://localhost:8080/api/v1` (NOT `/api`)
+- Vite proxy: `/api` → `http://localhost:8080` (all 3 web apps)
+- All apps share `auth_token` key in localStorage
+- Response format: `{ success, data, message }` — handled by `ApiResponse` wrapper
 
 ## Deployment
 

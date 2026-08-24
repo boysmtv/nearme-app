@@ -5,6 +5,8 @@ const HomePage = lazy(() => import('./pages/HomePage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
 const ProviderPage = lazy(() => import('./pages/ProviderPage'));
 const BookingPage = lazy(() => import('./pages/BookingPage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 
 function LoadingFallback() {
   return (
@@ -22,6 +24,8 @@ export function App() {
         <Route path="/search" element={<SearchPage />} />
         <Route path="/provider/:slug" element={<ProviderPage />} />
         <Route path="/booking/:providerId" element={<BookingPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
       </Routes>
     </Suspense>
   );

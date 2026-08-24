@@ -20,7 +20,7 @@ function LoadingFallback() {
 }
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = localStorage.getItem('admin_token');
+  const isAuthenticated = localStorage.getItem('auth_token');
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }

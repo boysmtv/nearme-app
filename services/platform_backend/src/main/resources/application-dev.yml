@@ -49,6 +49,13 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.kafka: DEBUG
 
+# ===== JWT (dev) =====
+jwt:
+  access-secret: "DEKAT-AccessSecret-Key-AtLeast32Chars-Long-2026!"
+  refresh-secret: "DEKAT-RefreshSecret-Key-AtLeast32Chars-Long-2026!"
+  access-token-validity-ms: 900000
+  refresh-token-validity-ms: 604800000
+
 # ===== CORS (dev) =====
 dekat:
   cors:

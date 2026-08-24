@@ -1,0 +1,46 @@
+{
+  "session_id": "mcp-25684",
+  "created_at": "2026-08-23T17:44:04.590620+00:00",
+  "last_active": "2026-08-23T17:44:34.784524+00:00",
+  "tool_call_count": 3,
+  "context": {
+    "client_info": "{'name': 'opencode', 'version': '1.18.21'}",
+    "client_name": "opencode",
+    "last_tool": "tools/call",
+    "last_args": "{'query': 'DEKAT booking platform Flutter near_flutter', 'limit': 10}"
+  },
+  "stream_buffer": [
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "memory_query",
+        "success": true
+      },
+      "timestamp": "2026-08-23T17:44:22.431467+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 4,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-23T17:44:23.749173+00:00"
+    },
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "memory_query",
+        "success": true
+      },
+      "timestamp": "2026-08-23T17:44:33.753436+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 5,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-23T17:44:34.784524+00:00"
+    }
+  ]
+}

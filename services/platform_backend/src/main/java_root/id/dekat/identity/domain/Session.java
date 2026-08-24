@@ -32,7 +32,7 @@ public class Session {
 
     private String tokenFamily;
 
-    @Column(nullable = false)
+    @Column(name = "refresh_token", nullable = false)
     private String refreshTokenHash;
 
     @Column(nullable = false)

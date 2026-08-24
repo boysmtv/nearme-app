@@ -15,6 +15,21 @@ import type {
 } from './types';
 
 export const publicApi = {
+  auth: {
+    login: (email: string, password: string) =>
+      apiClient.post<ApiResponse<{ accessToken: string; refreshToken: string; expiresIn: number; tokenType: string }>>('/auth/login', {
+        email,
+        password,
+      }),
+    register: (name: string, email: string, phone: string | undefined, password: string) =>
+      apiClient.post<ApiResponse<{ accessToken: string; refreshToken: string; expiresIn: number; tokenType: string }>>('/auth/register', {
+        name,
+        email,
+        phone,
+        password,
+      }),
+  },
+
   categories: {
     list: () =>
       apiClient.get<ApiResponse<Category[]>>('/public/categories'),

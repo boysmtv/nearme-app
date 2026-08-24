@@ -4,7 +4,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import { publicApi } from '../lib/api';
-import type { Category, Provider } from '../lib/types';
+import type { Category } from '../lib/types';
 
 const defaultCategories: Category[] = [
   { id: '1', name: 'Barbershop', slug: 'barbershop', icon: '💈', serviceCount: 0 },

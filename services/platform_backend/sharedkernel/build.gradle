@@ -16,6 +16,11 @@ dependencies {
     api 'org.springframework.boot:spring-boot-starter-security'
     api 'org.springframework.boot:spring-boot-starter-oauth2-resource-server'
     api 'org.springframework.boot:spring-boot-starter-web'  // for Jackson
+
+    // JWT
+    api "io.jsonwebtoken:jjwt-api:${rootProject.ext.jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${rootProject.ext.jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${rootProject.ext.jjwtVersion}"
     // spring-kafka instead of spring-boot-starter-kafka (which has version issues in 3.x)
     api 'org.springframework.kafka:spring-kafka'
 

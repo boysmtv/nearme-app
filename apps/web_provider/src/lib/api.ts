@@ -14,7 +14,7 @@ import type {
 export const providerApi = {
   auth: {
     login: (email: string, password: string) =>
-      apiClient.post<ApiResponse<{ token: string; refreshToken: string }>>('/auth/provider/login', {
+      apiClient.post<ApiResponse<{ accessToken: string; refreshToken: string }>>('/auth/login', {
         email,
         password,
       }),

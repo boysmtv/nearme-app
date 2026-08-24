@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { providerApi } from '../lib/api';
+import { publicApi } from '../lib/api';
 
 const loginSchema = z.object({
   email: z.string().email('Email tidak valid'),
@@ -26,11 +26,11 @@ export default function LoginPage() {
   });
 
   const loginMutation = useMutation({
-    mutationFn: (data: LoginFormData) => providerApi.auth.login(data.email, data.password),
+    mutationFn: (data: LoginFormData) => publicApi.auth.login(data.email, data.password),
     onSuccess: (res) => {
       localStorage.setItem('auth_token', res.data.accessToken);
       localStorage.setItem('auth_refresh', res.data.refreshToken);
-      navigate('/dashboard');
+      navigate('/');
     },
     onError: () => {
       setError('Email atau password salah');
@@ -47,8 +47,8 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center">
           <Link to="/" className="text-3xl font-bold text-primary-600">DEKAT</Link>
-          <h1 className="mt-6 text-2xl font-bold text-gray-900">Portal Provider</h1>
-          <p className="mt-2 text-gray-500">Masuk untuk mengelola bisnis Anda</p>
+          <h1 className="mt-6 text-2xl font-bold text-gray-900">Masuk</h1>
+          <p className="mt-2 text-gray-500">Masuk ke akun DEKAT Anda</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="mt-8 space-y-5 rounded-2xl bg-white p-8 shadow-xl ring-1 ring-gray-100">
@@ -71,7 +71,7 @@ export default function LoginPage() {
               autoComplete="email"
               {...register('email')}
               className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-3 text-sm transition-colors focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              placeholder="email@bisnis.com"
+              placeholder="email@contoh.com"
             />
             {errors.email && <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>}
           </div>
@@ -89,39 +89,19 @@ export default function LoginPage() {
             {errors.password && <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>}
           </div>
 
-          <div className="flex items-center justify-between">
-            <label className="flex items-center gap-2 text-sm text-gray-600">
-              <input type="checkbox" className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" />
-              Ingat saya
-            </label>
-            <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-700">
-              Lupa password?
-            </a>
-          </div>
-
           <button
             type="submit"
             disabled={isSubmitting}
             className="w-full rounded-lg bg-primary-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-700 disabled:opacity-50"
           >
-            {isSubmitting ? (
-              <span className="flex items-center justify-center gap-2">
-                <svg className="h-4 w-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-                Masuk...
-              </span>
-            ) : (
-              'Masuk'
-            )}
+            {isSubmitting ? 'Masuk...' : 'Masuk'}
           </button>
 
           <p className="text-center text-sm text-gray-500">
-            Belum punya akun provider?{' '}
-            <a href="#" className="font-medium text-primary-600 hover:text-primary-700">
+            Belum punya akun?{' '}
+            <Link to="/register" className="font-medium text-primary-600 hover:text-primary-700">
               Daftar sekarang
-            </a>
+            </Link>
           </p>
         </form>
       </div>

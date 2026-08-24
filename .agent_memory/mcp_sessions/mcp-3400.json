@@ -1,0 +1,142 @@
+{
+  "session_id": "mcp-3400",
+  "created_at": "2026-08-24T05:59:46.015001+00:00",
+  "last_active": "2026-08-24T14:02:55.716004+00:00",
+  "tool_call_count": 9,
+  "context": {
+    "client_info": "{'name': 'opencode', 'version': '1.18.21'}",
+    "client_name": "opencode",
+    "last_tool": "tools/call",
+    "last_args": "{'query': 'Check the web apps (web_public, web_provider, web_admin) for login pages, registration forms, API client configuration. How do they connect to the backend? What API URLs are configured? Loo"
+  },
+  "stream_buffer": [
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "memory_query",
+        "success": true
+      },
+      "timestamp": "2026-08-24T06:00:20.854344+00:00"
+    },
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "project_status",
+        "success": true
+      },
+      "timestamp": "2026-08-24T06:00:22.200374+00:00"
+    },
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "skill_status",
+        "success": true
+      },
+      "timestamp": "2026-08-24T06:00:22.601140+00:00"
+    },
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "approval_status",
+        "success": true
+      },
+      "timestamp": "2026-08-24T06:00:22.615521+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 4,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-24T06:00:23.531943+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 5,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-24T06:00:23.567014+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 6,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-24T06:00:23.567014+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 7,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-24T06:00:23.568022+00:00"
+    },
+    {
+      "type": "tool_result",
+      "data": {
+        "tool": "memory_query",
+        "success": true
+      },
+      "timestamp": "2026-08-24T06:00:59.115611+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 8,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-24T06:01:00.415961+00:00"
+    },
+    {
+      "type": "tool_error",
+      "data": {
+        "tool": "project_ask",
+        "error": "Missing API key environment variable: DEEPSEEK_API_KEY"
+      },
+      "timestamp": "2026-08-24T14:02:50.420943+00:00"
+    },
+    {
+      "type": "tool_error",
+      "data": {
+        "tool": "project_ask",
+        "error": "Missing API key environment variable: DEEPSEEK_API_KEY"
+      },
+      "timestamp": "2026-08-24T14:02:51.328822+00:00"
+    },
+    {
+      "type": "tool_error",
+      "data": {
+        "tool": "project_ask",
+        "error": "Missing API key environment variable: DEEPSEEK_API_KEY"
+      },
+      "timestamp": "2026-08-24T14:02:53.097462+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 9,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-24T14:02:54.395376+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 10,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-24T14:02:55.716004+00:00"
+    },
+    {
+      "type": "cancelled",
+      "data": {
+        "requestId": 11,
+        "reason": "AbortError: The operation was aborted."
+      },
+      "timestamp": "2026-08-24T14:02:55.716004+00:00"
+    }
+  ]
+}

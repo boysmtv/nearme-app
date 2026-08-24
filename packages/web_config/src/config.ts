@@ -5,7 +5,7 @@ export interface Config {
 }
 
 export const config: Config = {
-  apiUrl: import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api',
+  apiUrl: import.meta.env.VITE_API_URL ?? 'http://localhost:8080/api/v1',
   appName: import.meta.env.VITE_APP_NAME ?? 'DEKAT',
   environment: (import.meta.env.VITE_ENVIRONMENT as Config['environment']) ?? 'development',
 };

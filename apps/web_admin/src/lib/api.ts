@@ -7,7 +7,7 @@ import type {
 export const adminApi = {
   auth: {
     login: (email: string, password: string, mfaCode?: string) =>
-      apiClient.post<ApiResponse<{ token: string; requiresMfa: boolean }>>('/auth/admin/login', { email, password, mfaCode }),
+      apiClient.post<ApiResponse<{ accessToken: string; requiresMfa: boolean }>>('/auth/login', { email, password, mfaCode }),
   },
 
   dashboard: {

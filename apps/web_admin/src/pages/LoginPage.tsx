@@ -24,7 +24,8 @@ export default function LoginPage() {
     mutationFn: (d: FormData) => adminApi.auth.login(d.email, d.password, d.mfaCode),
     onSuccess: (res) => {
       if (res.data.requiresMfa && !requiresMfa) { setRequiresMfa(true); return; }
-      localStorage.setItem('admin_token', res.data.token);
+      localStorage.setItem('admin_token', res.data.accessToken);
+      localStorage.setItem('admin_user', JSON.stringify({ email: requiresMfa ? undefined : undefined }));
       localStorage.setItem('admin_user', JSON.stringify({ email: requiresMfa ? undefined : undefined }));
       navigate('/dashboard');
     },
