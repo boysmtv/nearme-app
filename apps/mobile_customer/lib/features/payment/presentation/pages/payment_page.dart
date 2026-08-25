@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
 class PaymentPage extends ConsumerStatefulWidget {
   final String bookingId;
-  const PaymentPage({super.key, required this.bookingId});
+  final String? tenantId;
+  final num amount;
+  final String currency;
+  const PaymentPage({
+    super.key,
+    required this.bookingId,
+    this.tenantId,
+    required this.amount,
+    required this.currency,
+  });
+
   @override
   ConsumerState<PaymentPage> createState() => _PaymentPageState();
 }
@@ -24,7 +36,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
           Card(color: Theme.of(context).colorScheme.primary, child: Padding(padding: const EdgeInsets.all(24), child: Center(child: Column(children: [
             Text('Total Amount', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16)),
             const SizedBox(height: 8),
-            const Text('Rp 75.000', style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+            Text(formatRupiah(widget.amount), style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
           ])))),
           const SizedBox(height: 24),
           Text('Select Payment Method', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
@@ -40,10 +52,11 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
           Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('Payment Summary', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            _SummaryRow(label: 'Service', value: 'Rp 75.000'),
-            _SummaryRow(label: 'Tax', value: 'Rp 0'),
+            _SummaryRow(label: 'Booking', value: widget.bookingId),
+            _SummaryRow(label: 'Amount', value: formatRupiah(widget.amount)),
+            _SummaryRow(label: 'Tax', value: formatRupiah(0)),
             const Divider(),
-            _SummaryRow(label: 'Total', value: 'Rp 75.000', isBold: true),
+            _SummaryRow(label: 'Total', value: formatRupiah(widget.amount), isBold: true),
           ]))),
         ]),
       ),
@@ -62,11 +75,36 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
   Future<void> _handlePayment() async {
     setState(() => _isProcessing = true);
     try {
-      await ApiService().createPaymentIntent(widget.bookingId, _selectedMethod);
-      if (mounted) context.push('/payment/success?bookingId=');
+      await ApiService().dio.post(
+            '/bookings/${widget.bookingId}/payment-intents',
+            data: {
+              'tenantId': widget.tenantId,
+              'amount': widget.amount,
+              'currency': widget.currency,
+              'method': _selectedMethod,
+            },
+          );
+      if (mounted) {
+        context.push('/payment/success'
+            '?bookingId=${widget.bookingId}'
+            '&amount=${widget.amount}'
+            '&currency=${Uri.encodeComponent(widget.currency)}'
+            '&method=$_selectedMethod');
+      }
+    } on DioException catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Payment failed: ${e.error ?? e.message}'),
+          backgroundColor: Colors.red,
+        ));
+        setState(() => _isProcessing = false);
+      }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Payment failed: '), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Payment failed: $e'),
+          backgroundColor: Colors.red,
+        ));
         setState(() => _isProcessing = false);
       }
     }
@@ -97,7 +135,7 @@ class _SummaryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label), Text(value, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: isBold ? 18 : 14)),
+      Text(label), Flexible(child: Text(value, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: isBold ? FontWeight.bold : FontWeight.normal, fontSize: isBold ? 18 : 14))),
     ]));
   }
 }

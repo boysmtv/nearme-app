@@ -1,5 +1,8 @@
 # ===== Dev Profile =====
 spring:
+  mail:
+    host: localhost
+    port: 1025
   datasource:
     url: jdbc:postgresql://localhost:5432/dekat_dev
     username: dekat
@@ -12,7 +15,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
@@ -56,14 +59,23 @@ jwt:
   access-token-validity-ms: 900000
   refresh-token-validity-ms: 604800000
 
-# ===== CORS (dev) =====
+# ===== CORS + File upload (dev) =====
 dekat:
   cors:
-    allowed-origins: http://localhost:3000,http://localhost:8081
+    allowed-origins: http://localhost:3000,http://localhost:3001,http://localhost:3002,http://localhost:8081,http://10.0.2.2:8080
     allowed-methods: GET,POST,PUT,PATCH,DELETE,OPTIONS
     allowed-headers: '*'
     allow-credentials: true
     max-age: 3600
+  storage:
+    base-path: ./uploads
+    allowed-types: image/jpeg,image/png,image/webp,application/pdf
+    max-size: 10MB
+  notification:
+    smtp:
+      host: localhost
+      port: 1025
+      from: no-reply@dekat.id
 
 # ===== Actuator (dev) =====
 management:
@@ -74,6 +86,9 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+    mail:
+      enabled: false
 
 # ===== OpenAPI (dev) =====
 springdoc:
@@ -83,9 +98,3 @@ springdoc:
     enabled: true
     path: /swagger-ui.html
 
-# ===== File upload (dev) =====
-dekat:
-  storage:
-    base-path: ./uploads
-    allowed-types: image/jpeg,image/png,image/webp,application/pdf
-    max-size: 10MB

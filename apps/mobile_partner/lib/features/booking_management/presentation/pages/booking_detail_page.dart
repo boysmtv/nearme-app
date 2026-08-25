@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-final partnerBookingDetailProvider = FutureProvider.autoDispose.family<Booking?, String>((ref, id) async {
-  try {
-    final response = await ApiService().getBooking(id);
-    return Booking.fromJson(response.data['data']);
-  } catch (e) { return null; }
+final partnerBookingDetailProvider =
+    FutureProvider.autoDispose.family<PartnerBookingRow, String>((ref, id) async {
+  final response = await ApiService().dio.get('/provider/bookings/$id');
+  return PartnerBookingRow.fromJson(response.data['data'] as Map<String, dynamic>);
 });
 
 class BookingDetailPage extends ConsumerWidget {
@@ -19,71 +18,79 @@ class BookingDetailPage extends ConsumerWidget {
     final bookingAsync = ref.watch(partnerBookingDetailProvider(bookingId));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Booking Details'), actions: [
-        IconButton(icon: const Icon(Icons.phone), onPressed: () {}),
-      ]),
+      appBar: AppBar(title: const Text('Booking Details')),
       body: bookingAsync.when(
         data: (booking) {
-          if (booking == null) return const Center(child: Text('Booking not found'));
+          final status = booking.status.toUpperCase();
+          final isPending = status == 'PENDING' || status == 'HELD' || status == 'PENDING_APPROVAL';
+          final color = switch (status) {
+            'CONFIRMED' || 'CHECKED_IN' || 'IN_SERVICE' => Colors.blue,
+            'COMPLETED' => Colors.green,
+            'CANCELLED' || 'NO_SHOW' => Colors.red,
+            _ => Colors.orange,
+          };
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Container(
                 width: double.infinity, padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: booking.status == 'pending' ? Colors.orange[50] : Colors.blue[50],
+                  color: color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(children: [
-                  Icon(booking.status == 'pending' ? Icons.pending_actions : Icons.info_outline,
-                      color: booking.status == 'pending' ? Colors.orange[700] : Colors.blue[700]),
+                  Icon(isPending ? Icons.pending_actions : Icons.info_outline, color: color),
                   const SizedBox(width: 12),
-                  Text(booking.status[0].toUpperCase() + booking.status.substring(1),
-                      style: TextStyle(fontWeight: FontWeight.bold, color: booking.status == 'pending' ? Colors.orange[700] : Colors.blue[700])),
+                  Text(status.isNotEmpty ? status[0] + status.substring(1).toLowerCase() : '-',
+                      style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+                  const Spacer(),
+                  Text(booking.bookingCode, style: TextStyle(color: color)),
                 ]),
               ),
               const SizedBox(height: 24),
               Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('Customer', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                _InfoRow(icon: Icons.person, label: 'Name', value: booking.customerId),
-                _InfoRow(icon: Icons.spa, label: 'Service', value: booking.service?.name ?? '-'),
-                _InfoRow(icon: Icons.access_time, label: 'Duration', value: '${booking.service?.durationMinutes ?? 0} min'),
-              ]))),
-              const SizedBox(height: 16),
-              Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Schedule', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                _InfoRow(icon: Icons.calendar_today, label: 'Date', value: booking.date.toString().substring(0, 10)),
-                _InfoRow(icon: Icons.access_time, label: 'Time', value: booking.time),
+                _InfoRow(icon: Icons.person, label: 'Name', value: booking.customerName),
+                _InfoRow(icon: Icons.spa, label: 'Service', value: booking.serviceName.isEmpty ? '-' : booking.serviceName),
+                _InfoRow(icon: Icons.access_time, label: 'Time', value: booking.time.isEmpty ? '-' : booking.time),
               ]))),
               const SizedBox(height: 16),
               Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Text('Payment', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
-                _InfoRow(icon: Icons.payments, label: 'Amount', value: 'Rp ${booking.amount}'),
+                _InfoRow(icon: Icons.payments, label: 'Amount', value: formatRupiah(booking.amount)),
               ]))),
             ]),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('Failed to load')),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Failed to load'),
+              TextButton(onPressed: () => ref.invalidate(partnerBookingDetailProvider(bookingId)), child: const Text('Coba lagi')),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))]),
         child: SafeArea(child: bookingAsync.when(
           data: (booking) {
-            if (booking?.status != 'pending') return const SizedBox();
+            final status = booking.status.toUpperCase();
+            if (status != 'PENDING' && status != 'HELD' && status != 'PENDING_APPROVAL') return const SizedBox();
             return Row(children: [
               Expanded(child: OutlinedButton(
-                onPressed: () async { try { await ApiService().declineBooking(bookingId); if (context.mounted) context.go('/bookings'); } catch (_) {} },
+                onPressed: () => _updateStatus(context, ref, 'CANCELLED'),
                 style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: Colors.red), foregroundColor: Colors.red),
                 child: const Text('Decline'),
               )),
               const SizedBox(width: 12),
               Expanded(child: ElevatedButton(
-                onPressed: () async { try { await ApiService().acceptBooking(bookingId); if (context.mounted) context.go('/bookings'); } catch (_) {} },
+                onPressed: () => _updateStatus(context, ref, 'CONFIRMED'),
                 style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
                 child: const Text('Accept'),
               )),
@@ -94,6 +101,19 @@ class BookingDetailPage extends ConsumerWidget {
         )),
       ),
     );
+  }
+
+  Future<void> _updateStatus(BuildContext context, WidgetRef ref, String status) async {
+    try {
+      await ApiService().updateBookingStatus(bookingId, status);
+      ref.invalidate(partnerBookingDetailProvider(bookingId));
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update: $e'), backgroundColor: Colors.red),
+        );
+      }
+    }
   }
 }
 
@@ -106,7 +126,7 @@ class _InfoRow extends StatelessWidget {
     return Padding(padding: const EdgeInsets.symmetric(vertical: 6), child: Row(children: [
       Icon(icon, size: 16, color: Colors.grey[500]), const SizedBox(width: 8),
       Text(label, style: TextStyle(color: Colors.grey[600])), const Spacer(),
-      Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+      Flexible(child: Text(value, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w500))),
     ]));
   }
 }

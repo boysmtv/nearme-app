@@ -7,7 +7,9 @@ import type {
 export const adminApi = {
   auth: {
     login: (email: string, password: string, mfaCode?: string) =>
-      apiClient.post<ApiResponse<{ accessToken: string; requiresMfa: boolean }>>('/auth/login', { email, password, mfaCode }),
+      apiClient.post<ApiResponse<{ accessToken: string; refreshToken?: string; expiresIn?: number; tokenType?: string; requiresMfa?: boolean }>>('/auth/login', { email, password, mfaCode }),
+    logout: (refreshToken?: string) =>
+      apiClient.post(`/auth/logout${refreshToken ? `?refreshToken=${encodeURIComponent(refreshToken)}` : ''}`, {}),
   },
 
   dashboard: {

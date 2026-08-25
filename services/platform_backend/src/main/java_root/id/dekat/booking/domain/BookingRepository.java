@@ -1,11 +1,14 @@
 package id.dekat.booking.domain;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,25 +19,38 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     Optional<Booking> findByBookingCode(String bookingCode);
 
+    Page<Booking> findByTenantId(UUID tenantId, Pageable pageable);
+
+    Page<Booking> findByTenantIdAndStatus(UUID tenantId, BookingStatus status, Pageable pageable);
+
+    Page<Booking> findByCustomerId(UUID customerId, Pageable pageable);
+
+    Page<Booking> findByCustomerIdAndStatus(UUID customerId, BookingStatus status, Pageable pageable);
+
+    List<Booking> findByTenantId(UUID tenantId);
+
+    List<Booking> findByTenantIdAndStartsAtBetween(UUID tenantId, OffsetDateTime startsAt, OffsetDateTime endsAt);
+
+    List<Booking> findByCustomerIdAndStartsAtBetween(UUID customerId, OffsetDateTime startsAt, OffsetDateTime endsAt);
+
     @Query("""
         SELECT b FROM Booking b
         WHERE b.tenantId = :tenantId
-          AND b.status NOT IN (id.dekat.booking.domain.BookingStatus.CANCELLED,
-                               id.dekat.booking.domain.BookingStatus.EXPIRED)
+          AND b.status NOT IN :excludedStatuses
           AND b.startsAt < :endsAt
           AND b.endsAt > :startsAt
     """)
     java.util.List<Booking> findOverlappingBookings(
         @Param("tenantId") UUID tenantId,
         @Param("startsAt") OffsetDateTime startsAt,
-        @Param("endsAt") OffsetDateTime endsAt
+        @Param("endsAt") OffsetDateTime endsAt,
+        @Param("excludedStatuses") List<BookingStatus> excludedStatuses
     );
 
     @Query("""
         SELECT b FROM Booking b
         WHERE b.tenantId = :tenantId
-          AND b.status NOT IN (id.dekat.booking.domain.BookingStatus.CANCELLED,
-                               id.dekat.booking.domain.BookingStatus.EXPIRED)
+          AND b.status NOT IN :excludedStatuses
           AND EXISTS (
               SELECT ba FROM BookingAssignment ba
               WHERE ba.bookingId = b.id
@@ -47,6 +63,7 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
         @Param("tenantId") UUID tenantId,
         @Param("staffId") UUID staffId,
         @Param("startsAt") OffsetDateTime startsAt,
-        @Param("endsAt") OffsetDateTime endsAt
+        @Param("endsAt") OffsetDateTime endsAt,
+        @Param("excludedStatuses") List<BookingStatus> excludedStatuses
     );
 }

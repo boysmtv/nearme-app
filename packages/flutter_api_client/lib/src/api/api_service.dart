@@ -95,24 +95,11 @@ class ApiService {
   }
 
   Future<Response> createPaymentIntent(String bookingId, String method) {
-    return _dio.post(Endpoints.paymentIntent, data: {'booking_id': bookingId, 'payment_method': method});
+    return _dio.post('$Endpoints.bookings/$bookingId/payment-intents', data: {'payment_method': method});
   }
 
   Future<Response> getPayment(String id) {
     return _dio.get('${Endpoints.payments}/$id');
-  }
-
-  Future<Response> getProfile() {
-    return _dio.get(Endpoints.profile);
-  }
-
-  Future<Response> updateProfile(Map<String, dynamic> data) {
-    return _dio.put(Endpoints.profile, data: data);
-  }
-
-  Future<Response> uploadAvatar(String filePath) async {
-    final formData = FormData.fromMap({'avatar': await MultipartFile.fromFile(filePath)});
-    return _dio.post('${Endpoints.profile}/avatar', data: formData);
   }
 
   Future<Response> getNotifications({Map<String, dynamic>? params}) {
@@ -135,43 +122,64 @@ class ApiService {
     return _dio.post(Endpoints.supportTickets, data: data);
   }
 
+  // Provider dashboard (partner app)
   Future<Response> getPartnerBookings({Map<String, dynamic>? params}) {
-    return _dio.get(Endpoints.partnerBookings, queryParameters: params);
+    return _dio.get(Endpoints.providerBookings, queryParameters: params);
   }
 
-  Future<Response> acceptBooking(String id) {
-    return _dio.post('${Endpoints.partnerBookings}/$id/accept');
+  Future<Response> updateBookingStatus(String id, String status) {
+    return _dio.put('${Endpoints.providerBookings}/$id/status', data: {'status': status});
   }
 
-  Future<Response> declineBooking(String id) {
-    return _dio.post('${Endpoints.partnerBookings}/$id/decline');
+  Future<Response> getPartnerDashboardStats() {
+    return _dio.get(Endpoints.providerDashboardStats);
   }
 
-  Future<Response> completeBooking(String id) {
-    return _dio.post('${Endpoints.partnerBookings}/$id/complete');
+  Future<Response> getPartnerRecentBookings() {
+    return _dio.get(Endpoints.providerRecentBookings);
   }
 
-  Future<Response> getPartnerEarnings({Map<String, dynamic>? params}) {
-    return _dio.get(Endpoints.partnerEarnings, queryParameters: params);
+  Future<Response> getProviderServicesList({Map<String, dynamic>? params}) {
+    return _dio.get(Endpoints.providerServices, queryParameters: params);
   }
 
   Future<Response> getStaff({Map<String, dynamic>? params}) {
-    return _dio.get(Endpoints.partnerStaff, queryParameters: params);
+    return _dio.get(Endpoints.providerStaff, queryParameters: params);
   }
 
   Future<Response> addStaff(Map<String, dynamic> data) {
-    return _dio.post(Endpoints.partnerStaff, data: data);
+    return _dio.post(Endpoints.providerStaff, data: data);
   }
 
   Future<Response> updateStaff(String id, Map<String, dynamic> data) {
-    return _dio.put('${Endpoints.partnerStaff}/$id', data: data);
+    return _dio.put('${Endpoints.providerStaff}/$id', data: data);
   }
 
   Future<Response> deleteStaff(String id) {
-    return _dio.delete('${Endpoints.partnerStaff}/$id');
+    return _dio.delete('${Endpoints.providerStaff}/$id');
+  }
+
+  Future<Response> inviteStaff(Map<String, dynamic> data) {
+    return _dio.post('${Endpoints.providerStaff}/invite', data: data);
+  }
+
+  Future<Response> getCustomers({Map<String, dynamic>? params}) {
+    return _dio.get(Endpoints.providerCustomers, queryParameters: params);
+  }
+
+  Future<Response> getCalendar({Map<String, dynamic>? params}) {
+    return _dio.get(Endpoints.providerCalendar, queryParameters: params);
   }
 
   Future<Response> getReports({Map<String, dynamic>? params}) {
-    return _dio.get(Endpoints.partnerReports, queryParameters: params);
+    return _dio.get(Endpoints.providerReports, queryParameters: params);
+  }
+
+  Future<Response> getSettings() {
+    return _dio.get(Endpoints.providerSettings);
+  }
+
+  Future<Response> updateSettings(Map<String, dynamic> data) {
+    return _dio.put(Endpoints.providerSettings, data: data);
   }
 }

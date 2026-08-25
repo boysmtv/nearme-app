@@ -3,16 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-final calendarBookingsProvider = FutureProvider.autoDispose.family<List<Booking>, DateTime>((ref, date) async {
+final calendarBookingsProvider =
+    FutureProvider.autoDispose.family<List<PartnerBookingRow>, DateTime>((ref, date) async {
   final dateStr = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
-  try {
-    final response = await ApiService().getPartnerBookings(params: {'date': dateStr});
-    final data = response.data['data'] as List;
-    return data.map((e) => Booking.fromJson(e)).toList();
-  } catch (e) {
-    return [];
-  }
+  final response = await ApiService().getPartnerBookings(params: {'date': dateStr, 'page': 1, 'limit': 50});
+  return parsePaginated(response.data['data'], PartnerBookingRow.fromJson).items;
 });
 
 class CalendarPage extends ConsumerStatefulWidget {
@@ -69,23 +66,30 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
               itemCount: bookings.length,
               itemBuilder: (context, index) {
                 final b = bookings[index];
+                final status = b.status.toUpperCase();
+                final color = switch (status) {
+                  'CONFIRMED' || 'CHECKED_IN' || 'IN_SERVICE' => Colors.green,
+                  'CANCELLED' || 'NO_SHOW' => Colors.red,
+                  'COMPLETED' => Colors.blue,
+                  _ => Colors.orange,
+                };
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: b.status == 'confirmed' ? Colors.green[50] : Colors.orange[50],
-                      child: Icon(Icons.person, color: b.status == 'confirmed' ? Colors.green : Colors.orange),
+                      backgroundColor: color.withOpacity(0.1),
+                      child: Icon(Icons.person, color: color),
                     ),
-                    title: Text(b.customerId, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('${b.service?.name ?? "Service"} - ${b.time}'),
+                    title: Text(b.customerName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('${b.serviceName.isEmpty ? "Service" : b.serviceName} - ${b.time}'),
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: b.status == 'confirmed' ? Colors.green[50] : Colors.orange[50],
+                        color: color.withOpacity(0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(b.status[0].toUpperCase() + b.status.substring(1),
-                          style: TextStyle(fontSize: 12, color: b.status == 'confirmed' ? Colors.green : Colors.orange, fontWeight: FontWeight.w500)),
+                      child: Text(status.isNotEmpty ? status[0] + status.substring(1).toLowerCase() : '-',
+                          style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w500)),
                     ),
                     onTap: () => context.push('/booking/${b.id}'),
                   ),
@@ -94,7 +98,18 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             );
           },
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (_, __) => const Center(child: Text('Failed to load bookings')),
+          error: (e, _) => Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('Failed to load bookings'),
+                TextButton(
+                  onPressed: () => ref.invalidate(calendarBookingsProvider(selectedDay)),
+                  child: const Text('Coba lagi'),
+                ),
+              ],
+            ),
+          ),
         )),
       ]),
     );

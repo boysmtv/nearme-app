@@ -78,13 +78,10 @@ export interface ServiceAddon {
 
 export interface StaffMember {
   id: string;
-  name: string;
-  email: string;
-  avatarUrl: string;
-  bio: string;
-  specialties: string[];
-  status: 'ACTIVE' | 'INACTIVE';
-  schedule: StaffSchedule[];
+  displayName: string;
+  title?: string;
+  email?: string;
+  isActive: boolean;
 }
 
 export interface StaffSchedule {

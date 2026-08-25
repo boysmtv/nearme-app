@@ -5,6 +5,7 @@ import id.dekat.notification.infrastructure.email.SendResult;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
@@ -20,6 +21,7 @@ import java.util.regex.Pattern;
 
 @Slf4j
 @Component
+@EnableConfigurationProperties(SmtpProperties.class)
 public class SmtpEmailAdapter implements EmailPort {
 
     private static final Pattern TEMPLATE_VAR_PATTERN = Pattern.compile("\\{\\{(\\w+)}}");
@@ -43,7 +45,12 @@ public class SmtpEmailAdapter implements EmailPort {
             helper.setSubject(subject);
             helper.setText(htmlBody, true);
 
-            mailSender.send(message);
+            try {
+                mailSender.send(message);
+            } catch (RuntimeException e) {
+                log.warn("Email send failed to={}: {}", to, e.getMessage());
+                return SendResult.failed(e.getMessage() == null ? "smtp error" : e.getMessage());
+            }
 
             String messageId = UUID.randomUUID().toString();
             log.info("Email sent successfully to={}, messageId={}", to, messageId);

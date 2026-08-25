@@ -2,7 +2,6 @@ package id.dekat.booking.domain;
 
 import jakarta.persistence.*;
 import java.time.OffsetDateTime;
-import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -13,23 +12,22 @@ public class BookingStatusHistory {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "booking_id", nullable = false, columnDefinition = "uuid")
     private UUID bookingId;
 
+    @Column(name = "old_status")
     @Enumerated(EnumType.STRING)
     private BookingStatus fromStatus;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "new_status", nullable = false)
     private BookingStatus toStatus;
 
+    @Column(name = "changed_by", columnDefinition = "uuid")
     private UUID actorId;
 
+    @Column(columnDefinition = "text")
     private String reason;
-
-    @Column(columnDefinition = "jsonb")
-    @Convert(converter = id.dekat.common.JsonbMapConverter.class)
-    private Map<String, Object> metadata;
 
     @Column(nullable = false)
     private OffsetDateTime createdAt;
@@ -38,13 +36,18 @@ public class BookingStatusHistory {
 
     public BookingStatusHistory(UUID bookingId, BookingStatus fromStatus,
                                 BookingStatus toStatus, UUID actorId,
-                                String reason, Map<String, Object> metadata) {
+                                String reason) {
+        this(bookingId, fromStatus, toStatus, actorId, reason, null);
+    }
+
+    public BookingStatusHistory(UUID bookingId, BookingStatus fromStatus,
+                                BookingStatus toStatus, UUID actorId,
+                                String reason, Object ignoredMetadata) {
         this.bookingId = bookingId;
         this.fromStatus = fromStatus;
         this.toStatus = toStatus;
         this.actorId = actorId;
         this.reason = reason;
-        this.metadata = metadata;
         this.createdAt = OffsetDateTime.now();
     }
 
@@ -54,6 +57,5 @@ public class BookingStatusHistory {
     public BookingStatus getToStatus() { return toStatus; }
     public UUID getActorId() { return actorId; }
     public String getReason() { return reason; }
-    public Map<String, Object> getMetadata() { return metadata; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
 }

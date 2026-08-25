@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
+import { Link } from 'react-router-dom';
 import { providerApi } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import Layout from '../components/Layout';
 import StatsCard from '../components/StatsCard';
-import BookingTable from '../components/BookingTable';
 
 function formatPrice(amount: number): string {
   return new Intl.NumberFormat('id-ID', {
@@ -14,6 +15,9 @@ function formatPrice(amount: number): string {
 }
 
 export default function DashboardPage() {
+  const { user } = useAuth();
+  const bookingLink = user && user.id ? `${window.location.origin}/booking/${user.id}` : null;
+
   const { data: statsRes, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard', 'stats'],
     queryFn: () => providerApi.dashboard.getStats(),
@@ -57,9 +61,9 @@ export default function DashboardPage() {
             <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-semibold text-gray-900">Booking Terbaru</h2>
-                <a href="/calendar" className="text-sm font-medium text-primary-600 hover:text-primary-700">
+                <Link to="/calendar" className="text-sm font-medium text-primary-600 hover:text-primary-700">
                   Lihat Semua
-                </a>
+                </Link>
               </div>
               {bookingsLoading ? (
                 <div className="space-y-3">
@@ -114,30 +118,41 @@ export default function DashboardPage() {
                   { label: 'Kelola Staf', href: '/staff', color: 'text-purple-600 bg-purple-50 hover:bg-purple-100' },
                   { label: 'Lihat Laporan', href: '/reports', color: 'text-amber-600 bg-amber-50 hover:bg-amber-100' },
                 ].map((action) => (
-                  <a
+                  <Link
                     key={action.href}
-                    href={action.href}
+                    to={action.href}
                     className={`block rounded-lg px-4 py-3 text-sm font-medium transition-colors ${action.color}`}
                   >
                     {action.label}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
 
             <div className="rounded-xl bg-gradient-to-br from-primary-600 to-primary-700 p-6 text-white">
               <h3 className="font-semibold">Link Booking Anda</h3>
-              <p className="mt-1 text-sm text-primary-100">Bagikan link ini kepada pelanggan</p>
-              <div className="mt-3 flex items-center gap-2">
-                <input
-                  readOnly
-                  value="https://dekat.app/b/my-business"
-                  className="flex-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white placeholder-white/50 backdrop-blur"
-                />
-                <button className="rounded-lg bg-white px-3 py-2 text-xs font-medium text-primary-700 hover:bg-primary-50">
-                  Salin
-                </button>
-              </div>
+              {bookingLink ? (
+                <>
+                  <p className="mt-1 text-sm text-primary-100">Bagikan link ini kepada pelanggan</p>
+                  <div className="mt-3 flex items-center gap-2">
+                    <input
+                      readOnly
+                      value={bookingLink}
+                      className="flex-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white placeholder-white/50 backdrop-blur"
+                    />
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(bookingLink).catch(() => {}); }}
+                      className="rounded-lg bg-white px-3 py-2 text-xs font-medium text-primary-700 hover:bg-primary-50"
+                    >
+                      Salin
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <p className="mt-2 text-sm text-primary-100">
+                  Tautan booking akan tersedia setelah bisnis diverifikasi
+                </p>
+              )}
             </div>
           </div>
         </div>

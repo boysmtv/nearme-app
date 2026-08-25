@@ -191,7 +191,7 @@ CREATE UNIQUE INDEX uq_idempotency_key ON idempotency_records (idempotency_key);
 -- ============================================================
 -- outbox_events (transactional outbox pattern)
 -- ============================================================
-CREATE TABLE outbox_events (
+CREATE TABLE IF NOT EXISTS outbox_events (
     id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     aggregate_type VARCHAR(64) NOT NULL,
     aggregate_id  UUID NOT NULL,
@@ -204,9 +204,9 @@ CREATE TABLE outbox_events (
     published_at  TIMESTAMPTZ
 );
 
-CREATE INDEX idx_outbox_pending ON outbox_events (available_at)
+CREATE INDEX IF NOT EXISTS idx_outbox_pending ON outbox_events (available_at)
     WHERE status = 'PENDING';
-CREATE INDEX idx_outbox_aggregate ON outbox_events (aggregate_type, aggregate_id);
+CREATE INDEX IF NOT EXISTS idx_outbox_aggregate ON outbox_events (aggregate_type, aggregate_id);
 
 -- ============================================================
 -- consumer_inbox (exactly-once consumer dedup)

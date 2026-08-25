@@ -23,14 +23,14 @@ public class ReviewController {
             @RequestBody CreateReviewRequest request) {
         Review review = reviewService.createReview(
                 id, userId, tenantId,
-                request.getOverallRating(), request.getTimelinessRating(),
-                request.getQualityRating(), request.getComment());
+                request.overallRating(), request.timelinessRating(),
+                request.qualityRating(), request.comment());
         return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }
 
     @PostMapping("/reviews/{id}/report")
     public ResponseEntity<Review> reportReview(@PathVariable UUID id) {
-        Review review = reviewService.reportReview(id);
+        Review review = reviewService.reportReview(id, null, null);
         return ResponseEntity.ok(review);
     }
 

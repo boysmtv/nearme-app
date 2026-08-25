@@ -2,15 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-final providerListProvider = FutureProvider.autoDispose<List<Provider>>((ref) async {
-  try {
-    final response = await ApiService().getProviders();
-    final data = response.data['data'] as List;
-    return data.map((e) => Provider.fromJson(e)).toList();
-  } catch (e) {
-    return [];
-  }
+final providerListProvider = FutureProvider.autoDispose<List<ProviderRow>>((ref) async {
+  final response = await ApiService().getProviders();
+  return ((response.data['data'] ?? []) as List)
+      .map((e) => ProviderRow.fromJson(e as Map<String, dynamic>))
+      .toList();
 });
 
 class ProviderListPage extends ConsumerWidget {
@@ -56,17 +54,28 @@ class ProviderListPage extends ConsumerWidget {
                     children: [
                       Icon(Icons.star, size: 14, color: Colors.amber[600]),
                       const SizedBox(width: 4),
-                      Text((p.rating ?? 0).toStringAsFixed(1)),
+                      Text(p.rating.toStringAsFixed(1)),
                     ],
                   ),
-                  onTap: () => context.push('/provider/${p.id}'),
+                  onTap: () => context.push('/provider/${p.slug}'),
                 ),
               );
             },
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Error: $e'),
+              TextButton(
+                onPressed: () => ref.invalidate(providerListProvider),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

@@ -2,13 +2,43 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 
-final earningsProvider = FutureProvider.autoDispose<Earnings>((ref) async {
+class PartnerStats {
+  final int todayBookings;
+  final int todayRevenue;
+  final int weekBookings;
+  final int weekRevenue;
+  final int totalCustomers;
+  final double avgRating;
+  final List<Map<String, dynamic>> recentBookings;
+  const PartnerStats({
+    required this.todayBookings,
+    required this.todayRevenue,
+    required this.weekBookings,
+    required this.weekRevenue,
+    required this.totalCustomers,
+    required this.avgRating,
+    required this.recentBookings,
+  });
+}
+
+final earningsProvider = FutureProvider.autoDispose<PartnerStats>((ref) async {
+  final api = ApiService();
+  final statsRes = await api.getPartnerDashboardStats();
+  final stats = (statsRes.data['data'] ?? {}) as Map<String, dynamic>;
+  List<Map<String, dynamic>> recent = [];
   try {
-    final response = await ApiService().getPartnerEarnings();
-    return Earnings.fromJson(response.data['data']);
-  } catch (e) {
-    return const Earnings(totalEarnings: 0, thisWeek: 0, thisMonth: 0, recentTransactions: []);
-  }
+    final recentRes = await api.getPartnerRecentBookings();
+    recent = ((recentRes.data['data'] ?? []) as List).cast<Map<String, dynamic>>();
+  } catch (_) {}
+  return PartnerStats(
+    todayBookings: (stats['todayBookings'] as num?)?.toInt() ?? 0,
+    todayRevenue: (stats['todayRevenue'] as num?)?.toInt() ?? 0,
+    weekBookings: (stats['weekBookings'] as num?)?.toInt() ?? 0,
+    weekRevenue: (stats['weekRevenue'] as num?)?.toInt() ?? 0,
+    totalCustomers: (stats['totalCustomers'] as num?)?.toInt() ?? 0,
+    avgRating: (stats['avgRating'] as num?)?.toDouble() ?? 0,
+    recentBookings: recent,
+  );
 });
 
 class EarningsPage extends ConsumerWidget {
@@ -16,12 +46,12 @@ class EarningsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final earningsAsync = ref.watch(earningsProvider);
+    final statsAsync = ref.watch(earningsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Earnings')),
-      body: earningsAsync.when(
-        data: (earnings) {
+      appBar: AppBar(title: const Text('Pendapatan')),
+      body: statsAsync.when(
+        data: (stats) {
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -35,42 +65,61 @@ class EarningsPage extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Text('Total Earnings', style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const Text('Pendapatan Hari Ini', style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 8),
-                  Text('Rp ${earnings.totalEarnings}', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                  Text('Rp ${stats.todayRevenue}', style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 12),
                   Row(children: [
-                    _MiniStat(label: 'This Week', value: 'Rp ${earnings.thisWeek}'),
+                    _MiniStat(label: 'Booking Hari Ini', value: '${stats.todayBookings}'),
                     const SizedBox(width: 24),
-                    _MiniStat(label: 'This Month', value: 'Rp ${earnings.thisMonth}'),
+                    _MiniStat(label: 'Rating', value: stats.avgRating.toStringAsFixed(1)),
                   ]),
                 ]),
               )),
+              const SizedBox(height: 16),
+              Row(children: [
+                Expanded(child: _SummaryCard(label: 'Pendapatan Minggu Ini', value: 'Rp ${stats.weekRevenue}')),
+                const SizedBox(width: 12),
+                Expanded(child: _SummaryCard(label: 'Booking Minggu Ini', value: '${stats.weekBookings}')),
+              ]),
+              const SizedBox(height: 16),
+              Row(children: [
+                Expanded(child: _SummaryCard(label: 'Total Pelanggan', value: '${stats.totalCustomers}')),
+                const SizedBox(width: 12),
+                Expanded(child: _SummaryCard(label: 'Status', value: 'Aktif')),
+              ]),
               const SizedBox(height: 24),
-              const Text('Recent Transactions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const Text('Transaksi Terbaru', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 12),
-              if (earnings.recentTransactions == null || earnings.recentTransactions!.isEmpty)
+              if (stats.recentBookings.isEmpty)
                 Center(child: Column(children: [
                   Icon(Icons.receipt_long, size: 48, color: Colors.grey[300]),
-                  const SizedBox(height: 8), Text('No transactions yet', style: TextStyle(color: Colors.grey)),
+                  const SizedBox(height: 8), Text('Belum ada transaksi', style: TextStyle(color: Colors.grey)),
                 ]))
-              else ...earnings.recentTransactions!.map((t) => Card(
+              else ...stats.recentBookings.map((t) => Card(
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: t.status == 'completed' ? Colors.green[50] : Colors.grey[100],
-                    child: Icon(Icons.receipt, color: t.status == 'completed' ? Colors.green : Colors.grey),
+                    backgroundColor: t['status'] == 'COMPLETED' ? Colors.green[50] : Colors.grey[100],
+                    child: Icon(Icons.receipt, color: t['status'] == 'COMPLETED' ? Colors.green : Colors.grey),
                   ),
-                  title: Text(t.customerName, style: const TextStyle(fontWeight: FontWeight.w500)),
-                  subtitle: Text(t.service, style: const TextStyle(fontSize: 12)),
-                  trailing: Text('Rp ${t.amount}', style: TextStyle(color: t.status == 'completed' ? Colors.green : Colors.orange, fontWeight: FontWeight.bold)),
+                  title: Text('${t['customerName'] ?? '-'}', style: const TextStyle(fontWeight: FontWeight.w500)),
+                  subtitle: Text('${t['serviceName'] ?? ''} · ${t['time'] ?? ''}', style: const TextStyle(fontSize: 12)),
+                  trailing: Text('Rp ${t['amount'] ?? 0}', style: TextStyle(
+                    color: t['status'] == 'COMPLETED' ? Colors.green : Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  )),
                 ),
               )),
             ]),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('Failed to load earnings')),
+        error: (e, _) => Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Text('Gagal memuat pendapatan'),
+          const SizedBox(height: 8),
+          TextButton(onPressed: () => ref.invalidate(earningsProvider), child: const Text('Coba lagi')),
+        ])),
       ),
     );
   }
@@ -85,5 +134,18 @@ class _MiniStat extends StatelessWidget {
       Text(label, style: const TextStyle(color: Colors.white60, fontSize: 12)),
       Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     ]);
+  }
+}
+
+class _SummaryCard extends StatelessWidget {
+  final String label, value;
+  const _SummaryCard({required this.label, required this.value});
+  @override
+  Widget build(BuildContext context) {
+    return Card(child: Padding(padding: const EdgeInsets.all(14), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(label, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+      const SizedBox(height: 6),
+      Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    ])));
   }
 }

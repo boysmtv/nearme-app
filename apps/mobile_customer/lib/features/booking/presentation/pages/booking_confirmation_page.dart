@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-final bookingDetailProvider = FutureProvider.autoDispose.family<Booking?, String>((ref, id) async {
-  try {
-    final response = await ApiService().getBooking(id);
-    return Booking.fromJson(response.data['data']);
-  } catch (e) { return null; }
+final bookingConfirmationProvider =
+    FutureProvider.autoDispose.family<BookingRow, String>((ref, id) async {
+  final response = await ApiService().getBooking(id);
+  return BookingRow.fromJson(response.data['data'] as Map<String, dynamic>);
 });
 
 class BookingConfirmationPage extends ConsumerWidget {
@@ -16,10 +16,11 @@ class BookingConfirmationPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bookingAsync = ref.watch(bookingDetailProvider(bookingId));
+    final bookingAsync = ref.watch(bookingConfirmationProvider(bookingId));
     return Scaffold(
-      body: SafeArea(child: Center(
+      body: SafeArea(child: Padding(
         padding: const EdgeInsets.all(24),
+        child: Center(
         child: bookingAsync.when(
           data: (booking) => Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(width: 120, height: 120, decoration: BoxDecoration(color: Colors.green[50], shape: BoxShape.circle),
@@ -30,27 +31,25 @@ class BookingConfirmationPage extends ConsumerWidget {
             Text('Your booking has been successfully confirmed.', textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
             const SizedBox(height: 32),
             Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(children: [
-              _DetailRow(icon: Icons.confirmation_number, label: 'Booking ID', value: '#'),
+              _DetailRow(icon: Icons.confirmation_number, label: 'Booking Code', value: booking.bookingCode.isEmpty ? booking.id : booking.bookingCode),
               const Divider(),
-              _DetailRow(icon: Icons.store, label: 'Provider', value: booking?.provider?.name ?? '-'),
+              _DetailRow(icon: Icons.info_outline, label: 'Status', value: booking.status),
               const Divider(),
-              _DetailRow(icon: Icons.spa, label: 'Service', value: booking?.service?.name ?? '-'),
+              _DetailRow(icon: Icons.calendar_today, label: 'Date & Time', value: booking.startsAt != null ? _fmt(booking.startsAt!) : '-'),
               const Divider(),
-              _DetailRow(icon: Icons.calendar_today, label: 'Date & Time', value: ' '),
+              _DetailRow(icon: Icons.payments, label: 'Total', value: formatRupiah(booking.total)),
             ]))),
             const SizedBox(height: 24),
-            Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(12)),
-              child: Row(children: [Icon(Icons.info_outline, color: Colors.blue[700]), const SizedBox(width: 8),
-                Expanded(child: Text('A confirmation has been sent to your email.', style: TextStyle(color: Colors.blue[700])))])),
           ]),
           loading: () => const CircularProgressIndicator(),
-          error: (_, __) => Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.check_circle, size: 80, color: Colors.green),
-            const SizedBox(height: 24),
-            Text('Booking # Confirmed!', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold)),
+          error: (e, _) => Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const Icon(Icons.error_outline, size: 64, color: Colors.red),
+            const SizedBox(height: 16),
+            Text('Failed to load booking: $e', textAlign: TextAlign.center),
+            TextButton(onPressed: () => ref.invalidate(bookingConfirmationProvider(bookingId)), child: const Text('Retry')),
           ]),
         ),
-      )),
+      ))),
       bottomNavigationBar: Container(padding: const EdgeInsets.all(16), child: SafeArea(child: Column(mainAxisSize: MainAxisSize.min, children: [
         ElevatedButton(onPressed: () => context.go('/bookings'), style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)), child: const Text('View My Bookings')),
         const SizedBox(height: 8),
@@ -58,6 +57,9 @@ class BookingConfirmationPage extends ConsumerWidget {
       ]))),
     );
   }
+
+  String _fmt(DateTime d) =>
+      '${d.day}/${d.month}/${d.year} ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 }
 
 class _DetailRow extends StatelessWidget {
@@ -68,7 +70,7 @@ class _DetailRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(padding: const EdgeInsets.symmetric(vertical: 8), child: Row(children: [
       Icon(icon, size: 20, color: Colors.grey[600]), const SizedBox(width: 12), Expanded(child: Text(label)),
-      Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
+      Flexible(child: Text(value, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.bold))),
     ]));
   }
 }

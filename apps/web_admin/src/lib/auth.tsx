@@ -13,7 +13,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(async (email: string, password: string, mfaCode?: string) => {
     const res = await adminApi.auth.login(email, password, mfaCode);
     if (res.data.requiresMfa && !mfaCode) return false;
-    localStorage.setItem('admin_token', res.data.token);
+    localStorage.setItem('auth_token', res.data.accessToken);
+    if (res.data.refreshToken) {
+      localStorage.setItem('auth_refresh', res.data.refreshToken);
+    }
     const u: AdminUser = { id: '', email, name: '', role: 'ADMIN', mfaVerified: !!mfaCode };
     localStorage.setItem('admin_user', JSON.stringify(u));
     setUser(u);
@@ -22,7 +25,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [navigate]);
 
   const logout = useCallback(() => {
-    localStorage.removeItem('admin_token');
+    const refreshToken = localStorage.getItem('auth_refresh');
+    adminApi.auth.logout(refreshToken ?? undefined).catch(() => {});
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_refresh');
     localStorage.removeItem('admin_user');
     setUser(null);
     navigate('/login');

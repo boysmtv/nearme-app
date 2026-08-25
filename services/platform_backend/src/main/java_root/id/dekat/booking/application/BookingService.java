@@ -65,11 +65,12 @@ public class BookingService {
             throw new IllegalStateException("Hold has expired. Please create a new hold.");
         }
 
+        UUID effectiveLocationId = locationId != null ? locationId : hold.getLocationId();
         String bookingCode = generateBookingCode(tenantId);
 
         Booking booking = new Booking(
-                tenantId, locationId, customerId, bookingCode,
-                ServiceMode.AT_BUSINESS,
+                tenantId, effectiveLocationId, customerId, bookingCode,
+                ServiceMode.IN_PERSON,
                 hold.getStartsAt(), hold.getEndsAt(),
                 ZoneId.of("Asia/Jakarta"),
                 currency
@@ -104,8 +105,7 @@ public class BookingService {
 
         BookingStatusHistory history = new BookingStatusHistory(
                 savedBooking.getId(), null, BookingStatus.CONFIRMED,
-                customerId, "Booking confirmed from hold", null
-        );
+                customerId, "Booking confirmed from hold");
         statusHistoryRepository.save(history);
 
         hold.markConverted();
@@ -148,8 +148,7 @@ public class BookingService {
 
         BookingStatusHistory history = new BookingStatusHistory(
                 bookingId, booking.getStatus(), booking.getStatus(),
-                null, "Booking rescheduled", metadata
-        );
+                null, "Booking rescheduled");
         statusHistoryRepository.save(history);
 
         return savedBooking;
@@ -200,8 +199,7 @@ public class BookingService {
 
         statusHistoryRepository.save(new BookingStatusHistory(
                 bookingId, fromStatus, BookingStatus.CHECKED_IN,
-                actorId, "Customer checked in", null
-        ));
+                actorId, "Customer checked in"));
 
         return savedBooking;
     }
@@ -217,8 +215,7 @@ public class BookingService {
 
         statusHistoryRepository.save(new BookingStatusHistory(
                 bookingId, fromStatus, BookingStatus.IN_SERVICE,
-                actorId, "Service started", null
-        ));
+                actorId, "Service started"));
 
         return savedBooking;
     }
@@ -275,12 +272,15 @@ public class BookingService {
     public void validateSlotAvailability(UUID tenantId, UUID staffId,
                                          OffsetDateTime startsAt, OffsetDateTime endsAt) {
         List<Booking> overlaps;
+        List<BookingStatus> activeStatuses = List.of(
+                BookingStatus.CONFIRMED, BookingStatus.CHECKED_IN, BookingStatus.EN_ROUTE,
+                BookingStatus.IN_SERVICE, BookingStatus.PENDING_APPROVAL, BookingStatus.HELD);
         if (staffId != null) {
             overlaps = bookingRepository.findOverlappingBookingsForStaff(
-                    tenantId, staffId, startsAt, endsAt
+                    tenantId, staffId, startsAt, endsAt, activeStatuses
             );
         } else {
-            overlaps = bookingRepository.findOverlappingBookings(tenantId, startsAt, endsAt);
+            overlaps = bookingRepository.findOverlappingBookings(tenantId, startsAt, endsAt, activeStatuses);
         }
         if (!overlaps.isEmpty()) {
             throw new IllegalStateException("Time slot not available: overlapping bookings exist");
@@ -305,8 +305,11 @@ public class BookingService {
 
     @Transactional(readOnly = true)
     public Booking getBooking(UUID bookingId) {
-        return bookingRepository.findById(bookingId)
+        Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
+        booking.getItems().size();
+        booking.getAssignments().size();
+        return booking;
     }
 
     @Transactional(readOnly = true)
@@ -340,3 +343,4 @@ public class BookingService {
         return sb.toString();
     }
 }
+

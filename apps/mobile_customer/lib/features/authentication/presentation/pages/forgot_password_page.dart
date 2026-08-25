@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import 'package:flutter_core/flutter_core.dart';
 
 class ForgotPasswordPage extends ConsumerStatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -144,13 +143,11 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           _isLoading = false;
           _emailSent = true;
         });
-      } catch (e) {
-        setState(() => _isLoading = false);
+      } catch (e) {        setState(() => _isLoading = false);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Reset link sent! Check your email.')),
+            SnackBar(content: Text('Failed to send reset link: $e'), backgroundColor: Colors.red),
           );
-          setState(() => _emailSent = true);
         }
       }
     }

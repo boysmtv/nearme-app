@@ -28,7 +28,7 @@ function formatPrice(amount: number): string {
   }).format(amount);
 }
 
-export default function BookingTable({ bookings, onStatusChange }: BookingTableProps) {
+export default function BookingTable({ bookings, onStatusChange: _onStatusChange }: BookingTableProps) {
   if (bookings.length === 0) {
     return (
       <div className="rounded-xl bg-white p-12 text-center shadow-sm ring-1 ring-gray-100">

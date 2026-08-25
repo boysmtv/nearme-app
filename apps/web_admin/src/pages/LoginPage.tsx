@@ -24,9 +24,10 @@ export default function LoginPage() {
     mutationFn: (d: FormData) => adminApi.auth.login(d.email, d.password, d.mfaCode),
     onSuccess: (res) => {
       if (res.data.requiresMfa && !requiresMfa) { setRequiresMfa(true); return; }
-      localStorage.setItem('admin_token', res.data.accessToken);
-      localStorage.setItem('admin_user', JSON.stringify({ email: requiresMfa ? undefined : undefined }));
-      localStorage.setItem('admin_user', JSON.stringify({ email: requiresMfa ? undefined : undefined }));
+      localStorage.setItem('auth_token', res.data.accessToken);
+      if (res.data.refreshToken) {
+        localStorage.setItem('auth_refresh', res.data.refreshToken);
+      }
       navigate('/dashboard');
     },
     onError: () => setError(requiresMfa ? 'Kode MFA salah' : 'Email atau password salah'),

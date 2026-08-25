@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -9,7 +9,7 @@ import Footer from '../components/Footer';
 import SlotPicker from '../components/SlotPicker';
 import BookingSummary from '../components/BookingSummary';
 import { publicApi } from '../lib/api';
-import type { Service, Staff, TimeSlot, Addon } from '../lib/types';
+import type { Service, Staff, TimeSlot, Addon, BookingResponse } from '../lib/types';
 
 const contactSchema = z.object({
   customerName: z.string().min(2, 'Nama harus minimal 2 karakter'),
@@ -41,11 +41,12 @@ export default function BookingPage() {
   const [selectedStaff, setSelectedStaff] = useState<Staff | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<TimeSlot | null>(null);
   const [selectedAddons, setSelectedAddons] = useState<Addon[]>([]);
-  const [selectedDate, setSelectedDate] = useState(() => {
+  const [selectedDate, setSelectedDate] = useState<string>(() => {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
+    return d.toISOString().split('T')[0] ?? '';
   });
+  const [createdBooking, setCreatedBooking] = useState<BookingResponse | null>(null);
 
   const { data: servicesRes } = useQuery({
     queryKey: ['services', providerId],
@@ -66,7 +67,7 @@ export default function BookingPage() {
         providerId!,
         selectedService!.id,
         selectedStaff!.id,
-        selectedDate,
+        selectedDate ?? new Date().toISOString().split('T')[0],
       ),
     enabled: !!providerId && !!selectedService?.id && !!selectedStaff?.id && !!selectedDate,
   });
@@ -78,6 +79,8 @@ export default function BookingPage() {
         serviceId: selectedService!.id,
         staffId: selectedStaff!.id,
         slotId: selectedSlot!.id,
+        startsAt: selectedSlot!.startTime,
+        endsAt: selectedSlot!.endTime,
         addons: selectedAddons.map((a) => a.id),
         ...data,
         notes: data.notes || '',
@@ -86,20 +89,22 @@ export default function BookingPage() {
   });
 
   const services = servicesRes?.data ?? [];
+
+  useEffect(() => {
+    if (preselectedServiceId && !selectedService && services.length > 0) {
+      const match = services.find((s) => s.id === preselectedServiceId);
+      if (match) setSelectedService(match);
+    }
+  }, [preselectedServiceId, services, selectedService]);
   const staffList = staffRes?.data ?? [];
   const slots = slotsRes?.data ?? [];
-
-  const preselectedService = useMemo(
-    () => services.find((s) => s.id === preselectedServiceId) || null,
-    [services, preselectedServiceId],
-  );
 
   const filteredStaff = useMemo(() => {
     if (!selectedService) return staffList;
     return staffList.filter(
       (s) =>
         selectedService.id &&
-        (!s.specialties.length || s.specialties.includes(selectedService.category)),
+        (!(s.specialties?.length) || s.specialties.includes(selectedService.category)),
     );
   }, [staffList, selectedService]);
 
@@ -122,23 +127,6 @@ export default function BookingPage() {
     { key: 'contact', label: 'Kontak' },
     { key: 'confirm', label: 'Konfirmasi' },
   ];
-
-  const canGoNext = useMemo(() => {
-    switch (step) {
-      case 'service':
-        return !!selectedService;
-      case 'staff':
-        return !!selectedStaff;
-      case 'slot':
-        return !!selectedSlot;
-      case 'contact':
-        return contactForm.formState.isValid;
-      case 'confirm':
-        return false;
-      default:
-        return false;
-    }
-  }, [step, selectedService, selectedStaff, selectedSlot, contactForm.formState.isValid]);
 
   const handleServiceSelect = (service: Service) => {
     setSelectedService(service);
@@ -169,13 +157,11 @@ export default function BookingPage() {
     setStep('confirm');
   };
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     const values = contactForm.getValues();
     createBooking.mutate(values, {
       onSuccess: (res) => {
-        if (res.data.paymentUrl) {
-          window.location.href = res.data.paymentUrl;
-        }
+        setCreatedBooking(res.data);
       },
     });
   };
@@ -238,6 +224,39 @@ export default function BookingPage() {
             </div>
           </div>
 
+          {createdBooking ? (
+            <div className="mx-auto max-w-xl rounded-xl border border-green-200 bg-white p-8 text-center shadow-sm">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+                <svg className="h-7 w-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="mt-4 text-xl font-semibold text-gray-900">Booking Berhasil Dibuat</h2>
+              <p className="mt-2 text-sm text-gray-500">
+                Simpan kode booking berikut sebagai referensi Anda
+              </p>
+              <div className="mx-auto mt-4 w-fit rounded-lg bg-gray-100 px-6 py-3 text-lg font-bold tracking-widest text-gray-900">
+                {createdBooking.bookingCode}
+              </div>
+              <p className="mt-3 text-xs uppercase tracking-wide text-gray-400">
+                Status: {createdBooking.status}
+              </p>
+              <div className="mt-6 flex justify-center gap-3">
+                <Link
+                  to="/"
+                  className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Beranda
+                </Link>
+                <Link
+                  to="/search"
+                  className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+                >
+                  Cari Layanan Lain
+                </Link>
+              </div>
+            </div>
+          ) : (
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Main Content */}
             <div className="lg:col-span-2">
@@ -266,7 +285,7 @@ export default function BookingPage() {
                             {formatPrice(service.price)}
                           </span>
                         </div>
-                        {service.addons.length > 0 && (
+                        {(service.addons?.length ?? 0) > 0 && (
                           <div className="mt-3 border-t border-gray-100 pt-3">
                             <p className="text-xs font-medium text-gray-500">Add-on tersedia:</p>
                             <div className="mt-1 flex flex-wrap gap-2">
@@ -360,7 +379,7 @@ export default function BookingPage() {
                       isLoading={slotsLoading}
                     />
                   </div>
-                  {selectedService && selectedService.addons.length > 0 && (
+                  {selectedService && (selectedService.addons?.length ?? 0) > 0 && (
                     <div className="mt-6">
                       <h3 className="text-sm font-medium text-gray-700">Tambah Add-on</h3>
                       <div className="mt-2 space-y-2">
@@ -569,6 +588,7 @@ export default function BookingPage() {
               </div>
             </div>
           </div>
+          )}
         </div>
       </main>
 

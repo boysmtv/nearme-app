@@ -2,55 +2,77 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-final providerDetailProvider = FutureProvider.autoDispose.family<Provider?, String>((ref, id) async {
-  try {
-    final response = await ApiService().getProvider(id);
-    return Provider.fromJson(response.data['data']);
-  } catch (e) {
-    return null;
-  }
-});
+class ProviderDetail {
+  final String id;
+  final String slug;
+  final String name;
+  final String? category;
+  final String? imageUrl;
+  final double rating;
+  final int reviewCount;
+  final String? city;
+  final String? address;
+  final String? description;
+  final List<Map<String, dynamic>> locations;
 
-final providerServicesProvider = FutureProvider.autoDispose.family<List<Service>, String>((ref, id) async {
-  try {
-    final response = await ApiService().getProviderServices(id);
-    final data = response.data['data'] as List;
-    return data.map((e) => Service.fromJson(e)).toList();
-  } catch (e) {
-    return [];
-  }
-});
+  const ProviderDetail({
+    required this.id,
+    required this.slug,
+    required this.name,
+    this.category,
+    this.imageUrl,
+    required this.rating,
+    required this.reviewCount,
+    this.city,
+    this.address,
+    this.description,
+    required this.locations,
+  });
 
-String _formatPrice(int price) {
-  return 'Rp ${price.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}';
+  String? get firstLocationId =>
+      locations.isNotEmpty ? locations.first['id'] as String? : null;
 }
 
+final providerDetailProvider =
+    FutureProvider.autoDispose.family<ProviderDetail, String>((ref, slug) async {
+  final response = await ApiService().getProvider(slug);
+  final data = response.data['data'] as Map<String, dynamic>;
+  return ProviderDetail(
+    id: data['id'] as String,
+    slug: (data['slug'] ?? slug) as String,
+    name: data['name'] as String,
+    category: data['category'] as String?,
+    imageUrl: data['imageUrl'] as String?,
+    rating: (data['rating'] as num?)?.toDouble() ?? 0,
+    reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
+    city: data['city'] as String?,
+    address: data['address'] as String?,
+    description: data['description'] as String?,
+    locations: ((data['locations'] ?? []) as List).cast<Map<String, dynamic>>(),
+  );
+});
+
+final providerServicesProvider =
+    FutureProvider.autoDispose.family<List<ServiceRow>, String>((ref, providerId) async {
+  final response = await ApiService().getProviderServices(providerId);
+  return ((response.data['data'] ?? []) as List)
+      .map((e) => ServiceRow.fromJson(e as Map<String, dynamic>))
+      .toList();
+});
+
 class ProviderDetailPage extends ConsumerWidget {
-  final String providerId;
-  const ProviderDetailPage({super.key, required this.providerId});
+  final String providerSlug;
+  const ProviderDetailPage({super.key, required this.providerSlug});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final providerAsync = ref.watch(providerDetailProvider(providerId));
-    final servicesAsync = ref.watch(providerServicesProvider(providerId));
-
+    final providerAsync = ref.watch(providerDetailProvider(providerSlug));
     return Scaffold(
       body: providerAsync.when(
         data: (provider) {
-          if (provider == null) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.error_outline, size: 64, color: Colors.grey),
-                  const SizedBox(height: 16),
-                  const Text('Provider not found'),
-                  TextButton(onPressed: () => context.pop(), child: const Text('Go Back')),
-                ],
-              ),
-            );
-          }
+          final servicesAsync = ref.watch(providerServicesProvider(provider.id));
           return CustomScrollView(
             slivers: [
               SliverAppBar(
@@ -73,15 +95,13 @@ class ProviderDetailPage extends ConsumerWidget {
                       const SizedBox(height: 4),
                       Text('${provider.category ?? "General"}${provider.address != null ? " - ${provider.address}" : ""}',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey)),
-                      if (provider.rating != null) ...[
-                        const SizedBox(height: 8),
-                        Row(children: [
-                          Icon(Icons.star, size: 18, color: Colors.amber[600]),
-                          const SizedBox(width: 4),
-                          Text('${provider.rating!.toStringAsFixed(1)} (${provider.reviewCount ?? 0} reviews)',
-                              style: const TextStyle(fontWeight: FontWeight.bold)),
-                        ]),
-                      ],
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        Icon(Icons.star, size: 18, color: Colors.amber[600]),
+                        const SizedBox(width: 4),
+                        Text('${provider.rating.toStringAsFixed(1)} (${provider.reviewCount} reviews)',
+                            style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ]),
                       if (provider.description != null) ...[
                         const SizedBox(height: 16),
                         const Text('About', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
@@ -110,9 +130,11 @@ class ProviderDetailPage extends ConsumerWidget {
                           ),
                           title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold)),
                           subtitle: Text('${s.durationMinutes} min'),
-                          trailing: Text(_formatPrice(s.price),
+                          trailing: Text(formatRupiah(s.price),
                               style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
-                          onTap: () => context.push('/booking/new?providerId=$providerId&serviceId=${s.id}'),
+                          onTap: () => context.push(
+                            '/provider/${provider.id}/availability?serviceId=${s.id}${provider.firstLocationId != null ? '&locationId=${provider.firstLocationId}' : ''}',
+                          ),
                         ),
                       );
                     },
@@ -120,14 +142,32 @@ class ProviderDetailPage extends ConsumerWidget {
                   ),
                 ),
                 loading: () => const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator())),
-                error: (_, __) => const SliverToBoxAdapter(child: Text('Failed to load services')),
+                error: (e, _) => SliverToBoxAdapter(
+                  child: Center(
+                    child: TextButton(
+                      onPressed: () => ref.invalidate(providerServicesProvider(provider.id)),
+                      child: const Text('Failed to load services - Retry'),
+                    ),
+                  ),
+                ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 100)),
             ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Error: $e'),
+              TextButton(
+                onPressed: () => ref.invalidate(providerDetailProvider(providerSlug)),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

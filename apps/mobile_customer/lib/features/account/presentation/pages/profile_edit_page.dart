@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../core/router/app_router.dart';
+import 'package:mobile_customer/core/router/app_router.dart';
 
 class ProfileEditPage extends ConsumerStatefulWidget {
   const ProfileEditPage({super.key});
@@ -87,20 +86,16 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
   Future<void> _handleSave() async {
     if (_formKey.currentState!.validate()) {
       setState(() => _isSaving = true);
-      try {
-        await ApiService().updateProfile({
-          'name': _nameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'phone': _phoneController.text.trim(),
-        });
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated!'), backgroundColor: Colors.green));
-          context.pop();
-        }
-      } catch (e) {
-        if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red));
-      } finally {
-        if (mounted) setState(() => _isSaving = false);
+      ref.read(authProvider.notifier).updateLocal(
+            name: _nameController.text.trim(),
+            email: _emailController.text.trim(),
+            phone: _phoneController.text.trim(),
+          );
+      await Future<void>.delayed(const Duration(milliseconds: 200));
+      if (mounted) {
+        setState(() => _isSaving = false);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated'), backgroundColor: Colors.green));
+        context.pop();
       }
     }
   }

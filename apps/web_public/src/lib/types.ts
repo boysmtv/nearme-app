@@ -118,11 +118,10 @@ export interface BookingRequest {
 
 export interface BookingResponse {
   id: string;
-  code: string;
+  bookingCode: string;
   status: string;
   totalAmount: number;
   depositAmount: number;
-  paymentUrl: string | null;
   createdAt: string;
 }
 

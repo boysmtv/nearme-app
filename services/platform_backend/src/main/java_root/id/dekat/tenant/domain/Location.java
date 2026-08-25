@@ -25,10 +25,10 @@ public class Location {
     @Column(nullable = false)
     private String address;
 
-    @Column(precision = 10, scale = 7)
+    @Column
     private Double latitude;
 
-    @Column(precision = 10, scale = 7)
+    @Column
     private Double longitude;
 
     @Column(name = "timezone", length = 50)

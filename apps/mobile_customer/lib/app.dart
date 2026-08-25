@@ -6,7 +6,7 @@ import 'core/router/app_router.dart';
 
 final lightTheme = ThemeData(
   useMaterial3: true,
-  colorScheme: DEKATColorScheme.light,
+  colorScheme: DEKATColorScheme.lightColorScheme,
   textTheme: GoogleFonts.poppinsTextTheme(),
   appBarTheme: AppBarTheme(
     elevation: 0,
@@ -62,7 +62,7 @@ final lightTheme = ThemeData(
       ),
     ),
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     elevation: 2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),
@@ -73,7 +73,7 @@ final lightTheme = ThemeData(
 
 final darkTheme = ThemeData(
   useMaterial3: true,
-  colorScheme: DEKATColorScheme.dark,
+  colorScheme: DEKATColorScheme.darkColorScheme,
   textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
   appBarTheme: AppBarTheme(
     elevation: 0,
@@ -117,7 +117,7 @@ final darkTheme = ThemeData(
       ),
     ),
   ),
-  cardTheme: CardTheme(
+  cardTheme: CardThemeData(
     elevation: 2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),

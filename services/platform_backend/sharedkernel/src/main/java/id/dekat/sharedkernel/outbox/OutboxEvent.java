@@ -23,8 +23,8 @@ public class OutboxEvent {
     @Column(nullable = false)
     private String aggregateType;
 
-    @Column(nullable = false)
-    private String aggregateId;
+    @Column(nullable = false, columnDefinition = "uuid")
+    private UUID aggregateId;
 
     @Column(nullable = false)
     private String eventType;
@@ -36,26 +36,19 @@ public class OutboxEvent {
     @Enumerated(EnumType.STRING)
     private OutboxStatus status = OutboxStatus.PENDING;
 
+    @Column(name = "available_at", nullable = false)
+    private Instant availableAt;
+
     @Column(nullable = false)
     private Instant createdAt;
 
+    @Column(name = "published_at")
     private Instant processedAt;
-
-    private int retryCount = 0;
-
-    private static final int MAX_RETRIES = 5;
 
     @PrePersist
     void prePersist() {
         this.id = UUID.randomUUID();
         if (createdAt == null) createdAt = Instant.now();
-    }
-
-    public boolean canRetry() {
-        return retryCount < MAX_RETRIES;
-    }
-
-    public void incrementRetry() {
-        this.retryCount++;
+        if (availableAt == null) availableAt = Instant.now();
     }
 }

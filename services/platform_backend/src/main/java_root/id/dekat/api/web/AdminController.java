@@ -1,6 +1,7 @@
 package id.dekat.api.web;
 
 import id.dekat.sharedkernel.web.ApiResponse;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;

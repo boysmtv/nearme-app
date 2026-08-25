@@ -1,6 +1,8 @@
 package id.dekat.staff.application;
 
 import id.dekat.staff.domain.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,24 +21,31 @@ public class StaffService {
     private final StaffScheduleRepository staffScheduleRepository;
     private final TimeOffRepository timeOffRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Transactional
     public Staff inviteStaff(UUID tenantId, String displayName, String email, String phone) {
-        if (staffRepository.existsByTenantIdAndEmail(tenantId, email)) {
-            throw new IllegalArgumentException("Staff with this email already exists for this tenant");
-        }
-
+        UUID userId = findUserIdByEmail(email);
         Staff staff = Staff.builder()
                 .tenantId(tenantId)
+                .userId(userId)
                 .displayName(displayName)
-                .email(email)
-                .phone(phone)
-                .status(Staff.StaffStatus.ACTIVE)
-                .visibility(Staff.StaffVisibility.PUBLIC)
+                .isActive(true)
                 .build();
 
-        // TODO: Send invitation email with activation link/token
-
         return staffRepository.save(staff);
+    }
+
+    private UUID findUserIdByEmail(String email) {
+        try {
+            Object result = entityManager.createNativeQuery("SELECT id FROM users WHERE email = :email")
+                    .setParameter("email", email)
+                    .getSingleResult();
+            return (UUID) result;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("No registered user found with email: " + email);
+        }
     }
 
     @Transactional
@@ -44,11 +53,11 @@ public class StaffService {
         Staff staff = staffRepository.findById(staffId)
                 .orElseThrow(() -> new IllegalArgumentException("Staff not found: " + staffId));
 
-        if (staff.getStatus() == Staff.StaffStatus.ACTIVE) {
+        if (Boolean.TRUE.equals(staff.getIsActive())) {
             throw new IllegalStateException("Staff is already active");
         }
 
-        staff.setStatus(Staff.StaffStatus.ACTIVE);
+        staff.setIsActive(true);
         return staffRepository.save(staff);
     }
 
@@ -57,17 +66,11 @@ public class StaffService {
         Staff staff = staffRepository.findById(staffId)
                 .orElseThrow(() -> new IllegalArgumentException("Staff not found: " + staffId));
 
-        if (staff.getStatus() == Staff.StaffStatus.INACTIVE) {
+        if (Boolean.FALSE.equals(staff.getIsActive())) {
             throw new IllegalStateException("Staff is already inactive");
         }
 
-        // Check for future bookings before deactivating
-        Instant now = Instant.now();
-        List<TimeOff> approvedTimeOffs = timeOffRepository.findByStaffIdAndStatus(
-                staffId, TimeOff.TimeOffStatus.APPROVED);
-        // Would also check BookingAssignmentRepository for future bookings
-
-        staff.setStatus(Staff.StaffStatus.INACTIVE);
+        staff.setIsActive(false);
         return staffRepository.save(staff);
     }
 
@@ -76,7 +79,7 @@ public class StaffService {
         Staff staff = staffRepository.findById(staffId)
                 .orElseThrow(() -> new IllegalArgumentException("Staff not found: " + staffId));
 
-        if (staff.getStatus() != Staff.StaffStatus.ACTIVE) {
+        if (!Boolean.TRUE.equals(staff.getIsActive())) {
             throw new IllegalStateException("Only active staff can request time off");
         }
 
@@ -151,7 +154,7 @@ public class StaffService {
 
     @Transactional(readOnly = true)
     public List<Staff> getStaffByTenant(UUID tenantId) {
-        return staffRepository.findByTenantIdAndStatus(tenantId, Staff.StaffStatus.ACTIVE);
+        return staffRepository.findByTenantIdAndIsActiveTrue(tenantId);
     }
 
     @Transactional(readOnly = true)
@@ -165,7 +168,7 @@ public class StaffService {
         Staff staff = staffRepository.findById(staffId)
                 .orElseThrow(() -> new IllegalArgumentException("Staff not found: " + staffId));
 
-        if (staff.getStatus() != Staff.StaffStatus.ACTIVE) {
+        if (!Boolean.TRUE.equals(staff.getIsActive())) {
             throw new IllegalStateException("Only active staff can have schedules");
         }
 

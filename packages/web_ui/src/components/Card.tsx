@@ -1,47 +1,31 @@
-import { type HTMLAttributes, type ReactNode } from 'react';
+import { HTMLAttributes, forwardRef } from 'react';
 import { cn } from '../utils/cn';
 
 interface CardProps extends HTMLAttributes<HTMLDivElement> {
-  children: ReactNode;
+  padding?: 'none' | 'sm' | 'md' | 'lg';
 }
 
-export function Card({ className, children, ...props }: CardProps) {
-  return (
+const paddingStyles: Record<string, string> = {
+  none: '',
+  sm: 'p-3',
+  md: 'p-5',
+  lg: 'p-8',
+};
+
+export const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ className, padding = 'md', children, ...props }, ref) => (
     <div
+      ref={ref}
       className={cn(
-        'rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100',
+        'rounded-xl border border-gray-200 bg-white shadow-sm',
+        paddingStyles[padding],
         className,
       )}
       {...props}
     >
       {children}
     </div>
-  );
-}
+  ),
+);
 
-export function CardHeader({ className, children, ...props }: CardProps) {
-  return (
-    <div className={cn('mb-4', className)} {...props}>
-      {children}
-    </div>
-  );
-}
-
-export function CardTitle({ className, children, ...props }: CardProps) {
-  return (
-    <h3
-      className={cn('text-lg font-semibold text-gray-900', className)}
-      {...props}
-    >
-      {children}
-    </h3>
-  );
-}
-
-export function CardContent({ className, children, ...props }: CardProps) {
-  return (
-    <div className={cn('', className)} {...props}>
-      {children}
-    </div>
-  );
-}
+Card.displayName = 'Card';

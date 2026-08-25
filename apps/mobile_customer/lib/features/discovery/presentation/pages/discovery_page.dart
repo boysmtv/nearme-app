@@ -2,25 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-final discoveryProvider = FutureProvider.autoDispose<List<Provider>>((ref) async {
-  try {
-    final response = await ApiService().getProviders();
-    final data = response.data['data'] as List;
-    return data.map((e) => Provider.fromJson(e)).toList();
-  } catch (e) {
-    return [];
-  }
+final discoveryProvider = FutureProvider.autoDispose<List<ProviderRow>>((ref) async {
+  final response = await ApiService().getProviders();
+  return ((response.data['data'] ?? []) as List)
+      .map((e) => ProviderRow.fromJson(e as Map<String, dynamic>))
+      .toList();
 });
 
 final categoriesProvider = FutureProvider.autoDispose<List<Category>>((ref) async {
-  try {
-    final response = await ApiService().getCategories();
-    final data = response.data['data'] as List;
-    return data.map((e) => Category.fromJson(e)).toList();
-  } catch (e) {
-    return [];
-  }
+  final response = await ApiService().getCategories();
+  return ((response.data['data'] ?? []) as List)
+      .map((e) => Category.fromJson(e as Map<String, dynamic>))
+      .toList();
 });
 
 class DiscoveryPage extends ConsumerWidget {
@@ -102,7 +97,14 @@ class DiscoveryPage extends ConsumerWidget {
                       },
                     ),
                     loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (_, __) => const SizedBox(),
+                    error: (e, _) => SizedBox(
+                      child: Center(
+                        child: TextButton(
+                          onPressed: () => ref.invalidate(categoriesProvider),
+                          child: const Text('Failed to load categories - Retry'),
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -134,10 +136,10 @@ class DiscoveryPage extends ConsumerWidget {
                       return _FeaturedCard(
                         name: provider.name,
                         category: provider.category ?? 'General',
-                        rating: provider.rating ?? 0,
-                        distance: '',
+                        rating: provider.rating,
+                        distance: provider.city ?? '',
                         imageUrl: provider.imageUrl,
-                        onTap: () => context.push('/provider/${provider.id}'),
+                        onTap: () => context.push('/provider/${provider.slug}'),
                       );
                     },
                     childCount: providers.length,

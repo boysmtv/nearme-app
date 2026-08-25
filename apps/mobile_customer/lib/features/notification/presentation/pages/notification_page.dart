@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-final notificationsProvider = FutureProvider.autoDispose<List<AppNotification>>((ref) async {
-  try {
-    final response = await ApiService().getNotifications();
-    final data = response.data['data'] as List;
-    return data.map((e) => AppNotification.fromJson(e)).toList();
-  } catch (e) {
-    return [];
-  }
+final notificationsProvider = FutureProvider.autoDispose<List<NotificationRow>>((ref) async {
+  final response = await ApiService().getNotifications(params: {'page': 1, 'limit': 50});
+  return parsePaginated(response.data['data'], NotificationRow.fromJson).items;
 });
 
 class NotificationPage extends ConsumerWidget {
@@ -27,7 +23,11 @@ class NotificationPage extends ConsumerWidget {
               try {
                 await ApiService().markAllNotificationsRead();
                 ref.invalidate(notificationsProvider);
-              } catch (_) {}
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red));
+                }
+              }
             },
             child: const Text('Mark all read'),
           ),
@@ -54,21 +54,25 @@ class NotificationPage extends ConsumerWidget {
               final n = notifications[index];
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
-                color: n.isRead ? null : Colors.blue[50],
+                color: n.read ? null : Colors.blue[50],
                 child: ListTile(
                   leading: Container(
                     width: 40, height: 40,
                     decoration: BoxDecoration(color: Colors.blue[50], borderRadius: BorderRadius.circular(8)),
-                    child: Icon(Icons.notifications, color: Colors.blue[700], size: 20),
+                    child: Icon(n.channel == 'EMAIL' ? Icons.email : Icons.notifications, color: Colors.blue[700], size: 20),
                   ),
-                  title: Text(n.title, style: TextStyle(fontWeight: n.isRead ? FontWeight.normal : FontWeight.bold)),
-                  subtitle: Text(n.message, maxLines: 2, overflow: TextOverflow.ellipsis),
+                  title: Text(n.subject.isEmpty ? '(no subject)' : n.subject, style: TextStyle(fontWeight: n.read ? FontWeight.normal : FontWeight.bold)),
+                  subtitle: Text(n.body, maxLines: 2, overflow: TextOverflow.ellipsis),
                   onTap: () async {
-                    if (!n.isRead) {
+                    if (!n.read) {
                       try {
                         await ApiService().markNotificationRead(n.id);
                         ref.invalidate(notificationsProvider);
-                      } catch (_) {}
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red));
+                        }
+                      }
                     }
                   },
                 ),
@@ -77,7 +81,15 @@ class NotificationPage extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('Failed to load notifications')),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('Failed to load notifications'),
+              TextButton(onPressed: () => ref.invalidate(notificationsProvider), child: const Text('Retry')),
+            ],
+          ),
+        ),
       ),
     );
   }

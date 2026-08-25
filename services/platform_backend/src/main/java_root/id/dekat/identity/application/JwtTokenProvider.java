@@ -50,7 +50,7 @@ public class JwtTokenProvider {
                 .claim("token_type", "access")
                 .issuedAt(now)
                 .expiration(expiry)
-                .signWith(accessKeyRing.get(currentKid))
+                .signWith(accessKeyRing.get(currentKid), Jwts.SIG.HS256)
                 .compact();
     }
 

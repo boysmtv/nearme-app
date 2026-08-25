@@ -59,3 +59,14 @@ test-results/
 # Build artifacts
 *.log
 *.tmp
+
+# AI tooling artifacts
+.playwright-mcp/
+.agent_memory/
+apps/.ai-agent/
+services/platform_backend/.ai-agent/
+node_modules/
+build/
+.gradle/
+.dart_tool/
+dist/

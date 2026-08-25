@@ -1,8 +1,4 @@
-import 'package:flutter_core/bootstrap.dart';
-import 'package:flutter_core/services/analytics_service.dart';
-import 'package:flutter_core/services/notification_service.dart';
-import 'package:flutter_core/services/localization_service.dart';
-import 'package:flutter_core/config/environment.dart';
+import 'package:flutter_core/flutter_core.dart';
 
 Future<void> initCore() async {
   await initFlutterCore(

@@ -4,19 +4,14 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ProviderCard from '../components/ProviderCard';
 import { publicApi } from '../lib/api';
-import type { Category } from '../lib/types';
-
-const defaultCategories: Category[] = [
-  { id: '1', name: 'Barbershop', slug: 'barbershop', icon: '💈', serviceCount: 0 },
-  { id: '2', name: 'Salon', slug: 'salon', icon: '💇', serviceCount: 0 },
-  { id: '3', name: 'Spa & Massage', slug: 'spa-massage', icon: '💆', serviceCount: 0 },
-  { id: '4', name: 'Kecantikan', slug: 'kecantikan', icon: '✨', serviceCount: 0 },
-  { id: '5', name: 'Kesehatan', slug: 'kesehatan', icon: '🏥', serviceCount: 0 },
-  { id: '6', name: 'Olahraga', slug: 'olahraga', icon: '🏋️', serviceCount: 0 },
-];
 
 export default function HomePage() {
-  const { data: categoriesRes } = useQuery({
+  const {
+    data: categoriesRes,
+    isLoading: categoriesLoading,
+    isError: categoriesError,
+    refetch: refetchCategories,
+  } = useQuery({
     queryKey: ['categories'],
     queryFn: () => publicApi.categories.list(),
     staleTime: 30 * 60 * 1000,
@@ -28,7 +23,7 @@ export default function HomePage() {
     staleTime: 10 * 60 * 1000,
   });
 
-  const categories = categoriesRes?.data ?? defaultCategories;
+  const categories = categoriesRes?.data ?? [];
   const featured = featuredRes?.data ?? [];
 
   return (
@@ -86,21 +81,50 @@ export default function HomePage() {
               <p className="mt-2 text-gray-500">Temukan layanan sesuai kebutuhan Anda</p>
             </div>
             <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  to={`/search?category=${cat.slug}`}
-                  className="group flex flex-col items-center rounded-xl border border-gray-200 p-6 transition-all hover:border-primary-200 hover:bg-primary-50 hover:shadow-md"
-                >
-                  <span className="text-4xl">{cat.icon}</span>
-                  <span className="mt-3 text-sm font-medium text-gray-700 group-hover:text-primary-600">
-                    {cat.name}
-                  </span>
-                  {cat.serviceCount > 0 && (
-                    <span className="mt-1 text-xs text-gray-400">{cat.serviceCount} layanan</span>
-                  )}
-                </Link>
-              ))}
+              {categoriesLoading ? (
+                Array.from({ length: 6 }).map((_, i) => (
+                  <div key={i} className="animate-pulse rounded-xl border border-gray-200 p-6">
+                    <div className="mx-auto h-10 w-10 rounded-full bg-gray-200" />
+                    <div className="mx-auto mt-3 h-4 w-16 rounded bg-gray-100" />
+                  </div>
+                ))
+              ) : categoriesError ? (
+                <div className="col-span-full rounded-xl border border-dashed border-red-200 bg-red-50 p-10 text-center">
+                  <p className="text-gray-700">Gagal memuat kategori</p>
+                  <button
+                    onClick={() => refetchCategories()}
+                    className="mt-4 inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+                  >
+                    Coba Lagi
+                  </button>
+                </div>
+              ) : categories.length === 0 ? (
+                <div className="col-span-full rounded-xl border border-dashed border-gray-300 bg-gray-50 p-10 text-center">
+                  <p className="text-gray-500">Belum ada kategori tersedia</p>
+                  <button
+                    onClick={() => refetchCategories()}
+                    className="mt-4 inline-flex items-center justify-center rounded-lg bg-primary-600 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+                  >
+                    Muat Ulang
+                  </button>
+                </div>
+              ) : (
+                categories.map((cat) => (
+                  <Link
+                    key={cat.id}
+                    to={`/search?category=${cat.slug}`}
+                    className="group flex flex-col items-center rounded-xl border border-gray-200 p-6 transition-all hover:border-primary-200 hover:bg-primary-50 hover:shadow-md"
+                  >
+                    <span className="text-4xl">{cat.icon}</span>
+                    <span className="mt-3 text-sm font-medium text-gray-700 group-hover:text-primary-600">
+                      {cat.name}
+                    </span>
+                    {cat.serviceCount > 0 && (
+                      <span className="mt-1 text-xs text-gray-400">{cat.serviceCount} layanan</span>
+                    )}
+                  </Link>
+                ))
+              )}
             </div>
           </div>
         </section>

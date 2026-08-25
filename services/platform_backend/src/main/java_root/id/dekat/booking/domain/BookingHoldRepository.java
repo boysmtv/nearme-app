@@ -17,8 +17,8 @@ public interface BookingHoldRepository extends JpaRepository<BookingHold, UUID> 
 
     @Modifying
     @Query("""
-        UPDATE BookingHold h SET h.status = id.dekat.booking.domain.BookingHold.HoldStatus.EXPIRED
-        WHERE h.status = id.dekat.booking.domain.BookingHold.HoldStatus.ACTIVE
+        UPDATE BookingHold h SET h.status = 'EXPIRED'
+        WHERE h.status = 'ACTIVE'
           AND h.expiresAt < :now
     """)
     int expireHolds(@Param("now") OffsetDateTime now);
@@ -26,7 +26,7 @@ public interface BookingHoldRepository extends JpaRepository<BookingHold, UUID> 
     @Query("""
         SELECT h FROM BookingHold h
         WHERE h.tenantId = :tenantId
-          AND h.status = id.dekat.booking.domain.BookingHold.HoldStatus.ACTIVE
+          AND h.status = 'ACTIVE'
           AND h.startsAt < :endsAt
           AND h.endsAt > :startsAt
     """)

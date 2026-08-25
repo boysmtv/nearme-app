@@ -2,26 +2,31 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { providerApi } from '../lib/api';
 import Layout from '../components/Layout';
-import type { StaffMember } from '../lib/types';
-
-const dayNames = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
 
 export default function StaffPage() {
   const [showInvite, setShowInvite] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteName, setInviteName] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
   const qc = useQueryClient();
   const { data: res, isLoading } = useQuery({ queryKey: ['staff'], queryFn: () => providerApi.staff.list() });
   const staff = res?.data ?? [];
 
   const inviteMut = useMutation({
-    mutationFn: () => providerApi.staff.invite({ email: inviteEmail, name: inviteName, role: 'STAFF' }),
+    mutationFn: () => providerApi.staff.invite({ displayName: inviteName, email: inviteEmail }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['staff'] }); setShowInvite(false); setInviteEmail(''); setInviteName(''); },
   });
 
   const deactivateMut = useMutation({
     mutationFn: (id: string) => providerApi.staff.deactivate(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['staff'] }),
+  });
+
+  const renameMut = useMutation({
+    mutationFn: ({ id, displayName }: { id: string; displayName: string }) =>
+      providerApi.staff.update(id, { displayName }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['staff'] }); setEditingId(null); },
   });
 
   return (
@@ -38,23 +43,29 @@ export default function StaffPage() {
           {staff.map((s) => (
             <div key={s.id} className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
               <div className="flex items-center gap-4">
-                <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-full bg-primary-100">
-                  {s.avatarUrl ? <img src={s.avatarUrl} alt={s.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-sm font-bold text-primary-600">{s.name.slice(0, 2).toUpperCase()}</div>}
+                <div className="flex h-14 w-14 flex-shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-600">
+                  {s.displayName.slice(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-gray-900 truncate">{s.name}</h3>
-                  <p className="text-xs text-gray-500 truncate">{s.email}</p>
-                  <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${s.status === 'ACTIVE' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{s.status === 'ACTIVE' ? 'Aktif' : 'Nonaktif'}</span>
+                  <h3 className="font-semibold text-gray-900 truncate">{s.displayName}</h3>
+                  <p className="text-xs text-gray-500 truncate">{s.title || s.email || 'Staf'}</p>
+                  <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{s.isActive ? 'Aktif' : 'Nonaktif'}</span>
                 </div>
               </div>
-              {s.specialties.length > 0 && <div className="mt-3 flex flex-wrap gap-1">{s.specialties.map((sp) => <span key={sp} className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{sp}</span>)}</div>}
-              <div className="mt-3 grid grid-cols-7 gap-1">
-                {s.schedule.map((sch, i) => <div key={i} className={`rounded px-1 py-0.5 text-center text-[10px] ${sch.isOff ? 'bg-gray-100 text-gray-400' : 'bg-green-50 text-green-700'}`}>{dayNames[i]}</div>)}
-              </div>
-              <div className="mt-4 flex gap-2">
-                <button className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Edit</button>
-                <button onClick={() => { if (confirm('Nonaktifkan staf ini?')) deactivateMut.mutate(s.id); }} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">Nonaktifkan</button>
-              </div>
+              {editingId === s.id ? (
+                <form onSubmit={(e) => { e.preventDefault(); if (editName.trim()) renameMut.mutate({ id: s.id, displayName: editName.trim() }); }} className="mt-4 flex gap-2">
+                  <input value={editName} onChange={(e) => setEditName(e.target.value)} autoFocus className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none" />
+                  <button type="submit" disabled={renameMut.isPending} className="rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700 disabled:opacity-50">Simpan</button>
+                  <button type="button" onClick={() => setEditingId(null)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Batal</button>
+                </form>
+              ) : (
+                <div className="mt-4 flex gap-2">
+                  <button onClick={() => { setEditingId(s.id); setEditName(s.displayName); }} className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Edit</button>
+                  {s.isActive && (
+                    <button onClick={() => { if (confirm('Nonaktifkan staf ini?')) deactivateMut.mutate(s.id); }} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">Nonaktifkan</button>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>}

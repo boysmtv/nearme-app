@@ -35,7 +35,9 @@ class SecureStorageService {
   }
 
   static Future<void> writeMultiple(Map<String, String> entries) async {
-    await _storage.writeAll(entries);
+    for (final entry in entries.entries) {
+      await _storage.write(key: entry.key, value: entry.value);
+    }
   }
 
   static Future<void> deleteMultiple(List<String> keys) async {

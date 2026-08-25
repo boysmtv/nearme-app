@@ -35,7 +35,7 @@ public class AvailabilityController {
             @RequestHeader("X-Tenant-Id") UUID tenantId,
             @RequestBody ValidateSlotRequest request) {
         boolean valid = availabilityService.validateSlot(
-                tenantId, request.getStaffId(), request.getStartsAt(), request.getEndsAt());
+                tenantId, request.staffId(), request.startsAt(), request.endsAt());
         return ResponseEntity.ok(valid);
     }
 

@@ -6,7 +6,7 @@ import 'core/router/app_router.dart';
 
 final lightTheme = ThemeData(
   useMaterial3: true,
-  colorScheme: DEKATColorScheme.light,
+  colorScheme: DEKATColorScheme.lightColorScheme,
   textTheme: GoogleFonts.poppinsTextTheme(),
   appBarTheme: AppBarTheme(
     elevation: 0, centerTitle: true, backgroundColor: Colors.transparent,
@@ -27,12 +27,12 @@ final lightTheme = ThemeData(
       textStyle: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
     ),
   ),
-  cardTheme: CardTheme(elevation: 2, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+  cardTheme: CardThemeData(elevation: 2, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
 );
 
 final darkTheme = ThemeData(
   useMaterial3: true,
-  colorScheme: DEKATColorScheme.dark,
+  colorScheme: DEKATColorScheme.darkColorScheme,
   textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
   appBarTheme: AppBarTheme(
     elevation: 0, centerTitle: true, backgroundColor: Colors.transparent,
@@ -53,7 +53,7 @@ final darkTheme = ThemeData(
       textStyle: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
     ),
   ),
-  cardTheme: CardTheme(elevation: 2, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
+  cardTheme: CardThemeData(elevation: 2, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
 );
 
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.system);

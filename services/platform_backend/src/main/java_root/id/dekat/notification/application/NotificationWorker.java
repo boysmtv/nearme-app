@@ -6,7 +6,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Component
@@ -22,16 +24,25 @@ public class NotificationWorker {
         try {
             Map<String, String> request = parseMessage(message);
             String type = request.get("type");
+            UUID tenantId = UUID.fromString(request.get("tenantId"));
+            UUID recipientId = UUID.fromString(request.get("recipientId"));
+            String bookingCode = request.get("bookingCode");
+            Instant bookingTime = request.get("bookingTime") != null
+                    ? Instant.parse(request.get("bookingTime")) : null;
 
             switch (type) {
                 case "BOOKING_CONFIRMATION" -> notificationService.sendBookingConfirmation(
-                        request.get("bookingId"), request.get("recipientId"));
+                        tenantId, recipientId, bookingCode,
+                        request.get("serviceName"), request.get("providerName"), bookingTime);
                 case "REMINDER" -> notificationService.sendReminder(
-                        request.get("bookingId"), request.get("recipientId"));
+                        tenantId, recipientId, bookingCode,
+                        request.get("serviceName"), request.get("providerName"),
+                        bookingTime, Integer.parseInt(request.getOrDefault("hoursBefore", "24")));
                 case "CANCELLATION" -> notificationService.sendCancellation(
-                        request.get("bookingId"), request.get("recipientId"));
+                        tenantId, recipientId, bookingCode, request.get("reason"));
                 case "PAYMENT_RECEIPT" -> notificationService.sendPaymentReceipt(
-                        request.get("bookingId"), request.get("recipientId"));
+                        tenantId, recipientId, bookingCode,
+                        request.get("amount"), request.get("currency"));
                 default -> log.warn("Unknown notification type: {}", type);
             }
         } catch (Exception e) {

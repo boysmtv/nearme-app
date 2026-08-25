@@ -6,6 +6,7 @@ import type {
   Booking,
   ProviderService,
   StaffMember,
+  StaffSchedule,
   Customer,
   ReportData,
   Settings,
@@ -18,7 +19,11 @@ export const providerApi = {
         email,
         password,
       }),
-    logout: () => apiClient.post('/auth/provider/logout', {}),
+    logout: (refreshToken?: string) =>
+      apiClient.post(
+        `/auth/logout${refreshToken ? `?refreshToken=${encodeURIComponent(refreshToken)}` : ''}`,
+        {},
+      ),
   },
 
   dashboard: {
@@ -61,7 +66,7 @@ export const providerApi = {
 
   services: {
     list: () => apiClient.get<ApiResponse<ProviderService[]>>('/provider/services'),
-    create: (data: Omit<ProviderService, 'id'>) =>
+    create: (data: { name: string; price: number; duration: number }) =>
       apiClient.post<ApiResponse<ProviderService>>('/provider/services', data),
     update: (id: string, data: Partial<ProviderService>) =>
       apiClient.put<ApiResponse<ProviderService>>(`/provider/services/${id}`, data),
@@ -71,14 +76,14 @@ export const providerApi = {
 
   staff: {
     list: () => apiClient.get<ApiResponse<StaffMember[]>>('/provider/staff'),
-    invite: (data: { email: string; name: string; role: string }) =>
-      apiClient.post<ApiResponse<StaffMember>>('/provider/staff/invite', data),
+    invite: (data: { displayName: string; email: string }) =>
+      apiClient.post<ApiResponse<StaffMember>>('/provider/staff', data),
     update: (id: string, data: Partial<StaffMember>) =>
       apiClient.put<ApiResponse<StaffMember>>(`/provider/staff/${id}`, data),
-    updateSchedule: (id: string, schedule: StaffMember['schedule']) =>
-      apiClient.put(`/provider/staff/${id}/schedule`, { schedule }),
+    updateSchedule: (id: string, schedule: StaffSchedule[]) =>
+      apiClient.post(`/provider/staff/${id}/schedule`, schedule),
     deactivate: (id: string) =>
-      apiClient.put(`/provider/staff/${id}/deactivate`, {}),
+      apiClient.delete(`/provider/staff/${id}`),
   },
 
   customers: {

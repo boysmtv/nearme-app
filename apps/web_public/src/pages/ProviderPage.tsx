@@ -5,7 +5,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ServiceCard from '../components/ServiceCard';
 import { publicApi } from '../lib/api';
-import type { Provider, Service, Review } from '../lib/types';
+import type { Review } from '../lib/types';
 
 const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
@@ -213,7 +213,7 @@ export default function ProviderPage() {
               <div className="space-y-4">
                 {services.length > 0 ? (
                   services.map((service) => (
-                    <ServiceCard key={service.id} service={service} providerSlug={slug!} />
+                    <ServiceCard key={service.id} service={service} providerSlug={slug!} providerId={provider?.id} />
                   ))
                 ) : (
                   <p className="text-center text-gray-500">Belum ada layanan tersedia</p>

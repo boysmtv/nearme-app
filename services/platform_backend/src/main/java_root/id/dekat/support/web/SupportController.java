@@ -24,8 +24,8 @@ public class SupportController {
             @RequestHeader("X-User-Id") UUID userId,
             @RequestBody CreateCaseRequest request) {
         SupportCase supportCase = supportService.createCase(
-                tenantId, request.getBookingId(), userId,
-                request.getCaseType(), request.getSeverity());
+                tenantId, request.bookingId(), userId,
+                request.caseType(), request.severity());
         return ResponseEntity.status(HttpStatus.CREATED).body(supportCase);
     }
 

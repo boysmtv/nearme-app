@@ -6,6 +6,17 @@ plugins {
 
 description = 'DEKAT API - Main Spring Boot Application'
 
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src/main/java', '../src/main/java_root']
+        }
+        resources {
+            srcDirs = ['src/main/resources', '../src/main/resources']
+        }
+    }
+}
+
 dependencies {
     implementation project(':sharedkernel')
     implementation project(':identity')
@@ -47,6 +58,7 @@ dependencies {
 
     // Database
     runtimeOnly 'org.postgresql:postgresql'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-63:3.15.5'
     runtimeOnly 'org.flywaydb:flyway-core:10.20.0'
     runtimeOnly 'org.flywaydb:flyway-database-postgresql:10.20.0'
 

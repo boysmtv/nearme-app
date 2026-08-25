@@ -11,14 +11,14 @@ import java.util.UUID;
 @Repository
 public interface StaffRepository extends JpaRepository<Staff, UUID> {
 
-    List<Staff> findByTenantIdAndStatus(UUID tenantId, Staff.StaffStatus status);
+    List<Staff> findByTenantIdAndIsActiveTrue(UUID tenantId);
 
-    List<Staff> findByTenantIdAndVisibility(UUID tenantId, Staff.StaffVisibility visibility);
+    List<Staff> findByTenantId(UUID tenantId);
 
-    @Query("SELECT s FROM Staff s WHERE s.tenantId = :tenantId AND s.status = 'ACTIVE' AND s.visibility = 'PUBLIC'")
+    @Query("SELECT s FROM Staff s WHERE s.tenantId = :tenantId AND s.isActive = true ORDER BY s.sortOrder ASC")
     List<Staff> findActivePublicStaff(@Param("tenantId") UUID tenantId);
 
-    boolean existsByTenantIdAndEmail(UUID tenantId, String email);
+    boolean existsByTenantIdAndDisplayName(UUID tenantId, String displayName);
 
     boolean existsByUserId(UUID userId);
 }

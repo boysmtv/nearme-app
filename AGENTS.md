@@ -191,6 +191,7 @@ pnpm install && pnpm dev
 
 ### Build System
 - Backend source dirs: `src/main/java_root/` (module controllers) and `src/main/java/` (sharedkernel)
+- **CRITICAL**: `api/build.gradle` registers `../src/main/java_root` + `../src/main/resources` as sourceSets — WITHOUT this the Docker jar is an empty shell (only DeKatApplication, no controllers, everything 401)
 - Kotlin incremental cache corruption on Windows: `org.gradle.daemon=false`, `org.gradle.parallel=false`
 - `freezed` code generation failed (Dart SDK 3.13.0 vs analyzer 3.9.0) — models are plain Dart classes
 
@@ -209,15 +210,28 @@ pnpm install && pnpm dev
 
 ### Auth
 - JWT secrets: `jwt.access-secret` and `jwt.refresh-secret` in `application-dev.yml`
-- SecurityConfig: `/auth/**` is permitAll, all other endpoints require JWT
+- SecurityConfig: `/auth/**` AND `/public/**` are permitAll, all other endpoints require JWT
 - Password hashing: BCrypt (`$2a$10$...`)
 - `OpaqueTokenIntrospector` replaced with JWT `JwtDecoder` bean
+- **JWT alg**: jjwt must sign with explicit `Jwts.SIG.HS256` — default picks HS384 for 43-char keys and Nimbus rejects it
+- Refresh token: `POST /auth/refresh?refreshToken=...` (query param, NOT body); response `{data:{accessToken,refreshToken}}` camelCase
 
 ### Frontend
 - Web config API URL: `http://localhost:8080/api/v1` (NOT `/api`)
+- Flutter base URL: `AppConfig.development.apiBaseUrl` (dart-define `API_BASE_URL` override; Android emulator needs `10.0.2.2`)
 - Vite proxy: `/api` → `http://localhost:8080` (all 3 web apps)
-- All apps share `auth_token` key in localStorage
+- All apps share `auth_token` key in localStorage (`auth_refresh` for refresh token)
 - Response format: `{ success, data, message }` — handled by `ApiResponse` wrapper
+- Availability slots return `{id,time,startTime,endTime,available}` — startTime is full ISO datetime
+
+### Backend Runtime (verified 2026-08-25)
+- Migrations V15–V17: bookings status CHECK widened, categories seeded, booking_holds expiry CHECK fixed, hold status CHECK includes CONVERTED/CANCELLED, ghost ddl-auto columns dropped
+- `spring.jpa.hibernate.ddl-auto: none` in ALL profiles — update mode corrupts schema (adds NOT NULL columns to seeded tables)
+- Healthcheck: image has NO curl → use `wget -q -O /dev/null http://localhost:8080/api/v1/actuator/health`
+- Mail health indicator disabled in dev (no local SMTP); SmtpEmailAdapter catches RuntimeException on send
+- Guest booking: `POST /public/bookings` resolves customerId from customerEmail (auto-creates PENDING_VERIFICATION user)
+- Booking flow E2E verified: holds → confirm (`DKT-*` code) → detail → history; anti-overlap rejects conflicting slots with 409/IllegalState
+- Duplicate class warning: sharedkernel module owns outbox trio; java_root/sharedkernel/outbox deleted — never re-create FQCN duplicates between java_root and modules
 
 ## Deployment
 

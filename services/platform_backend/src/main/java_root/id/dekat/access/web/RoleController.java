@@ -20,7 +20,7 @@ public class RoleController {
 
     @GetMapping
     public ResponseEntity<List<Role>> getAllRoles() {
-        List<Role> roles = authorizationService.getUserRoles(null);
+        List<Role> roles = authorizationService.getUserRoles(null, null);
         return ResponseEntity.ok(roles);
     }
 

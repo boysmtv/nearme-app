@@ -1,4 +1,5 @@
-import { Link, useLocation, Outlet } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { useAuth } from '../lib/auth';
 
 const sidebarItems = [
@@ -11,7 +12,7 @@ const sidebarItems = [
   { label: 'Config', href: '/config' },
 ];
 
-export default function AdminLayout() {
+export default function AdminLayout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const { user, logout } = useAuth();
 
@@ -50,7 +51,7 @@ export default function AdminLayout() {
             <span className="text-xs font-medium text-gray-500 bg-gray-100 rounded-full px-3 py-1">Admin Panel</span>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6"><Outlet /></main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6">{children}</main>
       </div>
     </div>
   );

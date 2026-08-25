@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/router/app_router.dart';
+import 'package:mobile_customer/core/router/app_router.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -16,6 +16,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   bool _useOtp = false;
+  bool _otpRequested = false;
   final _otpController = TextEditingController();
 
   @override
@@ -130,12 +131,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     controller: _otpController,
                     keyboardType: TextInputType.number,
                     maxLength: 6,
-                    decoration: const InputDecoration(
+                    enabled: _otpRequested,
+                    decoration: InputDecoration(
                       labelText: 'OTP Code',
-                      prefixIcon: Icon(Icons.pin_outlined),
+                      prefixIcon: const Icon(Icons.pin_outlined),
                       counterText: '',
+                      hintText: _otpRequested ? null : 'Request an OTP first',
+                      helperText: _otpRequested ? 'OTP sent to ${_emailController.text}' : null,
                     ),
                     validator: (value) {
+                      if (!_otpRequested) return null;
                       if (value == null || value.isEmpty) {
                         return 'Please enter the OTP code';
                       }
@@ -158,12 +163,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             color: Colors.white,
                           ),
                         )
-                      : Text(_useOtp ? 'Login with OTP' : 'Login'),
+                      : Text(_useOtp
+                          ? (_otpRequested ? 'Verify OTP' : 'Request OTP')
+                          : 'Login'),
                 ),
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: () {
-                    setState(() => _useOtp = !_useOtp);
+                    setState(() {
+                      _useOtp = !_useOtp;
+                      _otpRequested = false;
+                      _otpController.clear();
+                    });
                     ref.read(authProvider.notifier).clearError();
                   },
                   child: Text(
@@ -212,7 +223,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   void _handleLogin() {
     if (_formKey.currentState!.validate()) {
       if (_useOtp) {
-        ref.read(authProvider.notifier).requestOtp(_emailController.text);
+        if (!_otpRequested) {
+          ref.read(authProvider.notifier).requestOtp(_emailController.text).then((_) {
+            if (mounted && ref.read(authProvider).error == null) {
+              setState(() => _otpRequested = true);
+            }
+          });
+        } else {
+          ref.read(authProvider.notifier).verifyOtp(
+                _emailController.text,
+                _otpController.text,
+              );
+        }
       } else {
         ref.read(authProvider.notifier).login(
               _emailController.text,

@@ -1,6 +1,8 @@
 package id.dekat.payment.domain;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Map;
@@ -33,8 +35,8 @@ public class PaymentTransaction {
     @Column(nullable = false)
     private TransactionStatus status;
 
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(columnDefinition = "jsonb")
-    @Convert(converter = id.dekat.common.JsonbMapConverter.class)
     private Map<String, Object> rawResponse;
 
     @Column(nullable = false)

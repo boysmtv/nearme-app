@@ -1,19 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { providerApi } from '../lib/api';
 import Layout from '../components/Layout';
-import type { Settings } from '../lib/types';
+import type { Settings, OperatingHour } from '../lib/types';
 
 const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
 export default function SettingsPage() {
   const qc = useQueryClient();
+  const [hours, setHours] = useState<OperatingHour[]>([]);
   const { data: res, isLoading } = useQuery({ queryKey: ['settings'], queryFn: () => providerApi.settings.get() });
   const settings = res?.data;
   const { register, handleSubmit, reset } = useForm<Settings>();
 
-  useEffect(() => { if (settings) reset(settings); }, [settings, reset]);
+  useEffect(() => {
+    if (settings) {
+      reset(settings);
+      setHours(settings.operatingHours ?? []);
+    }
+  }, [settings, reset]);
+
+  const updateHour = (idx: number, patch: Partial<OperatingHour>) =>
+    setHours((prev) => prev.map((h, i) => (i === idx ? { ...h, ...patch } : h)));
 
   const updateMut = useMutation({
     mutationFn: (data: Partial<Settings>) => providerApi.settings.update(data),
@@ -27,7 +36,7 @@ export default function SettingsPage() {
       <div className="space-y-6 max-w-3xl">
         <div><h1 className="text-2xl font-bold text-gray-900">Pengaturan</h1><p className="mt-1 text-sm text-gray-500">Kelola profil bisnis dan preferensi</p></div>
 
-        <form onSubmit={handleSubmit((d) => updateMut.mutate(d))} className="space-y-6">
+        <form onSubmit={handleSubmit((d) => updateMut.mutate({ ...d, operatingHours: hours }))} className="space-y-6">
           <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">Profil Bisnis</h2>
             <div className="mt-4 space-y-4">
@@ -44,11 +53,11 @@ export default function SettingsPage() {
           <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
             <h2 className="text-lg font-semibold text-gray-900">Jam Operasional</h2>
             <div className="mt-4 space-y-3">
-              {settings?.operatingHours.map((hour, idx) => (
-                <div key={idx} className="flex items-center gap-4">
+              {hours.map((hour, idx) => (
+                <div key={hour.dayOfWeek} className="flex items-center gap-4">
                   <span className="w-24 text-sm font-medium text-gray-700">{dayNames[hour.dayOfWeek]}</span>
-                  <label className="flex items-center gap-2"><input type="checkbox" checked={!hour.isClosed} onChange={() => {}} className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" /><span className="text-sm text-gray-500">{hour.isClosed ? 'Tutup' : 'Buka'}</span></label>
-                  {!hour.isClosed && (<><input type="time" defaultValue={hour.open} className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm" /><span className="text-gray-400">-</span><input type="time" defaultValue={hour.close} className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm" /></>)}
+                  <label className="flex items-center gap-2"><input type="checkbox" checked={!hour.isClosed} onChange={(e) => updateHour(idx, { isClosed: !e.target.checked })} className="rounded border-gray-300 text-primary-600 focus:ring-primary-500" /><span className="text-sm text-gray-500">{hour.isClosed ? 'Tutup' : 'Buka'}</span></label>
+                  {!hour.isClosed && (<><input type="time" value={hour.open} onChange={(e) => updateHour(idx, { open: e.target.value })} className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm" /><span className="text-gray-400">-</span><input type="time" value={hour.close} onChange={(e) => updateHour(idx, { close: e.target.value })} className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm" /></>)}
                 </div>
               ))}
             </div>

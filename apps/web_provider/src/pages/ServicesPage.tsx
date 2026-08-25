@@ -25,7 +25,7 @@ export default function ServicesPage() {
   const { data: res, isLoading } = useQuery({ queryKey: ['services'], queryFn: () => providerApi.services.list() });
   const services = res?.data ?? [];
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(serviceSchema) });
-  const createMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.create({ ...d, isActive: true, addons: [], priceType: 'FIXED', id: '', providerId: '' } as any), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); } });
+  const createMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.create({ name: d.name, price: d.price, duration: d.duration }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); } });
   const updateMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.update(edit!.id, d), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); setEdit(null); } });
   const deleteMut = useMutation({ mutationFn: (id: string) => providerApi.services.delete(id), onSuccess: () => qc.invalidateQueries({ queryKey: ['services'] }) });
 

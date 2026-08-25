@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { adminApi } from '../lib/api';
 import AdminLayout from '../components/AdminLayout';
 import DataTable from '../components/DataTable';
@@ -9,9 +9,16 @@ import type { User } from '../lib/types';
 export default function UsersPage() {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
+  const qc = useQueryClient();
   const { data: res, isLoading } = useQuery({
     queryKey: ['admin', 'users', page, search],
     queryFn: () => adminApi.users.list({ page, limit: 20, search }),
+  });
+
+  const statusMut = useMutation({
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      adminApi.users.updateStatus(id, status),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users'] }),
   });
 
   const columns = [
@@ -21,8 +28,8 @@ export default function UsersPage() {
     { key: 'lastLoginAt', label: 'Login Terakhir', render: (u: User) => <span className="text-gray-500">{u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString('id-ID') : '-'}</span> },
     { key: 'actions', label: '', render: (u: User) => (
       <div className="flex gap-2">
-        {u.status === 'ACTIVE' && <button onClick={() => adminApi.users.updateStatus(u.id, 'SUSPENDED')} className="text-xs text-red-600 hover:underline">Suspend</button>}
-        {u.status === 'SUSPENDED' && <button onClick={() => adminApi.users.updateStatus(u.id, 'ACTIVE')} className="text-xs text-green-600 hover:underline">Reactivate</button>}
+        {u.status === 'ACTIVE' && <button disabled={statusMut.isPending} onClick={() => statusMut.mutate({ id: u.id, status: 'SUSPENDED' })} className="text-xs text-red-600 hover:underline disabled:opacity-50">Suspend</button>}
+        {u.status === 'SUSPENDED' && <button disabled={statusMut.isPending} onClick={() => statusMut.mutate({ id: u.id, status: 'ACTIVE' })} className="text-xs text-green-600 hover:underline disabled:opacity-50">Reactivate</button>}
       </div>
     )},
   ];

@@ -30,16 +30,8 @@ public class CatalogController {
 
     @GetMapping("/provider/{tenantId}/services")
     public ResponseEntity<List<ServiceResponse>> getServicesByTenant(@PathVariable UUID tenantId) {
-        List<ServiceResponse> services = catalogService.getServicesByTenant(tenantId);
+        List<ServiceResponse> services = catalogService.getServicesByTenant(tenantId, null, null);
         return ResponseEntity.ok(services);
-    }
-
-    @PutMapping("/provider/services/{id}")
-    public ResponseEntity<ServiceItem> updateService(
-            @PathVariable UUID id,
-            @Valid @RequestBody ServiceRequest request) {
-        ServiceItem service = catalogService.updateService(id, request);
-        return ResponseEntity.ok(service);
     }
 
     @PostMapping("/provider/services/{id}/publish")

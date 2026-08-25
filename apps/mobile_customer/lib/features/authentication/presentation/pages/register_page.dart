@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/router/app_router.dart';
+import 'package:mobile_customer/core/router/app_router.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
@@ -41,6 +41,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
           SnackBar(content: Text(next.error!), backgroundColor: Colors.red),
         );
         ref.read(authProvider.notifier).clearError();
+      }
+      if ((prev == null || !prev.isLoggedIn) && next.isLoggedIn && mounted) {
+        context.go('/discovery');
       }
     });
 

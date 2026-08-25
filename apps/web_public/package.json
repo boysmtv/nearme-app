@@ -11,18 +11,19 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@dekat/web-ui": "workspace:*",
     "@dekat/web-api-client": "workspace:*",
     "@dekat/web-config": "workspace:*",
+    "@dekat/web-ui": "workspace:*",
+    "@hookform/resolvers": "^3.9.0",
     "@tanstack/react-query": "^5.62.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-hook-form": "^7.54.0",
     "react-router-dom": "^7.1.0",
-    "zod": "^3.24.0",
-    "@hookform/resolvers": "^3.9.0"
+    "zod": "^3.24.0"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitejs/plugin-react": "^4.4.0",

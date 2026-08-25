@@ -29,8 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = useCallback(
     async (email: string, password: string) => {
       const res = await providerApi.auth.login(email, password);
-      localStorage.setItem('provider_token', res.data.token);
-      localStorage.setItem('provider_refresh', res.data.refreshToken);
+      localStorage.setItem('auth_token', res.data.accessToken);
+      localStorage.setItem('auth_refresh', res.data.refreshToken);
       const userData: AuthUser = { id: '', email, name: '', businessName: '', role: 'OWNER' };
       localStorage.setItem('provider_user', JSON.stringify(userData));
       setUser(userData);
@@ -40,9 +40,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const logout = useCallback(() => {
-    providerApi.auth.logout().catch(() => {});
-    localStorage.removeItem('provider_token');
-    localStorage.removeItem('provider_refresh');
+    const refreshToken = localStorage.getItem('auth_refresh');
+    providerApi.auth.logout(refreshToken ?? undefined).catch(() => {});
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_refresh');
     localStorage.removeItem('provider_user');
     setUser(null);
     navigate('/login');

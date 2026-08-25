@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { providerApi } from '../lib/api';
 import Layout from '../components/Layout';
-import type { Booking, BookingStatus } from '../lib/types';
+import type { BookingStatus } from '../lib/types';
 
 const statusColors: Record<BookingStatus, string> = {
   CONFIRMED: 'bg-green-100 border-green-300 text-green-800',
@@ -39,7 +39,7 @@ export default function CalendarPage() {
 
   const { data: bookingsRes, isLoading } = useQuery({
     queryKey: ['calendar', startDate.toISOString(), endDate.toISOString()],
-    queryFn: () => providerApi.calendar.getBookings(startDate.toISOString().split('T')[0], endDate.toISOString().split('T')[0]),
+    queryFn: () => providerApi.calendar.getBookings(startDate.toISOString().split('T')[0] ?? '', endDate.toISOString().split('T')[0] ?? ''),
   });
 
   const bookings = bookingsRes?.data ?? [];

@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
@@ -35,15 +34,7 @@ class PartnerAuthNotifier extends StateNotifier<PartnerAuthState> {
   Future<void> _checkAuth() async {
     final token = await SecureStorageService.read(StorageKeys.accessToken);
     if (token != null) {
-      state = state.copyWith(isLoading: true);
-      try {
-        final response = await _apiService.getProfile();
-        final user = User.fromJson(response.data['data']);
-        state = state.copyWith(isLoading: false, isLoggedIn: true, user: user);
-      } catch (_) {
-        await SecureStorageService.deleteAll();
-        state = state.copyWith(isLoading: false, isLoggedIn: false);
-      }
+      state = state.copyWith(isLoggedIn: true);
     }
   }
 
@@ -51,18 +42,23 @@ class PartnerAuthNotifier extends StateNotifier<PartnerAuthState> {
     state = state.copyWith(isLoading: true, error: null);
     try {
       final response = await _apiService.login(email, password);
-      final data = response.data['data'];
-      await SecureStorageService.write(StorageKeys.accessToken, data['access_token']);
-      await SecureStorageService.write(StorageKeys.refreshToken, data['refresh_token']);
-      final user = User.fromJson(data['user']);
-      state = state.copyWith(isLoading: false, isLoggedIn: true, user: user);
+      final data = response.data['data'] as Map<String, dynamic>;
+      await SecureStorageService.write(StorageKeys.accessToken, data['accessToken'] as String);
+      final refreshToken = data['refreshToken'] as String?;
+      if (refreshToken != null) {
+        await SecureStorageService.write(StorageKeys.refreshToken, refreshToken);
+      }
+      state = state.copyWith(isLoading: false, isLoggedIn: true);
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString().replaceAll('Exception: ', ''));
     }
   }
 
   Future<void> logout() async {
-    try { await _apiService.logout(); } catch (_) {}
+    final refreshToken = await SecureStorageService.read(StorageKeys.refreshToken);
+    try {
+      await _apiService.dio.post('/auth/logout', queryParameters: {'refreshToken': refreshToken});
+    } catch (_) {}
     await SecureStorageService.deleteAll();
     state = const PartnerAuthState();
   }

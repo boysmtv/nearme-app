@@ -4,6 +4,7 @@ import type { Service } from '../lib/types';
 interface ServiceCardProps {
   service: Service;
   providerSlug: string;
+  providerId?: string;
 }
 
 function formatPrice(price: number): string {
@@ -22,10 +23,10 @@ function formatDuration(minutes: number): string {
   return mins > 0 ? `${hours}j ${mins}m` : `${hours} jam`;
 }
 
-export default function ServiceCard({ service, providerSlug }: ServiceCardProps) {
+export default function ServiceCard({ service, providerSlug, providerId }: ServiceCardProps) {
   return (
     <Link
-      to={`/booking/${service.providerId}?service=${service.id}`}
+      to={providerId ? `/booking/${providerId}?service=${service.id}` : '/search'}
       className="group block rounded-xl border border-gray-200 bg-white p-5 transition-all hover:border-primary-200 hover:shadow-md"
     >
       <div className="flex items-start justify-between">

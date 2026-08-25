@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -13,61 +12,50 @@ import java.util.UUID;
 @Table(name = "staff")
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Staff {
 
     @Id
-    @GeneratedValue(generator = "UUID")
-    @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
-    private UUID tenantId;
-
-    @Column(columnDefinition = "uuid")
+    @Column(name = "user_id", nullable = false, columnDefinition = "uuid")
     private UUID userId;
 
-    @Column(nullable = false)
+    @Column(name = "tenant_id", nullable = false, columnDefinition = "uuid")
+    private UUID tenantId;
+
+    @Column(name = "display_name")
     private String displayName;
 
-    private String photoUrl;
+    @Column(name = "title", length = 100)
+    private String title;
 
     @Column(columnDefinition = "text")
     private String bio;
 
-    private String email;
+    @Column(name = "avatar_url", columnDefinition = "text")
+    private String avatarUrl;
 
-    private String phone;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "is_active", nullable = false)
     @Builder.Default
-    private StaffStatus status = StaffStatus.ACTIVE;
+    private Boolean isActive = true;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "sort_order", nullable = false)
     @Builder.Default
-    private StaffVisibility visibility = StaffVisibility.PUBLIC;
+    private Integer sortOrder = 0;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     @UpdateTimestamp
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
 
     @Version
-    private Long version;
-
-    public enum StaffStatus {
-        ACTIVE, INACTIVE
-    }
-
-    public enum StaffVisibility {
-        PUBLIC, HIDDEN
-    }
+    @Column(nullable = false)
+    private Integer version;
 }

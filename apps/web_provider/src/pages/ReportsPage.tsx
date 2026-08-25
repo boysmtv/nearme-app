@@ -6,11 +6,11 @@ import Layout from '../components/Layout';
 function fmt(n: number) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n); }
 
 export default function ReportsPage() {
-  const [start] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().split('T')[0]; });
-  const [end] = useState(() => new Date().toISOString().split('T')[0]);
+  const [start] = useState<string>(() => { const d = new Date(); d.setDate(1); return d.toISOString().split('T')[0] ?? ''; });
+  const [end] = useState<string>(() => new Date().toISOString().split('T')[0] ?? '');
   const { data: res, isLoading } = useQuery({
     queryKey: ['reports', start, end],
-    queryFn: () => providerApi.reports.getReport({ startDate: start, endDate: end }),
+    queryFn: () => providerApi.reports.getReport({ startDate: start ?? '', endDate: end ?? '' }),
   });
   const report = res?.data;
 

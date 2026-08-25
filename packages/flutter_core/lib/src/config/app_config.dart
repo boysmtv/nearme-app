@@ -44,9 +44,12 @@ class AppConfig {
     }
   }
 
-  static const development = AppConfig(
+  static final development = AppConfig(
     environment: Environment.development,
-    apiBaseUrl: 'https://dev-api.dekat.com',
+    apiBaseUrl: const String.fromEnvironment(
+      'API_BASE_URL',
+      defaultValue: 'http://localhost:8080/api/v1',
+    ),
     firebaseProjectId: 'dekat-dev',
     enableLogging: true,
   );

@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-final staffProvider = FutureProvider.autoDispose<List<Staff>>((ref) async {
-  try {
-    final response = await ApiService().getStaff();
-    final data = response.data['data'] as List;
-    return data.map((e) => Staff.fromJson(e)).toList();
-  } catch (e) { return []; }
+final staffProvider = FutureProvider.autoDispose<List<PartnerStaffRow>>((ref) async {
+  final response = await ApiService().getStaff();
+  return ((response.data['data'] ?? []) as List)
+      .map((e) => PartnerStaffRow.fromJson(e as Map<String, dynamic>))
+      .toList();
 });
 
 class StaffListPage extends ConsumerWidget {
@@ -33,23 +33,17 @@ class StaffListPage extends ConsumerWidget {
             itemCount: staffList.length,
             itemBuilder: (context, index) {
               final s = staffList[index];
-              final isActive = s.status == 'active';
+              final isActive = s.isActive;
               return Card(
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    child: Icon(Icons.person, color: Theme.of(context).colorScheme.primary),
+                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(isActive ? 0.1 : 0.05),
+                    child: Icon(Icons.person, color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey),
                   ),
-                  title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(s.role ?? '-'),
+                  title: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(s.title ?? '-'),
                   trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                    if (s.rating != null) ...[
-                      const Icon(Icons.star, size: 14, color: Colors.amber),
-                      const SizedBox(width: 2),
-                      Text(s.rating!.toStringAsFixed(1), style: const TextStyle(fontSize: 12)),
-                      const SizedBox(width: 8),
-                    ],
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
@@ -59,6 +53,30 @@ class StaffListPage extends ConsumerWidget {
                       child: Text(isActive ? 'Active' : 'Inactive',
                           style: TextStyle(fontSize: 12, color: isActive ? Colors.green : Colors.grey, fontWeight: FontWeight.w500)),
                     ),
+                    PopupMenuButton<String>(
+                      onSelected: (action) async {
+                        try {
+                          if (action == 'deactivate') {
+                            await ApiService().dio.delete('/provider/staff/${s.id}');
+                          } else if (action == 'activate') {
+                            await ApiService().updateStaff(s.id, {});
+                          }
+                          ref.invalidate(staffProvider);
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+                            );
+                          }
+                        }
+                      },
+                      itemBuilder: (_) => [
+                        if (isActive)
+                          const PopupMenuItem(value: 'deactivate', child: Text('Deactivate'))
+                        else
+                          const PopupMenuItem(value: 'activate', child: Text('Activate')),
+                      ],
+                    ),
                   ]),
                 ),
               );
@@ -66,7 +84,15 @@ class StaffListPage extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('Failed to load')),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Failed to load'),
+              TextButton(onPressed: () => ref.invalidate(staffProvider), child: const Text('Coba lagi')),
+            ],
+          ),
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddStaffDialog(context, ref),
@@ -77,7 +103,7 @@ class StaffListPage extends ConsumerWidget {
 
   void _showAddStaffDialog(BuildContext context, WidgetRef ref) {
     final nameController = TextEditingController();
-    final roleController = TextEditingController();
+    final emailController = TextEditingController();
     final formKey = GlobalKey<FormState>();
     showDialog(
       context: context,
@@ -87,13 +113,18 @@ class StaffListPage extends ConsumerWidget {
           TextFormField(
             controller: nameController,
             decoration: const InputDecoration(labelText: 'Name', prefixIcon: Icon(Icons.person_outline)),
-            validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+            validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
           ),
           const SizedBox(height: 12),
           TextFormField(
-            controller: roleController,
-            decoration: const InputDecoration(labelText: 'Role', prefixIcon: Icon(Icons.work_outline)),
-            validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+            controller: emailController,
+            keyboardType: TextInputType.emailAddress,
+            decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Required';
+              if (!v.contains('@') || !v.contains('.')) return 'Invalid email';
+              return null;
+            },
           ),
         ])),
         actions: [
@@ -102,10 +133,19 @@ class StaffListPage extends ConsumerWidget {
             onPressed: () async {
               if (formKey.currentState!.validate()) {
                 try {
-                  await ApiService().addStaff({'name': nameController.text, 'role': roleController.text});
+                  await ApiService().addStaff({
+                    'displayName': nameController.text.trim(),
+                    'email': emailController.text.trim(),
+                  });
                   ref.invalidate(staffProvider);
                   if (context.mounted) Navigator.pop(context);
-                } catch (_) {}
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to add staff: $e'), backgroundColor: Colors.red),
+                    );
+                  }
+                }
               }
             },
             child: const Text('Add'),

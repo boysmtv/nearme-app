@@ -23,11 +23,14 @@ CREATE UNIQUE INDEX uq_roles_name ON roles (LOWER(name));
 CREATE TABLE permissions (
     id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     code        VARCHAR(150) NOT NULL,   -- e.g. booking:create, service:read
+    module      VARCHAR(64) NOT NULL,    -- e.g. booking, identity, tenant
+    action      VARCHAR(64) NOT NULL,    -- e.g. create, read, update
     description TEXT,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE UNIQUE INDEX uq_permissions_code ON permissions (LOWER(code));
+CREATE UNIQUE INDEX uq_permissions_module_action ON permissions (LOWER(module), LOWER(action));
 
 -- ---------------------------------------------------------------------------
 -- role_permissions: Many-to-many role <-> permission

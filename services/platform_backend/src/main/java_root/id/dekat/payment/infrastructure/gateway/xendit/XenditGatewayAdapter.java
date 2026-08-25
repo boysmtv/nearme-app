@@ -11,6 +11,8 @@ import org.springframework.web.client.RestClient;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
+import java.security.NoSuchAlgorithmException;
+import java.security.InvalidKeyException;
 import java.util.*;
 
 @Slf4j

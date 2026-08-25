@@ -66,7 +66,7 @@ public class TenantController {
 
     @PostMapping("/tenant/{id}/reject")
     public ResponseEntity<Tenant> rejectTenant(@PathVariable UUID id) {
-        Tenant tenant = tenantService.rejectTenant(id);
+        Tenant tenant = tenantService.rejectTenant(id, null);
         return ResponseEntity.ok(tenant);
     }
 

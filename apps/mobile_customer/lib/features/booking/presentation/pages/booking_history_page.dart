@@ -2,20 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
-enum BookingFilter { all, upcoming, completed, cancelled }
+enum BookingFilter { all, pending, confirmed, completed, cancelled }
 
 final bookingFilterProvider = StateProvider<BookingFilter>((ref) => BookingFilter.all);
 
-final bookingsProvider = FutureProvider.autoDispose<List<Booking>>((ref) async {
+final bookingsProvider = FutureProvider.autoDispose<List<BookingRow>>((ref) async {
   final filter = ref.watch(bookingFilterProvider);
-  try {
-    final params = <String, dynamic>{};
-    if (filter != BookingFilter.all) params['status'] = filter.name;
-    final response = await ApiService().getBookings(params: params);
-    final data = response.data['data'] as List;
-    return data.map((e) => Booking.fromJson(e)).toList();
-  } catch (e) { return []; }
+  final params = <String, dynamic>{'page': 1, 'limit': 50};
+  if (filter != BookingFilter.all) params['status'] = filter.name.toUpperCase();
+  final response = await ApiService().getBookings(params: params);
+  return parsePaginated(response.data['data'], BookingRow.fromJson).items;
 });
 
 class BookingHistoryPage extends ConsumerWidget {
@@ -57,22 +55,39 @@ class BookingHistoryPage extends ConsumerWidget {
                   return Card(
                     margin: const EdgeInsets.only(bottom: 12),
                     child: ListTile(
-                      title: Text(b.service?.name ?? 'Service', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(b.provider?.name ?? 'Provider'),
-                      trailing: _StatusChip(status: b.status),
-                      onTap: () => context.push('/booking/'),
+                      title: Text(b.bookingCode.isEmpty ? b.id : b.bookingCode, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(b.startsAt != null
+                          ? '${_fmtDate(b.startsAt!)} ${_fmtTime(b.startsAt!)}'
+                          : '-'),
+                      trailing: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                        _StatusChip(status: b.status),
+                        const SizedBox(height: 4),
+                        Text(formatRupiah(b.total), style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                      ]),
+                      onTap: () => context.push('/booking/${b.id}'),
                     ),
                   );
                 },
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (_, __) => const Center(child: Text('Failed to load bookings')),
+            error: (e, _) => Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text('Failed to load bookings'),
+                  TextButton(onPressed: () => ref.invalidate(bookingsProvider), child: const Text('Retry')),
+                ],
+              ),
+            ),
           )),
         ],
       ),
     );
   }
+
+  String _fmtDate(DateTime d) => '${d.day}/${d.month}/${d.year}';
+  String _fmtTime(DateTime d) => '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
 }
 
 class _StatusChip extends StatelessWidget {
@@ -81,16 +96,30 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color color;
-    switch (status) {
-      case 'confirmed': color = Colors.blue; break;
-      case 'completed': color = Colors.green; break;
-      case 'cancelled': color = Colors.red; break;
-      default: color = Colors.orange;
+    switch (status.toUpperCase()) {
+      case 'PENDING':
+        color = Colors.orange;
+        break;
+      case 'HELD':
+        color = Colors.deepPurple;
+        break;
+      case 'CONFIRMED':
+        color = Colors.blue;
+        break;
+      case 'COMPLETED':
+        color = Colors.green;
+        break;
+      case 'CANCELLED':
+        color = Colors.red;
+        break;
+      default:
+        color = Colors.grey;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
-      child: Text(status[0].toUpperCase() + status.substring(1), style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500)),
+      child: Text(status.isNotEmpty ? status[0].toUpperCase() + status.substring(1).toLowerCase() : '-',
+          style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500)),
     );
   }
 }

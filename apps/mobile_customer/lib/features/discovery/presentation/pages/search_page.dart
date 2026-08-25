@@ -2,18 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/models/rows.dart';
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
-final searchResultsProvider = FutureProvider.autoDispose<List<Provider>>((ref) async {
+final searchResultsProvider = FutureProvider.autoDispose<List<ProviderRow>>((ref) async {
   final query = ref.watch(searchQueryProvider);
   if (query.isEmpty) return [];
-  try {
-    final response = await ApiService().search(query);
-    final data = response.data['data'] as List;
-    return data.map((e) => Provider.fromJson(e)).toList();
-  } catch (e) {
-    return [];
-  }
+  final response = await ApiService().search(query);
+  return ((response.data['data'] ?? []) as List)
+      .map((e) => ProviderRow.fromJson(e as Map<String, dynamic>))
+      .toList();
 });
 
 final recentSearchesProvider = StateNotifierProvider<RecentSearchesNotifier, List<String>>((ref) {
@@ -114,13 +112,24 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                           leading: Container(width: 48, height: 48, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(8)), child: const Icon(Icons.store)),
                           title: Text(p.name), subtitle: Text(p.category ?? 'General'),
                           trailing: const Icon(Icons.chevron_right),
-                          onTap: () => context.push('/provider/${p.id}'),
+                          onTap: () => context.push('/provider/${p.slug}'),
                         );
                       },
                     );
                   },
                   loading: () => const Center(child: CircularProgressIndicator()),
-                  error: (_, __) => const Center(child: Text('Failed to search')),
+                  error: (e, _) => Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text('Failed to search'),
+                        TextButton(
+                          onPressed: () => ref.invalidate(searchResultsProvider),
+                          child: const Text('Retry'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],

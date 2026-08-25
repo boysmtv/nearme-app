@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_core/flutter_core.dart';
+import '../../../../shared/models/rows.dart';
 
-final bookingDetailProvider2 = FutureProvider.autoDispose.family<Booking?, String>((ref, id) async {
-  try {
-    final response = await ApiService().getBooking(id);
-    return Booking.fromJson(response.data['data']);
-  } catch (e) { return null; }
+final bookingDetailProvider2 = FutureProvider.autoDispose.family<BookingRow, String>((ref, id) async {
+  final response = await ApiService().getBooking(id);
+  return BookingRow.fromJson(response.data['data'] as Map<String, dynamic>);
 });
 
 class BookingDetailPage extends ConsumerWidget {
@@ -21,48 +22,58 @@ class BookingDetailPage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Booking Details')),
       body: bookingAsync.when(
         data: (booking) {
-          if (booking == null) return const Center(child: Text('Booking not found'));
+          final status = booking.status.toUpperCase();
+          final statusColor = switch (status) {
+            'CONFIRMED' => Colors.blue,
+            'COMPLETED' => Colors.green,
+            'CANCELLED' => Colors.red,
+            _ => Colors.orange,
+          };
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Container(width: double.infinity, padding: const EdgeInsets.all(16), decoration: BoxDecoration(
-                color: booking.status == 'confirmed' ? Colors.blue[50] : booking.status == 'completed' ? Colors.green[50] : Colors.orange[50],
+                color: statusColor.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ), child: Row(children: [
-                Icon(booking.status == 'confirmed' ? Icons.info_outline : Icons.check_circle, color: booking.status == 'confirmed' ? Colors.blue[700] : Colors.green[700]),
+                Icon(Icons.info_outline, color: statusColor),
                 const SizedBox(width: 12),
-                Text(booking.status.toUpperCase(), style: TextStyle(fontWeight: FontWeight.bold, color: booking.status == 'confirmed' ? Colors.blue[700] : Colors.green[700])),
+                Text(booking.bookingCode.isEmpty ? booking.id : '${booking.status} · ${booking.bookingCode}',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: statusColor)),
               ])),
               const SizedBox(height: 24),
-              _Section(title: 'Service Details', children: [
-                _InfoRow(label: 'Service', value: booking.service?.name ?? '-'),
-                _InfoRow(label: 'Duration', value: ' min'),
-                _InfoRow(label: 'Price', value: 'Rp '),
-              ]),
-              const SizedBox(height: 16),
               _Section(title: 'Schedule', children: [
-                _InfoRow(label: 'Date', value: booking.date.toString().substring(0, 10)),
-                _InfoRow(label: 'Time', value: booking.time),
+                _InfoRow(label: 'Start', value: booking.startsAt != null ? _fmtDateTime(booking.startsAt!) : '-'),
+                _InfoRow(label: 'End', value: booking.endsAt != null ? _fmtDateTime(booking.endsAt!) : '-'),
+                _InfoRow(label: 'Created', value: booking.createdAt != null ? _fmtDate(booking.createdAt!) : '-'),
               ]),
               const SizedBox(height: 16),
-              _Section(title: 'Provider', children: [
-                _InfoRow(label: 'Name', value: booking.provider?.name ?? '-'),
-                _InfoRow(label: 'Address', value: booking.provider?.address ?? '-'),
+              _Section(title: 'Payment', children: [
+                _InfoRow(label: 'Currency', value: booking.currency),
+                _InfoRow(label: 'Subtotal', value: formatRupiah(booking.subtotal)),
+                if (booking.discount > 0) _InfoRow(label: 'Discount', value: '- ${formatRupiah(booking.discount)}'),
+                if (booking.tax > 0) _InfoRow(label: 'Tax', value: formatRupiah(booking.tax)),
+                if (booking.fee > 0) _InfoRow(label: 'Fee', value: formatRupiah(booking.fee)),
+                _InfoRow(label: 'Total', value: formatRupiah(booking.total)),
               ]),
             ]),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (_, __) => const Center(child: Text('Failed to load booking')),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Failed to load booking: $e'),
+              TextButton(onPressed: () => ref.invalidate(bookingDetailProvider2(bookingId)), child: const Text('Retry')),
+            ],
+          ),
+        ),
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))]),
-        child: SafeArea(child: Row(children: [
-          Expanded(child: OutlinedButton(onPressed: () => _showCancelDialog(context, ref), style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: Colors.red), foregroundColor: Colors.red), child: const Text('Cancel'))),
-          const SizedBox(width: 12),
-          Expanded(child: ElevatedButton(onPressed: () {}, style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)), child: const Text('Contact Provider'))),
-        ])),
+        child: SafeArea(child: OutlinedButton(onPressed: () => _showCancelDialog(context, ref), style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16), side: const BorderSide(color: Colors.red), foregroundColor: Colors.red), child: const Text('Cancel Booking'))),
       ),
     );
   }
@@ -75,11 +86,28 @@ class BookingDetailPage extends ConsumerWidget {
         TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('No')),
         TextButton(onPressed: () async {
           Navigator.pop(ctx);
-          try { await ApiService().cancelBooking(bookingId); if (context.mounted) context.go('/bookings'); } catch (_) {}
+          try {
+            final actorId = await SecureStorageService.read(StorageKeys.userId);
+            await ApiService().dio.post(
+                  '/bookings/$bookingId/cancel',
+                  queryParameters: {'reason': 'Cancelled by customer'},
+                  options: Options(headers: {'X-Actor-Id': actorId}),
+                );
+            ref.invalidate(bookingDetailProvider2(bookingId));
+            if (context.mounted) context.go('/bookings');
+          } catch (e) {
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Cancel failed: $e'), backgroundColor: Colors.red));
+            }
+          }
         }, style: TextButton.styleFrom(foregroundColor: Colors.red), child: const Text('Yes, Cancel')),
       ],
     ));
   }
+
+  String _fmtDateTime(DateTime d) =>
+      '${d.day}/${d.month}/${d.year} ${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+  String _fmtDate(DateTime d) => '${d.day}/${d.month}/${d.year}';
 }
 
 class _Section extends StatelessWidget {
@@ -101,7 +129,7 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(padding: const EdgeInsets.symmetric(vertical: 6), child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-      Text(label, style: TextStyle(color: Colors.grey[600])), Text(value, style: const TextStyle(fontWeight: FontWeight.w500)),
+      Text(label, style: TextStyle(color: Colors.grey[600])), Flexible(child: Text(value, textAlign: TextAlign.right, style: const TextStyle(fontWeight: FontWeight.w500))),
     ]));
   }
 }

@@ -18,9 +18,5 @@ public interface OutboxEventRepository extends JpaRepository<OutboxEvent, UUID> 
     @Query("UPDATE OutboxEvent o SET o.status = :status, o.processedAt = :processedAt WHERE o.id = :id")
     void updateStatus(UUID id, OutboxStatus status, Instant processedAt);
 
-    @Modifying
-    @Query("UPDATE OutboxEvent o SET o.status = 'FAILED', o.retryCount = o.retryCount + 1 WHERE o.id = :id")
-    void incrementRetryAndMarkFailed(UUID id);
-
     long countByStatus(OutboxStatus status);
 }
