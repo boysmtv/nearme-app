@@ -1,0 +1,1189 @@
+{
+  "project_name": "apps",
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+  "final_project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+  "problem_file": "",
+  "problem_statement": "",
+  "stack": [],
+  "stack_id": "",
+  "template_id": "",
+  "platform": "",
+  "domain": "",
+  "project_type": "",
+  "build_commands": [],
+  "run_commands": [],
+  "features": [
+    "add",
+    "login",
+    "logout"
+  ],
+  "packages": [
+    "com.example.mobile_customer",
+    "id.dekat.partner.mobile_partner",
+    "io.flutter.plugins"
+  ],
+  "languages": [
+    "dart",
+    "java",
+    "kotlin",
+    "python",
+    "swift",
+    "typescript"
+  ],
+  "entrypoints": [],
+  "final_status": "registered",
+  "mode": "factory_managed",
+  "updated_at": "2026-08-24T14:02:52.874499+00:00",
+  "source_fingerprint": {
+    "updated_at": "2026-08-24T14:02:52.939214+00:00",
+    "file_count": 228,
+    "digest": "64e4087faecf84113ecf325b88f2ebcc2101a3fbd02897a1b4da09c7077a619b",
+    "files": [
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/197d22eac5a42bfdd52e414b36df20de/build_hooks_result.json",
+        "hash": "5f11108229869271bf496e85d3bb3528449504960b526fc20957acf6936fc42f",
+        "size_bytes": 464
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/197d22eac5a42bfdd52e414b36df20de/link_hooks_result.json",
+        "hash": "ef5843e91cfa367b7c3fa5d2a17b2104d1b0d9d0997449345e2a0d31dbf4d262",
+        "size_bytes": 516
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/197d22eac5a42bfdd52e414b36df20de/native_assets.json",
+        "hash": "9548a31e4a048135c1d94f919328bfb62ae2c7bb3cab96557c7941daa97776cb",
+        "size_bytes": 45
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/197d22eac5a42bfdd52e414b36df20de/outputs.json",
+        "hash": "1de98e2c94cd08a43970b8173b6eec3724aaa951df393b46dcf9ae9539bad628",
+        "size_bytes": 1546
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/197d22eac5a42bfdd52e414b36df20de/recorded_uses.json",
+        "hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "size_bytes": 2
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/27410b24c73e320b79397565353285ac/build_hooks_result.json",
+        "hash": "2c2c8c0db1cea18434147115f3a60265015124de70dc24b7962b47e673a809fb",
+        "size_bytes": 1386
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/27410b24c73e320b79397565353285ac/link_hooks_result.json",
+        "hash": "477fc748d630b9e394b109f64657e3d764fac849a5b4b616c6e90c62b94a6e6a",
+        "size_bytes": 516
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/27410b24c73e320b79397565353285ac/native_assets.json",
+        "hash": "9548a31e4a048135c1d94f919328bfb62ae2c7bb3cab96557c7941daa97776cb",
+        "size_bytes": 45
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/27410b24c73e320b79397565353285ac/outputs.json",
+        "hash": "1de98e2c94cd08a43970b8173b6eec3724aaa951df393b46dcf9ae9539bad628",
+        "size_bytes": 1546
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/27410b24c73e320b79397565353285ac/recorded_uses.json",
+        "hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "size_bytes": 2
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/dart_plugin_registrant.dart",
+        "hash": "feb27d4c01afeabcd0370e839071243aa4d0b3bbfb2a5ed62a813c20c16bac28",
+        "size_bytes": 11131
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/ef585516676f162b0ed3f6c8b11cbb40/build_hooks_result.json",
+        "hash": "2c2c8c0db1cea18434147115f3a60265015124de70dc24b7962b47e673a809fb",
+        "size_bytes": 1386
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/ef585516676f162b0ed3f6c8b11cbb40/link_hooks_result.json",
+        "hash": "c60458e2e922c609796e8c93ffb55a33d8245476c21acd9f38a372789bfeadbe",
+        "size_bytes": 516
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/ef585516676f162b0ed3f6c8b11cbb40/native_assets.json",
+        "hash": "9548a31e4a048135c1d94f919328bfb62ae2c7bb3cab96557c7941daa97776cb",
+        "size_bytes": 45
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/ef585516676f162b0ed3f6c8b11cbb40/outputs.json",
+        "hash": "1de98e2c94cd08a43970b8173b6eec3724aaa951df393b46dcf9ae9539bad628",
+        "size_bytes": 1546
+      },
+      {
+        "path": "mobile_customer/.dart_tool/flutter_build/ef585516676f162b0ed3f6c8b11cbb40/recorded_uses.json",
+        "hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "size_bytes": 2
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/dependencies.dependencies_hash_file.json",
+        "hash": "fea626cf8ff81a7ebee699bf7ffdd4408767108dabd923c011c68a4b64c13b6f",
+        "size_bytes": 607
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/hook.dependencies_hash_file.json",
+        "hash": "809982a03f6a8965b870ac544735441a5814e0f9ca2f8a099b2a88d5471d2014",
+        "size_bytes": 438
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/input.json",
+        "hash": "24bb29234dacffdef09774263d0934b222b61a01102fa70fbc966a94fe17f00d",
+        "size_bytes": 1294
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/output.json",
+        "hash": "3af345b45725d60978f8cf94df14d62b15c9e8ec2e3d39fc2a7af35ad91b0ee5",
+        "size_bytes": 95
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/stderr.txt",
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/stdout.txt",
+        "hash": "1c559b600d112bbcac8bce9e08959718933d3fb9fb267875c722106a59ccaa0c",
+        "size_bytes": 2867
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/337ce265dc/dependencies.dependencies_hash_file.json",
+        "hash": "fea626cf8ff81a7ebee699bf7ffdd4408767108dabd923c011c68a4b64c13b6f",
+        "size_bytes": 607
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/337ce265dc/hook.dependencies_hash_file.json",
+        "hash": "809982a03f6a8965b870ac544735441a5814e0f9ca2f8a099b2a88d5471d2014",
+        "size_bytes": 438
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/337ce265dc/input.json",
+        "hash": "d12cba77183e1c747d5ef92a560b159fb39e00df2211d8e94d8553d48c44e167",
+        "size_bytes": 556
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/337ce265dc/output.json",
+        "hash": "1e6ae0d584a30b044d0ef6509334f0bb2d0e9a490ca1611ce66f8e7d29205e48",
+        "size_bytes": 95
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/337ce265dc/stderr.txt",
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/337ce265dc/stdout.txt",
+        "hash": "17620fa79314e314521db172bb06fbf4a583a6fbde0b3959eeb94efe456cbd1f",
+        "size_bytes": 2867
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/7ad719985a/dependencies.dependencies_hash_file.json",
+        "hash": "fea626cf8ff81a7ebee699bf7ffdd4408767108dabd923c011c68a4b64c13b6f",
+        "size_bytes": 607
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/7ad719985a/hook.dependencies_hash_file.json",
+        "hash": "809982a03f6a8965b870ac544735441a5814e0f9ca2f8a099b2a88d5471d2014",
+        "size_bytes": 438
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/7ad719985a/input.json",
+        "hash": "2df61bce7be6687824f84c447e0bf312b74567ff05e5e5884aca65552b963fd1",
+        "size_bytes": 1294
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/7ad719985a/output.json",
+        "hash": "3af345b45725d60978f8cf94df14d62b15c9e8ec2e3d39fc2a7af35ad91b0ee5",
+        "size_bytes": 95
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/7ad719985a/stderr.txt",
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/7ad719985a/stdout.txt",
+        "hash": "f584b5d0a5c7351a063e8d7f35aa9433ac068d550c04ef5a65eac894c14dad55",
+        "size_bytes": 2867
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/ea9979e860/dependencies.dependencies_hash_file.json",
+        "hash": "ba9b274f0c539a80394eba96901ea3358a0755bf36d281f5280b9d470b75c9e2",
+        "size_bytes": 607
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/ea9979e860/hook.dependencies_hash_file.json",
+        "hash": "809982a03f6a8965b870ac544735441a5814e0f9ca2f8a099b2a88d5471d2014",
+        "size_bytes": 438
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/ea9979e860/input.json",
+        "hash": "6fd4834d8a6f361add94feabd035ec61b0f81da55c9947bf0a03efdd3ea7caf3",
+        "size_bytes": 1296
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/ea9979e860/output.json",
+        "hash": "bebb51299dc86bca95411831a40114e44dbc4f1aebf0248c427651425bea982e",
+        "size_bytes": 95
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/ea9979e860/stderr.txt",
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      {
+        "path": "mobile_customer/.dart_tool/hooks_runner/objective_c/ea9979e860/stdout.txt",
+        "hash": "5619cf13694ad02745c8b6208fac391e81ba19f6842620f659a540d09d4d4c43",
+        "size_bytes": 2973
+      },
+      {
+        "path": "mobile_customer/.dart_tool/package_config.json",
+        "hash": "86dad35cbf3ea5249aec8aad92e976cb6f1b72cffdecebc428d577d8d0d04b63",
+        "size_bytes": 40131
+      },
+      {
+        "path": "mobile_customer/.dart_tool/package_graph.json",
+        "hash": "8061eaac40d8a390da3401f1fe5b6e09d60847fbf3aa38ed351b1e8d78d1e7b8",
+        "size_bytes": 38022
+      },
+      {
+        "path": "mobile_customer/README.md",
+        "hash": "b8e961cd8d0d7a6e2ba0504e8da6684533115125fb230c80331c7f91742be51d",
+        "size_bytes": 654
+      },
+      {
+        "path": "mobile_customer/analysis_options.yaml",
+        "hash": "98d70dd5a9033911f40e2e7f3ff9d74618e2aa13652990efe860ed0fe1cedfa9",
+        "size_bytes": 1585
+      },
+      {
+        "path": "mobile_customer/android/app/src/debug/AndroidManifest.xml",
+        "hash": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c",
+        "size_bytes": 385
+      },
+      {
+        "path": "mobile_customer/android/app/src/main/AndroidManifest.xml",
+        "hash": "cac803baf12721ef2a67b82fac6c4f16025ac8314363b16077806c76888ba8aa",
+        "size_bytes": 2238
+      },
+      {
+        "path": "mobile_customer/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+        "hash": "81e4ae80242425607ca95d64828db5a09b228607d611e9067b6fcdfbf8993322",
+        "size_bytes": 3471
+      },
+      {
+        "path": "mobile_customer/android/app/src/main/kotlin/com/example/mobile_customer/MainActivity.kt",
+        "hash": "08bcdd82c48e9f71ea5c83ae3b3f2934f82801218e6349a742c09d9d63032edc",
+        "size_bytes": 134
+      },
+      {
+        "path": "mobile_customer/android/app/src/main/res/drawable-v21/launch_background.xml",
+        "hash": "dca312ec77de83e43ef70a825c299b51451247286c29167d62f19165750b8793",
+        "size_bytes": 450
+      },
+      {
+        "path": "mobile_customer/android/app/src/main/res/drawable/launch_background.xml",
+        "hash": "2df60e2cfbee873ce2858088cf003e6b93498f2f568476da437610467ea1a9d7",
+        "size_bytes": 446
+      },
+      {
+        "path": "mobile_customer/android/app/src/main/res/values-night/styles.xml",
+        "hash": "ea763597dc1a84c8034251caee98d7753e0fbf57340ffc94677427de4b537516",
+        "size_bytes": 1013
+      },
+      {
+        "path": "mobile_customer/android/app/src/main/res/values/styles.xml",
+        "hash": "cca15a99b59380a548bf6a890f7ca5380ee509b1f9bbb2f5f9ec3589fa25c2f7",
+        "size_bytes": 1014
+      },
+      {
+        "path": "mobile_customer/android/app/src/profile/AndroidManifest.xml",
+        "hash": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c",
+        "size_bytes": 385
+      },
+      {
+        "path": "mobile_customer/lib/app.dart",
+        "hash": "5546e86e0b39d4049bff689c76a654be5d7454cd79cefd3b68e519daf31415a8",
+        "size_bytes": 4872
+      },
+      {
+        "path": "mobile_customer/lib/core/bootstrap/bootstrap.dart",
+        "hash": "22c49785de850841be158222420f3d4ceecee57edf8cc8861f3770d8f86dda7c",
+        "size_bytes": 295
+      },
+      {
+        "path": "mobile_customer/lib/core/router/app_router.dart",
+        "hash": "8a4a5ac08617b49fcd0d1adec426979eb25e7307cb2aa2d27e1c87eec5621390",
+        "size_bytes": 9847
+      },
+      {
+        "path": "mobile_customer/lib/features/account/presentation/pages/account_page.dart",
+        "hash": "818ee52fafb165a490289855560c534420e550beb0a445386f39e236e4d754e6",
+        "size_bytes": 3184
+      },
+      {
+        "path": "mobile_customer/lib/features/account/presentation/pages/profile_edit_page.dart",
+        "hash": "97963c8dc1ae56f7eaa0419cb0f981f8f3bb2653716130d940ed05ad632de964",
+        "size_bytes": 4002
+      },
+      {
+        "path": "mobile_customer/lib/features/authentication/presentation/pages/forgot_password_page.dart",
+        "hash": "19320ac140b3b4ac803a2f6327f094f856c3c984dd26c54dc4b8de56377f95aa",
+        "size_bytes": 4833
+      },
+      {
+        "path": "mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+        "hash": "51568616b3b2e41a0929eeabf91c2622f267f73fbcfd9f0eb1d18cbfb3bf5db2",
+        "size_bytes": 8196
+      },
+      {
+        "path": "mobile_customer/lib/features/authentication/presentation/pages/register_page.dart",
+        "hash": "274fb4551adcbd191a4053497c8c8210aae094a748aeb138d558050be5e6f343",
+        "size_bytes": 9282
+      },
+      {
+        "path": "mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+        "hash": "cec47f798b97875b32f366299f5a2037b9976fac4c95c28683d84796c44c2f8f",
+        "size_bytes": 5890
+      },
+      {
+        "path": "mobile_customer/lib/features/booking/presentation/pages/booking_confirmation_page.dart",
+        "hash": "19fce43a2e68355979a6c2bb0686a2a8faad63079aad219d085280503e879247",
+        "size_bytes": 4139
+      },
+      {
+        "path": "mobile_customer/lib/features/booking/presentation/pages/booking_detail_page.dart",
+        "hash": "17b2c6cdf3c96c2bb736dcaac38a0fadd1596a4fbac61342a073cfb1ce3f343e",
+        "size_bytes": 5535
+      },
+      {
+        "path": "mobile_customer/lib/features/booking/presentation/pages/booking_form_page.dart",
+        "hash": "0e690989e28662d61eedc221001d3d4eecbb71237a0146860fa0d40bbe8208d0",
+        "size_bytes": 5237
+      },
+      {
+        "path": "mobile_customer/lib/features/booking/presentation/pages/booking_history_page.dart",
+        "hash": "8983e7522640532fd12caa2002e418a4c0ec8a7f426af87a88812071d4b3b4d3",
+        "size_bytes": 4183
+      },
+      {
+        "path": "mobile_customer/lib/features/discovery/presentation/pages/discovery_page.dart",
+        "hash": "9eecb32ac68a922061b404130cddd373759ee8e8ad8874d2d95d747d13ee88b1",
+        "size_bytes": 11158
+      },
+      {
+        "path": "mobile_customer/lib/features/discovery/presentation/pages/search_page.dart",
+        "hash": "41029179d18fbab3d2373d264cd819f3f110fa1ca26d6a1f8e757664485d8b1d",
+        "size_bytes": 6527
+      },
+      {
+        "path": "mobile_customer/lib/features/notification/presentation/pages/notification_page.dart",
+        "hash": "52247c0a9886262b2bad3bd61ad13d2509847a0924967ec042fbe9af673919ba",
+        "size_bytes": 3145
+      },
+      {
+        "path": "mobile_customer/lib/features/payment/presentation/pages/payment_page.dart",
+        "hash": "20c5b51cef47f33374d68a12e04a433b2b5455e8cc0c34be1950d5c9c3b0bc1b",
+        "size_bytes": 5482
+      },
+      {
+        "path": "mobile_customer/lib/features/payment/presentation/pages/payment_success_page.dart",
+        "hash": "e61f740b1239a6d5b7234fbbf5dfdd2a8f212c549e24e3b6293b24090ddcb1d0",
+        "size_bytes": 2628
+      },
+      {
+        "path": "mobile_customer/lib/features/provider_profile/presentation/pages/provider_detail_page.dart",
+        "hash": "82e9814704b7d7a26c4c2e1bf24c4318ac85dcef12e4be8f93c3172b70a92c44",
+        "size_bytes": 6075
+      },
+      {
+        "path": "mobile_customer/lib/features/provider_profile/presentation/pages/provider_list_page.dart",
+        "hash": "ee65c9d534e7980b9a1dffb9e73e9f740ad40a78c7b348ffd80f6ae6579e0932",
+        "size_bytes": 2756
+      },
+      {
+        "path": "mobile_customer/lib/features/support/presentation/pages/support_page.dart",
+        "hash": "bc3ffb524da244e19e1f18a193311cf88563167904f21d347e1bb12bf5a43315",
+        "size_bytes": 3303
+      },
+      {
+        "path": "mobile_customer/lib/main.dart",
+        "hash": "f65c2e97bab0c117ca1188a51eea31a615fa8cb908c7cad80d3904211a28a34b",
+        "size_bytes": 436
+      },
+      {
+        "path": "mobile_customer/lib/shared/widgets/booking_card.dart",
+        "hash": "3dbd2796ef7df4d9b4d4e72bdb8f95973646304ff32b2db03ce12ac35e8c5875",
+        "size_bytes": 2944
+      },
+      {
+        "path": "mobile_customer/lib/shared/widgets/main_scaffold.dart",
+        "hash": "2a39ab243ec39eeec81c628a732fb5a27829acb0bb5909abe6b6df518d2c03de",
+        "size_bytes": 2200
+      },
+      {
+        "path": "mobile_customer/lib/shared/widgets/price_summary.dart",
+        "hash": "07dc79fd0fb91e8042783e12aac662d951a0a59be7e85e1956992175abd561e2",
+        "size_bytes": 2317
+      },
+      {
+        "path": "mobile_customer/lib/shared/widgets/service_card.dart",
+        "hash": "aa5653fc929f4d0664f279ac2f4f8357fa241e16f1d5bcab4dadbb0a93a6c4c1",
+        "size_bytes": 1532
+      },
+      {
+        "path": "mobile_customer/lib/shared/widgets/slot_picker.dart",
+        "hash": "3569cc4f64a7e7da21568ff9b9b0e1a308f40637d19bb0009bed91fe63d62a9a",
+        "size_bytes": 1533
+      },
+      {
+        "path": "mobile_customer/pubspec.lock",
+        "hash": "755c058f19293d108ddc5661f6c5f92d5d3d1aaca5ce98bbcdb34359ffaf3c65",
+        "size_bytes": 45340
+      },
+      {
+        "path": "mobile_customer/pubspec.yaml",
+        "hash": "dd29284b57709c448d32519e68cc3e6e85568701f800df9ca6e54bed724d0a25",
+        "size_bytes": 1598
+      },
+      {
+        "path": "mobile_customer/test/widget_test.dart",
+        "hash": "e65c6fb92e2fd776f8fd8ffa0df0cb85f3dbb816769c0fb9a9b5d18aa6a09105",
+        "size_bytes": 188
+      },
+      {
+        "path": "mobile_partner/.dart_tool/dartpad/web_plugin_registrant.dart",
+        "hash": "d8c4583d4101514eba92dc83f84bceb745dadaea8311f751007286c77ebada1f",
+        "size_bytes": 1255
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/1e64ae543f2c563a914f8e95de533d65/build_hooks_result.json",
+        "hash": "c5781b3a42c2c0b8cebce342c3cb5a1b0418eae1dcf7dec1a43912048e532dcd",
+        "size_bytes": 1377
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/1e64ae543f2c563a914f8e95de533d65/link_hooks_result.json",
+        "hash": "55abb4c40caf7a55ead25d92cb3122b3f54d6a1c70f1669dc06a2feb0e1c1219",
+        "size_bytes": 513
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/1e64ae543f2c563a914f8e95de533d65/native_assets.json",
+        "hash": "9548a31e4a048135c1d94f919328bfb62ae2c7bb3cab96557c7941daa97776cb",
+        "size_bytes": 45
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/1e64ae543f2c563a914f8e95de533d65/outputs.json",
+        "hash": "3a252c6957dd98c717b3b3cb68f1ea2c40ad3c2638bfff9c45c034abae35fd3d",
+        "size_bytes": 1536
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/1e64ae543f2c563a914f8e95de533d65/recorded_uses.json",
+        "hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "size_bytes": 2
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/b3810da699e77d816b18c852f53f2298/build_hooks_result.json",
+        "hash": "c5781b3a42c2c0b8cebce342c3cb5a1b0418eae1dcf7dec1a43912048e532dcd",
+        "size_bytes": 1377
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/b3810da699e77d816b18c852f53f2298/link_hooks_result.json",
+        "hash": "5772a623d9ed459b05d5cabbe7d7d2fe41a93a2ea2818870556b864b5ee7d1e5",
+        "size_bytes": 513
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/b3810da699e77d816b18c852f53f2298/native_assets.json",
+        "hash": "9548a31e4a048135c1d94f919328bfb62ae2c7bb3cab96557c7941daa97776cb",
+        "size_bytes": 45
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/b3810da699e77d816b18c852f53f2298/outputs.json",
+        "hash": "3a252c6957dd98c717b3b3cb68f1ea2c40ad3c2638bfff9c45c034abae35fd3d",
+        "size_bytes": 1536
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/b3810da699e77d816b18c852f53f2298/recorded_uses.json",
+        "hash": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+        "size_bytes": 2
+      },
+      {
+        "path": "mobile_partner/.dart_tool/flutter_build/dart_plugin_registrant.dart",
+        "hash": "419093de40f05c0502e64c44be4e748743b8c71c20fc3f30047fb456699e67c5",
+        "size_bytes": 11789
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/dependencies.dependencies_hash_file.json",
+        "hash": "fea626cf8ff81a7ebee699bf7ffdd4408767108dabd923c011c68a4b64c13b6f",
+        "size_bytes": 607
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/hook.dependencies_hash_file.json",
+        "hash": "8dd65ed2a5a4402f32992ed6f082c38b55cc030b7d9c8e78cc5bd4feb6f1d1fe",
+        "size_bytes": 436
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/input.json",
+        "hash": "50ab3028e2d111f4a79c8c7a59810b19a169da16762d551e5cbbb2a052195db4",
+        "size_bytes": 1292
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/output.json",
+        "hash": "b84a42c55ab341ca0a94d8a825dfdb44b71d2aef07876a8baeca71d059875191",
+        "size_bytes": 95
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/stderr.txt",
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/0fc79f5fbd/stdout.txt",
+        "hash": "77521b27c16061a0f155b6913285919b5b4483a13bdaf843458e48e2b03cbd95",
+        "size_bytes": 2864
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/7ad719985a/dependencies.dependencies_hash_file.json",
+        "hash": "fea626cf8ff81a7ebee699bf7ffdd4408767108dabd923c011c68a4b64c13b6f",
+        "size_bytes": 607
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/7ad719985a/hook.dependencies_hash_file.json",
+        "hash": "8dd65ed2a5a4402f32992ed6f082c38b55cc030b7d9c8e78cc5bd4feb6f1d1fe",
+        "size_bytes": 436
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/7ad719985a/input.json",
+        "hash": "a1e05120c9ad4b7e32b43164552244d21eae9e3ab70cace6c77c09c89d0c2121",
+        "size_bytes": 1292
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/7ad719985a/output.json",
+        "hash": "dd4e56ab2581aa44796e61079c0dbc331a8c787f3909765781ccb25a2e3bbc1d",
+        "size_bytes": 95
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/7ad719985a/stderr.txt",
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/7ad719985a/stdout.txt",
+        "hash": "41d89b6e7fc2f89fca4c1bee8b3d978fa297ecac7b713148eaeaa4873ff0eefd",
+        "size_bytes": 2864
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/ea9979e860/dependencies.dependencies_hash_file.json",
+        "hash": "fea626cf8ff81a7ebee699bf7ffdd4408767108dabd923c011c68a4b64c13b6f",
+        "size_bytes": 607
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/ea9979e860/hook.dependencies_hash_file.json",
+        "hash": "8dd65ed2a5a4402f32992ed6f082c38b55cc030b7d9c8e78cc5bd4feb6f1d1fe",
+        "size_bytes": 436
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/ea9979e860/input.json",
+        "hash": "75d415ae7b4eae9a5b6bdfebe1986edcf978e9f44dbb5e016b6d9c3ce69ee384",
+        "size_bytes": 1294
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/ea9979e860/output.json",
+        "hash": "dd4e56ab2581aa44796e61079c0dbc331a8c787f3909765781ccb25a2e3bbc1d",
+        "size_bytes": 95
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/ea9979e860/stderr.txt",
+        "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "size_bytes": 0
+      },
+      {
+        "path": "mobile_partner/.dart_tool/hooks_runner/objective_c/ea9979e860/stdout.txt",
+        "hash": "b589938c9c8db13a2618940182ee5f334532fc8beddfda1c3bf136e11ba6d74e",
+        "size_bytes": 2864
+      },
+      {
+        "path": "mobile_partner/.dart_tool/package_config.json",
+        "hash": "e2e1b30751ffc4c231a5af82096b34026815fb14e4d140d419407b98fa53bc85",
+        "size_bytes": 40764
+      },
+      {
+        "path": "mobile_partner/.dart_tool/package_graph.json",
+        "hash": "dca609771f79fcf3e09d3178e2100454cedaab89fa14cc7f9c52c4f6be730dd8",
+        "size_bytes": 38907
+      },
+      {
+        "path": "mobile_partner/README.md",
+        "hash": "300de8fdcac34df61071fd37300c81229a40211e90f372535b2209fb5c01f85f",
+        "size_bytes": 653
+      },
+      {
+        "path": "mobile_partner/analysis_options.yaml",
+        "hash": "98d70dd5a9033911f40e2e7f3ff9d74618e2aa13652990efe860ed0fe1cedfa9",
+        "size_bytes": 1585
+      },
+      {
+        "path": "mobile_partner/android/app/src/debug/AndroidManifest.xml",
+        "hash": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c",
+        "size_bytes": 385
+      },
+      {
+        "path": "mobile_partner/android/app/src/main/AndroidManifest.xml",
+        "hash": "d3702644902054e7a3603b41a1f87ead2c84a5e2a6499e7241f9420adcd923db",
+        "size_bytes": 2247
+      },
+      {
+        "path": "mobile_partner/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+        "hash": "cdc245a50ffef388989ecb2294a11bb67b944683caac3264b6789cf4c27c2fbd",
+        "size_bytes": 3717
+      },
+      {
+        "path": "mobile_partner/android/app/src/main/kotlin/id/dekat/partner/mobile_partner/MainActivity.kt",
+        "hash": "73812649fc80e203a2b369aa9dc3bd6dbb0742be5f4b151705d906064cdadf33",
+        "size_bytes": 138
+      },
+      {
+        "path": "mobile_partner/android/app/src/main/res/drawable-v21/launch_background.xml",
+        "hash": "dca312ec77de83e43ef70a825c299b51451247286c29167d62f19165750b8793",
+        "size_bytes": 450
+      },
+      {
+        "path": "mobile_partner/android/app/src/main/res/drawable/launch_background.xml",
+        "hash": "2df60e2cfbee873ce2858088cf003e6b93498f2f568476da437610467ea1a9d7",
+        "size_bytes": 446
+      },
+      {
+        "path": "mobile_partner/android/app/src/main/res/values-night/styles.xml",
+        "hash": "ea763597dc1a84c8034251caee98d7753e0fbf57340ffc94677427de4b537516",
+        "size_bytes": 1013
+      },
+      {
+        "path": "mobile_partner/android/app/src/main/res/values/styles.xml",
+        "hash": "cca15a99b59380a548bf6a890f7ca5380ee509b1f9bbb2f5f9ec3589fa25c2f7",
+        "size_bytes": 1014
+      },
+      {
+        "path": "mobile_partner/android/app/src/profile/AndroidManifest.xml",
+        "hash": "b01a4541a8144c15bc617bab7eb267c99fa1476368fbbda5a12cdbf4e316a34c",
+        "size_bytes": 385
+      },
+      {
+        "path": "mobile_partner/ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift",
+        "hash": "c59649b8eb9e7f78fbf8dc7f9254012fad2cbb594b19cc83640a5afc59e40e20",
+        "size_bytes": 596
+      },
+      {
+        "path": "mobile_partner/ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Sources/FlutterGeneratedPluginSwiftPackage/FlutterGeneratedPluginSwiftPackage.swift",
+        "hash": "8518fb048c29925943b03de7f45c9d5232c0b46d2cc97d36f83ff501e1ffb9ba",
+        "size_bytes": 38
+      },
+      {
+        "path": "mobile_partner/ios/Flutter/ephemeral/flutter_lldb_helper.py",
+        "hash": "05cfe3977fdee593efad2049a4f62d374e55c69cedc8aabeee5566b37acb8384",
+        "size_bytes": 1276
+      },
+      {
+        "path": "mobile_partner/ios/RunnerTests/RunnerTests.swift",
+        "hash": "c0e04141287eb7f9c9f3d31cf5be8cb626a9ea71351206c9121578e8b8f480c3",
+        "size_bytes": 297
+      },
+      {
+        "path": "mobile_partner/ios/Runner/AppDelegate.swift",
+        "hash": "54a5e98d6c3e8a79413ad50607b83aac8ded8828bc913eda1fe86bb33a66cd5d",
+        "size_bytes": 555
+      },
+      {
+        "path": "mobile_partner/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+        "hash": "5f8b941b774bde4496d73347c1f79cbdd786bb76fbdab9ed1f3f0cb78a0fb0d3",
+        "size_bytes": 2641
+      },
+      {
+        "path": "mobile_partner/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json",
+        "hash": "fbd112a9f3b541a1d811f71ac8e4fe68b6176687d973a5f4d99b7aa4a722e94e",
+        "size_bytes": 414
+      },
+      {
+        "path": "mobile_partner/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md",
+        "hash": "853ac958e2416fe2540f6f61165283a3618b71a7ba5f85f65ac41c2158dfcd21",
+        "size_bytes": 340
+      },
+      {
+        "path": "mobile_partner/ios/Runner/SceneDelegate.swift",
+        "hash": "edce811c671ca0a6ccb14753e14e16deb0d89a0adf4f1b685e362d87d8f4c366",
+        "size_bytes": 82
+      },
+      {
+        "path": "mobile_partner/lib/app.dart",
+        "hash": "31fcda94a2b03a0d8a34406db60fc899dd8cbffe7ff46bcad7657a0c814f1b0e",
+        "size_bytes": 3820
+      },
+      {
+        "path": "mobile_partner/lib/core/bootstrap/bootstrap.dart",
+        "hash": "b380fcc2889b2565d4fb4e219b46148b56ecb21394a830c45de85706d06d224f",
+        "size_bytes": 280
+      },
+      {
+        "path": "mobile_partner/lib/core/router/app_router.dart",
+        "hash": "05500a1f87c4cffdbe5cd0842ec35bb5b07f8f205c66e89e5a4baa5f23521389",
+        "size_bytes": 4703
+      },
+      {
+        "path": "mobile_partner/lib/features/authentication/presentation/pages/login_page.dart",
+        "hash": "cb83b11371880f27a0c5e1178c25f8680ea6f3638019b6ec7c6f30bb9f690fc5",
+        "size_bytes": 3899
+      },
+      {
+        "path": "mobile_partner/lib/features/authentication/presentation/pages/onboarding_page.dart",
+        "hash": "a16b8f440aa5450e1fd5262c40288e0c4ac774bf1d731d04c19c4740bd3e5b5f",
+        "size_bytes": 3475
+      },
+      {
+        "path": "mobile_partner/lib/features/booking_management/presentation/pages/booking_detail_page.dart",
+        "hash": "17afc1f1e3d33288b7e1c81e7277381e2cd972f12730b7b5f3a3553e1bcfa42b",
+        "size_bytes": 5923
+      },
+      {
+        "path": "mobile_partner/lib/features/booking_management/presentation/pages/booking_list_page.dart",
+        "hash": "a24796b1bc6fbd0c18114805a305e85ebafe475e8fff4337872c8a06a33db156",
+        "size_bytes": 4054
+      },
+      {
+        "path": "mobile_partner/lib/features/calendar/presentation/pages/calendar_page.dart",
+        "hash": "0474a9a06c0ce8f613e561a748a27a6df966ef70e219839d00d59e8be760c789",
+        "size_bytes": 4825
+      },
+      {
+        "path": "mobile_partner/lib/features/payment/presentation/pages/earnings_page.dart",
+        "hash": "7398f28fddc8e03bc48aceb9cf1e7c5bdccca04a860a622aa503ddc203786d09",
+        "size_bytes": 4246
+      },
+      {
+        "path": "mobile_partner/lib/features/payment/presentation/pages/payment_page.dart",
+        "hash": "9f6c65670a2971bea6b19d8a23b958b572140d36cad4f1185199dc9872ea8902",
+        "size_bytes": 3450
+      },
+      {
+        "path": "mobile_partner/lib/features/reports/presentation/pages/reports_page.dart",
+        "hash": "f59033e8d3b4dd5547883226a85bc6ae9bc6f5d11585ccc523c8b8ef67c35b69",
+        "size_bytes": 6122
+      },
+      {
+        "path": "mobile_partner/lib/features/staff_management/presentation/pages/staff_list_page.dart",
+        "hash": "e4ed437dfcd2eb8019b0ac225747f524239121a76eb5d6bd65fb9217aaf07303",
+        "size_bytes": 5007
+      },
+      {
+        "path": "mobile_partner/lib/main.dart",
+        "hash": "e375502d8ccd6a7b11c383cfa343e0899e79586a597d6186888f9f3a361dd947",
+        "size_bytes": 385
+      },
+      {
+        "path": "mobile_partner/lib/shared/widgets/main_scaffold.dart",
+        "hash": "fc0493dacdb1dc9fb957652edeb9c97c3522f38879f56e2b468eccdfeb8d1730",
+        "size_bytes": 1804
+      },
+      {
+        "path": "mobile_partner/linux/CMakeLists.txt",
+        "hash": "9f8e06e0d29743f57d58dd6914f105ba2611b77d61eac74619f979ab8adab7ff",
+        "size_bytes": 4900
+      },
+      {
+        "path": "mobile_partner/linux/flutter/CMakeLists.txt",
+        "hash": "4eb17836308c1cd53f6b2bb8edb3b7b30610bff3b1d9df7fecc9317f9109700c",
+        "size_bytes": 2903
+      },
+      {
+        "path": "mobile_partner/linux/runner/CMakeLists.txt",
+        "hash": "81ecf2604c50f480c23d460b2ddf653ecd39df29cc5b2fe4913f1a59f008a5a7",
+        "size_bytes": 1000
+      },
+      {
+        "path": "mobile_partner/macos/Flutter/GeneratedPluginRegistrant.swift",
+        "hash": "f9321a02afdc4387b7754f5ce940779dedc8f6bfe938e0aeab28a059643b1efb",
+        "size_bytes": 1234
+      },
+      {
+        "path": "mobile_partner/macos/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift",
+        "hash": "51d5d94b4415f40265616421beb55537492f11794acdb2e2e082002dc2823ec2",
+        "size_bytes": 598
+      },
+      {
+        "path": "mobile_partner/macos/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Sources/FlutterGeneratedPluginSwiftPackage/FlutterGeneratedPluginSwiftPackage.swift",
+        "hash": "8518fb048c29925943b03de7f45c9d5232c0b46d2cc97d36f83ff501e1ffb9ba",
+        "size_bytes": 38
+      },
+      {
+        "path": "mobile_partner/macos/RunnerTests/RunnerTests.swift",
+        "hash": "8a0ff977c64ceac0750fffa48087988b7b4125d1b1c49019221e7fffb574423e",
+        "size_bytes": 302
+      },
+      {
+        "path": "mobile_partner/macos/Runner/AppDelegate.swift",
+        "hash": "5b9cbdcb563ad8578a99b7c283958490e4af537322e9092fe1efbb3c29ab3e1b",
+        "size_bytes": 324
+      },
+      {
+        "path": "mobile_partner/macos/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json",
+        "hash": "992ba63d183dfb8f8e3af38ac203d834d23c004da1417c438b4c5a3d7d1d7103",
+        "size_bytes": 1359
+      },
+      {
+        "path": "mobile_partner/macos/Runner/MainFlutterWindow.swift",
+        "hash": "8178ad756f958f986f794a8bb06e321a6630ceaaf8f235b3b4ae3936e415dc7c",
+        "size_bytes": 403
+      },
+      {
+        "path": "mobile_partner/pubspec.lock",
+        "hash": "bc63f4a4ceeaaa32c690f92fc1aecfb85372f03dad0ad00f1cc61bc94a329741",
+        "size_bytes": 46071
+      },
+      {
+        "path": "mobile_partner/pubspec.yaml",
+        "hash": "62bfd8691c368a59842526a197927958be55e9b987fc6cf9800ae28b7b6ebea9",
+        "size_bytes": 1638
+      },
+      {
+        "path": "mobile_partner/test/widget_test.dart",
+        "hash": "ff33b4a7191d26a136c50d3f205512005f4e38624d1a6249b6d22c4bacbb8cc6",
+        "size_bytes": 1095
+      },
+      {
+        "path": "mobile_partner/web/manifest.json",
+        "hash": "24b284e952ac8516b282cfb18a7e7ead75a59dca52c0ab5912f4f3ba153eb2b1",
+        "size_bytes": 959
+      },
+      {
+        "path": "mobile_partner/windows/CMakeLists.txt",
+        "hash": "567eacc229039d6d032ed4e736fd1bc317d7b7fdc240b254d42dc5367c45d120",
+        "size_bytes": 4272
+      },
+      {
+        "path": "mobile_partner/windows/flutter/CMakeLists.txt",
+        "hash": "bd05e3268b2f246bcbafdb778165fe67a7bafdba04eb73599502563a67b8ae7e",
+        "size_bytes": 3851
+      },
+      {
+        "path": "mobile_partner/windows/runner/CMakeLists.txt",
+        "hash": "d765fdd05f63ad099e585a2cced0cbff13ec3229b7de68c8681b2107db850089",
+        "size_bytes": 1836
+      },
+      {
+        "path": "web_admin/package.json",
+        "hash": "dac37e34be523319864a887f9b9d18ec63f6de6e681b399da2008d78634ea914",
+        "size_bytes": 921
+      },
+      {
+        "path": "web_admin/src/App.tsx",
+        "hash": "ff6d21d90e9592444319d76a9b7b092b65b30e3cf3ba5df6e6f01eed54f69acb",
+        "size_bytes": 2096
+      },
+      {
+        "path": "web_admin/src/components/AdminLayout.tsx",
+        "hash": "b1464b1df7d26fd77a9e53e4a551ded251ffa27084f718c2e79c98ba2000dd2c",
+        "size_bytes": 3075
+      },
+      {
+        "path": "web_admin/src/components/DataTable.tsx",
+        "hash": "a6091d3ddce2c158303604368ee489a5de2f7a5c52a5848f2a8c43aebb524575",
+        "size_bytes": 2542
+      },
+      {
+        "path": "web_admin/src/components/StatsCard.tsx",
+        "hash": "011cbd9b24162c6c92f2465c5f4dfb2d654e5915b3ae707ae210c8e72ca8746a",
+        "size_bytes": 1378
+      },
+      {
+        "path": "web_admin/src/components/StatusBadge.tsx",
+        "hash": "0099977d998b718fa2427cd0200201122e61511e74fbf247f7119ef719f96c0e",
+        "size_bytes": 1894
+      },
+      {
+        "path": "web_admin/src/lib/api.ts",
+        "hash": "571d17730878a326c37dfb3aff8ca7f58be3dbe18e3ffe8617c3bcac58373e6a",
+        "size_bytes": 2934
+      },
+      {
+        "path": "web_admin/src/lib/auth.tsx",
+        "hash": "d216c8d46444589f572c9e786b175247a8f7a4fab42579119996a2fc2535e90f",
+        "size_bytes": 1711
+      },
+      {
+        "path": "web_admin/src/lib/types.ts",
+        "hash": "908749e1d7705c8ac0bb53268b2281ee6366bf8d4cc650ae1fc5ff2bbf4da880",
+        "size_bytes": 1973
+      },
+      {
+        "path": "web_admin/src/main.tsx",
+        "hash": "29f1228956c99cb119abaa61bb04e9702b46b2240f5ce0740de800aac689ac93",
+        "size_bytes": 620
+      },
+      {
+        "path": "web_admin/src/pages/BookingsPage.tsx",
+        "hash": "acd9499df05f849a8227a17310a4e8fb021eb66199481e1dd9886dad7fc4cb5e",
+        "size_bytes": 2622
+      },
+      {
+        "path": "web_admin/src/pages/CasesPage.tsx",
+        "hash": "798e32215c63d477e0b17b1b954fbf15c4483242f849e8a6b19000f9ddc4f530",
+        "size_bytes": 3644
+      },
+      {
+        "path": "web_admin/src/pages/ConfigPage.tsx",
+        "hash": "e8dd7d0a15b08dd8cee2dff413222b91a4d73fd96029573c2c38656483420488",
+        "size_bytes": 2493
+      },
+      {
+        "path": "web_admin/src/pages/DashboardPage.tsx",
+        "hash": "1b97d1e9745525fa6a643031fb2a608a154e2e0987edcf4c233ef6afbd4fdf93",
+        "size_bytes": 2518
+      },
+      {
+        "path": "web_admin/src/pages/LoginPage.tsx",
+        "hash": "d5b0a092be21260ca6a65f1707bcc87dce7673ea820abf690e7e504f7c9775e7",
+        "size_bytes": 3786
+      },
+      {
+        "path": "web_admin/src/pages/PaymentsPage.tsx",
+        "hash": "48956e7838644e0ca4baffc225a18c6d9597307ed9cfb34aae08667247b130fc",
+        "size_bytes": 2541
+      },
+      {
+        "path": "web_admin/src/pages/TenantsPage.tsx",
+        "hash": "ca86c687a556f4ca96d34f535050c64859201e2f482d632d10ed3ea898c3e430",
+        "size_bytes": 4720
+      },
+      {
+        "path": "web_admin/src/pages/UsersPage.tsx",
+        "hash": "30002edff1120b23932c082c33507c08cc2ca2958d07bef997a55aa3a20f08ca",
+        "size_bytes": 2392
+      },
+      {
+        "path": "web_admin/tailwind.config.ts",
+        "hash": "e71409e8bd95e9035cd000462063deab5ddb7fa184b49b514eff4214a7cf868b",
+        "size_bytes": 940
+      },
+      {
+        "path": "web_admin/tsconfig.json",
+        "hash": "5c5c2a8d36b19c1f8bef695e8af46d45c4a4cd1ceed305695fbd37a59617cf5e",
+        "size_bytes": 983
+      },
+      {
+        "path": "web_admin/vite-env.d.ts",
+        "hash": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+        "size_bytes": 38
+      },
+      {
+        "path": "web_admin/vite.config.ts",
+        "hash": "202b3a7c6ef67003d48035ae6d0ec9f7875f902fca023a908c59eb9ac3b0669c",
+        "size_bytes": 410
+      },
+      {
+        "path": "web_provider/package.json",
+        "hash": "7068dfcbae303751f10e1cf9de4708416d377eca59ecef9334a24a1ddbb6cef7",
+        "size_bytes": 924
+      },
+      {
+        "path": "web_provider/src/App.tsx",
+        "hash": "ac080b6429f570d89b125790f91dbaef68d1a3e8aa03e8562c1cfc528ee8f186",
+        "size_bytes": 2123
+      },
+      {
+        "path": "web_provider/src/components/BookingTable.tsx",
+        "hash": "a8467f61d846dc969ab594ed15c7d6e241835178e9cce6c2bc4fe9b61867b052",
+        "size_bytes": 5847
+      },
+      {
+        "path": "web_provider/src/components/Layout.tsx",
+        "hash": "b0632b467354a7bad6be0ee30c7ff4022fffbadc75eb389772ac487a789b5169",
+        "size_bytes": 5138
+      },
+      {
+        "path": "web_provider/src/components/StatsCard.tsx",
+        "hash": "5ca9454b11ee9f838551a6f3baef0c908582f4ef828e192b138f9db9045fc5cb",
+        "size_bytes": 2069
+      },
+      {
+        "path": "web_provider/src/lib/api.ts",
+        "hash": "e0ece26aaeadabf8ab781bc47344e82c305c36d2326f19256b6bbfcefd91de43",
+        "size_bytes": 4187
+      },
+      {
+        "path": "web_provider/src/lib/auth.tsx",
+        "hash": "48184eeb02d8ef97a7ebd34d7b19fbae013c39b9fc527c3eb40bfad315320ce3",
+        "size_bytes": 1937
+      },
+      {
+        "path": "web_provider/src/lib/types.ts",
+        "hash": "979de4de9e96e67dacd072bd455768a821e9f33aa0661255d2c50cd05166d552",
+        "size_bytes": 2783
+      },
+      {
+        "path": "web_provider/src/main.tsx",
+        "hash": "29f1228956c99cb119abaa61bb04e9702b46b2240f5ce0740de800aac689ac93",
+        "size_bytes": 620
+      },
+      {
+        "path": "web_provider/src/pages/CalendarPage.tsx",
+        "hash": "9a0fe8e94de6b8938f29f29662fa6ee032f5b0cf17147fc1ed07ff75c51a3c57",
+        "size_bytes": 9564
+      },
+      {
+        "path": "web_provider/src/pages/CustomersPage.tsx",
+        "hash": "4071233281310ca30b07a6b0af7242f675bea132f6c6c60a31466460daf49fde",
+        "size_bytes": 3944
+      },
+      {
+        "path": "web_provider/src/pages/DashboardPage.tsx",
+        "hash": "a7a40be6ad038c8f9e533b08fb2a5eed43a350c4277b89dedad6f3dc89042eb7",
+        "size_bytes": 7068
+      },
+      {
+        "path": "web_provider/src/pages/LoginPage.tsx",
+        "hash": "2f29f3e72a0533476cdfde140563708116344039f046f3f0fadfd95ad2d22c7a",
+        "size_bytes": 5428
+      },
+      {
+        "path": "web_provider/src/pages/ReportsPage.tsx",
+        "hash": "a32de92abffa1e363b4eca2287404a67ab0cab5fe4be926eb7bc8e3260846e49",
+        "size_bytes": 4357
+      },
+      {
+        "path": "web_provider/src/pages/ServicesPage.tsx",
+        "hash": "f735769edf06e5dda03354b293585d705945ab5c19e96e451ac6bd82fe45fd51",
+        "size_bytes": 8214
+      },
+      {
+        "path": "web_provider/src/pages/SettingsPage.tsx",
+        "hash": "3005ca7efe97ff81f47f100fbf3db2d7fa4b23b31b5ef4bf2d29e110f907890e",
+        "size_bytes": 6901
+      },
+      {
+        "path": "web_provider/src/pages/StaffPage.tsx",
+        "hash": "17ee9d5c99575327cffa3ac4d897972c7aac91a64e6119d000e2c928fadc9d96",
+        "size_bytes": 5756
+      },
+      {
+        "path": "web_provider/tailwind.config.ts",
+        "hash": "e71409e8bd95e9035cd000462063deab5ddb7fa184b49b514eff4214a7cf868b",
+        "size_bytes": 940
+      },
+      {
+        "path": "web_provider/tsconfig.json",
+        "hash": "5c5c2a8d36b19c1f8bef695e8af46d45c4a4cd1ceed305695fbd37a59617cf5e",
+        "size_bytes": 983
+      },
+      {
+        "path": "web_provider/vite-env.d.ts",
+        "hash": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+        "size_bytes": 38
+      },
+      {
+        "path": "web_provider/vite.config.ts",
+        "hash": "15aca807afda30d82a1685d5c4a97ddff9c94063aebdedad4bc1f7653bf9d754",
+        "size_bytes": 410
+      },
+      {
+        "path": "web_public/package.json",
+        "hash": "731617fad8c1dff38ab653d2f3dbd0766ce242c4f666c1fced9eaba6a921b1ab",
+        "size_bytes": 922
+      },
+      {
+        "path": "web_public/src/App.tsx",
+        "hash": "aa69cef77c6a9093de171fd96ff19d6d95d4fc17ab1974286d2bf97f79c65a6a",
+        "size_bytes": 957
+      },
+      {
+        "path": "web_public/src/components/BookingSummary.tsx",
+        "hash": "3b070f92c97f3aec8e76b27355fa8da14883c8a5a6214315e66612d2fa550ffe",
+        "size_bytes": 4722
+      },
+      {
+        "path": "web_public/src/components/Footer.tsx",
+        "hash": "58cd138f3a301acc6a5b749ae7fa4840051a972cd25b6b0baad22c217575bbf1",
+        "size_bytes": 4929
+      },
+      {
+        "path": "web_public/src/components/Header.tsx",
+        "hash": "3a8306eb44b5342996a060ec233733c48a9e6dd3a7e98a67e8ec170e18e48f07",
+        "size_bytes": 3822
+      },
+      {
+        "path": "web_public/src/components/ProviderCard.tsx",
+        "hash": "bfd5feca718104a69717fe36a02b3290168185c444b6f3b5021818c3e3cb9b5b",
+        "size_bytes": 3940
+      },
+      {
+        "path": "web_public/src/components/ServiceCard.tsx",
+        "hash": "2fd1a7e4921441723cc1bbaf1dc31ec4d9f2e353444c4071d73b5cbfbcec3d75",
+        "size_bytes": 2646
+      },
+      {
+        "path": "web_public/src/components/SlotPicker.tsx",
+        "hash": "741b73433a9deb6087d17e1c97018a21ef255b14e96323800b8badf39320bd40",
+        "size_bytes": 3072
+      },
+      {
+        "path": "web_public/src/lib/api.ts",
+        "hash": "5fb58b4d2fd9dbb48e05f1d8ce8707b6d50d9565b3bf231af80524c4a9c84656",
+        "size_bytes": 2373
+      },
+      {
+        "path": "web_public/src/lib/types.ts",
+        "hash": "7a2bf25f01c2bbe0005c871a268cf4e0fb799d7ba32b820eced227df91bcf926",
+        "size_bytes": 2572
+      },
+      {
+        "path": "web_public/src/main.tsx",
+        "hash": "29f1228956c99cb119abaa61bb04e9702b46b2240f5ce0740de800aac689ac93",
+        "size_bytes": 620
+      },
+      {
+        "path": "web_public/src/pages/BookingPage.tsx",
+        "hash": "e988bcbdd51f74b0ec49148d1c27a38f21db0804c92300150eb4932c45d5a46b",
+        "size_bytes": 25045
+      },
+      {
+        "path": "web_public/src/pages/HomePage.tsx",
+        "hash": "80f93ef4592435c9faea384c35940bf2a1847ca4480605c497381ee8eb6b1a4b",
+        "size_bytes": 12964
+      },
+      {
+        "path": "web_public/src/pages/ProviderPage.tsx",
+        "hash": "84937aabd9991ce8de750ca96cbdeb37011ae6cbec312692bd982f4f15a5f8da",
+        "size_bytes": 13637
+      },
+      {
+        "path": "web_public/src/pages/SearchPage.tsx",
+        "hash": "88df8328e808cb6d69a60db7f14c1c2164b09702d7c6a6547bfc698c0b2785b7",
+        "size_bytes": 12734
+      },
+      {
+        "path": "web_public/tailwind.config.ts",
+        "hash": "e71409e8bd95e9035cd000462063deab5ddb7fa184b49b514eff4214a7cf868b",
+        "size_bytes": 940
+      },
+      {
+        "path": "web_public/tsconfig.json",
+        "hash": "5c5c2a8d36b19c1f8bef695e8af46d45c4a4cd1ceed305695fbd37a59617cf5e",
+        "size_bytes": 983
+      },
+      {
+        "path": "web_public/vite-env.d.ts",
+        "hash": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+        "size_bytes": 38
+      },
+      {
+        "path": "web_public/vite.config.ts",
+        "hash": "a18086f70cabbbc5d4e1a67a892d9c3ebb853312948338689354eaeb273b171d",
+        "size_bytes": 410
+      }
+    ]
+  },
+  "registration": {
+    "source": "project_registration",
+    "actor": "",
+    "recorded_at": "2026-08-24T14:02:52.939214+00:00"
+  }
+}

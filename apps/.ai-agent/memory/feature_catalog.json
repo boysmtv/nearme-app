@@ -1,0 +1,668 @@
+{
+  "schema_version": 2,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+  "updated_at": "2026-08-26T10:00:00.000000+00:00",
+  "platforms": [
+    "mobile_customer",
+    "mobile_partner",
+    "web_public",
+    "web_provider",
+    "web_admin"
+  ],
+  "features": [
+    {
+      "id": "auth",
+      "name": "Authentication",
+      "category": "identity",
+      "description": "User registration, login, OTP, logout, token management",
+      "platforms": {
+        "mobile_customer": {
+          "status": "implemented",
+          "files": [
+            "features/authentication/presentation/pages/login_page.dart",
+            "features/authentication/presentation/pages/register_page.dart",
+            "features/authentication/presentation/pages/forgot_password_page.dart"
+          ],
+          "flows": ["email_login", "otp_login", "register", "forgot_password"]
+        },
+        "mobile_partner": {
+          "status": "implemented",
+          "files": [
+            "features/authentication/presentation/pages/login_page.dart",
+            "features/authentication/presentation/pages/onboarding_page.dart"
+          ],
+          "flows": ["email_login", "onboarding"]
+        },
+        "web_public": {
+          "status": "implemented",
+          "files": [
+            "src/pages/LoginPage.tsx",
+            "src/pages/RegisterPage.tsx"
+          ],
+          "flows": ["email_login", "register"]
+        },
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/LoginPage.tsx",
+            "src/lib/auth.tsx"
+          ],
+          "flows": ["email_login", "logout", "token_refresh"]
+        },
+        "web_admin": {
+          "status": "implemented",
+          "files": [
+            "src/pages/LoginPage.tsx",
+            "src/lib/auth.tsx"
+          ],
+          "flows": ["email_login", "mfa", "logout", "token_refresh"]
+        }
+      },
+      "backend_endpoints": [
+        "POST /auth/register",
+        "POST /auth/login",
+        "POST /auth/otp/request",
+        "POST /auth/otp/verify",
+        "POST /auth/refresh",
+        "POST /auth/logout"
+      ]
+    },
+    {
+      "id": "discovery",
+      "name": "Discovery & Search",
+      "category": "marketplace",
+      "description": "Provider browsing, search, categories, featured listings",
+      "platforms": {
+        "mobile_customer": {
+          "status": "implemented",
+          "files": [
+            "features/discovery/presentation/pages/discovery_page.dart",
+            "features/discovery/presentation/pages/search_page.dart"
+          ],
+          "flows": ["browse_categories", "featured_providers", "search"]
+        },
+        "web_public": {
+          "status": "implemented",
+          "files": [
+            "src/pages/HomePage.tsx",
+            "src/pages/SearchPage.tsx",
+            "src/components/ProviderCard.tsx"
+          ],
+          "flows": ["browse_categories", "featured_providers", "search", "filter", "sort", "pagination"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /public/categories",
+        "GET /public/providers",
+        "GET /public/providers/featured"
+      ]
+    },
+    {
+      "id": "provider_profile",
+      "name": "Provider Profile",
+      "category": "tenant",
+      "description": "Provider detail view, services, staff, reviews, operating hours",
+      "platforms": {
+        "mobile_customer": {
+          "status": "implemented",
+          "files": [
+            "features/provider_profile/presentation/pages/provider_list_page.dart",
+            "features/provider_profile/presentation/pages/provider_detail_page.dart"
+          ],
+          "flows": ["provider_list", "provider_detail"]
+        },
+        "web_public": {
+          "status": "implemented",
+          "files": [
+            "src/pages/ProviderPage.tsx",
+            "src/components/ServiceCard.tsx"
+          ],
+          "flows": ["provider_detail", "service_list", "staff_list", "reviews", "operating_hours"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /public/providers/{slug}",
+        "GET /public/providers/{id}/services",
+        "GET /public/providers/{id}/staff",
+        "GET /public/providers/{id}/reviews"
+      ]
+    },
+    {
+      "id": "availability",
+      "name": "Availability & Scheduling",
+      "category": "scheduling",
+      "description": "Time slot display, calendar selection, availability checking",
+      "platforms": {
+        "mobile_customer": {
+          "status": "implemented",
+          "files": [
+            "features/availability/presentation/pages/availability_page.dart"
+          ],
+          "flows": ["calendar_picker", "service_selector", "time_slot_grid"]
+        },
+        "web_public": {
+          "status": "implemented",
+          "files": [
+            "src/components/SlotPicker.tsx"
+          ],
+          "flows": ["date_picker", "time_slot_grid", "grouped_by_period"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /public/providers/{id}/availability",
+        "GET /availability",
+        "POST /availability/validate"
+      ]
+    },
+    {
+      "id": "booking",
+      "name": "Booking Management",
+      "category": "booking",
+      "description": "Booking creation, confirmation, cancellation, history, detail view",
+      "platforms": {
+        "mobile_customer": {
+          "status": "implemented",
+          "files": [
+            "features/booking/presentation/pages/booking_form_page.dart",
+            "features/booking/presentation/pages/booking_confirmation_page.dart",
+            "features/booking/presentation/pages/booking_detail_page.dart",
+            "features/booking/presentation/pages/booking_history_page.dart"
+          ],
+          "flows": ["create_hold", "confirm_booking", "booking_detail", "booking_history", "cancel_booking", "filter_by_status"]
+        },
+        "mobile_partner": {
+          "status": "implemented",
+          "files": [
+            "features/booking_management/presentation/pages/booking_list_page.dart",
+            "features/booking_management/presentation/pages/booking_detail_page.dart"
+          ],
+          "flows": ["partner_booking_list", "partner_booking_detail", "accept_booking", "decline_booking", "filter_by_status"]
+        },
+        "web_public": {
+          "status": "implemented",
+          "files": [
+            "src/pages/BookingPage.tsx",
+            "src/components/BookingSummary.tsx"
+          ],
+          "flows": ["5_step_wizard", "service_selection", "staff_selection", "slot_selection", "contact_info", "confirm", "guest_booking"]
+        },
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/CalendarPage.tsx",
+            "src/components/BookingTable.tsx"
+          ],
+          "flows": ["calendar_view", "week_view", "month_view", "booking_list", "status_update"]
+        },
+        "web_admin": {
+          "status": "implemented",
+          "files": [
+            "src/pages/BookingsPage.tsx"
+          ],
+          "flows": ["platform_bookings", "filter_by_status"]
+        }
+      },
+      "backend_endpoints": [
+        "POST /bookings/holds",
+        "POST /bookings",
+        "GET /bookings",
+        "GET /bookings/{id}",
+        "POST /bookings/{id}/confirm",
+        "POST /bookings/{id}/cancel",
+        "POST /bookings/{id}/reschedule",
+        "POST /bookings/{id}/check-in",
+        "POST /bookings/{id}/start",
+        "POST /bookings/{id}/complete",
+        "POST /bookings/{id}/no-show",
+        "POST /public/bookings"
+      ]
+    },
+    {
+      "id": "payment",
+      "name": "Payment",
+      "category": "payment",
+      "description": "Payment intent creation, payment methods, success confirmation",
+      "platforms": {
+        "mobile_customer": {
+          "status": "implemented",
+          "files": [
+            "features/payment/presentation/pages/payment_page.dart",
+            "features/payment/presentation/pages/payment_success_page.dart"
+          ],
+          "flows": ["payment_method_selection", "create_payment_intent", "payment_success"]
+        },
+        "mobile_partner": {
+          "status": "partial",
+          "files": [
+            "features/payment/presentation/pages/earnings_page.dart",
+            "features/payment/presentation/pages/payment_page.dart"
+          ],
+          "notes": "earnings_page is wired; payment_page.dart is unused stub",
+          "flows": ["earnings_dashboard", "recent_transactions"]
+        },
+        "web_admin": {
+          "status": "implemented",
+          "files": [
+            "src/pages/PaymentsPage.tsx"
+          ],
+          "flows": ["platform_payments", "filter_by_status"]
+        }
+      },
+      "backend_endpoints": [
+        "POST /bookings/{id}/payment-intents",
+        "GET /payments/{id}",
+        "POST /webhooks/payments/{provider}"
+      ]
+    },
+    {
+      "id": "notification",
+      "name": "Notifications",
+      "category": "notification",
+      "description": "Notification list, mark read, badge count",
+      "platforms": {
+        "mobile_customer": {
+          "status": "implemented",
+          "files": [
+            "features/notification/presentation/pages/notification_page.dart"
+          ],
+          "flows": ["notification_list", "mark_read", "mark_all_read", "badge_count"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /notifications",
+        "PUT /notifications/{id}/read",
+        "PUT /notifications/read-all"
+      ]
+    },
+    {
+      "id": "support",
+      "name": "Support & Cases",
+      "category": "support",
+      "description": "Support ticket submission, case management, SLA tracking",
+      "platforms": {
+        "mobile_customer": {
+          "status": "implemented",
+          "files": [
+            "features/support/presentation/pages/support_page.dart"
+          ],
+          "flows": ["submit_ticket"]
+        },
+        "web_admin": {
+          "status": "implemented",
+          "files": [
+            "src/pages/CasesPage.tsx"
+          ],
+          "flows": ["case_list", "filter_severity", "filter_status", "take_case", "resolve_case"]
+        }
+      },
+      "backend_endpoints": [
+        "POST /support/cases",
+        "GET /support/cases/{id}",
+        "GET /support/cases/{id}/events"
+      ]
+    },
+    {
+      "id": "account",
+      "name": "Account & Profile",
+      "category": "identity",
+      "description": "Profile viewing, editing, account menu",
+      "platforms": {
+        "mobile_customer": {
+          "status": "partial",
+          "files": [
+            "features/account/presentation/pages/account_page.dart",
+            "features/account/presentation/pages/profile_edit_page.dart"
+          ],
+          "notes": "Profile edit is local-only (no API call)",
+          "flows": ["view_profile", "edit_profile_local", "logout"]
+        }
+      },
+      "backend_endpoints": []
+    },
+    {
+      "id": "provider_dashboard",
+      "name": "Provider Dashboard",
+      "category": "provider",
+      "description": "Provider stats, recent bookings, quick actions",
+      "platforms": {
+        "mobile_partner": {
+          "status": "implemented",
+          "files": [
+            "features/payment/presentation/pages/earnings_page.dart"
+          ],
+          "flows": ["today_revenue", "weekly_stats", "recent_transactions"]
+        },
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/DashboardPage.tsx",
+            "src/components/StatsCard.tsx"
+          ],
+          "flows": ["dashboard_stats", "recent_bookings", "shareable_booking_link"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /provider/dashboard/stats",
+        "GET /provider/dashboard/recent-bookings"
+      ]
+    },
+    {
+      "id": "provider_services",
+      "name": "Service Management",
+      "category": "catalog",
+      "description": "Service CRUD, categories, pricing, addons",
+      "platforms": {
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/ServicesPage.tsx"
+          ],
+          "flows": ["list_services", "create_service", "edit_service", "delete_service", "toggle_active"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /provider/services",
+        "POST /provider/services",
+        "PUT /provider/services/{id}",
+        "DELETE /provider/services/{id}",
+        "POST /provider/{tenantId}/services",
+        "GET /provider/{tenantId}/services",
+        "POST /provider/services/{id}/publish",
+        "POST /provider/services/{id}/unpublish",
+        "GET /services/{id}"
+      ]
+    },
+    {
+      "id": "staff_management",
+      "name": "Staff Management",
+      "category": "staff",
+      "description": "Staff listing, invite, activate/deactivate, schedules",
+      "platforms": {
+        "mobile_partner": {
+          "status": "implemented",
+          "files": [
+            "features/staff_management/presentation/pages/staff_list_page.dart"
+          ],
+          "flows": ["staff_list", "add_staff", "activate_deactivate"]
+        },
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/StaffPage.tsx"
+          ],
+          "flows": ["staff_list", "invite_staff", "edit_staff", "deactivate_staff"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /provider/staff",
+        "POST /provider/staff",
+        "PUT /provider/staff/{id}",
+        "DELETE /provider/staff/{id}",
+        "POST /provider/staff/{id}/schedule"
+      ]
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar View",
+      "category": "scheduling",
+      "description": "Calendar-based booking visualization (week/month views)",
+      "platforms": {
+        "mobile_partner": {
+          "status": "implemented",
+          "files": [
+            "features/calendar/presentation/pages/calendar_page.dart"
+          ],
+          "flows": ["monthly_view", "weekly_view", "day_bookings"]
+        },
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/CalendarPage.tsx"
+          ],
+          "flows": ["week_view", "month_view", "date_navigation", "booking_per_day"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /provider/calendar"
+      ]
+    },
+    {
+      "id": "reports",
+      "name": "Reports & Analytics",
+      "category": "reporting",
+      "description": "Revenue reports, booking analytics, staff utilization",
+      "platforms": {
+        "mobile_partner": {
+          "status": "implemented",
+          "files": [
+            "features/reports/presentation/pages/reports_page.dart"
+          ],
+          "flows": ["monthly_summary", "total_bookings", "revenue", "avg_rating"]
+        },
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/ReportsPage.tsx"
+          ],
+          "flows": ["date_range_reports", "bookings_chart", "revenue_chart", "staff_utilization", "top_services"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /provider/reports",
+        "GET /provider/reports/export"
+      ]
+    },
+    {
+      "id": "customers",
+      "name": "Customer Directory",
+      "category": "customer",
+      "description": "Customer listing, search, booking history per customer",
+      "platforms": {
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/CustomersPage.tsx"
+          ],
+          "flows": ["customer_list", "search", "pagination"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /provider/customers"
+      ]
+    },
+    {
+      "id": "settings",
+      "name": "Provider Settings",
+      "category": "tenant",
+      "description": "Business profile, operating hours, booking policy, notification preferences",
+      "platforms": {
+        "web_provider": {
+          "status": "implemented",
+          "files": [
+            "src/pages/SettingsPage.tsx"
+          ],
+          "flows": ["business_profile", "operating_hours", "booking_policy", "notification_preferences"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /provider/settings",
+        "PUT /provider/settings"
+      ]
+    },
+    {
+      "id": "tenant_management",
+      "name": "Tenant Management",
+      "category": "tenant",
+      "description": "Tenant CRUD, verification workflow, location management",
+      "platforms": {
+        "web_admin": {
+          "status": "implemented",
+          "files": [
+            "src/pages/TenantsPage.tsx"
+          ],
+          "flows": ["tenant_list", "approve_tenant", "reject_tenant", "search", "filter_status"]
+        }
+      },
+      "backend_endpoints": [
+        "POST /provider/tenant",
+        "GET /provider/tenant",
+        "GET /provider/tenant/{id}",
+        "GET /provider/tenant/slug/{slug}",
+        "PUT /provider/tenant/{id}",
+        "POST /provider/tenant/{id}/submit",
+        "POST /provider/tenant/{id}/approve",
+        "POST /provider/tenant/{id}/reject",
+        "POST /provider/tenant/{id}/suspend",
+        "POST /provider/tenant/{id}/reactivate",
+        "POST /provider/tenant/{tenantId}/locations",
+        "GET /provider/tenant/{tenantId}/locations",
+        "PUT /provider/locations/{id}"
+      ]
+    },
+    {
+      "id": "user_management",
+      "name": "User Management",
+      "category": "access",
+      "description": "User listing, suspend/reactivate, role management",
+      "platforms": {
+        "web_admin": {
+          "status": "implemented",
+          "files": [
+            "src/pages/UsersPage.tsx"
+          ],
+          "flows": ["user_list", "suspend_user", "reactivate_user", "search"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /admin/users",
+        "PUT /admin/users/{id}/status",
+        "GET /roles",
+        "POST /roles",
+        "GET /roles/{id}",
+        "PUT /roles/{id}",
+        "DELETE /roles/{id}",
+        "POST /roles/{id}/permissions"
+      ]
+    },
+    {
+      "id": "admin_dashboard",
+      "name": "Admin Dashboard",
+      "category": "platform",
+      "description": "Platform-wide stats, recent bookings, open cases",
+      "platforms": {
+        "web_admin": {
+          "status": "implemented",
+          "files": [
+            "src/pages/DashboardPage.tsx",
+            "src/components/StatsCard.tsx"
+          ],
+          "flows": ["platform_stats", "recent_bookings", "open_cases"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /admin/dashboard/stats",
+        "GET /admin/bookings",
+        "GET /admin/cases"
+      ]
+    },
+    {
+      "id": "feature_flags",
+      "name": "Feature Flag Management",
+      "category": "platformconfig",
+      "description": "Feature flag listing and toggling",
+      "platforms": {
+        "web_admin": {
+          "status": "implemented",
+          "files": [
+            "src/pages/ConfigPage.tsx"
+          ],
+          "flows": ["list_flags", "toggle_flag"]
+        }
+      },
+      "backend_endpoints": [
+        "GET /admin/config/flags",
+        "PUT /admin/config/flags/{id}"
+      ]
+    },
+    {
+      "id": "reviews",
+      "name": "Reviews & Moderation",
+      "category": "review",
+      "description": "Review creation, reporting, moderation",
+      "platforms": {
+        "web_public": {
+          "status": "read_only",
+          "notes": "Reviews displayed on provider page, no create/report UI",
+          "flows": ["view_reviews"]
+        }
+      },
+      "backend_endpoints": [
+        "POST /bookings/{id}/review",
+        "POST /reviews/{id}/report"
+      ]
+    }
+  ],
+  "summary": {
+    "total_features": 21,
+    "by_category": {
+      "identity": 2,
+      "marketplace": 1,
+      "tenant": 3,
+      "scheduling": 2,
+      "booking": 1,
+      "payment": 1,
+      "notification": 1,
+      "support": 1,
+      "provider": 1,
+      "catalog": 1,
+      "staff": 1,
+      "reporting": 1,
+      "customer": 1,
+      "access": 1,
+      "platform": 1,
+      "platformconfig": 1,
+      "review": 1
+    },
+    "by_platform": {
+      "mobile_customer": 8,
+      "mobile_partner": 5,
+      "web_public": 3,
+      "web_provider": 7,
+      "web_admin": 6
+    },
+    "total_backend_endpoints": 96
+  },
+  "commands": [],
+  "gaps": [
+    {
+      "feature": "account",
+      "gap": "Profile edit is local-only, no backend API call",
+      "severity": "medium"
+    },
+    {
+      "feature": "reviews",
+      "gap": "No review creation or reporting UI in any frontend",
+      "severity": "low"
+    },
+    {
+      "feature": "payment",
+      "gap": "mobile_partner payment_page.dart is unused stub with hardcoded data",
+      "severity": "low"
+    },
+    {
+      "feature": "settings",
+      "gap": "Staff schedule editing has API but no UI in web_provider",
+      "severity": "low"
+    },
+    {
+      "feature": "provider_services",
+      "gap": "Service addons type defined but no CRUD UI",
+      "severity": "low"
+    },
+    {
+      "feature": "web_public",
+      "gap": "Broken links to /provider/register and /about (routes not defined)",
+      "severity": "low"
+    }
+  ]
+}

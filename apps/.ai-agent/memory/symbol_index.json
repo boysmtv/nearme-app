@@ -1,0 +1,6065 @@
+{
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+  "file_count": 118,
+  "files": [
+    {
+      "path": "mobile_customer/.dart_tool/flutter_build/dart_plugin_registrant.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "_PluginRegistrant",
+          "kind": "class",
+          "line": 39
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 43
+        },
+        {
+          "name": "print",
+          "line": 47
+        },
+        {
+          "name": "print",
+          "line": 56
+        },
+        {
+          "name": "print",
+          "line": 65
+        },
+        {
+          "name": "print",
+          "line": 74
+        },
+        {
+          "name": "print",
+          "line": 83
+        },
+        {
+          "name": "print",
+          "line": 93
+        },
+        {
+          "name": "print",
+          "line": 102
+        },
+        {
+          "name": "print",
+          "line": 111
+        },
+        {
+          "name": "print",
+          "line": 120
+        },
+        {
+          "name": "print",
+          "line": 129
+        },
+        {
+          "name": "print",
+          "line": 139
+        },
+        {
+          "name": "print",
+          "line": 148
+        },
+        {
+          "name": "print",
+          "line": 157
+        },
+        {
+          "name": "print",
+          "line": 166
+        },
+        {
+          "name": "print",
+          "line": 175
+        },
+        {
+          "name": "print",
+          "line": 184
+        },
+        {
+          "name": "print",
+          "line": 194
+        },
+        {
+          "name": "print",
+          "line": 203
+        },
+        {
+          "name": "print",
+          "line": 212
+        },
+        {
+          "name": "print",
+          "line": 221
+        },
+        {
+          "name": "print",
+          "line": 230
+        },
+        {
+          "name": "print",
+          "line": 239
+        },
+        {
+          "name": "print",
+          "line": 249
+        },
+        {
+          "name": "print",
+          "line": 258
+        },
+        {
+          "name": "print",
+          "line": 267
+        },
+        {
+          "name": "print",
+          "line": 276
+        },
+        {
+          "name": "print",
+          "line": 285
+        },
+        {
+          "name": "print",
+          "line": 294
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+      "language": "java",
+      "package": "io.flutter.plugins",
+      "classes": [],
+      "functions": [
+        {
+          "name": "registerWith",
+          "line": 17
+        }
+      ],
+      "data_members": [
+        {
+          "name": "TAG",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "mobile_customer/android/app/src/main/kotlin/com/example/mobile_customer/MainActivity.kt",
+      "language": "kotlin",
+      "package": "com.example.mobile_customer",
+      "classes": [
+        {
+          "name": "MainActivity",
+          "kind": "class",
+          "line": 4
+        }
+      ],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/app.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "DekaCustomerApp",
+          "kind": "class",
+          "line": 130
+        }
+      ],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/core/bootstrap/bootstrap.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "initCore",
+          "line": 2
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/core/router/app_router.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "AuthState",
+          "kind": "class",
+          "line": 28
+        },
+        {
+          "name": "AuthNotifier",
+          "kind": "class",
+          "line": 56
+        }
+      ],
+      "functions": [
+        {
+          "name": "AuthNotifier",
+          "line": 58
+        },
+        {
+          "name": "_checkAuthStatus",
+          "line": 59
+        },
+        {
+          "name": "_checkAuthStatus",
+          "line": 63
+        },
+        {
+          "name": "if",
+          "line": 66
+        },
+        {
+          "name": "login",
+          "line": 78
+        },
+        {
+          "name": "if",
+          "line": 89
+        },
+        {
+          "name": "register",
+          "line": 100
+        },
+        {
+          "name": "requestOtp",
+          "line": 113
+        },
+        {
+          "name": "verifyOtp",
+          "line": 126
+        },
+        {
+          "name": "logout",
+          "line": 143
+        },
+        {
+          "name": "clearError",
+          "line": 151
+        },
+        {
+          "name": "GoRoute",
+          "line": 162
+        },
+        {
+          "name": "GoRoute",
+          "line": 167
+        },
+        {
+          "name": "GoRoute",
+          "line": 172
+        },
+        {
+          "name": "ShellRoute",
+          "line": 177
+        },
+        {
+          "name": "GoRoute",
+          "line": 180
+        },
+        {
+          "name": "GoRoute",
+          "line": 187
+        },
+        {
+          "name": "GoRoute",
+          "line": 194
+        },
+        {
+          "name": "GoRoute",
+          "line": 201
+        },
+        {
+          "name": "GoRoute",
+          "line": 208
+        },
+        {
+          "name": "GoRoute",
+          "line": 217
+        },
+        {
+          "name": "GoRoute",
+          "line": 222
+        },
+        {
+          "name": "GoRoute",
+          "line": 229
+        },
+        {
+          "name": "GoRoute",
+          "line": 236
+        },
+        {
+          "name": "GoRoute",
+          "line": 244
+        },
+        {
+          "name": "GoRoute",
+          "line": 251
+        },
+        {
+          "name": "GoRoute",
+          "line": 258
+        },
+        {
+          "name": "GoRoute",
+          "line": 265
+        },
+        {
+          "name": "GoRoute",
+          "line": 272
+        },
+        {
+          "name": "GoRoute",
+          "line": 277
+        },
+        {
+          "name": "if",
+          "line": 288
+        },
+        {
+          "name": "if",
+          "line": 290
+        },
+        {
+          "name": "if",
+          "line": 294
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/account/presentation/pages/account_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "AccountPage",
+          "kind": "class",
+          "line": 5
+        },
+        {
+          "name": "_MenuItem",
+          "kind": "class",
+          "line": 64
+        }
+      ],
+      "functions": [
+        {
+          "name": "Container",
+          "line": 16
+        },
+        {
+          "name": "CircleAvatar",
+          "line": 20
+        },
+        {
+          "name": "Expanded",
+          "line": 29
+        },
+        {
+          "name": "Text",
+          "line": 32
+        },
+        {
+          "name": "Text",
+          "line": 34
+        },
+        {
+          "name": "IconButton",
+          "line": 37
+        },
+        {
+          "name": "_MenuItem",
+          "line": 41
+        },
+        {
+          "name": "_MenuItem",
+          "line": 42
+        },
+        {
+          "name": "_MenuItem",
+          "line": 44
+        },
+        {
+          "name": "showDialog",
+          "line": 45
+        },
+        {
+          "name": "TextButton",
+          "line": 48
+        },
+        {
+          "name": "TextButton",
+          "line": 49
+        },
+        {
+          "name": "Center",
+          "line": 58
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/account/presentation/pages/profile_edit_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "ProfileEditPage",
+          "kind": "class",
+          "line": 6
+        },
+        {
+          "name": "_ProfileEditPageState",
+          "kind": "class",
+          "line": 12
+        }
+      ],
+      "functions": [
+        {
+          "name": "initState",
+          "line": 21
+        },
+        {
+          "name": "dispose",
+          "line": 30
+        },
+        {
+          "name": "TextButton",
+          "line": 43
+        },
+        {
+          "name": "CircleAvatar",
+          "line": 56
+        },
+        {
+          "name": "TextFormField",
+          "line": 58
+        },
+        {
+          "name": "TextFormField",
+          "line": 64
+        },
+        {
+          "name": "if",
+          "line": 69
+        },
+        {
+          "name": "if",
+          "line": 70
+        },
+        {
+          "name": "TextFormField",
+          "line": 75
+        },
+        {
+          "name": "_handleSave",
+          "line": 86
+        },
+        {
+          "name": "if",
+          "line": 88
+        },
+        {
+          "name": "setState",
+          "line": 89
+        },
+        {
+          "name": "if",
+          "line": 96
+        },
+        {
+          "name": "if",
+          "line": 101
+        },
+        {
+          "name": "if",
+          "line": 103
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/authentication/presentation/pages/forgot_password_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "ForgotPasswordPage",
+          "kind": "class",
+          "line": 5
+        },
+        {
+          "name": "_ForgotPasswordPageState",
+          "kind": "class",
+          "line": 12
+        }
+      ],
+      "functions": [
+        {
+          "name": "dispose",
+          "line": 20
+        },
+        {
+          "name": "Icon",
+          "line": 49
+        },
+        {
+          "name": "Text",
+          "line": 55
+        },
+        {
+          "name": "Text",
+          "line": 63
+        },
+        {
+          "name": "TextFormField",
+          "line": 69
+        },
+        {
+          "name": "if",
+          "line": 77
+        },
+        {
+          "name": "if",
+          "line": 78
+        },
+        {
+          "name": "ElevatedButton",
+          "line": 83
+        },
+        {
+          "name": "TextButton",
+          "line": 94
+        },
+        {
+          "name": "Icon",
+          "line": 107
+        },
+        {
+          "name": "Text",
+          "line": 113
+        },
+        {
+          "name": "Text",
+          "line": 118
+        },
+        {
+          "name": "ElevatedButton",
+          "line": 124
+        },
+        {
+          "name": "TextButton",
+          "line": 129
+        },
+        {
+          "name": "_handleSendResetLink",
+          "line": 136
+        },
+        {
+          "name": "if",
+          "line": 138
+        },
+        {
+          "name": "setState",
+          "line": 139
+        },
+        {
+          "name": "setState",
+          "line": 142
+        },
+        {
+          "name": "setState",
+          "line": 147
+        },
+        {
+          "name": "if",
+          "line": 148
+        },
+        {
+          "name": "setState",
+          "line": 152
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "LoginPage",
+          "kind": "class",
+          "line": 5
+        },
+        {
+          "name": "_LoginPageState",
+          "kind": "class",
+          "line": 12
+        }
+      ],
+      "functions": [
+        {
+          "name": "dispose",
+          "line": 22
+        },
+        {
+          "name": "if",
+          "line": 34
+        },
+        {
+          "name": "SnackBar",
+          "line": 36
+        },
+        {
+          "name": "Icon",
+          "line": 52
+        },
+        {
+          "name": "Text",
+          "line": 58
+        },
+        {
+          "name": "Text",
+          "line": 66
+        },
+        {
+          "name": "TextFormField",
+          "line": 74
+        },
+        {
+          "name": "if",
+          "line": 82
+        },
+        {
+          "name": "if",
+          "line": 85
+        },
+        {
+          "name": "if",
+          "line": 92
+        },
+        {
+          "name": "TextFormField",
+          "line": 93
+        },
+        {
+          "name": "setState",
+          "line": 106
+        },
+        {
+          "name": "if",
+          "line": 111
+        },
+        {
+          "name": "if",
+          "line": 114
+        },
+        {
+          "name": "Align",
+          "line": 121
+        },
+        {
+          "name": "TextFormField",
+          "line": 129
+        },
+        {
+          "name": "if",
+          "line": 139
+        },
+        {
+          "name": "if",
+          "line": 142
+        },
+        {
+          "name": "ElevatedButton",
+          "line": 150
+        },
+        {
+          "name": "TextButton",
+          "line": 164
+        },
+        {
+          "name": "setState",
+          "line": 166
+        },
+        {
+          "name": "Row",
+          "line": 174
+        },
+        {
+          "name": "Padding",
+          "line": 177
+        },
+        {
+          "name": "Row",
+          "line": 194
+        },
+        {
+          "name": "TextButton",
+          "line": 198
+        },
+        {
+          "name": "_handleLogin",
+          "line": 211
+        },
+        {
+          "name": "if",
+          "line": 213
+        },
+        {
+          "name": "if",
+          "line": 214
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/authentication/presentation/pages/register_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "RegisterPage",
+          "kind": "class",
+          "line": 5
+        },
+        {
+          "name": "_RegisterPageState",
+          "kind": "class",
+          "line": 12
+        }
+      ],
+      "functions": [
+        {
+          "name": "dispose",
+          "line": 25
+        },
+        {
+          "name": "if",
+          "line": 39
+        },
+        {
+          "name": "SnackBar",
+          "line": 41
+        },
+        {
+          "name": "Text",
+          "line": 62
+        },
+        {
+          "name": "Text",
+          "line": 69
+        },
+        {
+          "name": "TextFormField",
+          "line": 76
+        },
+        {
+          "name": "if",
+          "line": 84
+        },
+        {
+          "name": "if",
+          "line": 85
+        },
+        {
+          "name": "TextFormField",
+          "line": 90
+        },
+        {
+          "name": "if",
+          "line": 98
+        },
+        {
+          "name": "if",
+          "line": 99
+        },
+        {
+          "name": "TextFormField",
+          "line": 104
+        },
+        {
+          "name": "if",
+          "line": 113
+        },
+        {
+          "name": "if",
+          "line": 114
+        },
+        {
+          "name": "TextFormField",
+          "line": 119
+        },
+        {
+          "name": "if",
+          "line": 133
+        },
+        {
+          "name": "if",
+          "line": 134
+        },
+        {
+          "name": "if",
+          "line": 135
+        },
+        {
+          "name": "if",
+          "line": 136
+        },
+        {
+          "name": "TextFormField",
+          "line": 141
+        },
+        {
+          "name": "if",
+          "line": 155
+        },
+        {
+          "name": "Row",
+          "line": 160
+        },
+        {
+          "name": "Checkbox",
+          "line": 162
+        },
+        {
+          "name": "Expanded",
+          "line": 166
+        },
+        {
+          "name": "TextSpan",
+          "line": 168
+        },
+        {
+          "name": "TextSpan",
+          "line": 171
+        },
+        {
+          "name": "TextSpan",
+          "line": 179
+        },
+        {
+          "name": "ElevatedButton",
+          "line": 194
+        },
+        {
+          "name": "Row",
+          "line": 205
+        },
+        {
+          "name": "TextButton",
+          "line": 209
+        },
+        {
+          "name": "_handleRegister",
+          "line": 222
+        },
+        {
+          "name": "if",
+          "line": 224
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "AvailabilityPage",
+          "kind": "class",
+          "line": 23
+        },
+        {
+          "name": "_AvailabilityPageState",
+          "kind": "class",
+          "line": 31
+        }
+      ],
+      "functions": [
+        {
+          "name": "TableCalendar",
+          "line": 47
+        },
+        {
+          "name": "setState",
+          "line": 56
+        },
+        {
+          "name": "Padding",
+          "line": 67
+        },
+        {
+          "name": "Text",
+          "line": 72
+        },
+        {
+          "name": "Text",
+          "line": 73
+        },
+        {
+          "name": "Expanded",
+          "line": 79
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/booking/presentation/pages/booking_confirmation_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "BookingConfirmationPage",
+          "kind": "class",
+          "line": 12
+        },
+        {
+          "name": "_DetailRow",
+          "kind": "class",
+          "line": 63
+        }
+      ],
+      "functions": [
+        {
+          "name": "Container",
+          "line": 26
+        },
+        {
+          "name": "Text",
+          "line": 29
+        },
+        {
+          "name": "Text",
+          "line": 31
+        },
+        {
+          "name": "Card",
+          "line": 33
+        },
+        {
+          "name": "_DetailRow",
+          "line": 34
+        },
+        {
+          "name": "_DetailRow",
+          "line": 36
+        },
+        {
+          "name": "_DetailRow",
+          "line": 38
+        },
+        {
+          "name": "_DetailRow",
+          "line": 40
+        },
+        {
+          "name": "Container",
+          "line": 43
+        },
+        {
+          "name": "Expanded",
+          "line": 45
+        },
+        {
+          "name": "Text",
+          "line": 51
+        },
+        {
+          "name": "ElevatedButton",
+          "line": 56
+        },
+        {
+          "name": "TextButton",
+          "line": 58
+        },
+        {
+          "name": "Icon",
+          "line": 71
+        },
+        {
+          "name": "Text",
+          "line": 72
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/booking/presentation/pages/booking_detail_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "BookingDetailPage",
+          "kind": "class",
+          "line": 12
+        },
+        {
+          "name": "_Section",
+          "kind": "class",
+          "line": 84
+        },
+        {
+          "name": "_InfoRow",
+          "kind": "class",
+          "line": 97
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 24
+        },
+        {
+          "name": "Container",
+          "line": 28
+        },
+        {
+          "name": "Icon",
+          "line": 32
+        },
+        {
+          "name": "Text",
+          "line": 34
+        },
+        {
+          "name": "_Section",
+          "line": 37
+        },
+        {
+          "name": "_InfoRow",
+          "line": 38
+        },
+        {
+          "name": "_InfoRow",
+          "line": 39
+        },
+        {
+          "name": "_InfoRow",
+          "line": 40
+        },
+        {
+          "name": "_Section",
+          "line": 43
+        },
+        {
+          "name": "_InfoRow",
+          "line": 44
+        },
+        {
+          "name": "_InfoRow",
+          "line": 45
+        },
+        {
+          "name": "_Section",
+          "line": 48
+        },
+        {
+          "name": "_InfoRow",
+          "line": 49
+        },
+        {
+          "name": "_InfoRow",
+          "line": 50
+        },
+        {
+          "name": "Expanded",
+          "line": 62
+        },
+        {
+          "name": "Expanded",
+          "line": 64
+        },
+        {
+          "name": "_showCancelDialog",
+          "line": 69
+        },
+        {
+          "name": "showDialog",
+          "line": 71
+        },
+        {
+          "name": "TextButton",
+          "line": 75
+        },
+        {
+          "name": "TextButton",
+          "line": 76
+        },
+        {
+          "name": "Text",
+          "line": 92
+        },
+        {
+          "name": "Text",
+          "line": 104
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/booking/presentation/pages/booking_form_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "BookingFormPage",
+          "kind": "class",
+          "line": 5
+        },
+        {
+          "name": "_BookingFormPageState",
+          "kind": "class",
+          "line": 13
+        },
+        {
+          "name": "_SummaryRow",
+          "kind": "class",
+          "line": 77
+        },
+        {
+          "name": "_PaymentOption",
+          "kind": "class",
+          "line": 90
+        }
+      ],
+      "functions": [
+        {
+          "name": "dispose",
+          "line": 20
+        },
+        {
+          "name": "Card",
+          "line": 29
+        },
+        {
+          "name": "Text",
+          "line": 30
+        },
+        {
+          "name": "_SummaryRow",
+          "line": 32
+        },
+        {
+          "name": "_SummaryRow",
+          "line": 33
+        },
+        {
+          "name": "Text",
+          "line": 36
+        },
+        {
+          "name": "TextFormField",
+          "line": 38
+        },
+        {
+          "name": "Text",
+          "line": 40
+        },
+        {
+          "name": "_PaymentOption",
+          "line": 42
+        },
+        {
+          "name": "_PaymentOption",
+          "line": 43
+        },
+        {
+          "name": "_PaymentOption",
+          "line": 44
+        },
+        {
+          "name": "_handleBooking",
+          "line": 58
+        },
+        {
+          "name": "setState",
+          "line": 60
+        },
+        {
+          "name": "if",
+          "line": 69
+        },
+        {
+          "name": "if",
+          "line": 71
+        },
+        {
+          "name": "if",
+          "line": 73
+        },
+        {
+          "name": "Text",
+          "line": 85
+        },
+        {
+          "name": "Text",
+          "line": 86
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/booking/presentation/pages/booking_history_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "BookingHistoryPage",
+          "kind": "class",
+          "line": 20
+        },
+        {
+          "name": "_StatusChip",
+          "kind": "class",
+          "line": 77
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 14
+        },
+        {
+          "name": "SingleChildScrollView",
+          "line": 32
+        },
+        {
+          "name": "Expanded",
+          "line": 45
+        },
+        {
+          "name": "if",
+          "line": 47
+        },
+        {
+          "name": "Icon",
+          "line": 48
+        },
+        {
+          "name": "Text",
+          "line": 50
+        },
+        {
+          "name": "switch",
+          "line": 84
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/discovery/presentation/pages/discovery_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "DiscoveryPage",
+          "kind": "class",
+          "line": 25
+        },
+        {
+          "name": "_CategoryItem",
+          "kind": "class",
+          "line": 185
+        },
+        {
+          "name": "_FeaturedCard",
+          "kind": "class",
+          "line": 222
+        }
+      ],
+      "functions": [
+        {
+          "name": "SliverToBoxAdapter",
+          "line": 43
+        },
+        {
+          "name": "Text",
+          "line": 49
+        },
+        {
+          "name": "Text",
+          "line": 56
+        },
+        {
+          "name": "GestureDetector",
+          "line": 63
+        },
+        {
+          "name": "Icon",
+          "line": 73
+        },
+        {
+          "name": "Text",
+          "line": 75
+        },
+        {
+          "name": "SliverToBoxAdapter",
+          "line": 87
+        },
+        {
+          "name": "SliverToBoxAdapter",
+          "line": 109
+        },
+        {
+          "name": "Text",
+          "line": 115
+        },
+        {
+          "name": "TextButton",
+          "line": 121
+        },
+        {
+          "name": "Icon",
+          "line": 162
+        },
+        {
+          "name": "Text",
+          "line": 164
+        },
+        {
+          "name": "TextButton",
+          "line": 165
+        },
+        {
+          "name": "Container",
+          "line": 205
+        },
+        {
+          "name": "Text",
+          "line": 215
+        },
+        {
+          "name": "Container",
+          "line": 251
+        },
+        {
+          "name": "Expanded",
+          "line": 266
+        },
+        {
+          "name": "Text",
+          "line": 270
+        },
+        {
+          "name": "Text",
+          "line": 277
+        },
+        {
+          "name": "Row",
+          "line": 282
+        },
+        {
+          "name": "Icon",
+          "line": 284
+        },
+        {
+          "name": "Text",
+          "line": 286
+        },
+        {
+          "name": "if",
+          "line": 287
+        },
+        {
+          "name": "Icon",
+          "line": 289
+        },
+        {
+          "name": "Text",
+          "line": 291
+        },
+        {
+          "name": "Icon",
+          "line": 301
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/discovery/presentation/pages/search_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "RecentSearchesNotifier",
+          "kind": "class",
+          "line": 22
+        },
+        {
+          "name": "SearchPage",
+          "kind": "class",
+          "line": 32
+        },
+        {
+          "name": "_SearchPageState",
+          "kind": "class",
+          "line": 38
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 9
+        },
+        {
+          "name": "RecentSearchesNotifier",
+          "line": 24
+        },
+        {
+          "name": "add",
+          "line": 25
+        },
+        {
+          "name": "if",
+          "line": 26
+        },
+        {
+          "name": "remove",
+          "line": 29
+        },
+        {
+          "name": "clear",
+          "line": 30
+        },
+        {
+          "name": "initState",
+          "line": 43
+        },
+        {
+          "name": "dispose",
+          "line": 45
+        },
+        {
+          "name": "Padding",
+          "line": 54
+        },
+        {
+          "name": "IconButton",
+          "line": 58
+        },
+        {
+          "name": "Expanded",
+          "line": 59
+        },
+        {
+          "name": "if",
+          "line": 78
+        },
+        {
+          "name": "Padding",
+          "line": 79
+        },
+        {
+          "name": "Text",
+          "line": 84
+        },
+        {
+          "name": "TextButton",
+          "line": 85
+        },
+        {
+          "name": "Expanded",
+          "line": 89
+        },
+        {
+          "name": "Expanded",
+          "line": 102
+        },
+        {
+          "name": "Expanded",
+          "line": 104
+        },
+        {
+          "name": "if",
+          "line": 107
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/notification/presentation/pages/notification_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "NotificationPage",
+          "kind": "class",
+          "line": 14
+        }
+      ],
+      "functions": [
+        {
+          "name": "TextButton",
+          "line": 25
+        },
+        {
+          "name": "if",
+          "line": 38
+        },
+        {
+          "name": "Icon",
+          "line": 43
+        },
+        {
+          "name": "Text",
+          "line": 45
+        },
+        {
+          "name": "if",
+          "line": 67
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/payment/presentation/pages/payment_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "PaymentPage",
+          "kind": "class",
+          "line": 5
+        },
+        {
+          "name": "_PaymentPageState",
+          "kind": "class",
+          "line": 12
+        },
+        {
+          "name": "_PaymentMethodCard",
+          "kind": "class",
+          "line": 75
+        },
+        {
+          "name": "_SummaryRow",
+          "kind": "class",
+          "line": 92
+        }
+      ],
+      "functions": [
+        {
+          "name": "Card",
+          "line": 24
+        },
+        {
+          "name": "Text",
+          "line": 25
+        },
+        {
+          "name": "Text",
+          "line": 30
+        },
+        {
+          "name": "_PaymentMethodCard",
+          "line": 32
+        },
+        {
+          "name": "_PaymentMethodCard",
+          "line": 34
+        },
+        {
+          "name": "_PaymentMethodCard",
+          "line": 36
+        },
+        {
+          "name": "_PaymentMethodCard",
+          "line": 38
+        },
+        {
+          "name": "Card",
+          "line": 40
+        },
+        {
+          "name": "Text",
+          "line": 41
+        },
+        {
+          "name": "_SummaryRow",
+          "line": 43
+        },
+        {
+          "name": "_SummaryRow",
+          "line": 44
+        },
+        {
+          "name": "_SummaryRow",
+          "line": 46
+        },
+        {
+          "name": "_handlePayment",
+          "line": 61
+        },
+        {
+          "name": "setState",
+          "line": 63
+        },
+        {
+          "name": "if",
+          "line": 66
+        },
+        {
+          "name": "if",
+          "line": 68
+        },
+        {
+          "name": "setState",
+          "line": 70
+        },
+        {
+          "name": "Text",
+          "line": 100
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/payment/presentation/pages/payment_success_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "PaymentSuccessPage",
+          "kind": "class",
+          "line": 4
+        },
+        {
+          "name": "_ReceiptRow",
+          "kind": "class",
+          "line": 42
+        }
+      ],
+      "functions": [
+        {
+          "name": "Container",
+          "line": 16
+        },
+        {
+          "name": "Text",
+          "line": 19
+        },
+        {
+          "name": "Text",
+          "line": 21
+        },
+        {
+          "name": "Card",
+          "line": 23
+        },
+        {
+          "name": "_ReceiptRow",
+          "line": 24
+        },
+        {
+          "name": "_ReceiptRow",
+          "line": 26
+        },
+        {
+          "name": "_ReceiptRow",
+          "line": 28
+        },
+        {
+          "name": "_ReceiptRow",
+          "line": 30
+        },
+        {
+          "name": "ElevatedButton",
+          "line": 35
+        },
+        {
+          "name": "TextButton",
+          "line": 37
+        },
+        {
+          "name": "Text",
+          "line": 49
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/provider_profile/presentation/pages/provider_detail_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "ProviderDetailPage",
+          "kind": "class",
+          "line": 28
+        }
+      ],
+      "functions": [
+        {
+          "name": "_formatPrice",
+          "line": 24
+        },
+        {
+          "name": "if",
+          "line": 41
+        },
+        {
+          "name": "TextButton",
+          "line": 49
+        },
+        {
+          "name": "SliverAppBar",
+          "line": 56
+        },
+        {
+          "name": "SliverToBoxAdapter",
+          "line": 66
+        },
+        {
+          "name": "Text",
+          "line": 72
+        },
+        {
+          "name": "Text",
+          "line": 74
+        },
+        {
+          "name": "if",
+          "line": 76
+        },
+        {
+          "name": "Row",
+          "line": 78
+        },
+        {
+          "name": "Icon",
+          "line": 79
+        },
+        {
+          "name": "Text",
+          "line": 81
+        },
+        {
+          "name": "if",
+          "line": 85
+        },
+        {
+          "name": "Text",
+          "line": 89
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/provider_profile/presentation/pages/provider_list_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "ProviderListPage",
+          "kind": "class",
+          "line": 15
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 26
+        },
+        {
+          "name": "Icon",
+          "line": 31
+        },
+        {
+          "name": "Text",
+          "line": 33
+        },
+        {
+          "name": "Icon",
+          "line": 57
+        },
+        {
+          "name": "Text",
+          "line": 59
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/features/support/presentation/pages/support_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "SupportPage",
+          "kind": "class",
+          "line": 4
+        },
+        {
+          "name": "_SupportPageState",
+          "kind": "class",
+          "line": 10
+        }
+      ],
+      "functions": [
+        {
+          "name": "dispose",
+          "line": 18
+        },
+        {
+          "name": "Text",
+          "line": 31
+        },
+        {
+          "name": "DropdownMenuItem",
+          "line": 37
+        },
+        {
+          "name": "DropdownMenuItem",
+          "line": 38
+        },
+        {
+          "name": "DropdownMenuItem",
+          "line": 39
+        },
+        {
+          "name": "DropdownMenuItem",
+          "line": 40
+        },
+        {
+          "name": "TextField",
+          "line": 45
+        },
+        {
+          "name": "TextField",
+          "line": 47
+        },
+        {
+          "name": "ElevatedButton",
+          "line": 49
+        },
+        {
+          "name": "_submitTicket",
+          "line": 59
+        },
+        {
+          "name": "if",
+          "line": 61
+        },
+        {
+          "name": "setState",
+          "line": 65
+        },
+        {
+          "name": "if",
+          "line": 72
+        },
+        {
+          "name": "if",
+          "line": 77
+        },
+        {
+          "name": "if",
+          "line": 79
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/main.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "main",
+          "line": 6
+        },
+        {
+          "name": "runApp",
+          "line": 13
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/shared/widgets/booking_card.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "BookingCard",
+          "kind": "class",
+          "line": 3
+        }
+      ],
+      "functions": [
+        {
+          "name": "switch",
+          "line": 13
+        },
+        {
+          "name": "Row",
+          "line": 43
+        },
+        {
+          "name": "Text",
+          "line": 44
+        },
+        {
+          "name": "Container",
+          "line": 45
+        },
+        {
+          "name": "Text",
+          "line": 55
+        },
+        {
+          "name": "Row",
+          "line": 57
+        },
+        {
+          "name": "Icon",
+          "line": 58
+        },
+        {
+          "name": "Text",
+          "line": 60
+        },
+        {
+          "name": "Icon",
+          "line": 62
+        },
+        {
+          "name": "Text",
+          "line": 64
+        },
+        {
+          "name": "Row",
+          "line": 67
+        },
+        {
+          "name": "Text",
+          "line": 68
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/shared/widgets/main_scaffold.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "MainScaffold",
+          "kind": "class",
+          "line": 8
+        }
+      ],
+      "functions": [
+        {
+          "name": "NavigationDestination",
+          "line": 32
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/shared/widgets/price_summary.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "PriceSummary",
+          "kind": "class",
+          "line": 2
+        },
+        {
+          "name": "_PriceRow",
+          "kind": "class",
+          "line": 49
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 21
+        },
+        {
+          "name": "if",
+          "line": 22
+        },
+        {
+          "name": "if",
+          "line": 23
+        },
+        {
+          "name": "Text",
+          "line": 33
+        },
+        {
+          "name": "_PriceRow",
+          "line": 35
+        },
+        {
+          "name": "if",
+          "line": 36
+        },
+        {
+          "name": "if",
+          "line": 37
+        },
+        {
+          "name": "if",
+          "line": 38
+        },
+        {
+          "name": "Row",
+          "line": 40
+        },
+        {
+          "name": "Text",
+          "line": 42
+        },
+        {
+          "name": "Text",
+          "line": 62
+        },
+        {
+          "name": "Text",
+          "line": 63
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/shared/widgets/service_card.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "ServiceCard",
+          "kind": "class",
+          "line": 3
+        }
+      ],
+      "functions": [
+        {
+          "name": "Container",
+          "line": 19
+        },
+        {
+          "name": "Expanded",
+          "line": 28
+        },
+        {
+          "name": "Text",
+          "line": 29
+        },
+        {
+          "name": "Text",
+          "line": 31
+        },
+        {
+          "name": "Text",
+          "line": 33
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/lib/shared/widgets/slot_picker.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "SlotPicker",
+          "kind": "class",
+          "line": 3
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 12
+        },
+        {
+          "name": "Icon",
+          "line": 17
+        },
+        {
+          "name": "Text",
+          "line": 19
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_customer/test/widget_test.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "main",
+          "line": 2
+        },
+        {
+          "name": "testWidgets",
+          "line": 4
+        },
+        {
+          "name": "expect",
+          "line": 6
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/.dart_tool/dartpad/web_plugin_registrant.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "registerPlugins",
+          "line": 18
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/.dart_tool/flutter_build/dart_plugin_registrant.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "_PluginRegistrant",
+          "kind": "class",
+          "line": 41
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 45
+        },
+        {
+          "name": "print",
+          "line": 49
+        },
+        {
+          "name": "print",
+          "line": 58
+        },
+        {
+          "name": "print",
+          "line": 67
+        },
+        {
+          "name": "print",
+          "line": 76
+        },
+        {
+          "name": "print",
+          "line": 85
+        },
+        {
+          "name": "print",
+          "line": 95
+        },
+        {
+          "name": "print",
+          "line": 104
+        },
+        {
+          "name": "print",
+          "line": 113
+        },
+        {
+          "name": "print",
+          "line": 122
+        },
+        {
+          "name": "print",
+          "line": 131
+        },
+        {
+          "name": "print",
+          "line": 141
+        },
+        {
+          "name": "print",
+          "line": 150
+        },
+        {
+          "name": "print",
+          "line": 159
+        },
+        {
+          "name": "print",
+          "line": 168
+        },
+        {
+          "name": "print",
+          "line": 177
+        },
+        {
+          "name": "print",
+          "line": 186
+        },
+        {
+          "name": "print",
+          "line": 195
+        },
+        {
+          "name": "print",
+          "line": 205
+        },
+        {
+          "name": "print",
+          "line": 214
+        },
+        {
+          "name": "print",
+          "line": 223
+        },
+        {
+          "name": "print",
+          "line": 232
+        },
+        {
+          "name": "print",
+          "line": 241
+        },
+        {
+          "name": "print",
+          "line": 250
+        },
+        {
+          "name": "print",
+          "line": 260
+        },
+        {
+          "name": "print",
+          "line": 269
+        },
+        {
+          "name": "print",
+          "line": 278
+        },
+        {
+          "name": "print",
+          "line": 287
+        },
+        {
+          "name": "print",
+          "line": 296
+        },
+        {
+          "name": "print",
+          "line": 305
+        },
+        {
+          "name": "print",
+          "line": 314
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+      "language": "java",
+      "package": "io.flutter.plugins",
+      "classes": [],
+      "functions": [
+        {
+          "name": "registerWith",
+          "line": 17
+        }
+      ],
+      "data_members": [
+        {
+          "name": "TAG",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "mobile_partner/android/app/src/main/kotlin/id/dekat/partner/mobile_partner/MainActivity.kt",
+      "language": "kotlin",
+      "package": "id.dekat.partner.mobile_partner",
+      "classes": [
+        {
+          "name": "MainActivity",
+          "kind": "class",
+          "line": 4
+        }
+      ],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/ios/Flutter/ephemeral/flutter_lldb_helper.py",
+      "language": "python",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "handle_new_rx_page",
+          "line": 7
+        },
+        {
+          "name": "__lldb_init_module",
+          "line": 24
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/ios/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Sources/FlutterGeneratedPluginSwiftPackage/FlutterGeneratedPluginSwiftPackage.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/ios/Runner/AppDelegate.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "didInitializeImplicitFlutterEngine",
+          "line": 12
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/ios/Runner/SceneDelegate.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [
+        {
+          "name": "SceneDelegate",
+          "kind": "class",
+          "line": 3
+        }
+      ],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/ios/RunnerTests/RunnerTests.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [
+        {
+          "name": "RunnerTests",
+          "kind": "class",
+          "line": 4
+        }
+      ],
+      "functions": [
+        {
+          "name": "testExample",
+          "line": 6
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/app.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "DekaPartnerApp",
+          "kind": "class",
+          "line": 60
+        }
+      ],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/core/bootstrap/bootstrap.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "initCore",
+          "line": 2
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/core/router/app_router.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "PartnerAuthState",
+          "kind": "class",
+          "line": 18
+        },
+        {
+          "name": "PartnerAuthNotifier",
+          "kind": "class",
+          "line": 29
+        }
+      ],
+      "functions": [
+        {
+          "name": "PartnerAuthNotifier",
+          "line": 31
+        },
+        {
+          "name": "_checkAuth",
+          "line": 33
+        },
+        {
+          "name": "if",
+          "line": 36
+        },
+        {
+          "name": "login",
+          "line": 48
+        },
+        {
+          "name": "logout",
+          "line": 62
+        },
+        {
+          "name": "clearError",
+          "line": 68
+        },
+        {
+          "name": "GoRoute",
+          "line": 77
+        },
+        {
+          "name": "GoRoute",
+          "line": 78
+        },
+        {
+          "name": "ShellRoute",
+          "line": 79
+        },
+        {
+          "name": "GoRoute",
+          "line": 80
+        },
+        {
+          "name": "GoRoute",
+          "line": 81
+        },
+        {
+          "name": "GoRoute",
+          "line": 82
+        },
+        {
+          "name": "GoRoute",
+          "line": 83
+        },
+        {
+          "name": "GoRoute",
+          "line": 84
+        },
+        {
+          "name": "GoRoute",
+          "line": 86
+        },
+        {
+          "name": "if",
+          "line": 91
+        },
+        {
+          "name": "if",
+          "line": 92
+        },
+        {
+          "name": "if",
+          "line": 93
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/authentication/presentation/pages/login_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "LoginPage",
+          "kind": "class",
+          "line": 5
+        },
+        {
+          "name": "_LoginPageState",
+          "kind": "class",
+          "line": 11
+        }
+      ],
+      "functions": [
+        {
+          "name": "dispose",
+          "line": 19
+        },
+        {
+          "name": "if",
+          "line": 25
+        },
+        {
+          "name": "Icon",
+          "line": 36
+        },
+        {
+          "name": "Text",
+          "line": 38
+        },
+        {
+          "name": "Text",
+          "line": 40
+        },
+        {
+          "name": "TextFormField",
+          "line": 42
+        },
+        {
+          "name": "if",
+          "line": 46
+        },
+        {
+          "name": "if",
+          "line": 47
+        },
+        {
+          "name": "TextFormField",
+          "line": 52
+        },
+        {
+          "name": "ElevatedButton",
+          "line": 61
+        },
+        {
+          "name": "TextButton",
+          "line": 68
+        },
+        {
+          "name": "Row",
+          "line": 70
+        },
+        {
+          "name": "TextButton",
+          "line": 72
+        },
+        {
+          "name": "_handleLogin",
+          "line": 78
+        },
+        {
+          "name": "if",
+          "line": 80
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/authentication/presentation/pages/onboarding_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "OnboardingPage",
+          "kind": "class",
+          "line": 4
+        },
+        {
+          "name": "_OnboardingPageState",
+          "kind": "class",
+          "line": 10
+        },
+        {
+          "name": "_Step",
+          "kind": "class",
+          "line": 65
+        }
+      ],
+      "functions": [
+        {
+          "name": "_Step",
+          "line": 16
+        },
+        {
+          "name": "_Step",
+          "line": 17
+        },
+        {
+          "name": "_Step",
+          "line": 18
+        },
+        {
+          "name": "_Step",
+          "line": 19
+        },
+        {
+          "name": "dispose",
+          "line": 23
+        },
+        {
+          "name": "Align",
+          "line": 29
+        },
+        {
+          "name": "Expanded",
+          "line": 30
+        },
+        {
+          "name": "Container",
+          "line": 36
+        },
+        {
+          "name": "Text",
+          "line": 39
+        },
+        {
+          "name": "Text",
+          "line": 41
+        },
+        {
+          "name": "Row",
+          "line": 45
+        },
+        {
+          "name": "Padding",
+          "line": 50
+        },
+        {
+          "name": "if",
+          "line": 52
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/booking_management/presentation/pages/booking_detail_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "BookingDetailPage",
+          "kind": "class",
+          "line": 12
+        },
+        {
+          "name": "_InfoRow",
+          "kind": "class",
+          "line": 99
+        }
+      ],
+      "functions": [
+        {
+          "name": "IconButton",
+          "line": 23
+        },
+        {
+          "name": "if",
+          "line": 27
+        },
+        {
+          "name": "Container",
+          "line": 31
+        },
+        {
+          "name": "Icon",
+          "line": 38
+        },
+        {
+          "name": "Text",
+          "line": 41
+        },
+        {
+          "name": "Card",
+          "line": 46
+        },
+        {
+          "name": "_InfoRow",
+          "line": 49
+        },
+        {
+          "name": "_InfoRow",
+          "line": 50
+        },
+        {
+          "name": "_InfoRow",
+          "line": 51
+        },
+        {
+          "name": "Card",
+          "line": 54
+        },
+        {
+          "name": "_InfoRow",
+          "line": 57
+        },
+        {
+          "name": "_InfoRow",
+          "line": 58
+        },
+        {
+          "name": "Card",
+          "line": 61
+        },
+        {
+          "name": "_InfoRow",
+          "line": 64
+        },
+        {
+          "name": "if",
+          "line": 77
+        },
+        {
+          "name": "Expanded",
+          "line": 79
+        },
+        {
+          "name": "Expanded",
+          "line": 85
+        },
+        {
+          "name": "Icon",
+          "line": 107
+        },
+        {
+          "name": "Text",
+          "line": 108
+        },
+        {
+          "name": "Text",
+          "line": 109
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/booking_management/presentation/pages/booking_list_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "BookingListPage",
+          "kind": "class",
+          "line": 20
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 14
+        },
+        {
+          "name": "SingleChildScrollView",
+          "line": 32
+        },
+        {
+          "name": "Expanded",
+          "line": 46
+        },
+        {
+          "name": "if",
+          "line": 48
+        },
+        {
+          "name": "Icon",
+          "line": 49
+        },
+        {
+          "name": "switch",
+          "line": 58
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/calendar/presentation/pages/calendar_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "CalendarPage",
+          "kind": "class",
+          "line": 17
+        },
+        {
+          "name": "_CalendarPageState",
+          "kind": "class",
+          "line": 23
+        }
+      ],
+      "functions": [
+        {
+          "name": "IconButton",
+          "line": 38
+        },
+        {
+          "name": "TableCalendar",
+          "line": 42
+        },
+        {
+          "name": "Expanded",
+          "line": 60
+        },
+        {
+          "name": "if",
+          "line": 62
+        },
+        {
+          "name": "Icon",
+          "line": 63
+        },
+        {
+          "name": "Text",
+          "line": 65
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/payment/presentation/pages/earnings_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "EarningsPage",
+          "kind": "class",
+          "line": 13
+        },
+        {
+          "name": "_MiniStat",
+          "kind": "class",
+          "line": 78
+        }
+      ],
+      "functions": [
+        {
+          "name": "Card",
+          "line": 28
+        },
+        {
+          "name": "Text",
+          "line": 40
+        },
+        {
+          "name": "Row",
+          "line": 42
+        },
+        {
+          "name": "_MiniStat",
+          "line": 43
+        },
+        {
+          "name": "_MiniStat",
+          "line": 45
+        },
+        {
+          "name": "if",
+          "line": 52
+        },
+        {
+          "name": "Center",
+          "line": 53
+        },
+        {
+          "name": "Icon",
+          "line": 54
+        },
+        {
+          "name": "Text",
+          "line": 85
+        },
+        {
+          "name": "Text",
+          "line": 86
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/payment/presentation/pages/payment_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "PaymentPage",
+          "kind": "class",
+          "line": 3
+        },
+        {
+          "name": "_DetailRow",
+          "kind": "class",
+          "line": 76
+        }
+      ],
+      "functions": [
+        {
+          "name": "Card",
+          "line": 18
+        },
+        {
+          "name": "Text",
+          "line": 23
+        },
+        {
+          "name": "Text",
+          "line": 28
+        },
+        {
+          "name": "Container",
+          "line": 35
+        },
+        {
+          "name": "Card",
+          "line": 50
+        },
+        {
+          "name": "Text",
+          "line": 56
+        },
+        {
+          "name": "_DetailRow",
+          "line": 61
+        },
+        {
+          "name": "_DetailRow",
+          "line": 62
+        },
+        {
+          "name": "_DetailRow",
+          "line": 63
+        },
+        {
+          "name": "_DetailRow",
+          "line": 64
+        },
+        {
+          "name": "_DetailRow",
+          "line": 65
+        },
+        {
+          "name": "Text",
+          "line": 90
+        },
+        {
+          "name": "Text",
+          "line": 91
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/reports/presentation/pages/reports_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "ReportsPage",
+          "kind": "class",
+          "line": 14
+        },
+        {
+          "name": "_StatCard",
+          "kind": "class",
+          "line": 101
+        }
+      ],
+      "functions": [
+        {
+          "name": "Row",
+          "line": 29
+        },
+        {
+          "name": "_StatCard",
+          "line": 30
+        },
+        {
+          "name": "_StatCard",
+          "line": 32
+        },
+        {
+          "name": "Row",
+          "line": 35
+        },
+        {
+          "name": "_StatCard",
+          "line": 36
+        },
+        {
+          "name": "_StatCard",
+          "line": 38
+        },
+        {
+          "name": "if",
+          "line": 41
+        },
+        {
+          "name": "Card",
+          "line": 44
+        },
+        {
+          "name": "SizedBox",
+          "line": 47
+        },
+        {
+          "name": "BarChartRodData",
+          "line": 52
+        },
+        {
+          "name": "Wrap",
+          "line": 60
+        },
+        {
+          "name": "Container",
+          "line": 62
+        },
+        {
+          "name": "Text",
+          "line": 67
+        },
+        {
+          "name": "if",
+          "line": 74
+        },
+        {
+          "name": "Text",
+          "line": 85
+        },
+        {
+          "name": "Text",
+          "line": 87
+        },
+        {
+          "name": "Container",
+          "line": 112
+        },
+        {
+          "name": "Text",
+          "line": 115
+        },
+        {
+          "name": "Text",
+          "line": 117
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/features/staff_management/presentation/pages/staff_list_page.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "StaffListPage",
+          "kind": "class",
+          "line": 12
+        }
+      ],
+      "functions": [
+        {
+          "name": "if",
+          "line": 24
+        },
+        {
+          "name": "Icon",
+          "line": 25
+        },
+        {
+          "name": "Text",
+          "line": 27
+        },
+        {
+          "name": "Text",
+          "line": 29
+        },
+        {
+          "name": "if",
+          "line": 47
+        },
+        {
+          "name": "Text",
+          "line": 50
+        },
+        {
+          "name": "Container",
+          "line": 53
+        },
+        {
+          "name": "_showAddStaffDialog",
+          "line": 77
+        },
+        {
+          "name": "showDialog",
+          "line": 82
+        },
+        {
+          "name": "TextFormField",
+          "line": 87
+        },
+        {
+          "name": "TextFormField",
+          "line": 93
+        },
+        {
+          "name": "TextButton",
+          "line": 100
+        },
+        {
+          "name": "TextButton",
+          "line": 101
+        },
+        {
+          "name": "if",
+          "line": 103
+        },
+        {
+          "name": "if",
+          "line": 107
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/main.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "main",
+          "line": 6
+        },
+        {
+          "name": "runApp",
+          "line": 11
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/lib/shared/widgets/main_scaffold.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [
+        {
+          "name": "MainScaffold",
+          "kind": "class",
+          "line": 3
+        }
+      ],
+      "functions": [
+        {
+          "name": "_currentIndex",
+          "line": 7
+        },
+        {
+          "name": "if",
+          "line": 10
+        },
+        {
+          "name": "if",
+          "line": 11
+        },
+        {
+          "name": "if",
+          "line": 12
+        },
+        {
+          "name": "if",
+          "line": 13
+        },
+        {
+          "name": "_onTap",
+          "line": 16
+        },
+        {
+          "name": "switch",
+          "line": 18
+        },
+        {
+          "name": "BottomNavigationBarItem",
+          "line": 36
+        },
+        {
+          "name": "BottomNavigationBarItem",
+          "line": 37
+        },
+        {
+          "name": "BottomNavigationBarItem",
+          "line": 38
+        },
+        {
+          "name": "BottomNavigationBarItem",
+          "line": 39
+        },
+        {
+          "name": "BottomNavigationBarItem",
+          "line": 40
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/macos/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Package.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/macos/Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage/Sources/FlutterGeneratedPluginSwiftPackage/FlutterGeneratedPluginSwiftPackage.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/macos/Flutter/GeneratedPluginRegistrant.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "RegisterGeneratedPlugins",
+          "line": 17
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/macos/Runner/AppDelegate.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [
+        {
+          "name": "AppDelegate",
+          "kind": "class",
+          "line": 5
+        }
+      ],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/macos/Runner/MainFlutterWindow.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [
+        {
+          "name": "MainFlutterWindow",
+          "kind": "class",
+          "line": 3
+        }
+      ],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/macos/RunnerTests/RunnerTests.swift",
+      "language": "swift",
+      "package": "",
+      "classes": [
+        {
+          "name": "RunnerTests",
+          "kind": "class",
+          "line": 4
+        }
+      ],
+      "functions": [
+        {
+          "name": "testExample",
+          "line": 6
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "mobile_partner/test/widget_test.dart",
+      "language": "dart",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "main",
+          "line": 12
+        },
+        {
+          "name": "testWidgets",
+          "line": 14
+        },
+        {
+          "name": "expect",
+          "line": 19
+        },
+        {
+          "name": "expect",
+          "line": 20
+        },
+        {
+          "name": "expect",
+          "line": 27
+        },
+        {
+          "name": "expect",
+          "line": 28
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "web_admin/src/App.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "LoadingFallback",
+          "line": 13
+        },
+        {
+          "name": "ProtectedRoute",
+          "line": 21
+        },
+        {
+          "name": "App",
+          "line": 29
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "web_admin/src/components/AdminLayout.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "web_admin/src/components/DataTable.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "web_admin/src/components/StatsCard.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "label",
+          "line": 2
+        },
+        {
+          "name": "value",
+          "line": 3
+        },
+        {
+          "name": "icon",
+          "line": 4
+        },
+        {
+          "name": "color",
+          "line": 5
+        },
+        {
+          "name": "change",
+          "line": 6
+        },
+        {
+          "name": "blue",
+          "line": 10
+        },
+        {
+          "name": "green",
+          "line": 11
+        },
+        {
+          "name": "purple",
+          "line": 12
+        },
+        {
+          "name": "amber",
+          "line": 13
+        },
+        {
+          "name": "red",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/components/StatusBadge.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "success",
+          "line": 3
+        },
+        {
+          "name": "warning",
+          "line": 4
+        },
+        {
+          "name": "error",
+          "line": 5
+        },
+        {
+          "name": "info",
+          "line": 6
+        },
+        {
+          "name": "neutral",
+          "line": 7
+        },
+        {
+          "name": "ACTIVE",
+          "line": 11
+        },
+        {
+          "name": "PENDING",
+          "line": 12
+        },
+        {
+          "name": "FAILED",
+          "line": 13
+        },
+        {
+          "name": "DRAFT",
+          "line": 14
+        },
+        {
+          "name": "UNDER_REVIEW",
+          "line": 20
+        },
+        {
+          "name": "OPEN",
+          "line": 22
+        },
+        {
+          "name": "RESOLVED",
+          "line": 23
+        },
+        {
+          "name": "REFUNDED",
+          "line": 24
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/lib/api.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "auth",
+          "line": 8
+        },
+        {
+          "name": "login",
+          "line": 9
+        },
+        {
+          "name": "dashboard",
+          "line": 12
+        },
+        {
+          "name": "getStats",
+          "line": 14
+        },
+        {
+          "name": "users",
+          "line": 16
+        },
+        {
+          "name": "list",
+          "line": 18
+        },
+        {
+          "name": "updateStatus",
+          "line": 23
+        },
+        {
+          "name": "tenants",
+          "line": 26
+        },
+        {
+          "name": "approve",
+          "line": 33
+        },
+        {
+          "name": "reject",
+          "line": 34
+        },
+        {
+          "name": "bookings",
+          "line": 36
+        },
+        {
+          "name": "payments",
+          "line": 44
+        },
+        {
+          "name": "cases",
+          "line": 52
+        },
+        {
+          "name": "config",
+          "line": 61
+        },
+        {
+          "name": "getFlags",
+          "line": 63
+        },
+        {
+          "name": "toggleFlag",
+          "line": 64
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/lib/auth.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "AuthProvider",
+          "line": 8
+        },
+        {
+          "name": "useAuth",
+          "line": 33
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "web_admin/src/lib/types.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "totalUsers",
+          "line": 6
+        },
+        {
+          "name": "totalTenants",
+          "line": 7
+        },
+        {
+          "name": "totalBookings",
+          "line": 8
+        },
+        {
+          "name": "totalRevenue",
+          "line": 9
+        },
+        {
+          "name": "userGrowth",
+          "line": 10
+        },
+        {
+          "name": "tenantGrowth",
+          "line": 11
+        },
+        {
+          "name": "bookingGrowth",
+          "line": 12
+        },
+        {
+          "name": "revenueGrowth",
+          "line": 13
+        },
+        {
+          "name": "id",
+          "line": 17
+        },
+        {
+          "name": "email",
+          "line": 18
+        },
+        {
+          "name": "name",
+          "line": 19
+        },
+        {
+          "name": "role",
+          "line": 20
+        },
+        {
+          "name": "status",
+          "line": 21
+        },
+        {
+          "name": "lastLoginAt",
+          "line": 22
+        },
+        {
+          "name": "createdAt",
+          "line": 23
+        },
+        {
+          "name": "slug",
+          "line": 29
+        },
+        {
+          "name": "category",
+          "line": 30
+        },
+        {
+          "name": "ownerName",
+          "line": 31
+        },
+        {
+          "name": "verificationStatus",
+          "line": 33
+        },
+        {
+          "name": "code",
+          "line": 41
+        },
+        {
+          "name": "customerName",
+          "line": 42
+        },
+        {
+          "name": "providerName",
+          "line": 43
+        },
+        {
+          "name": "serviceName",
+          "line": 44
+        },
+        {
+          "name": "staffName",
+          "line": 45
+        },
+        {
+          "name": "startTime",
+          "line": 46
+        },
+        {
+          "name": "totalAmount",
+          "line": 48
+        },
+        {
+          "name": "bookingCode",
+          "line": 54
+        },
+        {
+          "name": "amount",
+          "line": 57
+        },
+        {
+          "name": "method",
+          "line": 59
+        },
+        {
+          "name": "paidAt",
+          "line": 61
+        },
+        {
+          "name": "caseNumber",
+          "line": 66
+        },
+        {
+          "name": "subject",
+          "line": 67
+        },
+        {
+          "name": "severity",
+          "line": 68
+        },
+        {
+          "name": "assignee",
+          "line": 70
+        },
+        {
+          "name": "slaDeadline",
+          "line": 73
+        },
+        {
+          "name": "key",
+          "line": 78
+        },
+        {
+          "name": "description",
+          "line": 80
+        },
+        {
+          "name": "enabled",
+          "line": 81
+        },
+        {
+          "name": "environment",
+          "line": 82
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/main.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "defaultOptions",
+          "line": 9
+        },
+        {
+          "name": "queries",
+          "line": 10
+        },
+        {
+          "name": "staleTime",
+          "line": 11
+        },
+        {
+          "name": "retry",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/pages/BookingsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 8
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 15
+        },
+        {
+          "name": "queryFn",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/pages/CasesPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 15
+        },
+        {
+          "name": "queryFn",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/pages/ConfigPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "web_admin/src/pages/DashboardPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 5
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "web_admin/src/pages/LoginPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "onSubmit",
+          "line": 33
+        }
+      ],
+      "data_members": [
+        {
+          "name": "email",
+          "line": 10
+        },
+        {
+          "name": "password",
+          "line": 11
+        },
+        {
+          "name": "mfaCode",
+          "line": 12
+        },
+        {
+          "name": "mutationFn",
+          "line": 24
+        },
+        {
+          "name": "onSuccess",
+          "line": 25
+        },
+        {
+          "name": "onError",
+          "line": 31
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/pages/PaymentsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 8
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 15
+        },
+        {
+          "name": "queryFn",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/pages/TenantsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 8
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 20
+        },
+        {
+          "name": "queryFn",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "path": "web_admin/src/pages/UsersPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 13
+        },
+        {
+          "name": "queryFn",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "web_admin/tailwind.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "content",
+          "line": 4
+        },
+        {
+          "name": "theme",
+          "line": 8
+        },
+        {
+          "name": "extend",
+          "line": 9
+        },
+        {
+          "name": "colors",
+          "line": 10
+        },
+        {
+          "name": "primary",
+          "line": 11
+        },
+        {
+          "name": "accent",
+          "line": 24
+        },
+        {
+          "name": "fontFamily",
+          "line": 38
+        },
+        {
+          "name": "sans",
+          "line": 39
+        },
+        {
+          "name": "plugins",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "path": "web_admin/vite-env.d.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "web_admin/vite.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "plugins",
+          "line": 7
+        },
+        {
+          "name": "resolve",
+          "line": 8
+        },
+        {
+          "name": "alias",
+          "line": 9
+        },
+        {
+          "name": "server",
+          "line": 13
+        },
+        {
+          "name": "port",
+          "line": 14
+        },
+        {
+          "name": "host",
+          "line": 15
+        },
+        {
+          "name": "build",
+          "line": 17
+        },
+        {
+          "name": "outDir",
+          "line": 18
+        },
+        {
+          "name": "sourcemap",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/App.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "LoadingFallback",
+          "line": 13
+        },
+        {
+          "name": "ProtectedRoute",
+          "line": 21
+        },
+        {
+          "name": "App",
+          "line": 29
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "web_provider/src/components/BookingTable.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 21
+        }
+      ],
+      "data_members": [
+        {
+          "name": "bookings",
+          "line": 4
+        },
+        {
+          "name": "onStatusChange",
+          "line": 5
+        },
+        {
+          "name": "HELD",
+          "line": 9
+        },
+        {
+          "name": "PENDING_PAYMENT",
+          "line": 10
+        },
+        {
+          "name": "PENDING_APPROVAL",
+          "line": 11
+        },
+        {
+          "name": "CONFIRMED",
+          "line": 12
+        },
+        {
+          "name": "CHECKED_IN",
+          "line": 13
+        },
+        {
+          "name": "EN_ROUTE",
+          "line": 14
+        },
+        {
+          "name": "IN_SERVICE",
+          "line": 15
+        },
+        {
+          "name": "COMPLETED",
+          "line": 16
+        },
+        {
+          "name": "CANCELLED",
+          "line": 17
+        },
+        {
+          "name": "NO_SHOW",
+          "line": 18
+        },
+        {
+          "name": "EXPIRED",
+          "line": 19
+        },
+        {
+          "name": "style",
+          "line": 24
+        },
+        {
+          "name": "currency",
+          "line": 25
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 26
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 27
+        },
+        {
+          "name": "day",
+          "line": 93
+        },
+        {
+          "name": "month",
+          "line": 94
+        },
+        {
+          "name": "hour",
+          "line": 99
+        },
+        {
+          "name": "minute",
+          "line": 100
+        },
+        {
+          "name": "hour12",
+          "line": 101
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/components/Layout.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "web_provider/src/components/StatsCard.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "label",
+          "line": 2
+        },
+        {
+          "name": "value",
+          "line": 3
+        },
+        {
+          "name": "icon",
+          "line": 4
+        },
+        {
+          "name": "color",
+          "line": 5
+        },
+        {
+          "name": "change",
+          "line": 6
+        },
+        {
+          "name": "blue",
+          "line": 10
+        },
+        {
+          "name": "green",
+          "line": 11
+        },
+        {
+          "name": "purple",
+          "line": 12
+        },
+        {
+          "name": "amber",
+          "line": 13
+        },
+        {
+          "name": "red",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/lib/api.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "auth",
+          "line": 15
+        },
+        {
+          "name": "login",
+          "line": 16
+        },
+        {
+          "name": "logout",
+          "line": 21
+        },
+        {
+          "name": "dashboard",
+          "line": 23
+        },
+        {
+          "name": "getStats",
+          "line": 25
+        },
+        {
+          "name": "getRecentBookings",
+          "line": 26
+        },
+        {
+          "name": "bookings",
+          "line": 29
+        },
+        {
+          "name": "list",
+          "line": 31
+        },
+        {
+          "name": "getById",
+          "line": 40
+        },
+        {
+          "name": "updateStatus",
+          "line": 42
+        },
+        {
+          "name": "reschedule",
+          "line": 47
+        },
+        {
+          "name": "calendar",
+          "line": 52
+        },
+        {
+          "name": "getBookings",
+          "line": 54
+        },
+        {
+          "name": "services",
+          "line": 61
+        },
+        {
+          "name": "create",
+          "line": 64
+        },
+        {
+          "name": "update",
+          "line": 66
+        },
+        {
+          "name": "delete",
+          "line": 68
+        },
+        {
+          "name": "staff",
+          "line": 71
+        },
+        {
+          "name": "invite",
+          "line": 74
+        },
+        {
+          "name": "updateSchedule",
+          "line": 78
+        },
+        {
+          "name": "deactivate",
+          "line": 80
+        },
+        {
+          "name": "customers",
+          "line": 83
+        },
+        {
+          "name": "reports",
+          "line": 95
+        },
+        {
+          "name": "getReport",
+          "line": 97
+        },
+        {
+          "name": "exportCsv",
+          "line": 106
+        },
+        {
+          "name": "settings",
+          "line": 113
+        },
+        {
+          "name": "get",
+          "line": 115
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/lib/auth.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "AuthProvider",
+          "line": 21
+        },
+        {
+          "name": "useAuth",
+          "line": 57
+        }
+      ],
+      "data_members": [
+        {
+          "name": "id",
+          "line": 6
+        },
+        {
+          "name": "email",
+          "line": 7
+        },
+        {
+          "name": "name",
+          "line": 8
+        },
+        {
+          "name": "businessName",
+          "line": 9
+        },
+        {
+          "name": "role",
+          "line": 10
+        },
+        {
+          "name": "user",
+          "line": 14
+        },
+        {
+          "name": "isAuthenticated",
+          "line": 15
+        },
+        {
+          "name": "login",
+          "line": 16
+        },
+        {
+          "name": "logout",
+          "line": 17
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/lib/types.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "success",
+          "line": 2
+        },
+        {
+          "name": "data",
+          "line": 3
+        },
+        {
+          "name": "message",
+          "line": 4
+        },
+        {
+          "name": "pagination",
+          "line": 10
+        },
+        {
+          "name": "page",
+          "line": 14
+        },
+        {
+          "name": "limit",
+          "line": 15
+        },
+        {
+          "name": "total",
+          "line": 16
+        },
+        {
+          "name": "totalPages",
+          "line": 17
+        },
+        {
+          "name": "todayBookings",
+          "line": 21
+        },
+        {
+          "name": "weekRevenue",
+          "line": 22
+        },
+        {
+          "name": "totalCustomers",
+          "line": 23
+        },
+        {
+          "name": "averageRating",
+          "line": 24
+        },
+        {
+          "name": "occupancyRate",
+          "line": 25
+        },
+        {
+          "name": "pendingBookings",
+          "line": 26
+        },
+        {
+          "name": "id",
+          "line": 30
+        },
+        {
+          "name": "code",
+          "line": 31
+        },
+        {
+          "name": "customerName",
+          "line": 32
+        },
+        {
+          "name": "customerEmail",
+          "line": 33
+        },
+        {
+          "name": "customerPhone",
+          "line": 34
+        },
+        {
+          "name": "serviceName",
+          "line": 35
+        },
+        {
+          "name": "staffName",
+          "line": 36
+        },
+        {
+          "name": "startTime",
+          "line": 37
+        },
+        {
+          "name": "endTime",
+          "line": 38
+        },
+        {
+          "name": "status",
+          "line": 39
+        },
+        {
+          "name": "totalAmount",
+          "line": 40
+        },
+        {
+          "name": "depositPaid",
+          "line": 41
+        },
+        {
+          "name": "notes",
+          "line": 42
+        },
+        {
+          "name": "createdAt",
+          "line": 43
+        },
+        {
+          "name": "name",
+          "line": 61
+        },
+        {
+          "name": "description",
+          "line": 62
+        },
+        {
+          "name": "duration",
+          "line": 63
+        },
+        {
+          "name": "price",
+          "line": 64
+        },
+        {
+          "name": "priceType",
+          "line": 65
+        },
+        {
+          "name": "depositAmount",
+          "line": 66
+        },
+        {
+          "name": "category",
+          "line": 67
+        },
+        {
+          "name": "isActive",
+          "line": 68
+        },
+        {
+          "name": "addons",
+          "line": 69
+        },
+        {
+          "name": "email",
+          "line": 82
+        },
+        {
+          "name": "avatarUrl",
+          "line": 83
+        },
+        {
+          "name": "bio",
+          "line": 84
+        },
+        {
+          "name": "specialties",
+          "line": 85
+        },
+        {
+          "name": "schedule",
+          "line": 87
+        },
+        {
+          "name": "dayOfWeek",
+          "line": 91
+        },
+        {
+          "name": "isOff",
+          "line": 94
+        },
+        {
+          "name": "phone",
+          "line": 101
+        },
+        {
+          "name": "totalBookings",
+          "line": 102
+        },
+        {
+          "name": "lastBookingAt",
+          "line": 103
+        },
+        {
+          "name": "totalSpent",
+          "line": 104
+        },
+        {
+          "name": "bookingsOverTime",
+          "line": 108
+        },
+        {
+          "name": "revenueOverTime",
+          "line": 109
+        },
+        {
+          "name": "staffUtilization",
+          "line": 110
+        },
+        {
+          "name": "topServices",
+          "line": 111
+        },
+        {
+          "name": "businessName",
+          "line": 115
+        },
+        {
+          "name": "address",
+          "line": 119
+        },
+        {
+          "name": "logoUrl",
+          "line": 120
+        },
+        {
+          "name": "operatingHours",
+          "line": 121
+        },
+        {
+          "name": "bookingPolicy",
+          "line": 122
+        },
+        {
+          "name": "cancellationPolicy",
+          "line": 123
+        },
+        {
+          "name": "autoConfirm",
+          "line": 124
+        },
+        {
+          "name": "depositRequired",
+          "line": 125
+        },
+        {
+          "name": "depositPercentage",
+          "line": 126
+        },
+        {
+          "name": "notifications",
+          "line": 127
+        },
+        {
+          "name": "open",
+          "line": 132
+        },
+        {
+          "name": "close",
+          "line": 133
+        },
+        {
+          "name": "isClosed",
+          "line": 134
+        },
+        {
+          "name": "emailBookingConfirmation",
+          "line": 138
+        },
+        {
+          "name": "emailBookingReminder",
+          "line": 139
+        },
+        {
+          "name": "smsBookingReminder",
+          "line": 140
+        },
+        {
+          "name": "reminderHoursBefore",
+          "line": 141
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/main.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "defaultOptions",
+          "line": 9
+        },
+        {
+          "name": "queries",
+          "line": 10
+        },
+        {
+          "name": "staleTime",
+          "line": 11
+        },
+        {
+          "name": "retry",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/pages/CalendarPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "getBookingsForDate",
+          "line": 46
+        },
+        {
+          "name": "navigateWeek",
+          "line": 51
+        },
+        {
+          "name": "navigateMonth",
+          "line": 57
+        },
+        {
+          "name": "getWeekDays",
+          "line": 63
+        }
+      ],
+      "data_members": [
+        {
+          "name": "CONFIRMED",
+          "line": 8
+        },
+        {
+          "name": "PENDING_APPROVAL",
+          "line": 9
+        },
+        {
+          "name": "PENDING_PAYMENT",
+          "line": 10
+        },
+        {
+          "name": "IN_SERVICE",
+          "line": 11
+        },
+        {
+          "name": "COMPLETED",
+          "line": 12
+        },
+        {
+          "name": "CANCELLED",
+          "line": 13
+        },
+        {
+          "name": "NO_SHOW",
+          "line": 14
+        },
+        {
+          "name": "HELD",
+          "line": 15
+        },
+        {
+          "name": "CHECKED_IN",
+          "line": 16
+        },
+        {
+          "name": "EN_ROUTE",
+          "line": 17
+        },
+        {
+          "name": "EXPIRED",
+          "line": 18
+        },
+        {
+          "name": "queryKey",
+          "line": 41
+        },
+        {
+          "name": "queryFn",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/pages/CustomersPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 5
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 12
+        },
+        {
+          "name": "queryFn",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/pages/DashboardPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 5
+        }
+      ],
+      "data_members": [
+        {
+          "name": "style",
+          "line": 8
+        },
+        {
+          "name": "currency",
+          "line": 9
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 10
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 11
+        },
+        {
+          "name": "queryKey",
+          "line": 17
+        },
+        {
+          "name": "queryFn",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/pages/LoginPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "onSubmit",
+          "line": 39
+        }
+      ],
+      "data_members": [
+        {
+          "name": "email",
+          "line": 10
+        },
+        {
+          "name": "password",
+          "line": 11
+        },
+        {
+          "name": "formState",
+          "line": 23
+        },
+        {
+          "name": "resolver",
+          "line": 25
+        },
+        {
+          "name": "mutationFn",
+          "line": 29
+        },
+        {
+          "name": "onSuccess",
+          "line": 30
+        },
+        {
+          "name": "onError",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/pages/ReportsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 5
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 12
+        },
+        {
+          "name": "queryFn",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/pages/ServicesPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 19
+        }
+      ],
+      "data_members": [
+        {
+          "name": "name",
+          "line": 11
+        },
+        {
+          "name": "description",
+          "line": 12
+        },
+        {
+          "name": "duration",
+          "line": 13
+        },
+        {
+          "name": "price",
+          "line": 14
+        },
+        {
+          "name": "depositAmount",
+          "line": 15
+        },
+        {
+          "name": "category",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/pages/SettingsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "mutationFn",
+          "line": 19
+        },
+        {
+          "name": "onSuccess",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "path": "web_provider/src/pages/StaffPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "mutationFn",
+          "line": 18
+        },
+        {
+          "name": "onSuccess",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "path": "web_provider/tailwind.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "content",
+          "line": 4
+        },
+        {
+          "name": "theme",
+          "line": 8
+        },
+        {
+          "name": "extend",
+          "line": 9
+        },
+        {
+          "name": "colors",
+          "line": 10
+        },
+        {
+          "name": "primary",
+          "line": 11
+        },
+        {
+          "name": "accent",
+          "line": 24
+        },
+        {
+          "name": "fontFamily",
+          "line": 38
+        },
+        {
+          "name": "sans",
+          "line": 39
+        },
+        {
+          "name": "plugins",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "path": "web_provider/vite-env.d.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "web_provider/vite.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "plugins",
+          "line": 7
+        },
+        {
+          "name": "resolve",
+          "line": 8
+        },
+        {
+          "name": "alias",
+          "line": 9
+        },
+        {
+          "name": "server",
+          "line": 13
+        },
+        {
+          "name": "port",
+          "line": 14
+        },
+        {
+          "name": "host",
+          "line": 15
+        },
+        {
+          "name": "build",
+          "line": 17
+        },
+        {
+          "name": "outDir",
+          "line": 18
+        },
+        {
+          "name": "sourcemap",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/App.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "LoadingFallback",
+          "line": 8
+        },
+        {
+          "name": "App",
+          "line": 16
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "web_public/src/components/BookingSummary.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 12
+        },
+        {
+          "name": "formatDateTime",
+          "line": 21
+        }
+      ],
+      "data_members": [
+        {
+          "name": "service",
+          "line": 4
+        },
+        {
+          "name": "staff",
+          "line": 5
+        },
+        {
+          "name": "slot",
+          "line": 6
+        },
+        {
+          "name": "selectedAddons",
+          "line": 7
+        },
+        {
+          "name": "depositRequired",
+          "line": 8
+        },
+        {
+          "name": "onConfirm",
+          "line": 9
+        },
+        {
+          "name": "isPending",
+          "line": 10
+        },
+        {
+          "name": "style",
+          "line": 15
+        },
+        {
+          "name": "currency",
+          "line": 16
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 17
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 18
+        },
+        {
+          "name": "weekday",
+          "line": 24
+        },
+        {
+          "name": "day",
+          "line": 25
+        },
+        {
+          "name": "month",
+          "line": 26
+        },
+        {
+          "name": "year",
+          "line": 27
+        },
+        {
+          "name": "hour",
+          "line": 28
+        },
+        {
+          "name": "minute",
+          "line": 29
+        },
+        {
+          "name": "hour12",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/components/Footer.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "produk",
+          "line": 4
+        },
+        {
+          "name": "perusahaan",
+          "line": 10
+        },
+        {
+          "name": "dukungan",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/components/Header.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "handleSearch",
+          "line": 7
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "web_public/src/components/ProviderCard.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "getInitials",
+          "line": 9
+        }
+      ],
+      "data_members": [
+        {
+          "name": "provider",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/components/ServiceCard.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 8
+        },
+        {
+          "name": "formatDuration",
+          "line": 17
+        }
+      ],
+      "data_members": [
+        {
+          "name": "service",
+          "line": 5
+        },
+        {
+          "name": "providerSlug",
+          "line": 6
+        },
+        {
+          "name": "style",
+          "line": 11
+        },
+        {
+          "name": "currency",
+          "line": 12
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 13
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/components/SlotPicker.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatTime",
+          "line": 53
+        }
+      ],
+      "data_members": [
+        {
+          "name": "slots",
+          "line": 4
+        },
+        {
+          "name": "selectedSlotId",
+          "line": 5
+        },
+        {
+          "name": "onSelect",
+          "line": 6
+        },
+        {
+          "name": "isLoading",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/lib/api.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "categories",
+          "line": 18
+        },
+        {
+          "name": "list",
+          "line": 19
+        },
+        {
+          "name": "providers",
+          "line": 22
+        },
+        {
+          "name": "search",
+          "line": 24
+        },
+        {
+          "name": "getBySlug",
+          "line": 35
+        },
+        {
+          "name": "getFeatured",
+          "line": 38
+        },
+        {
+          "name": "services",
+          "line": 42
+        },
+        {
+          "name": "listByProvider",
+          "line": 44
+        },
+        {
+          "name": "staff",
+          "line": 49
+        },
+        {
+          "name": "availability",
+          "line": 56
+        },
+        {
+          "name": "getSlots",
+          "line": 58
+        },
+        {
+          "name": "reviews",
+          "line": 65
+        },
+        {
+          "name": "bookings",
+          "line": 74
+        },
+        {
+          "name": "create",
+          "line": 76
+        },
+        {
+          "name": "hold",
+          "line": 78
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/lib/types.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "success",
+          "line": 2
+        },
+        {
+          "name": "data",
+          "line": 3
+        },
+        {
+          "name": "message",
+          "line": 4
+        },
+        {
+          "name": "pagination",
+          "line": 10
+        },
+        {
+          "name": "page",
+          "line": 14
+        },
+        {
+          "name": "limit",
+          "line": 15
+        },
+        {
+          "name": "total",
+          "line": 16
+        },
+        {
+          "name": "totalPages",
+          "line": 17
+        },
+        {
+          "name": "id",
+          "line": 21
+        },
+        {
+          "name": "name",
+          "line": 22
+        },
+        {
+          "name": "slug",
+          "line": 23
+        },
+        {
+          "name": "icon",
+          "line": 24
+        },
+        {
+          "name": "serviceCount",
+          "line": 25
+        },
+        {
+          "name": "description",
+          "line": 32
+        },
+        {
+          "name": "logoUrl",
+          "line": 33
+        },
+        {
+          "name": "coverUrl",
+          "line": 34
+        },
+        {
+          "name": "category",
+          "line": 35
+        },
+        {
+          "name": "categorySlug",
+          "line": 36
+        },
+        {
+          "name": "rating",
+          "line": 37
+        },
+        {
+          "name": "reviewCount",
+          "line": 38
+        },
+        {
+          "name": "location",
+          "line": 39
+        },
+        {
+          "name": "address",
+          "line": 40
+        },
+        {
+          "name": "latitude",
+          "line": 41
+        },
+        {
+          "name": "longitude",
+          "line": 42
+        },
+        {
+          "name": "phone",
+          "line": 43
+        },
+        {
+          "name": "openingHours",
+          "line": 44
+        },
+        {
+          "name": "verificationStatus",
+          "line": 45
+        },
+        {
+          "name": "dayOfWeek",
+          "line": 49
+        },
+        {
+          "name": "open",
+          "line": 50
+        },
+        {
+          "name": "close",
+          "line": 51
+        },
+        {
+          "name": "isClosed",
+          "line": 52
+        },
+        {
+          "name": "providerId",
+          "line": 57
+        },
+        {
+          "name": "duration",
+          "line": 60
+        },
+        {
+          "name": "price",
+          "line": 61
+        },
+        {
+          "name": "priceType",
+          "line": 62
+        },
+        {
+          "name": "depositAmount",
+          "line": 63
+        },
+        {
+          "name": "addons",
+          "line": 65
+        },
+        {
+          "name": "imageUrl",
+          "line": 66
+        },
+        {
+          "name": "avatarUrl",
+          "line": 80
+        },
+        {
+          "name": "bio",
+          "line": 81
+        },
+        {
+          "name": "specialties",
+          "line": 82
+        },
+        {
+          "name": "startTime",
+          "line": 89
+        },
+        {
+          "name": "endTime",
+          "line": 90
+        },
+        {
+          "name": "available",
+          "line": 91
+        },
+        {
+          "name": "staffId",
+          "line": 92
+        },
+        {
+          "name": "staffName",
+          "line": 93
+        },
+        {
+          "name": "customerName",
+          "line": 98
+        },
+        {
+          "name": "customerAvatar",
+          "line": 99
+        },
+        {
+          "name": "comment",
+          "line": 101
+        },
+        {
+          "name": "serviceName",
+          "line": 102
+        },
+        {
+          "name": "createdAt",
+          "line": 103
+        },
+        {
+          "name": "serviceId",
+          "line": 108
+        },
+        {
+          "name": "slotId",
+          "line": 110
+        },
+        {
+          "name": "customerEmail",
+          "line": 113
+        },
+        {
+          "name": "customerPhone",
+          "line": 114
+        },
+        {
+          "name": "notes",
+          "line": 115
+        },
+        {
+          "name": "idempotencyKey",
+          "line": 116
+        },
+        {
+          "name": "code",
+          "line": 121
+        },
+        {
+          "name": "status",
+          "line": 122
+        },
+        {
+          "name": "totalAmount",
+          "line": 123
+        },
+        {
+          "name": "paymentUrl",
+          "line": 125
+        },
+        {
+          "name": "query",
+          "line": 130
+        },
+        {
+          "name": "minPrice",
+          "line": 133
+        },
+        {
+          "name": "maxPrice",
+          "line": 134
+        },
+        {
+          "name": "minRating",
+          "line": 135
+        },
+        {
+          "name": "date",
+          "line": 136
+        },
+        {
+          "name": "sort",
+          "line": 137
+        },
+        {
+          "name": "providers",
+          "line": 143
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/main.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "defaultOptions",
+          "line": 9
+        },
+        {
+          "name": "queries",
+          "line": 10
+        },
+        {
+          "name": "staleTime",
+          "line": 11
+        },
+        {
+          "name": "retry",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/pages/BookingPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 24
+        },
+        {
+          "name": "handleServiceSelect",
+          "line": 120
+        },
+        {
+          "name": "handleStaffSelect",
+          "line": 128
+        },
+        {
+          "name": "handleSlotSelect",
+          "line": 134
+        },
+        {
+          "name": "handleAddonToggle",
+          "line": 139
+        },
+        {
+          "name": "handleContactSubmit",
+          "line": 145
+        },
+        {
+          "name": "handleConfirm",
+          "line": 149
+        }
+      ],
+      "data_members": [
+        {
+          "name": "customerName",
+          "line": 15
+        },
+        {
+          "name": "customerEmail",
+          "line": 16
+        },
+        {
+          "name": "customerPhone",
+          "line": 17
+        },
+        {
+          "name": "notes",
+          "line": 18
+        },
+        {
+          "name": "style",
+          "line": 27
+        },
+        {
+          "name": "currency",
+          "line": 28
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 29
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 30
+        },
+        {
+          "name": "queryKey",
+          "line": 51
+        },
+        {
+          "name": "queryFn",
+          "line": 52
+        },
+        {
+          "name": "enabled",
+          "line": 53
+        },
+        {
+          "name": "mutationFn",
+          "line": 75
+        },
+        {
+          "name": "providerId",
+          "line": 77
+        },
+        {
+          "name": "serviceId",
+          "line": 78
+        },
+        {
+          "name": "staffId",
+          "line": 79
+        },
+        {
+          "name": "slotId",
+          "line": 80
+        },
+        {
+          "name": "addons",
+          "line": 81
+        },
+        {
+          "name": "idempotencyKey",
+          "line": 84
+        },
+        {
+          "name": "resolver",
+          "line": 102
+        },
+        {
+          "name": "service",
+          "line": 106
+        },
+        {
+          "name": "staff",
+          "line": 107
+        },
+        {
+          "name": "slot",
+          "line": 108
+        },
+        {
+          "name": "contact",
+          "line": 109
+        },
+        {
+          "name": "confirm",
+          "line": 110
+        },
+        {
+          "name": "onSuccess",
+          "line": 153
+        },
+        {
+          "name": "weekday",
+          "line": 489
+        },
+        {
+          "name": "day",
+          "line": 490
+        },
+        {
+          "name": "month",
+          "line": 491
+        },
+        {
+          "name": "hour",
+          "line": 492
+        },
+        {
+          "name": "minute",
+          "line": 493
+        },
+        {
+          "name": "hour12",
+          "line": 494
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/pages/HomePage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 20
+        },
+        {
+          "name": "queryFn",
+          "line": 21
+        },
+        {
+          "name": "staleTime",
+          "line": 22
+        },
+        {
+          "name": "step",
+          "line": 175
+        },
+        {
+          "name": "title",
+          "line": 176
+        },
+        {
+          "name": "desc",
+          "line": 177
+        },
+        {
+          "name": "icon",
+          "line": 178
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/pages/ProviderPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "StarRating",
+          "line": 11
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 34
+        },
+        {
+          "name": "queryFn",
+          "line": 35
+        },
+        {
+          "name": "enabled",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "path": "web_public/src/pages/SearchPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "handleFilterChange",
+          "line": 54
+        },
+        {
+          "name": "handleSearch",
+          "line": 58
+        }
+      ],
+      "data_members": [
+        {
+          "name": "query",
+          "line": 32
+        },
+        {
+          "name": "category",
+          "line": 33
+        },
+        {
+          "name": "location",
+          "line": 34
+        },
+        {
+          "name": "minPrice",
+          "line": 35
+        },
+        {
+          "name": "maxPrice",
+          "line": 36
+        },
+        {
+          "name": "minRating",
+          "line": 37
+        },
+        {
+          "name": "date",
+          "line": 38
+        },
+        {
+          "name": "sort",
+          "line": 39
+        },
+        {
+          "name": "page",
+          "line": 40
+        },
+        {
+          "name": "limit",
+          "line": 41
+        },
+        {
+          "name": "queryKey",
+          "line": 47
+        },
+        {
+          "name": "queryFn",
+          "line": 48
+        },
+        {
+          "name": "staleTime",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "path": "web_public/tailwind.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "content",
+          "line": 4
+        },
+        {
+          "name": "theme",
+          "line": 8
+        },
+        {
+          "name": "extend",
+          "line": 9
+        },
+        {
+          "name": "colors",
+          "line": 10
+        },
+        {
+          "name": "primary",
+          "line": 11
+        },
+        {
+          "name": "accent",
+          "line": 24
+        },
+        {
+          "name": "fontFamily",
+          "line": 38
+        },
+        {
+          "name": "sans",
+          "line": 39
+        },
+        {
+          "name": "plugins",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "path": "web_public/vite-env.d.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "web_public/vite.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "plugins",
+          "line": 7
+        },
+        {
+          "name": "resolve",
+          "line": 8
+        },
+        {
+          "name": "alias",
+          "line": 9
+        },
+        {
+          "name": "server",
+          "line": 13
+        },
+        {
+          "name": "port",
+          "line": 14
+        },
+        {
+          "name": "host",
+          "line": 15
+        },
+        {
+          "name": "build",
+          "line": 17
+        },
+        {
+          "name": "outDir",
+          "line": 18
+        },
+        {
+          "name": "sourcemap",
+          "line": 19
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-08-24T14:02:52.694903+00:00"
+}

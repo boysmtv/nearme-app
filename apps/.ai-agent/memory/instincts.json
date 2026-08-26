@@ -1,0 +1,38 @@
+{
+  "schema_version": 2,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+  "instincts": [
+    {
+      "id": "I001",
+      "trigger": "Adding new feature to Flutter app",
+      "action": "Create feature/presentation/pages/ only. No domain/data layers needed unless refactoring.",
+      "confidence": 0.9
+    },
+    {
+      "id": "I002",
+      "trigger": "Adding new API endpoint",
+      "action": "Add to appropriate controller. Use /public/ prefix for permitAll, else JWT required.",
+      "confidence": 0.95
+    },
+    {
+      "id": "I003",
+      "trigger": "Adding new web page",
+      "action": "Use React.lazy() for code-splitting. Add route in App.tsx. Use @dekat/web-api-client for API calls.",
+      "confidence": 0.9
+    },
+    {
+      "id": "I004",
+      "trigger": "Booking status change",
+      "action": "Use status machine: HELD -> PENDING_PAYMENT -> PENDING_APPROVAL -> CONFIRMED -> CHECKED_IN -> IN_SERVICE -> COMPLETED. Also: CANCELLED, NO_SHOW, EXPIRED.",
+      "confidence": 0.85
+    },
+    {
+      "id": "I005",
+      "trigger": "Money formatting",
+      "action": "Use formatRupiah() in Flutter (minor units/sen). Use Intl.NumberFormat with id-ID in TypeScript.",
+      "confidence": 0.95
+    }
+  ],
+  "promotion_policy": "Promote only repeated, validated, project-neutral lessons.",
+  "updated_at": "2026-08-26T10:00:00.000000+00:00"
+}

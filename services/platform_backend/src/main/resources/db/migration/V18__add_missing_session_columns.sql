@@ -1,0 +1,2 @@
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS device_info TEXT;
+ALTER TABLE sessions ADD COLUMN IF NOT EXISTS token_family VARCHAR(50);

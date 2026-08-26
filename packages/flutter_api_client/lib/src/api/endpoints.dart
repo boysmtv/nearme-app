@@ -34,8 +34,12 @@ class Endpoints {
   static const String providerReports = '/provider/reports';
   static const String providerSettings = '/provider/settings';
 
+  // Password
+  static const String forgotPassword = '/auth/forgot-password';
+
   // Support
   static const String supportCases = '/support/cases';
+  static const String supportTickets = '/support/tickets';
 
   // Notifications (device tokens)
   static const String notifications = '/notifications';

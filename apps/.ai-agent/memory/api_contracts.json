@@ -1,0 +1,204 @@
+{
+  "contracts": [
+    {
+      "module": "auth",
+      "base_path": "/auth",
+      "access": "public",
+      "endpoints": [
+        {"method": "POST", "path": "/auth/register", "description": "Register new user"},
+        {"method": "POST", "path": "/auth/login", "description": "Login with email/password"},
+        {"method": "POST", "path": "/auth/otp/request", "description": "Request OTP code"},
+        {"method": "POST", "path": "/auth/otp/verify", "description": "Verify OTP"},
+        {"method": "POST", "path": "/auth/refresh", "description": "Refresh access token"},
+        {"method": "POST", "path": "/auth/logout", "description": "Logout/invalidate token"}
+      ]
+    },
+    {
+      "module": "public",
+      "base_path": "/public",
+      "access": "public",
+      "endpoints": [
+        {"method": "GET", "path": "/public/categories", "description": "List categories"},
+        {"method": "GET", "path": "/public/providers", "description": "Search providers"},
+        {"method": "GET", "path": "/public/providers/featured", "description": "Featured providers"},
+        {"method": "GET", "path": "/public/providers/{slug}", "description": "Provider detail"},
+        {"method": "GET", "path": "/public/providers/{id}/services", "description": "Provider services"},
+        {"method": "GET", "path": "/public/providers/{id}/staff", "description": "Provider staff"},
+        {"method": "GET", "path": "/public/providers/{id}/availability", "description": "Available slots"},
+        {"method": "GET", "path": "/public/providers/{id}/reviews", "description": "Provider reviews"},
+        {"method": "POST", "path": "/public/bookings", "description": "Create booking (guest)"}
+      ]
+    },
+    {
+      "module": "admin",
+      "base_path": "/admin",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "GET", "path": "/admin/dashboard/stats", "description": "Platform stats"},
+        {"method": "GET", "path": "/admin/users", "description": "List users"},
+        {"method": "PUT", "path": "/admin/users/{id}/status", "description": "Update user status"},
+        {"method": "GET", "path": "/admin/tenants", "description": "List tenants"},
+        {"method": "PUT", "path": "/admin/tenants/{id}/approve", "description": "Approve tenant"},
+        {"method": "PUT", "path": "/admin/tenants/{id}/reject", "description": "Reject tenant"},
+        {"method": "GET", "path": "/admin/bookings", "description": "List bookings"},
+        {"method": "GET", "path": "/admin/payments", "description": "List payments"},
+        {"method": "GET", "path": "/admin/cases", "description": "List support cases"},
+        {"method": "PUT", "path": "/admin/cases/{id}/status", "description": "Update case status"},
+        {"method": "GET", "path": "/admin/config/flags", "description": "List feature flags"},
+        {"method": "PUT", "path": "/admin/config/flags/{id}", "description": "Toggle feature flag"}
+      ]
+    },
+    {
+      "module": "provider_dashboard",
+      "base_path": "/provider",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "GET", "path": "/provider/dashboard/stats", "description": "Dashboard stats"},
+        {"method": "GET", "path": "/provider/dashboard/recent-bookings", "description": "Recent bookings"},
+        {"method": "GET", "path": "/provider/bookings", "description": "List bookings"},
+        {"method": "GET", "path": "/provider/bookings/{id}", "description": "Booking detail"},
+        {"method": "PUT", "path": "/provider/bookings/{id}/status", "description": "Update booking status"},
+        {"method": "GET", "path": "/provider/services", "description": "List services"},
+        {"method": "POST", "path": "/provider/services", "description": "Create service"},
+        {"method": "PUT", "path": "/provider/services/{id}", "description": "Update service"},
+        {"method": "DELETE", "path": "/provider/services/{id}", "description": "Delete service"},
+        {"method": "POST", "path": "/provider/staff/invite", "description": "Invite staff"},
+        {"method": "GET", "path": "/provider/customers", "description": "List customers"},
+        {"method": "GET", "path": "/provider/calendar", "description": "Calendar bookings"},
+        {"method": "GET", "path": "/provider/reports", "description": "Reports"},
+        {"method": "GET", "path": "/provider/settings", "description": "Get settings"},
+        {"method": "PUT", "path": "/provider/settings", "description": "Update settings"}
+      ]
+    },
+    {
+      "module": "tenant",
+      "base_path": "/provider/tenant",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "POST", "path": "/provider/tenant", "description": "Create tenant"},
+        {"method": "GET", "path": "/provider/tenant", "description": "List tenants"},
+        {"method": "GET", "path": "/provider/tenant/{id}", "description": "Get tenant"},
+        {"method": "GET", "path": "/provider/tenant/slug/{slug}", "description": "Get by slug"},
+        {"method": "PUT", "path": "/provider/tenant/{id}", "description": "Update tenant"},
+        {"method": "POST", "path": "/provider/tenant/{id}/submit", "description": "Submit for review"},
+        {"method": "POST", "path": "/provider/tenant/{id}/approve", "description": "Approve tenant"},
+        {"method": "POST", "path": "/provider/tenant/{id}/reject", "description": "Reject tenant"},
+        {"method": "POST", "path": "/provider/tenant/{id}/suspend", "description": "Suspend tenant"},
+        {"method": "POST", "path": "/provider/tenant/{id}/reactivate", "description": "Reactivate tenant"},
+        {"method": "POST", "path": "/provider/tenant/{tenantId}/locations", "description": "Create location"},
+        {"method": "GET", "path": "/provider/tenant/{tenantId}/locations", "description": "List locations"},
+        {"method": "PUT", "path": "/provider/locations/{id}", "description": "Update location"}
+      ]
+    },
+    {
+      "module": "booking",
+      "base_path": "/bookings",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "GET", "path": "/bookings", "description": "List bookings"},
+        {"method": "POST", "path": "/bookings/holds", "description": "Create hold"},
+        {"method": "POST", "path": "/bookings", "description": "Confirm booking"},
+        {"method": "GET", "path": "/bookings/{id}", "description": "Get booking"},
+        {"method": "POST", "path": "/bookings/{id}/confirm", "description": "Confirm booking"},
+        {"method": "POST", "path": "/bookings/{id}/reschedule", "description": "Reschedule"},
+        {"method": "POST", "path": "/bookings/{id}/cancel", "description": "Cancel booking"},
+        {"method": "POST", "path": "/bookings/{id}/check-in", "description": "Check in"},
+        {"method": "POST", "path": "/bookings/{id}/start", "description": "Start service"},
+        {"method": "POST", "path": "/bookings/{id}/complete", "description": "Complete"},
+        {"method": "POST", "path": "/bookings/{id}/no-show", "description": "No show"}
+      ]
+    },
+    {
+      "module": "payment",
+      "base_path": "",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "POST", "path": "/bookings/{id}/payment-intents", "description": "Create payment intent"},
+        {"method": "GET", "path": "/payments/{id}", "description": "Get payment"},
+        {"method": "POST", "path": "/webhooks/payments/{provider}", "description": "Payment webhook"}
+      ]
+    },
+    {
+      "module": "notification",
+      "base_path": "/notifications",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "GET", "path": "/notifications", "description": "List notifications"},
+        {"method": "PUT", "path": "/notifications/{id}/read", "description": "Mark read"},
+        {"method": "PUT", "path": "/notifications/read-all", "description": "Mark all read"}
+      ]
+    },
+    {
+      "module": "support",
+      "base_path": "/support/cases",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "POST", "path": "/support/cases", "description": "Create case"},
+        {"method": "GET", "path": "/support/cases/{id}", "description": "Get case"},
+        {"method": "GET", "path": "/support/cases/{id}/events", "description": "Get case events"}
+      ]
+    },
+    {
+      "module": "staff",
+      "base_path": "/provider/staff",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "POST", "path": "/provider/staff", "description": "Invite staff"},
+        {"method": "GET", "path": "/provider/staff", "description": "List staff"},
+        {"method": "PUT", "path": "/provider/staff/{id}", "description": "Update staff"},
+        {"method": "DELETE", "path": "/provider/staff/{id}", "description": "Deactivate staff"},
+        {"method": "POST", "path": "/provider/staff/{id}/schedule", "description": "Add schedule"}
+      ]
+    },
+    {
+      "module": "availability",
+      "base_path": "/availability",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "GET", "path": "/availability", "description": "Get available slots"},
+        {"method": "POST", "path": "/availability/validate", "description": "Validate slot"}
+      ]
+    },
+    {
+      "module": "catalog",
+      "base_path": "",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "POST", "path": "/provider/{tenantId}/services", "description": "Create service"},
+        {"method": "GET", "path": "/provider/{tenantId}/services", "description": "List services"},
+        {"method": "POST", "path": "/provider/services/{id}/publish", "description": "Publish service"},
+        {"method": "POST", "path": "/provider/services/{id}/unpublish", "description": "Unpublish service"},
+        {"method": "GET", "path": "/services/{id}", "description": "Get service public"}
+      ]
+    },
+    {
+      "module": "review",
+      "base_path": "",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "POST", "path": "/bookings/{id}/review", "description": "Create review"},
+        {"method": "POST", "path": "/reviews/{id}/report", "description": "Report review"}
+      ]
+    },
+    {
+      "module": "roles",
+      "base_path": "/roles",
+      "access": "authenticated",
+      "endpoints": [
+        {"method": "GET", "path": "/roles", "description": "List roles"},
+        {"method": "POST", "path": "/roles", "description": "Create role"},
+        {"method": "GET", "path": "/roles/{id}", "description": "Get role"},
+        {"method": "PUT", "path": "/roles/{id}", "description": "Update role"},
+        {"method": "DELETE", "path": "/roles/{id}", "description": "Delete role"},
+        {"method": "POST", "path": "/roles/{id}/permissions", "description": "Add permissions"}
+      ]
+    }
+  ],
+  "summary": {
+    "total_modules": 13,
+    "total_endpoints": 96,
+    "public_endpoints": 15,
+    "authenticated_endpoints": 81
+  },
+  "updated_at": "2026-08-26T10:00:00.000000+00:00"
+}

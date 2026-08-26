@@ -14,7 +14,7 @@ dekat-platform/
 ├── apps/
 │   ├── mobile_customer/     # Flutter customer app (id.dekat.customer)
 │   ├── mobile_partner/      # Flutter partner app (id.dekat.partner)
-│   ├── web_public/          # React public booking (port 3000)
+│   ├── web_public/          # React public booking (port 4100)
 │   ├── web_provider/        # React provider portal (port 3001)
 │   └── web_admin/           # React platform admin (port 3002)
 ├── packages/
@@ -147,9 +147,11 @@ module/
 
 ## Database
 
-- 80+ tables, migrations V0-V14 (Flyway)
+- 80+ tables, migrations V0-V19 (Flyway)
 - V14 includes seed data (roles, permissions, plans, users, tenant, services, bookings)
 - V14 adds `password_hash` column to users table
+- V18 adds `device_info` and `token_family` columns to sessions table
+- V19 fixes `ip_address` type from `inet` to `text` in sessions table (entity uses String)
 - Seed password: `admin123` (BCrypt hashed)
 - Credentials stored in both `users.password_hash` and `credentials` table
 
@@ -224,6 +226,17 @@ pnpm install && pnpm dev
 - Response format: `{ success, data, message }` — handled by `ApiResponse` wrapper
 - Availability slots return `{id,time,startTime,endTime,available}` — startTime is full ISO datetime
 
+### Testing
+- **Total: 358 tests** across 6 platforms, all passing
+- Backend: 72 tests (BookingService, Booking domain, JwtTokenProvider) — JUnit 5 + Mockito
+- web_public: 80 tests (8 files) — Vitest + @testing-library/react
+- web_provider: 58 tests (5 files) — Vitest + @testing-library/react
+- web_admin: 49 tests (5 files) — Vitest + @testing-library/react
+- mobile_customer: 56 tests (models, utils, router) — flutter_test
+- mobile_partner: 31 tests (models, utils) — flutter_test
+- E2E Playwright: 12 tests (web-public runtime proof)
+- Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
+
 ### Backend Runtime (verified 2026-08-25)
 - Migrations V15–V17: bookings status CHECK widened, categories seeded, booking_holds expiry CHECK fixed, hold status CHECK includes CONVERTED/CANCELLED, ghost ddl-auto columns dropped
 - `spring.jpa.hibernate.ddl-auto: none` in ALL profiles — update mode corrupts schema (adds NOT NULL columns to seeded tables)
@@ -232,6 +245,11 @@ pnpm install && pnpm dev
 - Guest booking: `POST /public/bookings` resolves customerId from customerEmail (auto-creates PENDING_VERIFICATION user)
 - Booking flow E2E verified: holds → confirm (`DKT-*` code) → detail → history; anti-overlap rejects conflicting slots with 409/IllegalState
 - Duplicate class warning: sharedkernel module owns outbox trio; java_root/sharedkernel/outbox deleted — never re-create FQCN duplicates between java_root and modules
+
+### Docker Compose (verified 2026-08-26)
+- Always run backend via `docker compose -f infra/compose/compose.local.yaml up -d --build`
+- Sessions table requires V18 (`device_info`, `token_family`) and V19 (`ip_address` type fix) migrations
+- CORS allowed origins in `WebConfig.java`: `localhost:4100, 3001, 3002, 8081, 4101, 4102`
 
 ## Deployment
 

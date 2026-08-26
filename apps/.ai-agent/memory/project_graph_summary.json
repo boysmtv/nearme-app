@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+  "updated_at": "2026-08-24T14:02:53.068338+00:00",
+  "node_count": 1384,
+  "edge_count": 2828,
+  "node_types": {
+    "Class": 79,
+    "Field": 508,
+    "File": 118,
+    "Flow": 3,
+    "Function": 66,
+    "Method": 564,
+    "Module": 42,
+    "Package": 3,
+    "Project": 1
+  },
+  "edge_types": {
+    "DEFINED_IN": 1339,
+    "IMPLEMENTS": 3,
+    "IMPORTS": 204,
+    "PART_OF_FLOW": 23,
+    "USES": 1259
+  },
+  "top_flows": [
+    "add",
+    "login",
+    "logout"
+  ],
+  "top_api_routes": [],
+  "metrics": {
+    "schema_version": 1,
+    "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+    "updated_at": "2026-08-24T14:02:53.010268+00:00",
+    "memory_completeness_score": 0.474,
+    "graph_coverage_score": 1.0,
+    "symbol_extraction_confidence": 1.0,
+    "api_contract_coverage": 1.0,
+    "flow_completeness_score": 1.0,
+    "test_mapping_score": 0.0,
+    "runtime_proof_score": 0.0,
+    "security_readiness_score": 0.4,
+    "hotspot_risk": "low",
+    "blast_radius_risk": "high",
+    "release_readiness_score": 0.629,
+    "release_readiness": "ready"
+  }
+}

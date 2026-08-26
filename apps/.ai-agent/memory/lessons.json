@@ -1,0 +1,43 @@
+{
+  "schema_version": 2,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+  "lessons": [
+    {
+      "id": "L001",
+      "category": "architecture",
+      "lesson": "All Flutter features use presentation-only architecture (no domain/data layers). Business logic is inline in pages or providers.",
+      "impact": "medium",
+      "evidence": "All mobile_customer and mobile_partner features have only presentation/pages/ folders"
+    },
+    {
+      "id": "L002",
+      "category": "testing",
+      "lesson": "Zero test coverage across all platforms. No unit, widget, or integration tests exist.",
+      "impact": "high",
+      "evidence": "completeness_matrix shows test_mapped_requirement_count: 0"
+    },
+    {
+      "id": "L003",
+      "category": "api",
+      "lesson": "Backend has 96 endpoints across 14 controllers. Public endpoints (15) are permitAll, rest require JWT.",
+      "impact": "medium",
+      "evidence": "api_contracts.json shows 13 modules with endpoint details"
+    },
+    {
+      "id": "L004",
+      "category": "gap",
+      "lesson": "Profile edit in mobile_customer is local-only (no API call). Reviews have no create/report UI.",
+      "impact": "low",
+      "evidence": "feature_catalog.json gaps section"
+    },
+    {
+      "id": "L005",
+      "category": "platform",
+      "lesson": "web_public supports guest booking (no auth required). web_provider has 11 booking status states.",
+      "impact": "medium",
+      "evidence": "web_public BookingPage.tsx, web_provider types.ts"
+    }
+  ],
+  "scope": "project",
+  "updated_at": "2026-08-26T10:00:00.000000+00:00"
+}

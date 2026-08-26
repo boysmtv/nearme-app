@@ -1,0 +1,155 @@
+{
+  "flows": [
+    {
+      "name": "auth",
+      "description": "User authentication flow (register, login, OTP, logout)",
+      "platforms": ["mobile_customer", "mobile_partner", "web_public", "web_provider", "web_admin"],
+      "entrypoints": [
+        "mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+        "mobile_customer/lib/features/authentication/presentation/pages/register_page.dart",
+        "mobile_partner/lib/features/authentication/presentation/pages/login_page.dart",
+        "web_public/src/pages/LoginPage.tsx",
+        "web_public/src/pages/RegisterPage.tsx",
+        "web_provider/src/pages/LoginPage.tsx",
+        "web_admin/src/pages/LoginPage.tsx"
+      ],
+      "api_endpoints": [
+        "POST /auth/register",
+        "POST /auth/login",
+        "POST /auth/otp/request",
+        "POST /auth/otp/verify",
+        "POST /auth/refresh",
+        "POST /auth/logout"
+      ],
+      "tests": []
+    },
+    {
+      "name": "discovery",
+      "description": "Provider discovery, search, categories",
+      "platforms": ["mobile_customer", "web_public"],
+      "entrypoints": [
+        "mobile_customer/lib/features/discovery/presentation/pages/discovery_page.dart",
+        "mobile_customer/lib/features/discovery/presentation/pages/search_page.dart",
+        "web_public/src/pages/HomePage.tsx",
+        "web_public/src/pages/SearchPage.tsx"
+      ],
+      "api_endpoints": [
+        "GET /public/categories",
+        "GET /public/providers",
+        "GET /public/providers/featured"
+      ],
+      "tests": []
+    },
+    {
+      "name": "provider_profile",
+      "description": "Provider detail view with services, staff, reviews",
+      "platforms": ["mobile_customer", "web_public"],
+      "entrypoints": [
+        "mobile_customer/lib/features/provider_profile/presentation/pages/provider_detail_page.dart",
+        "web_public/src/pages/ProviderPage.tsx"
+      ],
+      "api_endpoints": [
+        "GET /public/providers/{slug}",
+        "GET /public/providers/{id}/services",
+        "GET /public/providers/{id}/staff",
+        "GET /public/providers/{id}/reviews"
+      ],
+      "tests": []
+    },
+    {
+      "name": "booking",
+      "description": "End-to-end booking flow (hold, confirm, cancel, history)",
+      "platforms": ["mobile_customer", "mobile_partner", "web_public", "web_provider", "web_admin"],
+      "entrypoints": [
+        "mobile_customer/lib/features/booking/presentation/pages/booking_form_page.dart",
+        "mobile_customer/lib/features/booking/presentation/pages/booking_history_page.dart",
+        "mobile_customer/lib/features/booking/presentation/pages/booking_detail_page.dart",
+        "mobile_partner/lib/features/booking_management/presentation/pages/booking_list_page.dart",
+        "mobile_partner/lib/features/booking_management/presentation/pages/booking_detail_page.dart",
+        "web_public/src/pages/BookingPage.tsx",
+        "web_provider/src/pages/CalendarPage.tsx",
+        "web_admin/src/pages/BookingsPage.tsx"
+      ],
+      "api_endpoints": [
+        "POST /bookings/holds",
+        "POST /bookings",
+        "GET /bookings",
+        "GET /bookings/{id}",
+        "POST /bookings/{id}/confirm",
+        "POST /bookings/{id}/cancel",
+        "POST /public/bookings"
+      ],
+      "tests": []
+    },
+    {
+      "name": "payment",
+      "description": "Payment processing and earnings",
+      "platforms": ["mobile_customer", "mobile_partner", "web_admin"],
+      "entrypoints": [
+        "mobile_customer/lib/features/payment/presentation/pages/payment_page.dart",
+        "mobile_partner/lib/features/payment/presentation/pages/earnings_page.dart",
+        "web_admin/src/pages/PaymentsPage.tsx"
+      ],
+      "api_endpoints": [
+        "POST /bookings/{id}/payment-intents",
+        "GET /payments/{id}"
+      ],
+      "tests": []
+    },
+    {
+      "name": "provider_management",
+      "description": "Provider dashboard, services, staff, calendar, reports, settings",
+      "platforms": ["mobile_partner", "web_provider"],
+      "entrypoints": [
+        "mobile_partner/lib/features/payment/presentation/pages/earnings_page.dart",
+        "mobile_partner/lib/features/calendar/presentation/pages/calendar_page.dart",
+        "mobile_partner/lib/features/staff_management/presentation/pages/staff_list_page.dart",
+        "mobile_partner/lib/features/reports/presentation/pages/reports_page.dart",
+        "web_provider/src/pages/DashboardPage.tsx",
+        "web_provider/src/pages/ServicesPage.tsx",
+        "web_provider/src/pages/StaffPage.tsx",
+        "web_provider/src/pages/CalendarPage.tsx",
+        "web_provider/src/pages/ReportsPage.tsx",
+        "web_provider/src/pages/CustomersPage.tsx",
+        "web_provider/src/pages/SettingsPage.tsx"
+      ],
+      "api_endpoints": [
+        "GET /provider/dashboard/stats",
+        "GET /provider/services",
+        "POST /provider/services",
+        "GET /provider/staff",
+        "POST /provider/staff",
+        "GET /provider/calendar",
+        "GET /provider/reports",
+        "GET /provider/settings",
+        "PUT /provider/settings"
+      ],
+      "tests": []
+    },
+    {
+      "name": "admin_management",
+      "description": "Platform admin: users, tenants, cases, config",
+      "platforms": ["web_admin"],
+      "entrypoints": [
+        "web_admin/src/pages/DashboardPage.tsx",
+        "web_admin/src/pages/UsersPage.tsx",
+        "web_admin/src/pages/TenantsPage.tsx",
+        "web_admin/src/pages/CasesPage.tsx",
+        "web_admin/src/pages/ConfigPage.tsx"
+      ],
+      "api_endpoints": [
+        "GET /admin/dashboard/stats",
+        "GET /admin/users",
+        "PUT /admin/users/{id}/status",
+        "GET /admin/tenants",
+        "PUT /admin/tenants/{id}/approve",
+        "GET /admin/cases",
+        "PUT /admin/cases/{id}/status",
+        "GET /admin/config/flags",
+        "PUT /admin/config/flags/{id}"
+      ],
+      "tests": []
+    }
+  ],
+  "updated_at": "2026-08-26T10:00:00.000000+00:00"
+}

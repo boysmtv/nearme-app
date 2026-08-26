@@ -1,0 +1,443 @@
+{
+  "schema_version": 2,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
+  "updated_at": "2026-08-26T10:00:00.000000+00:00",
+  "status": "active",
+  "rows": [
+    {
+      "requirement": "auth",
+      "description": "User registration, login, OTP, logout, token management",
+      "acceptance_criteria": [
+        "User can register with email/password",
+        "User can login with email/password or OTP",
+        "User can logout and tokens are invalidated",
+        "Access tokens are refreshed automatically"
+      ],
+      "platforms": ["mobile_customer", "mobile_partner", "web_public", "web_provider", "web_admin"],
+      "api_endpoints": [
+        "POST /auth/register",
+        "POST /auth/login",
+        "POST /auth/otp/request",
+        "POST /auth/otp/verify",
+        "POST /auth/refresh",
+        "POST /auth/logout"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:auth"}]
+    },
+    {
+      "requirement": "discovery",
+      "description": "Provider browsing, search, categories, featured listings",
+      "acceptance_criteria": [
+        "User can browse categories",
+        "User can view featured providers",
+        "User can search providers with filters"
+      ],
+      "platforms": ["mobile_customer", "web_public"],
+      "api_endpoints": [
+        "GET /public/categories",
+        "GET /public/providers",
+        "GET /public/providers/featured"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:discovery"}]
+    },
+    {
+      "requirement": "provider_profile",
+      "description": "Provider detail view, services, staff, reviews, operating hours",
+      "acceptance_criteria": [
+        "User can view provider detail by slug",
+        "User can view provider services",
+        "User can view provider staff",
+        "User can view provider reviews"
+      ],
+      "platforms": ["mobile_customer", "web_public"],
+      "api_endpoints": [
+        "GET /public/providers/{slug}",
+        "GET /public/providers/{id}/services",
+        "GET /public/providers/{id}/staff",
+        "GET /public/providers/{id}/reviews"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:provider_profile"}]
+    },
+    {
+      "requirement": "availability",
+      "description": "Time slot display, calendar selection, availability checking",
+      "acceptance_criteria": [
+        "User can select a date and view available slots",
+        "Slots show available/unavailable state",
+        "Availability is validated against backend"
+      ],
+      "platforms": ["mobile_customer", "web_public"],
+      "api_endpoints": [
+        "GET /public/providers/{id}/availability",
+        "GET /availability",
+        "POST /availability/validate"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:availability"}]
+    },
+    {
+      "requirement": "booking",
+      "description": "Booking creation, confirmation, cancellation, history, detail view",
+      "acceptance_criteria": [
+        "Customer can create a booking (hold + confirm)",
+        "Customer can view booking history with filters",
+        "Customer can view booking detail",
+        "Customer can cancel a booking",
+        "Provider can accept/decline bookings",
+        "Provider can view bookings in calendar",
+        "Admin can view all platform bookings"
+      ],
+      "platforms": ["mobile_customer", "mobile_partner", "web_public", "web_provider", "web_admin"],
+      "api_endpoints": [
+        "POST /bookings/holds",
+        "POST /bookings",
+        "GET /bookings",
+        "GET /bookings/{id}",
+        "POST /bookings/{id}/confirm",
+        "POST /bookings/{id}/cancel",
+        "POST /bookings/{id}/reschedule",
+        "POST /bookings/{id}/check-in",
+        "POST /bookings/{id}/start",
+        "POST /bookings/{id}/complete",
+        "POST /bookings/{id}/no-show",
+        "POST /public/bookings"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:booking"}]
+    },
+    {
+      "requirement": "payment",
+      "description": "Payment intent creation, payment methods, success confirmation",
+      "acceptance_criteria": [
+        "Customer can select payment method",
+        "Payment intent is created via API",
+        "Payment success is confirmed",
+        "Provider can view earnings",
+        "Admin can view all payments"
+      ],
+      "platforms": ["mobile_customer", "mobile_partner", "web_admin"],
+      "api_endpoints": [
+        "POST /bookings/{id}/payment-intents",
+        "GET /payments/{id}",
+        "POST /webhooks/payments/{provider}"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:payment"}]
+    },
+    {
+      "requirement": "notification",
+      "description": "Notification list, mark read, badge count",
+      "acceptance_criteria": [
+        "User can view notification list",
+        "User can mark individual notification as read",
+        "User can mark all notifications as read",
+        "Badge shows unread count"
+      ],
+      "platforms": ["mobile_customer"],
+      "api_endpoints": [
+        "GET /notifications",
+        "PUT /notifications/{id}/read",
+        "PUT /notifications/read-all"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:notification"}]
+    },
+    {
+      "requirement": "support",
+      "description": "Support ticket submission, case management, SLA tracking",
+      "acceptance_criteria": [
+        "Customer can submit support ticket",
+        "Admin can view and manage cases",
+        "Admin can take/resolve cases"
+      ],
+      "platforms": ["mobile_customer", "web_admin"],
+      "api_endpoints": [
+        "POST /support/cases",
+        "GET /support/cases/{id}",
+        "GET /support/cases/{id}/events"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:support"}]
+    },
+    {
+      "requirement": "account",
+      "description": "Profile viewing, editing, account menu",
+      "acceptance_criteria": [
+        "User can view profile",
+        "User can edit profile"
+      ],
+      "platforms": ["mobile_customer"],
+      "api_endpoints": [],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "partial",
+      "notes": "Profile edit is local-only, no backend API call",
+      "evidence": [{"path": "feature_catalog.json:account"}]
+    },
+    {
+      "requirement": "provider_dashboard",
+      "description": "Provider stats, recent bookings, quick actions",
+      "acceptance_criteria": [
+        "Provider can view today's stats",
+        "Provider can view weekly revenue",
+        "Provider can see recent bookings"
+      ],
+      "platforms": ["mobile_partner", "web_provider"],
+      "api_endpoints": [
+        "GET /provider/dashboard/stats",
+        "GET /provider/dashboard/recent-bookings"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:provider_dashboard"}]
+    },
+    {
+      "requirement": "provider_services",
+      "description": "Service CRUD, categories, pricing, addons",
+      "acceptance_criteria": [
+        "Provider can list services",
+        "Provider can create/edit/delete services",
+        "Provider can toggle service active status"
+      ],
+      "platforms": ["web_provider"],
+      "api_endpoints": [
+        "GET /provider/services",
+        "POST /provider/services",
+        "PUT /provider/services/{id}",
+        "DELETE /provider/services/{id}"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:provider_services"}]
+    },
+    {
+      "requirement": "staff_management",
+      "description": "Staff listing, invite, activate/deactivate, schedules",
+      "acceptance_criteria": [
+        "Provider can list staff",
+        "Provider can invite/add staff",
+        "Provider can activate/deactivate staff"
+      ],
+      "platforms": ["mobile_partner", "web_provider"],
+      "api_endpoints": [
+        "GET /provider/staff",
+        "POST /provider/staff",
+        "PUT /provider/staff/{id}",
+        "DELETE /provider/staff/{id}",
+        "POST /provider/staff/{id}/schedule"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:staff_management"}]
+    },
+    {
+      "requirement": "calendar",
+      "description": "Calendar-based booking visualization (week/month views)",
+      "acceptance_criteria": [
+        "Provider can view bookings in calendar",
+        "Provider can switch week/month views",
+        "Bookings show color-coded status"
+      ],
+      "platforms": ["mobile_partner", "web_provider"],
+      "api_endpoints": [
+        "GET /provider/calendar"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:calendar"}]
+    },
+    {
+      "requirement": "reports",
+      "description": "Revenue reports, booking analytics, staff utilization",
+      "acceptance_criteria": [
+        "Provider can view monthly reports",
+        "Provider can see revenue charts",
+        "Provider can see staff utilization"
+      ],
+      "platforms": ["mobile_partner", "web_provider"],
+      "api_endpoints": [
+        "GET /provider/reports",
+        "GET /provider/reports/export"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:reports"}]
+    },
+    {
+      "requirement": "customers",
+      "description": "Customer listing, search, booking history per customer",
+      "acceptance_criteria": [
+        "Provider can list customers",
+        "Provider can search customers",
+        "Provider can see customer booking history"
+      ],
+      "platforms": ["web_provider"],
+      "api_endpoints": [
+        "GET /provider/customers"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:customers"}]
+    },
+    {
+      "requirement": "settings",
+      "description": "Business profile, operating hours, booking policy, notification preferences",
+      "acceptance_criteria": [
+        "Provider can view/edit business profile",
+        "Provider can set operating hours",
+        "Provider can configure booking policy"
+      ],
+      "platforms": ["web_provider"],
+      "api_endpoints": [
+        "GET /provider/settings",
+        "PUT /provider/settings"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:settings"}]
+    },
+    {
+      "requirement": "tenant_management",
+      "description": "Tenant CRUD, verification workflow, location management",
+      "acceptance_criteria": [
+        "Admin can list tenants",
+        "Admin can approve/reject tenants",
+        "Provider can create/manage tenants"
+      ],
+      "platforms": ["web_admin"],
+      "api_endpoints": [
+        "POST /provider/tenant",
+        "GET /provider/tenant",
+        "GET /provider/tenant/{id}",
+        "PUT /provider/tenant/{id}",
+        "POST /provider/tenant/{id}/submit",
+        "POST /provider/tenant/{id}/approve",
+        "POST /provider/tenant/{id}/reject"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:tenant_management"}]
+    },
+    {
+      "requirement": "user_management",
+      "description": "User listing, suspend/reactivate, role management",
+      "acceptance_criteria": [
+        "Admin can list users",
+        "Admin can suspend/reactivate users",
+        "Admin can manage roles"
+      ],
+      "platforms": ["web_admin"],
+      "api_endpoints": [
+        "GET /admin/users",
+        "PUT /admin/users/{id}/status",
+        "GET /roles",
+        "POST /roles"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:user_management"}]
+    },
+    {
+      "requirement": "admin_dashboard",
+      "description": "Platform-wide stats, recent bookings, open cases",
+      "acceptance_criteria": [
+        "Admin can view platform stats",
+        "Admin can see recent bookings",
+        "Admin can see open cases"
+      ],
+      "platforms": ["web_admin"],
+      "api_endpoints": [
+        "GET /admin/dashboard/stats"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:admin_dashboard"}]
+    },
+    {
+      "requirement": "feature_flags",
+      "description": "Feature flag listing and toggling",
+      "acceptance_criteria": [
+        "Admin can list feature flags",
+        "Admin can toggle flags"
+      ],
+      "platforms": ["web_admin"],
+      "api_endpoints": [
+        "GET /admin/config/flags",
+        "PUT /admin/config/flags/{id}"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "implemented",
+      "evidence": [{"path": "feature_catalog.json:feature_flags"}]
+    },
+    {
+      "requirement": "reviews",
+      "description": "Review creation, reporting, moderation",
+      "acceptance_criteria": [
+        "User can create review for completed booking",
+        "User can report a review"
+      ],
+      "platforms": ["web_public"],
+      "api_endpoints": [
+        "POST /bookings/{id}/review",
+        "POST /reviews/{id}/report"
+      ],
+      "tests": [],
+      "runtime_proof": [],
+      "status": "read_only",
+      "notes": "Reviews displayed on provider page, no create/report UI yet",
+      "evidence": [{"path": "feature_catalog.json:reviews"}]
+    }
+  ],
+  "blockers": [
+    {
+      "requirement": "account",
+      "reason": "profile_edit_is_local_only_no_api"
+    },
+    {
+      "requirement": "reviews",
+      "reason": "no_create_or_report_ui"
+    }
+  ],
+  "release_readiness": {
+    "blocked": false,
+    "blocking_rules": []
+  },
+  "coverage": {
+    "requirement_count": 21,
+    "implemented_count": 19,
+    "partial_count": 1,
+    "read_only_count": 1,
+    "test_mapped_requirement_count": 0,
+    "implementation_percentage": 90.5
+  }
+}
