@@ -15,7 +15,7 @@ class AccountPage extends ConsumerWidget {
         children: [
           Container(
             padding: const EdgeInsets.all(24),
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
             child: Row(children: [
               CircleAvatar(
                 radius: 40,

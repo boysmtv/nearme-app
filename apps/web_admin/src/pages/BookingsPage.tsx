@@ -34,7 +34,7 @@ export default function BookingsPage() {
           <option value="">Semua Status</option>
           {['CONFIRMED','PENDING_PAYMENT','PENDING_APPROVAL','COMPLETED','CANCELLED','NO_SHOW'].map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
-        <DataTable columns={columns} data={res?.data ?? []} pagination={res?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada booking" />
+        <DataTable columns={columns} data={res?.data?.data ?? []} pagination={res?.data?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada booking" />
       </div>
     </AdminLayout>
   );

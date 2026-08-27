@@ -10,12 +10,13 @@ public class ServiceAddon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "service_id", nullable = false)
     private UUID serviceId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "price_amount", precision = 12, scale = 2)

@@ -8,8 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,46 +15,37 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class SupportService {
 
-    private static final int SLA_LOW_HOURS = 72;
-    private static final int SLA_MEDIUM_HOURS = 48;
-    private static final int SLA_HIGH_HOURS = 24;
-    private static final int SLA_URGENT_HOURS = 8;
-
     private final SupportRepository supportRepository;
     private final CaseEventRepository caseEventRepository;
 
     @Transactional
-    public SupportCase createCase(UUID tenantId, UUID bookingId, UUID reporterId,
-                                   SupportCase.CaseType caseType, SupportCase.CaseSeverity severity) {
-        if (caseType == null) {
-            throw new IllegalArgumentException("Case type is required");
+    public SupportCase createCase(UUID tenantId, UUID customerId, String subject,
+                                   SupportCase.CasePriority priority) {
+        if (subject == null || subject.isBlank()) {
+            throw new IllegalArgumentException("Subject is required");
         }
-        if (severity == null) {
-            severity = SupportCase.CaseSeverity.MEDIUM;
+        if (priority == null) {
+            priority = SupportCase.CasePriority.MEDIUM;
         }
-
-        int slaHours = getSlaHours(severity);
 
         SupportCase supportCase = SupportCase.builder()
                 .tenantId(tenantId)
-                .bookingId(bookingId)
-                .reporterId(reporterId)
-                .caseType(caseType)
-                .severity(severity)
+                .customerId(customerId)
+                .subject(subject)
+                .priority(priority)
                 .status(SupportCase.CaseStatus.OPEN)
-                .slaDeadline(Instant.now().plus(slaHours, ChronoUnit.HOURS))
                 .build();
 
         SupportCase saved = supportRepository.save(supportCase);
 
-        addEvent(saved.getId(), reporterId, CaseEvent.EventAction.CREATED,
-                "Case created with severity: " + severity + ", SLA: " + slaHours + "h");
+        addEvent(saved.getId(), customerId, "CREATED",
+                "Case created with priority: " + priority);
 
         return saved;
     }
 
     @Transactional
-    public CaseEvent addEvent(UUID caseId, UUID actorId, CaseEvent.EventAction action, String details) {
+    public CaseEvent addEvent(UUID caseId, UUID actorId, String eventType, String body) {
         SupportCase supportCase = supportRepository.findById(caseId)
                 .orElseThrow(() -> new IllegalArgumentException("Case not found: " + caseId));
 
@@ -67,8 +56,8 @@ public class SupportService {
         CaseEvent event = CaseEvent.builder()
                 .caseId(caseId)
                 .actorId(actorId)
-                .action(action)
-                .details(details)
+                .eventType(eventType)
+                .body(body)
                 .build();
 
         return caseEventRepository.save(event);
@@ -87,11 +76,10 @@ public class SupportService {
         }
 
         supportCase.setStatus(SupportCase.CaseStatus.RESOLVED);
-        supportCase.setResolvedAt(Instant.now());
 
         SupportCase saved = supportRepository.save(supportCase);
 
-        addEvent(caseId, resolverId, CaseEvent.EventAction.RESOLVE, "Case resolved");
+        addEvent(caseId, resolverId, "RESOLVE", "Case resolved");
 
         return saved;
     }
@@ -106,33 +94,31 @@ public class SupportService {
             throw new IllegalStateException("Cannot escalate a resolved or closed case");
         }
 
-        SupportCase.CaseSeverity newSeverity = escalateSeverity(supportCase.getSeverity());
-        int newSlaHours = getSlaHours(newSeverity);
+        SupportCase.CasePriority newPriority = escalatePriority(supportCase.getPriority());
 
-        supportCase.setStatus(SupportCase.CaseStatus.ESCALATED);
-        supportCase.setSeverity(newSeverity);
-        supportCase.setSlaDeadline(Instant.now().plus(newSlaHours, ChronoUnit.HOURS));
+        supportCase.setStatus(SupportCase.CaseStatus.IN_PROGRESS);
+        supportCase.setPriority(newPriority);
 
         SupportCase saved = supportRepository.save(supportCase);
 
-        addEvent(caseId, escalatorId, CaseEvent.EventAction.ESCALATE,
-                "Escalated to severity: " + newSeverity + ". Reason: " + reason);
+        addEvent(caseId, escalatorId, "ESCALATE",
+                "Escalated to priority: " + newPriority + ". Reason: " + reason);
 
         return saved;
     }
 
     @Transactional
-    public SupportCase assignCase(UUID caseId, UUID ownerId, UUID assignerId) {
+    public SupportCase assignCase(UUID caseId, UUID assignedTo, UUID assignerId) {
         SupportCase supportCase = supportRepository.findById(caseId)
                 .orElseThrow(() -> new IllegalArgumentException("Case not found: " + caseId));
 
-        supportCase.setOwnerId(ownerId);
+        supportCase.setAssignedTo(assignedTo);
         supportCase.setStatus(SupportCase.CaseStatus.IN_PROGRESS);
 
         SupportCase saved = supportRepository.save(supportCase);
 
-        addEvent(caseId, assignerId, CaseEvent.EventAction.ASSIGN,
-                "Case assigned to owner: " + ownerId);
+        addEvent(caseId, assignerId, "ASSIGN",
+                "Case assigned to: " + assignedTo);
 
         return saved;
     }
@@ -150,7 +136,7 @@ public class SupportService {
 
         SupportCase saved = supportRepository.save(supportCase);
 
-        addEvent(caseId, closerId, CaseEvent.EventAction.CLOSE, "Case closed");
+        addEvent(caseId, closerId, "CLOSE", "Case closed");
 
         return saved;
     }
@@ -166,24 +152,15 @@ public class SupportService {
     }
 
     @Transactional(readOnly = true)
-    public List<SupportCase> getCasesByOwner(UUID ownerId) {
-        return supportRepository.findByOwnerIdAndStatus(ownerId, SupportCase.CaseStatus.IN_PROGRESS);
+    public List<SupportCase> getCasesByAssignee(UUID assignedTo) {
+        return supportRepository.findByAssignedTo(assignedTo);
     }
 
-    private int getSlaHours(SupportCase.CaseSeverity severity) {
-        return switch (severity) {
-            case LOW -> SLA_LOW_HOURS;
-            case MEDIUM -> SLA_MEDIUM_HOURS;
-            case HIGH -> SLA_HIGH_HOURS;
-            case URGENT -> SLA_URGENT_HOURS;
-        };
-    }
-
-    private SupportCase.CaseSeverity escalateSeverity(SupportCase.CaseSeverity current) {
+    private SupportCase.CasePriority escalatePriority(SupportCase.CasePriority current) {
         return switch (current) {
-            case LOW -> SupportCase.CaseSeverity.MEDIUM;
-            case MEDIUM -> SupportCase.CaseSeverity.HIGH;
-            case HIGH, URGENT -> SupportCase.CaseSeverity.URGENT;
+            case LOW -> SupportCase.CasePriority.MEDIUM;
+            case MEDIUM -> SupportCase.CasePriority.HIGH;
+            case HIGH, URGENT -> SupportCase.CasePriority.URGENT;
         };
     }
 }

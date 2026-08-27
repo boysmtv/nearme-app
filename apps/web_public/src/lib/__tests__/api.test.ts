@@ -91,7 +91,7 @@ describe('publicApi', () => {
 
       const [url] = mockFetch.mock.calls[0];
       expect(url).toContain('/public/providers?');
-      expect(url).toContain('query=barbershop');
+      expect(url).toContain('q=barbershop');
       expect(url).toContain('page=1');
       expect(url).toContain('limit=10');
     });
@@ -153,9 +153,8 @@ describe('publicApi', () => {
       const bookingData = {
         providerId: 'prov-1',
         serviceId: 'svc-1',
-        staffId: 'staff-1',
-        slotId: 'slot-1',
-        addons: [],
+        startsAt: '2026-08-27T10:00:00+07:00',
+        endsAt: '2026-08-27T11:00:00+07:00',
         customerName: 'Budi',
         customerEmail: 'budi@test.com',
         customerPhone: '081234567890',

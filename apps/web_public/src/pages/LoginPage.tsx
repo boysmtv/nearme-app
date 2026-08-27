@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { useMutation } from '@tanstack/react-query';
-import { publicApi } from '../lib/api';
+import { useAuth } from '../lib/auth';
 
 const loginSchema = z.object({
   email: z.string().email('Email tidak valid'),
@@ -14,7 +13,7 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const navigate = useNavigate();
+  const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   const {
@@ -25,21 +24,13 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const loginMutation = useMutation({
-    mutationFn: (data: LoginFormData) => publicApi.auth.login(data.email, data.password),
-    onSuccess: (res) => {
-      localStorage.setItem('auth_token', res.data.accessToken);
-      localStorage.setItem('auth_refresh', res.data.refreshToken);
-      navigate('/');
-    },
-    onError: () => {
-      setError('Email atau password salah');
-    },
-  });
-
-  const onSubmit = (data: LoginFormData) => {
+  const onSubmit = async (data: LoginFormData) => {
     setError(null);
-    loginMutation.mutate(data);
+    try {
+      await login(data.email, data.password);
+    } catch {
+      setError('Email atau password salah');
+    }
   };
 
   return (

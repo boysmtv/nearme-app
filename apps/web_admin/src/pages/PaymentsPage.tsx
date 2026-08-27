@@ -34,7 +34,7 @@ export default function PaymentsPage() {
           <option value="">Semua Status</option>
           {['PENDING','PAID','FAILED','REFUNDED','EXPIRED','CANCELLED'].map((s) => <option key={s} value={s}>{s}</option>)}
         </select>
-        <DataTable columns={columns} data={res?.data ?? []} pagination={res?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada pembayaran" />
+        <DataTable columns={columns} data={res?.data?.data ?? []} pagination={res?.data?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada pembayaran" />
       </div>
     </AdminLayout>
   );

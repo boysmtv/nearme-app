@@ -33,7 +33,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
           itemBuilder: (context, i) {
             final step = _steps[i];
             return Padding(padding: const EdgeInsets.all(32), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Container(width: 120, height: 120, decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), shape: BoxShape.circle),
+              Container(width: 120, height: 120, decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), shape: BoxShape.circle),
                 child: Icon(step.icon, size: 60, color: Theme.of(context).colorScheme.primary)),
               const SizedBox(height: 32),
               Text(step.title, textAlign: TextAlign.center, style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),

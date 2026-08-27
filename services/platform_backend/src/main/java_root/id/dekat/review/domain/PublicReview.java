@@ -13,6 +13,7 @@ public class PublicReview {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "booking_id", nullable = false)
@@ -24,17 +25,17 @@ public class PublicReview {
     @Column(name = "customer_id", nullable = false)
     private UUID customerId;
 
-    @Column(nullable = false)
+    @Column(name = "rating", nullable = false)
     private Integer rating;
 
-    @Column(length = 255)
+    @Column(name = "title", length = 255)
     private String title;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "body", columnDefinition = "TEXT")
     private String body;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private ReviewStatus status = ReviewStatus.PUBLISHED;
 
     public enum ReviewStatus {

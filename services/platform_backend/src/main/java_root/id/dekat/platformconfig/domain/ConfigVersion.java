@@ -17,6 +17,7 @@ public class ConfigVersion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "config_key", nullable = false)
@@ -26,7 +27,7 @@ public class ConfigVersion {
     @Column(name = "config_value", nullable = false, columnDefinition = "jsonb")
     private Map<String, Object> configValue = new HashMap<>();
 
-    @Column(nullable = false)
+    @Column(name = "version", nullable = false)
     private Integer version = 1;
 
     @Column(name = "created_by", nullable = false)

@@ -9,7 +9,7 @@ import java.util.UUID;
 @Repository
 public interface NotificationTemplateRepository extends JpaRepository<NotificationTemplate, UUID> {
 
-    Optional<NotificationTemplate> findByCode(String code);
+    Optional<NotificationTemplate> findByEventTypeAndChannelAndLocale(String eventType, String channel, String locale);
 
-    Optional<NotificationTemplate> findByCodeAndActiveTrue(String code);
+    Optional<NotificationTemplate> findByEventType(String eventType);
 }

@@ -5,8 +5,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -30,29 +28,11 @@ public class SubscriptionService {
         Plan currentPlan = planRepository.findById(subscription.getPlanId())
                 .orElseThrow(() -> new IllegalArgumentException("Current plan not found"));
 
-        // Validate upgrade/downgrade limits
         if (newPlan.getMaxStaff() < currentPlan.getMaxStaff()) {
             // Downgrading - check if current staff count exceeds new limit
-            // This would require staff count check against StaffRepository
-        }
-
-        // Calculate proration
-        long remainingDays = ChronoUnit.DAYS.between(
-                Instant.now(), subscription.getCurrentPeriodEnd()
-        );
-        long totalDays = ChronoUnit.DAYS.between(
-                subscription.getCurrentPeriodStart(), subscription.getCurrentPeriodEnd()
-        );
-
-        BigDecimal proratedCredit = BigDecimal.ZERO;
-        if (totalDays > 0 && remainingDays > 0) {
-            BigDecimal dailyCurrentRate = currentPlan.getPriceAmount()
-                    .divide(BigDecimal.valueOf(totalDays), 10, RoundingMode.HALF_UP);
-            proratedCredit = dailyCurrentRate.multiply(BigDecimal.valueOf(remainingDays));
         }
 
         subscription.setPlanId(newPlanId);
-        subscription.setUsedBookingsThisPeriod(0);
 
         return subscriptionRepository.save(subscription);
     }
@@ -62,11 +42,10 @@ public class SubscriptionService {
         Subscription subscription = subscriptionRepository.findActiveSubscription(tenantId)
                 .orElseThrow(() -> new IllegalArgumentException("No active subscription found for tenant: " + tenantId));
 
-        if (subscription.getStatus() == Subscription.SubscriptionStatus.CANCELED) {
+        if (subscription.getStatus() == Subscription.SubscriptionStatus.CANCELLED) {
             throw new IllegalStateException("Subscription is already cancelled");
         }
 
-        // Set cancel_at to end of current period - maintain access until then
         subscription.setCancelAt(subscription.getCurrentPeriodEnd());
 
         return subscriptionRepository.save(subscription);
@@ -75,11 +54,10 @@ public class SubscriptionService {
     @Transactional
     public Subscription reactivateSubscription(UUID tenantId) {
         Subscription subscription = subscriptionRepository.findByTenantIdAndStatus(
-                tenantId, Subscription.SubscriptionStatus.CANCELED)
+                tenantId, Subscription.SubscriptionStatus.CANCELLED)
                 .orElseThrow(() -> new IllegalArgumentException("No cancelled subscription found"));
 
         if (subscription.getCancelAt() != null && Instant.now().isBefore(subscription.getCancelAt())) {
-            // Reactivate before cancellation takes effect
             subscription.setCancelAt(null);
             subscription.setStatus(Subscription.SubscriptionStatus.ACTIVE);
             return subscriptionRepository.save(subscription);
@@ -97,8 +75,7 @@ public class SubscriptionService {
             return false;
         }
 
-        // Check if subscription is cancelled but still in access period
-        if (subscription.getStatus() == Subscription.SubscriptionStatus.CANCELED) {
+        if (subscription.getStatus() == Subscription.SubscriptionStatus.CANCELLED) {
             if (subscription.getCancelAt() != null && Instant.now().isAfter(subscription.getCancelAt())) {
                 return false;
             }
@@ -109,40 +86,15 @@ public class SubscriptionService {
             return false;
         }
 
-        // Check feature-specific entitlements
-        if ("bookings".equals(feature)) {
-            return subscription.getUsedBookingsThisPeriod() < plan.getMaxBookingsPerMonth();
-        }
-
         if ("staff".equals(feature)) {
-            // Would need to check current staff count against plan.getMaxStaff()
             return true;
         }
 
-        // Check if feature string is in plan's features JSON
         if (plan.getFeatures() != null) {
             return plan.getFeatures().contains(feature);
         }
 
         return false;
-    }
-
-    @Transactional
-    public Subscription incrementUsage(UUID tenantId) {
-        Subscription subscription = subscriptionRepository.findActiveSubscription(tenantId)
-                .orElseThrow(() -> new IllegalArgumentException("No active subscription found"));
-
-        Plan plan = planRepository.findById(subscription.getPlanId())
-                .orElseThrow(() -> new IllegalArgumentException("Plan not found"));
-
-        if (subscription.getUsedBookingsThisPeriod() >= plan.getMaxBookingsPerMonth()) {
-            throw new IllegalStateException(
-                "Booking limit reached for current period. Limit: " + plan.getMaxBookingsPerMonth()
-            );
-        }
-
-        subscription.setUsedBookingsThisPeriod(subscription.getUsedBookingsThisPeriod() + 1);
-        return subscriptionRepository.save(subscription);
     }
 
     @Transactional(readOnly = true)
@@ -171,7 +123,6 @@ public class SubscriptionService {
                 .status(Subscription.SubscriptionStatus.ACTIVE)
                 .currentPeriodStart(now)
                 .currentPeriodEnd(periodEnd)
-                .usedBookingsThisPeriod(0)
                 .build();
 
         return subscriptionRepository.save(subscription);
@@ -186,7 +137,7 @@ public class SubscriptionService {
                 .toList();
 
         for (Subscription sub : subscriptions) {
-            sub.setStatus(Subscription.SubscriptionStatus.CANCELED);
+            sub.setStatus(Subscription.SubscriptionStatus.CANCELLED);
             subscriptionRepository.save(sub);
         }
     }

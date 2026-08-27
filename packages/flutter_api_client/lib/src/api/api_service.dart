@@ -34,7 +34,7 @@ class ApiService {
   }
 
   Future<Response> refreshToken(String refreshToken) {
-    return _dio.post(Endpoints.refreshToken, data: {'refresh_token': refreshToken});
+    return _dio.post(Endpoints.refreshToken, queryParameters: {'refreshToken': refreshToken});
   }
 
   Future<Response> logout() {

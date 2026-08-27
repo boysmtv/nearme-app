@@ -52,7 +52,7 @@ export default function DashboardPage() {
                 <StatsCard key="today" label="Booking Hari Ini" value={stats?.todayBookings ?? 0} icon="calendar" color="blue" />,
                 <StatsCard key="revenue" label="Pendapatan Minggu Ini" value={formatPrice(stats?.weekRevenue ?? 0)} icon="currency" color="green" />,
                 <StatsCard key="customers" label="Total Pelanggan" value={stats?.totalCustomers ?? 0} icon="users" color="purple" />,
-                <StatsCard key="rating" label="Rating Rata-rata" value={stats?.averageRating?.toFixed(1) ?? '-'} icon="star" color="amber" />,
+                <StatsCard key="rating" label="Rating Rata-rata" value={(stats?.avgRating)?.toFixed(1) ?? '-'} icon="star" color="amber" />,
               ]}
         </div>
 
@@ -94,9 +94,9 @@ export default function DashboardPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">{formatPrice(booking.totalAmount)}</p>
+                        <p className="text-sm font-medium text-gray-900">{formatPrice(booking.amount ?? 0)}</p>
                         <p className="text-xs text-gray-500">
-                          {new Date(booking.startTime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                          {booking.time ?? '-'}
                         </p>
                       </div>
                     </div>

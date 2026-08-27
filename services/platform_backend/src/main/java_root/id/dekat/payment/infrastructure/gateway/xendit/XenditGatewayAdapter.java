@@ -109,7 +109,7 @@ public class XenditGatewayAdapter implements PaymentGatewayPort {
         HttpHeaders headers = createAuthHeaders();
         Map<String, Object> body = new HashMap<>();
         body.put("invoice_id", request.getReferenceId());
-        body.put("amount", request.getAmount().toPlainString());
+        body.put("amount", request.getAmount().toString());
         body.put("reason", request.getReason() != null ? request.getReason() : "Refund requested");
 
         try {
@@ -180,7 +180,7 @@ public class XenditGatewayAdapter implements PaymentGatewayPort {
             String mappedStatus = mapXenditStatus(status);
             return WebhookEvent.builder()
                     .eventType(eventType).orderId(externalId).referenceId(id != null ? id : externalId)
-                    .status(mappedStatus).amount(amount).signature(payload).timestamp(createdAt).build();
+                    .status(mappedStatus).amount(amount != null ? amount.intValue() : null).signature(payload).timestamp(createdAt).build();
         } catch (Exception e) {
             log.error("Failed to parse Xendit webhook event", e);
             throw new RuntimeException("Invalid Xendit webhook payload", e);
@@ -190,7 +190,7 @@ public class XenditGatewayAdapter implements PaymentGatewayPort {
     private Map<String, Object> buildInvoiceBody(CreateTransactionRequest request) {
         Map<String, Object> body = new HashMap<>();
         body.put("external_id", request.getOrderId());
-        body.put("amount", request.getAmount().toPlainString());
+        body.put("amount", request.getAmount().toString());
         body.put("currency", request.getCurrency() != null ? request.getCurrency() : "IDR");
 
         if (request.getCustomerName() != null) {
@@ -210,7 +210,7 @@ public class XenditGatewayAdapter implements PaymentGatewayPort {
                 items.add(Map.of(
                         "id", item.getId(),
                         "name", item.getName(),
-                        "price", item.getPrice().toPlainString(),
+                        "price", item.getPrice().toString(),
                         "quantity", item.getQuantity()
                 ));
             }
@@ -218,7 +218,7 @@ public class XenditGatewayAdapter implements PaymentGatewayPort {
             items.add(Map.of(
                     "id", request.getOrderId(),
                     "name", "Booking Payment",
-                    "price", request.getAmount().toPlainString(),
+                    "price", request.getAmount().toString(),
                     "quantity", 1
             ));
         }

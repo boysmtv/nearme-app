@@ -3,14 +3,13 @@ package id.dekat.notification.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "device_token")
+@Table(name = "device_tokens")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,27 +20,25 @@ public class DeviceToken {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "uuid")
+    @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "user_id", nullable = false, columnDefinition = "uuid")
     private UUID userId;
 
-    @Column(nullable = false)
+    @Column(name = "device_type", nullable = false, length = 16)
+    private String deviceType;
+
+    @Column(name = "token", nullable = false, length = 512)
     private String token;
 
-    @Column(nullable = false)
-    private String platform;
-
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean active = true;
+    @Column(name = "app_version", length = 16)
+    private String appVersion;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    @UpdateTimestamp
-    @Column(nullable = false)
-    private Instant updatedAt;
+    @Column(name = "last_active_at")
+    private Instant lastActiveAt;
 }

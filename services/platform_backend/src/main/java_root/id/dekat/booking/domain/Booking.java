@@ -18,75 +18,92 @@ public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(nullable = false)
+    @Column(name = "location_id", nullable = false)
     private UUID locationId;
 
-    @Column(nullable = false)
+    @Column(name = "customer_id", nullable = false)
     private UUID customerId;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "booking_code", nullable = false, unique = true)
     private String bookingCode;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private BookingStatus status;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "service_mode", nullable = false)
     private ServiceMode serviceMode;
 
-    @Column(nullable = false)
+    @Column(name = "starts_at", nullable = false)
     private OffsetDateTime startsAt;
 
+    @Column(name = "ends_at")
     private OffsetDateTime endsAt;
 
-    @Column(nullable = false)
+    @Column(name = "timezone", nullable = false)
     private ZoneId timezone;
 
-    @Column(nullable = false, length = 3)
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(name = "subtotal", nullable = false, precision = 12, scale = 2)
     private BigDecimal subtotal = BigDecimal.ZERO;
 
-    @Column(precision = 12, scale = 2)
+    @Column(name = "discount", precision = 12, scale = 2)
     private BigDecimal discount = BigDecimal.ZERO;
 
-    @Column(precision = 12, scale = 2)
+    @Column(name = "tax", precision = 12, scale = 2)
     private BigDecimal tax = BigDecimal.ZERO;
 
-    @Column(precision = 12, scale = 2)
+    @Column(name = "fee", precision = 12, scale = 2)
     private BigDecimal fee = BigDecimal.ZERO;
 
-    @Column(precision = 12, scale = 2)
+    @Column(name = "deposit", precision = 12, scale = 2)
     private BigDecimal deposit = BigDecimal.ZERO;
 
-    @Column(nullable = false, precision = 12, scale = 2)
+    @Column(name = "total", nullable = false, precision = 12, scale = 2)
     private BigDecimal total = BigDecimal.ZERO;
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "policy_snapshot")
     private Map<String, Object> policySnapshot = new HashMap<>();
 
+    @Column(name = "confirmation_pin")
+    private String confirmationPin;
+
+    @Column(name = "pin_verified", nullable = false)
+    private Boolean pinVerified = false;
+
+    @Column(name = "source")
     private String source;
 
+    @Column(name = "campaign_id")
     private UUID campaignId;
 
+    @Column(name = "referrer_tenant_id")
     private UUID referrerTenantId;
 
     @Version
+    @Column(name = "version")
     private Long version;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
+    @Column(name = "confirmed_at")
     private OffsetDateTime confirmedAt;
+
+    @Column(name = "completed_at")
     private OffsetDateTime completedAt;
+
+    @Column(name = "cancelled_at")
     private OffsetDateTime cancelledAt;
 
     @OneToMany(mappedBy = "bookingId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -217,4 +234,8 @@ public class Booking {
     public void setFee(BigDecimal fee) { this.fee = fee; }
     public void setDeposit(BigDecimal deposit) { this.deposit = deposit; }
     public void setTotal(BigDecimal total) { this.total = total; }
+    public String getConfirmationPin() { return confirmationPin; }
+    public void setConfirmationPin(String confirmationPin) { this.confirmationPin = confirmationPin; }
+    public Boolean getPinVerified() { return pinVerified; }
+    public void setPinVerified(Boolean pinVerified) { this.pinVerified = pinVerified; }
 }

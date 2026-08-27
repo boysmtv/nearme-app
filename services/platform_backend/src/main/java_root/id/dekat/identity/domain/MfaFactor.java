@@ -19,22 +19,23 @@ public class MfaFactor {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "factor_type", nullable = false)
     private MfaFactorType factorType;
 
-    @Column(nullable = false)
+    @Column(name = "secret_encrypted", nullable = false)
     private String secretEncrypted;
 
-    @Column(nullable = false)
+    @Column(name = "enabled", nullable = false)
     private Boolean enabled;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

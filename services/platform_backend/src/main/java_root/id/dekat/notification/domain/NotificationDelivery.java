@@ -2,14 +2,13 @@ package id.dekat.notification.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "notification_delivery")
+@Table(name = "notification_deliveries")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,42 +19,43 @@ public class NotificationDelivery {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "uuid")
+    @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
-    private UUID tenantId;
-
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "recipient_id", nullable = false, columnDefinition = "uuid")
     private UUID recipientId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private NotificationTemplate.NotificationType channel;
+    @Column(name = "template_id", nullable = false, columnDefinition = "uuid")
+    private UUID templateId;
 
-    @Column(nullable = false)
+    @Column(name = "channel", nullable = false, length = 16)
+    private String channel;
+
+    @Column(name = "subject", length = 512)
     private String subject;
 
-    @Column(columnDefinition = "text")
+    @Column(name = "body", nullable = false, columnDefinition = "text")
     private String body;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false, length = 32)
     @Builder.Default
     private DeliveryStatus status = DeliveryStatus.PENDING;
 
-    private Instant sentAt;
+    @Column(name = "provider_response", columnDefinition = "text")
+    private String providerResponse;
 
-    private Instant readAt;
+    @Column(name = "retry_count", nullable = false)
+    @Builder.Default
+    private Integer retryCount = 0;
 
-    @Column(columnDefinition = "jsonb")
-    private String metadata;
-
-    @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
+    @Column(name = "delivered_at")
+    private Instant deliveredAt;
+
     public enum DeliveryStatus {
-        PENDING, SENT, DELIVERED, FAILED, READ
+        PENDING, SENT, DELIVERED, FAILED, BOUNCED
     }
 }

@@ -1,5 +1,7 @@
 package id.dekat.payment.domain;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,4 +17,6 @@ public interface PaymentRepository extends JpaRepository<PaymentIntent, UUID> {
     List<PaymentIntent> findByBookingId(UUID bookingId);
 
     Optional<PaymentIntent> findByGatewayReference(String gatewayReference);
+
+    Page<PaymentIntent> findByStatus(PaymentStatus status, Pageable pageable);
 }

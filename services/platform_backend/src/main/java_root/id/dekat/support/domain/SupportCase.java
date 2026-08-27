@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "support_case")
+@Table(name = "support_cases")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,49 +23,40 @@ public class SupportCase {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "tenant_id", nullable = false, columnDefinition = "uuid")
     private UUID tenantId;
 
-    @Column(columnDefinition = "uuid")
-    private UUID bookingId;
+    @Column(name = "customer_id", nullable = false, columnDefinition = "uuid")
+    private UUID customerId;
 
-    @Column(nullable = false, columnDefinition = "uuid")
-    private UUID reporterId;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private CaseType caseType;
+    @Column(name = "subject", nullable = false, length = 512)
+    private String subject;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    @Builder.Default
-    private CaseSeverity severity = CaseSeverity.MEDIUM;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false, length = 32)
     @Builder.Default
     private CaseStatus status = CaseStatus.OPEN;
 
-    @Column(columnDefinition = "uuid")
-    private UUID ownerId;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "priority", nullable = false, length = 16)
+    @Builder.Default
+    private CasePriority priority = CasePriority.MEDIUM;
 
-    private Instant slaDeadline;
+    @Column(name = "assigned_to", columnDefinition = "uuid")
+    private UUID assignedTo;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
-    private Instant resolvedAt;
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 
-    public enum CaseType {
-        BOOKING_ISSUE, PAYMENT_DISPUTE, SERVICE_QUALITY, CANCELLATION_REQUEST, OTHER
-    }
-
-    public enum CaseSeverity {
+    public enum CasePriority {
         LOW, MEDIUM, HIGH, URGENT
     }
 
     public enum CaseStatus {
-        OPEN, IN_PROGRESS, ESCALATED, RESOLVED, CLOSED
+        OPEN, IN_PROGRESS, WAITING, RESOLVED, CLOSED
     }
 }

@@ -3,6 +3,7 @@ package id.dekat.access.web;
 import id.dekat.access.application.AuthorizationService;
 import id.dekat.access.domain.Permission;
 import id.dekat.access.domain.Role;
+import id.dekat.access.domain.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,31 +18,43 @@ import java.util.UUID;
 public class RoleController {
 
     private final AuthorizationService authorizationService;
+    private final RoleRepository roleRepository;
 
     @GetMapping
     public ResponseEntity<List<Role>> getAllRoles() {
-        List<Role> roles = authorizationService.getUserRoles(null, null);
+        List<Role> roles = roleRepository.findAll();
         return ResponseEntity.ok(roles);
     }
 
     @PostMapping
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(role);
+        Role saved = roleRepository.save(role);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Role> getRoleById(@PathVariable UUID id) {
-        return ResponseEntity.ok(new Role());
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + id));
+        return ResponseEntity.ok(role);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Role> updateRole(@PathVariable UUID id, @RequestBody Role role) {
-        role.setId(id);
-        return ResponseEntity.ok(role);
+        Role existing = roleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + id));
+        if (role.getName() != null) existing.setName(role.getName());
+        if (role.getDescription() != null) existing.setDescription(role.getDescription());
+        if (role.getIsSystem() != null) existing.setIsSystem(role.getIsSystem());
+        Role saved = roleRepository.save(existing);
+        return ResponseEntity.ok(saved);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRole(@PathVariable UUID id) {
+        Role role = roleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + id));
+        roleRepository.delete(role);
         return ResponseEntity.noContent().build();
     }
 
@@ -49,6 +62,10 @@ public class RoleController {
     public ResponseEntity<List<Permission>> addPermissions(
             @PathVariable UUID id,
             @RequestBody List<Permission> permissions) {
+        List<UUID> permissionIds = permissions.stream()
+                .map(Permission::getId)
+                .toList();
+        authorizationService.assignPermissionsToRole(id, permissionIds);
         List<Permission> result = authorizationService.getRolePermissions(id);
         return ResponseEntity.ok(result);
     }

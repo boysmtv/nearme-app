@@ -19,24 +19,25 @@ public class RoleAssignment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "tenant_id")
     private UUID tenantId;
 
-    @Column(nullable = false)
+    @Column(name = "role_id", nullable = false)
     private UUID roleId;
 
-    private UUID locationId;
+    @Column(name = "granted_by")
+    private UUID grantedBy;
 
-    @Column(nullable = false)
-    private UUID assignedBy;
-
+    @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

@@ -14,8 +14,8 @@ dekat-platform/
 ├── apps/
 │   ├── mobile_customer/     # Flutter customer app (id.dekat.customer)
 │   ├── mobile_partner/      # Flutter partner app (id.dekat.partner)
-│   ├── web_public/          # React public booking (port 4100)
-│   ├── web_provider/        # React provider portal (port 3001)
+│   ├── web_public/          # React unified app - customer+provider (port 4100)
+│   ├── web_provider/        # React provider portal (port 3001) [DEPRECATED - merged into web_public]
 │   └── web_admin/           # React platform admin (port 3002)
 ├── packages/
 │   ├── flutter_core/        # Shared Flutter core
@@ -25,7 +25,7 @@ dekat-platform/
 │   ├── web_api_client/
 │   └── web_config/
 ├── services/
-│   └── platform_backend/    # Java Spring Boot (20 modules)
+│   └── platform_backend/    # Java Spring Boot (21 modules)
 ├── infra/
 │   └── compose/
 │       ├── compose.yaml         # Production compose (ghcr.io images)
@@ -47,25 +47,25 @@ dekat-platform/
 | Web | React 19, TypeScript, Vite, Tailwind CSS |
 | Infra | Docker Compose (single VPS) |
 
-## Backend Modules (20)
+## Backend Modules (21)
 
 | Module | Package | Responsibility |
 |--------|---------|----------------|
 | sharedkernel | id.dekat.sharedkernel | Base entities, outbox, security config, ApiResponse wrapper |
 | identity | id.dekat.identity | Auth, JWT, OTP, MFA, Sessions |
 | access | id.dekat.access | RBAC, Roles, Permissions |
-| tenant | id.dekat.tenant | Business, Locations, Verification |
+| tenant | id.dekat.tenant | Business, Locations, Verification, BlockedDates |
 | staff | id.dekat.staff | Staff, Schedules, Time-off |
 | catalog | id.dekat.catalog | Services, Variants, Add-ons, Pricing |
 | scheduling | id.dekat.scheduling | Availability rules, Slot validation |
-| booking | id.dekat.booking | Hold, State machine, Anti-overlap |
-| payment | id.dekat.payment | Intent, Webhook, Refund, Ledger |
+| booking | id.dekat.booking | Hold, State machine, Anti-overlap, PIN confirmation |
+| payment | id.dekat.payment | Intent, Gateway (Midtrans/Xendit), Webhook, Refund, Ledger |
 | subscription | id.dekat.subscription | Plans, Entitlements, Usage |
-| customer | id.dekat.customer | Customer profiles, Consent |
+| customer | id.dekat.customer | Customer profiles, Service, Controller |
 | marketplace | id.dekat.marketplace | Search projection, Attribution |
 | review | id.dekat.review | Reviews, Responses, Moderation |
-| promotion | id.dekat.promotion | Coupons, Campaigns, Loyalty |
-| notification | id.dekat.notification | Templates, Push, Email, Worker |
+| promotion | id.dekat.promotion | Coupons, Campaigns, Loyalty (full CRUD) |
+| notification | id.dekat.notification | Templates, Push, Email, Kafka consumer/producer |
 | support | id.dekat.support | Cases, Evidence, SLA |
 | reporting | id.dekat.reporting | Aggregates, Export |
 | media | id.dekat.media | Object storage, Signed URLs |
@@ -121,6 +121,8 @@ module/
 - `GET /public/providers/{id}/staff` - Provider staff
 - `GET /public/providers/{id}/availability` - Available slots
 - `GET /public/providers/{id}/reviews` - Provider reviews
+- `GET /public/providers/{id}/blocked-dates` - Provider blocked dates
+- `GET /public/bookings/validate-coupon` - Validate coupon code
 - `POST /public/bookings` - Create booking
 
 ### Provider Dashboard (JWT required)
@@ -129,6 +131,45 @@ module/
 - `GET /provider/bookings` - List bookings
 - `GET /provider/services` - List services
 - `GET /provider/staff` - List staff
+- `GET /provider/reviews` - List reviews
+- `POST /provider/reviews/{id}/respond` - Respond to review
+- `GET /provider/blocked-dates` - List blocked dates
+- `POST /provider/blocked-dates` - Add blocked date
+- `DELETE /provider/blocked-dates/{date}` - Remove blocked date
+- `GET /provider/coupons` - List coupons
+- `POST /provider/coupons` - Create coupon
+- `PUT /provider/coupons/{id}` - Update coupon
+- `DELETE /provider/coupons/{id}` - Deactivate coupon
+- `GET /provider/campaigns` - List campaigns
+- `POST /provider/campaigns` - Create campaign
+- `PUT /provider/campaigns/{id}/activate` - Activate campaign
+- `PUT /provider/campaigns/{id}/pause` - Pause campaign
+- `GET /provider/loyalty/{customerId}` - Customer loyalty history
+- `POST /provider/loyalty/earn` - Earn loyalty points
+
+### Customer (JWT required)
+- `GET /customer/profile` - Get customer profile
+- `PUT /customer/profile` - Update customer profile
+
+### Core (JWT required)
+- `POST /bookings/holds` - Create booking hold
+- `POST /bookings` - Confirm booking
+- `POST /bookings/{id}/verify-pin` - Verify booking PIN
+- `POST /bookings/{id}/cancel` - Cancel booking
+- `GET /roles` - List roles
+- `GET /availability` - Get available slots
+
+### Payment (JWT required)
+- `POST /bookings/{id}/payment-intents` - Create payment intent
+- `GET /payments/{id}` - Get payment status
+- `POST /webhooks/payments/{provider}` - Payment webhook
+
+### Notification (JWT required)
+- `GET /notifications` - List notifications
+- `PUT /notifications/{id}/read` - Mark as read
+- `PUT /notifications/read-all` - Mark all as read
+- `POST /notifications/device-tokens` - Register device token
+- `GET /notifications/unread-count` - Unread count
 
 ### Admin (JWT required)
 - `GET /admin/dashboard/stats` - Platform stats
@@ -138,20 +179,14 @@ module/
 - `PUT /admin/tenants/{id}/approve` - Approve tenant
 - `GET /admin/config/flags` - Feature flags
 
-### Core (JWT required)
-- `POST /bookings/holds` - Create booking hold
-- `POST /bookings` - Confirm booking
-- `POST /bookings/{id}/cancel` - Cancel booking
-- `GET /roles` - List roles
-- `GET /availability` - Get available slots
-
 ## Database
 
-- 80+ tables, migrations V0-V19 (Flyway)
+- 80+ tables, migrations V0-V20 (Flyway)
 - V14 includes seed data (roles, permissions, plans, users, tenant, services, bookings)
 - V14 adds `password_hash` column to users table
 - V18 adds `device_info` and `token_family` columns to sessions table
 - V19 fixes `ip_address` type from `inet` to `text` in sessions table (entity uses String)
+- V20 adds `confirmation_pin` and `pin_verified` columns to bookings table
 - Seed password: `admin123` (BCrypt hashed)
 - Credentials stored in both `users.password_hash` and `credentials` table
 
@@ -225,6 +260,11 @@ pnpm install && pnpm dev
 - All apps share `auth_token` key in localStorage (`auth_refresh` for refresh token)
 - Response format: `{ success, data, message }` — handled by `ApiResponse` wrapper
 - Availability slots return `{id,time,startTime,endTime,available}` — startTime is full ISO datetime
+- **Unified web_public app**: Customer + Provider in one app, role-based routing via `useAuth()` context
+- Auth user stored in `auth_user` localStorage key with `{id, email, name, role, hasProfile}`
+- Provider routes: `/provider/dashboard`, `/provider/calendar`, `/provider/services`, etc.
+- Customer routes: `/`, `/search`, `/provider/:slug`, `/booking/:providerId`
+- Profile completion route: `/profile/complete` (required before booking)
 
 ### Testing
 - **Total: 358 tests** across 6 platforms, all passing
@@ -237,19 +277,44 @@ pnpm install && pnpm dev
 - E2E Playwright: 12 tests (web-public runtime proof)
 - Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
 
-### Backend Runtime (verified 2026-08-25)
-- Migrations V15–V17: bookings status CHECK widened, categories seeded, booking_holds expiry CHECK fixed, hold status CHECK includes CONVERTED/CANCELLED, ghost ddl-auto columns dropped
+### Testing
+- **Total: 358 tests** across 6 platforms, all passing
+- Backend: 72 tests (BookingService, Booking domain, JwtTokenProvider) — JUnit 5 + Mockito
+- web_public: 80 tests (8 files) — Vitest + @testing-library/react
+- web_provider: 58 tests (5 files) — Vitest + @testing-library/react
+- web_admin: 49 tests (5 files) — Vitest + @testing-library/react
+- mobile_customer: 56 tests (models, utils, router) — flutter_test
+- mobile_partner: 31 tests (models, utils) — flutter_test
+- E2E Playwright: 12 tests (web-public runtime proof)
+- Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
+
+### Backend Runtime (verified 2026-08-27)
+- Migrations V15–V20: bookings status CHECK widened, categories seeded, booking_holds expiry CHECK fixed, hold status CHECK includes CONVERTED/CANCELLED, ghost ddl-auto columns dropped, confirmation_pin+pin_verified added
 - `spring.jpa.hibernate.ddl-auto: none` in ALL profiles — update mode corrupts schema (adds NOT NULL columns to seeded tables)
 - Healthcheck: image has NO curl → use `wget -q -O /dev/null http://localhost:8080/api/v1/actuator/health`
 - Mail health indicator disabled in dev (no local SMTP); SmtpEmailAdapter catches RuntimeException on send
 - Guest booking: `POST /public/bookings` resolves customerId from customerEmail (auto-creates PENDING_VERIFICATION user)
 - Booking flow E2E verified: holds → confirm (`DKT-*` code) → detail → history; anti-overlap rejects conflicting slots with 409/IllegalState
 - Duplicate class warning: sharedkernel module owns outbox trio; java_root/sharedkernel/outbox deleted — never re-create FQCN duplicates between java_root and modules
+- **Payment module**: BigDecimal→Integer (DB uses INT/sen), MidtransGatewayAdapter has @Primary, webhook signature verification active
+- **Notification module**: DeliveryRecord deleted (duplicate entity), NotificationWorker uses ObjectMapper, NotificationProducer sends to Kafka
+- **Promotion module**: Full CRUD (Coupon, Campaign, Loyalty) built from scratch with 5 entities, 5 repos, 3 services, 4 controllers
+- **Review module**: Entity fixed (rating/title/body), ReviewResponse entity added, provider review endpoints added
+- **Customer module**: CustomerService + CustomerController with profile CRUD, booking integration
+- **Blocked dates**: BlockedDate entity + repository, provider CRUD endpoints, public endpoint for date picker
+- **Booking PIN**: confirmation_pin + pin_verified columns, verifyPin endpoint, auto-generated 6-digit PIN
 
-### Docker Compose (verified 2026-08-26)
+### Docker Compose (verified 2026-08-27)
 - Always run backend via `docker compose -f infra/compose/compose.local.yaml up -d --build`
 - Sessions table requires V18 (`device_info`, `token_family`) and V19 (`ip_address` type fix) migrations
 - CORS allowed origins in `WebConfig.java`: `localhost:4100, 3001, 3002, 8081, 4101, 4102`
+
+### Known Issues (2026-08-27)
+- `POST /public/bookings` returns 401 Unauthorized — SecurityConfig has `/public/**` permitAll but something blocks it. Need to check if JWT decoder rejects requests with no token or if there's a filter chain issue.
+- Booking PIN flow: backend endpoints created (`POST /bookings/{id}/verify-pin`), frontend not yet wired
+- Profile completion page (`/profile/complete`) not yet created in frontend
+- Provider blocked dates UI not yet added to Settings page
+- web_provider app is now DEPRECATED — all its routes are in web_public
 
 ## Deployment
 

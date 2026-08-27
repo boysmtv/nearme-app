@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "case_event")
+@Table(name = "case_events")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,24 +23,19 @@ public class CaseEvent {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "case_id", nullable = false, columnDefinition = "uuid")
     private UUID caseId;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "actor_id", columnDefinition = "uuid")
     private UUID actorId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private EventAction action;
+    @Column(name = "event_type", nullable = false, length = 32)
+    private String eventType;
 
-    @Column(columnDefinition = "jsonb")
-    private String details;
+    @Column(name = "body", columnDefinition = "text")
+    private String body;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
-
-    public enum EventAction {
-        CREATED, COMMENT, STATUS_CHANGE, ASSIGN, ESCALATE, RESOLVE, CLOSE
-    }
 }

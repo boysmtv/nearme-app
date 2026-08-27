@@ -12,8 +12,8 @@ export default function CustomersPage() {
     queryKey: ['customers', page, search],
     queryFn: () => providerApi.customers.list({ page, limit: 20, search }),
   });
-  const customers = res?.data ?? [];
-  const pagination = res?.pagination;
+  const customers = res?.data?.data ?? [];
+  const pagination = res?.data?.pagination;
 
   return (
     <Layout>

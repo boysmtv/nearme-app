@@ -39,7 +39,7 @@ export default function UsersPage() {
       <div className="space-y-6">
         <div><h1 className="text-2xl font-bold text-gray-900">Users</h1><p className="mt-1 text-sm text-gray-500">Kelola pengguna platform</p></div>
         <input value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} placeholder="Cari nama atau email..." className="w-full max-w-md rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500" />
-        <DataTable columns={columns} data={res?.data ?? []} pagination={res?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada pengguna" />
+        <DataTable columns={columns} data={res?.data?.data ?? []} pagination={res?.data?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada pengguna" />
       </div>
     </AdminLayout>
   );

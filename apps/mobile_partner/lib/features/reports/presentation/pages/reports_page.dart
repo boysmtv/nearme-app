@@ -64,7 +64,7 @@ class _StatCard extends StatelessWidget {
     return Expanded(child: Card(child: Padding(
       padding: const EdgeInsets.all(16),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+        Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
           child: Icon(icon, color: color, size: 20)),
         const SizedBox(height: 12),
         Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),

@@ -146,9 +146,7 @@ class DekaCustomerApp extends ConsumerWidget {
       builder: (context, child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(
-            textScaler: TextScaler.linear(
-              MediaQuery.of(context).textScaleFactor,
-            ),
+            textScaler: MediaQuery.of(context).textScaler,
           ),
           child: child!,
         );

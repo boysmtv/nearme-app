@@ -2,6 +2,8 @@ package id.dekat.review.application;
 
 import id.dekat.review.domain.Review;
 import id.dekat.review.domain.ReviewRepository;
+import id.dekat.review.domain.ReviewResponse;
+import id.dekat.review.domain.ReviewResponseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,35 +19,28 @@ public class ReviewService {
     private static final int MAX_RATING = 5;
 
     private final ReviewRepository reviewRepository;
+    private final ReviewResponseRepository reviewResponseRepository;
 
     @Transactional
     public Review createReview(UUID bookingId, UUID customerId, UUID tenantId,
-                                Integer overallRating, Integer timelinessRating,
-                                Integer qualityRating, String comment) {
+                                Integer rating, String title, String body) {
         if (reviewRepository.existsByBookingIdAndCustomerId(bookingId, customerId)) {
             throw new IllegalArgumentException("You have already reviewed this booking");
         }
 
-        validateRating(overallRating, "Overall rating");
-        if (timelinessRating != null) {
-            validateRating(timelinessRating, "Timeliness rating");
-        }
-        if (qualityRating != null) {
-            validateRating(qualityRating, "Quality rating");
-        }
+        validateRating(rating, "Rating");
 
-        if (comment != null && comment.length() > 2000) {
-            throw new IllegalArgumentException("Comment must be 2000 characters or less");
+        if (body != null && body.length() > 2000) {
+            throw new IllegalArgumentException("Body must be 2000 characters or less");
         }
 
         Review review = Review.builder()
                 .bookingId(bookingId)
                 .customerId(customerId)
                 .tenantId(tenantId)
-                .overallRating(overallRating)
-                .timelinessRating(timelinessRating)
-                .qualityRating(qualityRating)
-                .comment(comment)
+                .rating(rating)
+                .title(title)
+                .body(body)
                 .status(Review.ReviewStatus.PUBLISHED)
                 .build();
 
@@ -53,24 +48,25 @@ public class ReviewService {
     }
 
     @Transactional
-    public Review respondToReview(UUID reviewId, String response, UUID providerId) {
-        Review review = reviewRepository.findById(reviewId)
+    public ReviewResponse respondToReview(UUID reviewId, String body, UUID authorId) {
+        reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
 
-        if (review.getStatus() == Review.ReviewStatus.REMOVED) {
-            throw new IllegalStateException("Cannot respond to a removed review");
+        if (body == null || body.isBlank()) {
+            throw new IllegalArgumentException("Response body is required");
         }
 
-        if (response == null || response.isBlank()) {
-            throw new IllegalArgumentException("Response text is required");
-        }
-
-        if (response.length() > 2000) {
+        if (body.length() > 2000) {
             throw new IllegalArgumentException("Response must be 2000 characters or less");
         }
 
-        review.setProviderResponse(response);
-        return reviewRepository.save(review);
+        ReviewResponse response = ReviewResponse.builder()
+                .reviewId(reviewId)
+                .authorId(authorId)
+                .body(body)
+                .build();
+
+        return reviewResponseRepository.save(response);
     }
 
     @Transactional
@@ -78,8 +74,8 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("Review not found: " + reviewId));
 
-        if (review.getStatus() == Review.ReviewStatus.REMOVED) {
-            throw new IllegalStateException("Review has already been removed");
+        if (review.getStatus() == Review.ReviewStatus.HIDDEN) {
+            throw new IllegalStateException("Review has already been hidden");
         }
 
         review.setStatus(Review.ReviewStatus.HIDDEN);
@@ -117,7 +113,7 @@ public class ReviewService {
         }
 
         double sum = reviews.stream()
-                .mapToInt(Review::getOverallRating)
+                .mapToInt(Review::getRating)
                 .average()
                 .orElse(0.0);
 

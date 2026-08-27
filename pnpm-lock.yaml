@@ -233,6 +233,9 @@ importers:
       autoprefixer:
         specifier: ^10.4.0
         version: 10.5.4(postcss@8.5.26)
+      playwright:
+        specifier: ^1.62.1
+        version: 1.62.1
       postcss:
         specifier: ^8.5.0
         version: 8.5.26

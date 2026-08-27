@@ -7,8 +7,6 @@ const morningSlot: TimeSlot = {
   startTime: '2026-08-26T09:00:00+07:00',
   endTime: '2026-08-26T09:30:00+07:00',
   available: true,
-  staffId: 'staff-1',
-  staffName: 'Andi',
 };
 
 const afternoonSlot: TimeSlot = {
@@ -16,8 +14,6 @@ const afternoonSlot: TimeSlot = {
   startTime: '2026-08-26T13:00:00+07:00',
   endTime: '2026-08-26T13:30:00+07:00',
   available: true,
-  staffId: 'staff-1',
-  staffName: 'Andi',
 };
 
 const eveningSlot: TimeSlot = {
@@ -25,8 +21,6 @@ const eveningSlot: TimeSlot = {
   startTime: '2026-08-26T18:00:00+07:00',
   endTime: '2026-08-26T18:30:00+07:00',
   available: true,
-  staffId: 'staff-1',
-  staffName: 'Andi',
 };
 
 const unavailableSlot: TimeSlot = {
@@ -34,8 +28,6 @@ const unavailableSlot: TimeSlot = {
   startTime: '2026-08-26T10:00:00+07:00',
   endTime: '2026-08-26T10:30:00+07:00',
   available: false,
-  staffId: 'staff-1',
-  staffName: 'Andi',
 };
 
 const onSelect = vi.fn();

@@ -50,7 +50,7 @@ public class AuditService {
                 .requestId(requestId)
                 .ipAddress(ipAddress)
                 .userAgent(userAgent)
-                .result(result != null ? result : AuditLog.AuditResult.SUCCESS)
+                .result(result != null ? result : AuditLog.AuditResult.OK)
                 .build();
 
         AuditLog saved = auditRepository.save(auditLog);
@@ -64,7 +64,7 @@ public class AuditService {
                                    UUID resourceId, String afterSnapshot,
                                    String requestId, String ipAddress) {
         return record(actorId, action, resourceType, resourceId, null, afterSnapshot,
-                null, requestId, ipAddress, null, AuditLog.AuditResult.SUCCESS);
+                null, requestId, ipAddress, null, AuditLog.AuditResult.OK);
     }
 
     @Transactional
@@ -72,7 +72,7 @@ public class AuditService {
                                    UUID resourceId, String reason,
                                    String requestId, String ipAddress) {
         return record(actorId, action, resourceType, resourceId, null, null,
-                reason, requestId, ipAddress, null, AuditLog.AuditResult.FAILURE);
+                reason, requestId, ipAddress, null, AuditLog.AuditResult.DENIED);
     }
 
     @Transactional
@@ -95,7 +95,7 @@ public class AuditService {
 
         return record(actorId, action, resourceType, resourceId,
                 beforeJson, afterJson, reason, requestId, ipAddress,
-                null, AuditLog.AuditResult.SUCCESS);
+                null, AuditLog.AuditResult.OK);
     }
 
     @Transactional(readOnly = true)

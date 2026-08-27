@@ -16,13 +16,14 @@ class ApiClient {
   private async request<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
     const { method = 'GET', headers = {}, body } = options;
 
+    const isPublic = endpoint.startsWith('/public/') || endpoint.startsWith('/auth/');
     const token = localStorage.getItem('auth_token');
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        ...(token && { Authorization: `Bearer ${token}` }),
+        ...(!isPublic && token && { Authorization: `Bearer ${token}` }),
         ...headers,
       },
       body: body ? JSON.stringify(body) : undefined,

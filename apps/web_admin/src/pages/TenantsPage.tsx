@@ -48,7 +48,7 @@ export default function TenantsPage() {
             <option value="">Semua Status</option><option value="SUBMITTED">Diajukan</option><option value="UNDER_REVIEW">Ditinjau</option><option value="APPROVED">Disetujui</option><option value="REJECTED">Ditolak</option><option value="SUSPENDED">Ditangguhkan</option>
           </select>
         </div>
-        <DataTable columns={columns} data={res?.data ?? []} pagination={res?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada tenant" />
+        <DataTable columns={columns} data={res?.data?.data ?? []} pagination={res?.data?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada tenant" />
       </div>
       {rejectId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

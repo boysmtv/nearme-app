@@ -58,7 +58,7 @@ export default function ProviderPage() {
 
   const services = servicesRes?.data ?? [];
   const staffList = staffRes?.data ?? [];
-  const reviews = reviewsRes?.data ?? [];
+  const reviews = reviewsRes?.data?.data ?? [];
 
   if (isLoading) {
     return (
@@ -246,7 +246,7 @@ export default function ProviderPage() {
                           )}
                         </div>
                       </div>
-                      {s.specialties.length > 0 && (
+                      {s.specialties?.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1">
                           {s.specialties.map((spec) => (
                             <span

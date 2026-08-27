@@ -32,8 +32,6 @@ const slot: TimeSlot = {
   startTime: '2026-08-26T10:00:00+07:00',
   endTime: '2026-08-26T10:30:00+07:00',
   available: true,
-  staffId: 'staff-1',
-  staffName: 'Andi',
 };
 
 const addon: Addon = {

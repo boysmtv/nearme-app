@@ -61,8 +61,7 @@ public class AuthorizationService {
                 .userId(userId)
                 .roleId(roleId)
                 .tenantId(tenantId)
-                .locationId(locationId)
-                .assignedBy(assignedBy)
+                .grantedBy(assignedBy)
                 .build();
 
         return roleAssignmentRepository.save(assignment);

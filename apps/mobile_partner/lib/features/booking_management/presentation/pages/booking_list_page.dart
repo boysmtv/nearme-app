@@ -36,17 +36,19 @@ class BookingListPage extends ConsumerWidget {
               label: Text(f.name[0].toUpperCase() + f.name.substring(1)),
               selected: currentFilter == f,
               onSelected: (_) => ref.read(partnerBookingFilterProvider.notifier).state = f,
-              selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              selectedColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
               checkmarkColor: Theme.of(context).colorScheme.primary,
             ),
           )).toList()),
         ),
         Expanded(child: bookingsAsync.when(
           data: (bookings) {
-            if (bookings.isEmpty) return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(Icons.book_outlined, size: 64, color: Colors.grey[300]),
-              const SizedBox(height: 16), Text('No bookings found', style: TextStyle(color: Colors.grey[500])),
-            ]));
+            if (bookings.isEmpty) {
+              return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(Icons.book_outlined, size: 64, color: Colors.grey[300]),
+                const SizedBox(height: 16), Text('No bookings found', style: TextStyle(color: Colors.grey[500])),
+              ]));
+            }
             return ListView.builder(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: bookings.length,
@@ -66,7 +68,7 @@ class BookingListPage extends ConsumerWidget {
                     subtitle: Text('${b.serviceName.isEmpty ? "Service" : b.serviceName} - ${b.customerName}'),
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
                       child: Text(status.isNotEmpty ? status[0] + status.substring(1).toLowerCase() : '-',
                           style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w500)),
                     ),

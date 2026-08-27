@@ -1,12 +1,10 @@
 package id.dekat.payment.domain;
 
 public enum PaymentStatus {
-    CREATED,
     PENDING,
-    PAID,
+    AUTHORIZED,
+    CAPTURED,
     FAILED,
-    EXPIRED,
     CANCELLED,
-    REFUNDED,
-    PARTIAL_REFUND
+    REFUNDED
 }

@@ -6,7 +6,6 @@ import type {
   Booking,
   BookingStatus,
   ProviderService,
-  ServiceAddon,
   StaffMember,
   StaffSchedule,
   Customer,
@@ -31,11 +30,10 @@ describe('TypeScript type interfaces', () => {
   it('PaginatedResponse compiles with array data', () => {
     const response: PaginatedResponse<string> = {
       success: true,
-      data: ['a', 'b'],
-      pagination: { page: 1, limit: 10, total: 2, totalPages: 1 },
+      data: { data: ['a', 'b'], pagination: { page: 1, limit: 10, total: 2, totalPages: 1 } },
     };
-    expect(response.data).toHaveLength(2);
-    expect(response.pagination.totalPages).toBe(1);
+    expect(response.data.data).toHaveLength(2);
+    expect(response.data.pagination.totalPages).toBe(1);
   });
 
   it('Pagination compiles with all fields', () => {
@@ -48,27 +46,27 @@ describe('TypeScript type interfaces', () => {
       todayBookings: 10,
       weekRevenue: 500000,
       totalCustomers: 120,
-      averageRating: 4.8,
+      avgRating: 4.8,
       occupancyRate: 75.5,
       pendingBookings: 3,
     };
     expect(stats.todayBookings).toBe(10);
-    expect(stats.averageRating).toBe(4.8);
+    expect(stats.avgRating).toBe(4.8);
   });
 
   it('Booking compiles with all required fields', () => {
     const booking: Booking = {
       id: 'b1',
-      code: 'DKT-001',
+      bookingCode: 'DKT-001',
       customerName: 'Siti',
       customerEmail: 'siti@test.com',
       customerPhone: '081234567890',
       serviceName: 'Haircut',
       staffName: 'Andi',
-      startTime: '2026-08-25T10:00:00Z',
-      endTime: '2026-08-25T10:30:00Z',
+      time: '10:00',
+      endTime: '10:30',
       status: 'CONFIRMED',
-      totalAmount: 50000,
+      amount: 50000,
       depositPaid: 10000,
       notes: '',
       createdAt: '2026-08-24T08:00:00Z',
@@ -96,7 +94,7 @@ describe('TypeScript type interfaces', () => {
       priceType: 'FIXED',
       depositAmount: 10000,
       category: 'Hair',
-      isActive: true,
+      active: true,
       addons: [{ id: 'a1', name: 'Shampoo', price: 10000, duration: 10 }],
     };
     expect(svc.addons).toHaveLength(1);
@@ -129,12 +127,14 @@ describe('TypeScript type interfaces', () => {
 
   it('ReportData compiles with nested arrays', () => {
     const report: ReportData = {
-      bookingsOverTime: [{ date: '2026-08-25', count: 5 }],
-      revenueOverTime: [{ date: '2026-08-25', amount: 250000 }],
-      staffUtilization: [{ staffId: 'st1', name: 'Andi', utilization: 80 }],
-      topServices: [{ name: 'Haircut', count: 10, revenue: 500000 }],
+      totalBookings: 50,
+      completedBookings: 40,
+      cancelledBookings: 5,
+      totalRevenue: 5000000,
+      avgRating: 4.7,
+      currency: 'IDR',
     };
-    expect(report.topServices[0].count).toBe(10);
+    expect(report.totalBookings).toBe(50);
   });
 
   it('Settings compiles with all nested types', () => {

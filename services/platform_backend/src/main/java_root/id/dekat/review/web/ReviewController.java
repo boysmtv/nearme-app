@@ -23,8 +23,7 @@ public class ReviewController {
             @RequestBody CreateReviewRequest request) {
         Review review = reviewService.createReview(
                 id, userId, tenantId,
-                request.overallRating(), request.timelinessRating(),
-                request.qualityRating(), request.comment());
+                request.rating(), request.title(), request.body());
         return ResponseEntity.status(HttpStatus.CREATED).body(review);
     }
 
@@ -35,9 +34,8 @@ public class ReviewController {
     }
 
     public record CreateReviewRequest(
-            Integer overallRating,
-            Integer timelinessRating,
-            Integer qualityRating,
-            String comment
+            Integer rating,
+            String title,
+            String body
     ) {}
 }

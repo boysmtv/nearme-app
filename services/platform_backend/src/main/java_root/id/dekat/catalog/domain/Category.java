@@ -13,6 +13,7 @@ public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
@@ -21,10 +22,10 @@ public class Category {
     @Column(name = "parent_id")
     private UUID parentId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "icon_url", columnDefinition = "TEXT")

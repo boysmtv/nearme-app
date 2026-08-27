@@ -32,10 +32,9 @@ describe('types', () => {
   it('PaginatedResponse memiliki pagination', () => {
     const res: PaginatedResponse<string> = {
       success: true,
-      data: ['a'],
-      pagination: { page: 1, limit: 10, total: 1, totalPages: 1 },
+      data: { data: ['a'], pagination: { page: 1, limit: 10, total: 1, totalPages: 1 } },
     };
-    expect(res.pagination.totalPages).toBe(1);
+    expect(res.data.pagination.totalPages).toBe(1);
   });
 
   it('Category memiliki field yang diperlukan', () => {
@@ -114,8 +113,6 @@ describe('types', () => {
       startTime: '2026-08-26T09:00:00Z',
       endTime: '2026-08-26T09:30:00Z',
       available: true,
-      staffId: '1',
-      staffName: 'Andi',
     };
     expect(slot.available).toBe(true);
   });
@@ -137,9 +134,8 @@ describe('types', () => {
     const req: BookingRequest = {
       providerId: '1',
       serviceId: '1',
-      staffId: '1',
-      slotId: '1',
-      addons: [],
+      startsAt: '2026-08-26T09:00:00+07:00',
+      endsAt: '2026-08-26T10:00:00+07:00',
       customerName: 'Budi',
       customerEmail: 'budi@test.com',
       customerPhone: '081234',
@@ -154,9 +150,6 @@ describe('types', () => {
       id: '1',
       bookingCode: 'DKT-001',
       status: 'CONFIRMED',
-      totalAmount: 50000,
-      depositAmount: 20000,
-      createdAt: '2026-08-26T00:00:00Z',
     };
     expect(res.bookingCode).toMatch(/^DKT-/);
   });

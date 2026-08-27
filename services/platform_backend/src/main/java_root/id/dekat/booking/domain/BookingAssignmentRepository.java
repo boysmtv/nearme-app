@@ -11,5 +11,7 @@ public interface BookingAssignmentRepository extends JpaRepository<BookingAssign
 
     List<BookingAssignment> findByBookingId(UUID bookingId);
 
+    List<BookingAssignment> findByBookingIdIn(java.util.Collection<UUID> bookingIds);
+
     List<BookingAssignment> findByStaffIdAndStatus(UUID staffId, BookingAssignment.AssignmentStatus status);
 }

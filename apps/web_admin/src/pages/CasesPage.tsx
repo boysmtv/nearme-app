@@ -43,7 +43,7 @@ export default function CasesPage() {
           <select value={severity} onChange={(e) => { setSeverity(e.target.value); setPage(1); }} className="rounded-lg border border-gray-300 px-3 py-2 text-sm"><option value="">Semua Severity</option>{['P0','P1','P2','P3'].map((s) => <option key={s} value={s}>{s}</option>)}</select>
           <select value={caseStatus} onChange={(e) => { setCaseStatus(e.target.value); setPage(1); }} className="rounded-lg border border-gray-300 px-3 py-2 text-sm"><option value="">Semua Status</option>{['OPEN','IN_PROGRESS','WAITING_CUSTOMER','RESOLVED','CLOSED'].map((s) => <option key={s} value={s}>{s}</option>)}</select>
         </div>
-        <DataTable columns={columns} data={res?.data ?? []} pagination={res?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada kasus" />
+        <DataTable columns={columns} data={res?.data?.data ?? []} pagination={res?.data?.pagination} onPageChange={setPage} isLoading={isLoading} emptyMessage="Tidak ada kasus" />
       </div>
     </AdminLayout>
   );

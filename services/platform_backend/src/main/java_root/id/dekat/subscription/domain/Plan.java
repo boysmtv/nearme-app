@@ -5,12 +5,11 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "plan")
+@Table(name = "plans")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -21,45 +20,45 @@ public class Plan {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "uuid")
+    @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false, length = 128)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "slug", nullable = false, unique = true, length = 128)
     private String slug;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal priceAmount;
+    @Column(name = "price_amount", nullable = false)
+    private Integer priceAmount;
 
-    @Column(nullable = false, length = 3)
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "billing_cycle", nullable = false, length = 16)
     private BillingCycle billingCycle;
 
-    @Column(nullable = false)
+    @Column(name = "max_staff", nullable = false)
     private Integer maxStaff;
 
-    @Column(nullable = false)
+    @Column(name = "max_bookings_per_month", nullable = false)
     private Integer maxBookingsPerMonth;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "features", columnDefinition = "jsonb")
     private String features;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false, length = 16)
     @Builder.Default
     private PlanStatus status = PlanStatus.ACTIVE;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     public enum BillingCycle {
-        MONTHLY, YEARLY
+        WEEKLY, MONTHLY, QUARTERLY, YEARLY
     }
 
     public enum PlanStatus {

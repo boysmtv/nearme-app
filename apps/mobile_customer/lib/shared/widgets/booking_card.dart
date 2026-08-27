@@ -45,7 +45,7 @@ class BookingCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.1),
+                  color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(statusLabel, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w500)),
@@ -57,7 +57,7 @@ class BookingCard extends StatelessWidget {
             Row(children: [
               Icon(Icons.calendar_today, size: 14, color: Colors.grey[500]),
               const SizedBox(width: 4),
-              Text('${booking.date.toString().substring(0, 10)}', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+              Text(booking.date.toString().substring(0, 10), style: TextStyle(color: Colors.grey[600], fontSize: 13)),
               const SizedBox(width: 16),
               Icon(Icons.access_time, size: 14, color: Colors.grey[500]),
               const SizedBox(width: 4),

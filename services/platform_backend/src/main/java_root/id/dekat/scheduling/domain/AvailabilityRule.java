@@ -4,13 +4,13 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
-import java.time.DayOfWeek;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "availability_rule")
+@Table(name = "availability_rules")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,30 +24,33 @@ public class AvailabilityRule {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "tenant_id", nullable = false, columnDefinition = "uuid")
     private UUID tenantId;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "staff_id", columnDefinition = "uuid")
     private UUID staffId;
 
-    @Column(columnDefinition = "uuid")
+    @Column(name = "resource_id", columnDefinition = "uuid")
     private UUID resourceId;
 
-    @Column(columnDefinition = "uuid")
+    @Column(name = "location_id", nullable = false, columnDefinition = "uuid")
     private UUID locationId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DayOfWeek dayOfWeek;
+    @Column(name = "day_of_week", nullable = false)
+    private Integer dayOfWeek;
 
-    @Column(nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
-    @Column(nullable = false)
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 
-    @Column(nullable = false)
-    private Instant effectiveFrom;
+    @Column(name = "effective_from", nullable = false)
+    private LocalDate effectiveFrom;
 
-    private Instant effectiveUntil;
+    @Column(name = "effective_until")
+    private LocalDate effectiveUntil;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 }

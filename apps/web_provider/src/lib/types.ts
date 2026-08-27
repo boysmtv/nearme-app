@@ -6,8 +6,7 @@ export interface ApiResponse<T> {
 
 export interface PaginatedResponse<T> {
   success: boolean;
-  data: T[];
-  pagination: Pagination;
+  data: { pagination: Pagination; data: T[] };
 }
 
 export interface Pagination {
@@ -21,23 +20,24 @@ export interface DashboardStats {
   todayBookings: number;
   weekRevenue: number;
   totalCustomers: number;
-  averageRating: number;
+  avgRating: number;
   occupancyRate: number;
   pendingBookings: number;
 }
 
 export interface Booking {
   id: string;
-  code: string;
+  bookingCode: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;
   serviceName: string;
   staffName: string;
-  startTime: string;
+  time: string;
+  startsAt?: string;
   endTime: string;
   status: BookingStatus;
-  totalAmount: number;
+  amount: number;
   depositPaid: number;
   notes: string;
   createdAt: string;
@@ -62,18 +62,9 @@ export interface ProviderService {
   description: string;
   duration: number;
   price: number;
-  priceType: string;
-  depositAmount: number;
-  category: string;
-  isActive: boolean;
-  addons: ServiceAddon[];
-}
-
-export interface ServiceAddon {
-  id: string;
-  name: string;
-  price: number;
-  duration: number;
+  currency?: string;
+  imageUrl?: string;
+  active: boolean;
 }
 
 export interface StaffMember {
@@ -102,10 +93,12 @@ export interface Customer {
 }
 
 export interface ReportData {
-  bookingsOverTime: { date: string; count: number }[];
-  revenueOverTime: { date: string; amount: number }[];
-  staffUtilization: { staffId: string; name: string; utilization: number }[];
-  topServices: { name: string; count: number; revenue: number }[];
+  totalBookings: number;
+  completedBookings: number;
+  cancelledBookings: number;
+  totalRevenue: number;
+  avgRating: number;
+  currency: string;
 }
 
 export interface Settings {

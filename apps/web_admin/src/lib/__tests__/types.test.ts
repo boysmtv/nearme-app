@@ -34,11 +34,10 @@ describe('TypeScript interfaces', () => {
   it('PaginatedResponse conforms to expected shape', () => {
     const response: PaginatedResponse<User> = {
       success: true,
-      data: [],
-      pagination: { page: 1, limit: 10, total: 50, totalPages: 5 },
+      data: { data: [], pagination: { page: 1, limit: 10, total: 50, totalPages: 5 } },
     };
 
-    expect(response.pagination.totalPages).toBe(5);
+    expect(response.data.pagination.totalPages).toBe(5);
   });
 
   it('AdminStats has all required fields', () => {

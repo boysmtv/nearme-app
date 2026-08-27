@@ -11,7 +11,5 @@ public interface SupportRepository extends JpaRepository<SupportCase, UUID> {
 
     List<SupportCase> findByTenantIdAndStatus(UUID tenantId, SupportCase.CaseStatus status);
 
-    List<SupportCase> findByOwnerIdAndStatus(UUID ownerId, SupportCase.CaseStatus status);
-
-    List<SupportCase> findByBookingId(UUID bookingId);
+    List<SupportCase> findByAssignedTo(UUID assignedTo);
 }

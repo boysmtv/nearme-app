@@ -10,6 +10,7 @@ public class BookingStatusHistory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "booking_id", nullable = false, columnDefinition = "uuid")
@@ -26,10 +27,10 @@ public class BookingStatusHistory {
     @Column(name = "changed_by", columnDefinition = "uuid")
     private UUID actorId;
 
-    @Column(columnDefinition = "text")
+    @Column(name = "reason", columnDefinition = "text")
     private String reason;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     protected BookingStatusHistory() {}

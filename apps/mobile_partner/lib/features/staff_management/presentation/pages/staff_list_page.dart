@@ -21,13 +21,15 @@ class StaffListPage extends ConsumerWidget {
       appBar: AppBar(title: const Text('Staff')),
       body: staffAsync.when(
         data: (staffList) {
-          if (staffList.isEmpty) return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.people_outline, size: 64, color: Colors.grey[300]),
-            const SizedBox(height: 16),
-            Text('No staff members', style: TextStyle(color: Colors.grey[500])),
-            const SizedBox(height: 8),
-            Text('Add staff to manage bookings', style: TextStyle(color: Colors.grey[400], fontSize: 12)),
-          ]));
+          if (staffList.isEmpty) {
+            return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Icon(Icons.people_outline, size: 64, color: Colors.grey[300]),
+              const SizedBox(height: 16),
+              Text('No staff members', style: TextStyle(color: Colors.grey[500])),
+              const SizedBox(height: 8),
+              Text('Add staff to manage bookings', style: TextStyle(color: Colors.grey[400], fontSize: 12)),
+            ]));
+          }
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: staffList.length,
@@ -38,7 +40,7 @@ class StaffListPage extends ConsumerWidget {
                 margin: const EdgeInsets.only(bottom: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(isActive ? 0.1 : 0.05),
+                    backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: isActive ? 0.1 : 0.05),
                     child: Icon(Icons.person, color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey),
                   ),
                   title: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),

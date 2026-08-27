@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "audit_log")
+@Table(name = "audit_logs")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,44 +23,46 @@ public class AuditLog {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "actor_id", columnDefinition = "uuid")
     private UUID actorId;
 
-    @Column(nullable = false)
+    @Column(name = "action", nullable = false, length = 128)
     private String action;
 
-    @Column(nullable = false)
+    @Column(name = "resource_type", nullable = false, length = 64)
     private String resourceType;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "resource_id", columnDefinition = "uuid")
     private UUID resourceId;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "before_snapshot", columnDefinition = "jsonb")
     private String beforeSnapshot;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "after_snapshot", columnDefinition = "jsonb")
     private String afterSnapshot;
 
-    @Column(columnDefinition = "text")
+    @Column(name = "reason", columnDefinition = "text")
     private String reason;
 
-    @Column(nullable = false)
+    @Column(name = "request_id", nullable = false, length = 128)
     private String requestId;
 
+    @Column(name = "ip_address")
     private String ipAddress;
 
+    @Column(name = "user_agent", columnDefinition = "text")
     private String userAgent;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "result", nullable = false, length = 16)
     @Builder.Default
-    private AuditResult result = AuditResult.SUCCESS;
+    private AuditResult result = AuditResult.OK;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     public enum AuditResult {
-        SUCCESS, FAILURE, PARTIAL
+        OK, DENIED, ERROR
     }
 }

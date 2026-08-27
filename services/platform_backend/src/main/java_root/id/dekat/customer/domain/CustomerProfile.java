@@ -14,6 +14,7 @@ public class CustomerProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "user_id", nullable = false)
@@ -22,10 +23,10 @@ public class CustomerProfile {
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(length = 100)
+    @Column(name = "nickname", length = 100)
     private String nickname;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "notes", columnDefinition = "TEXT")
     private String notes;
 
     @Column(name = "loyalty_points", nullable = false)
@@ -47,6 +48,6 @@ public class CustomerProfile {
     private OffsetDateTime updatedAt;
 
     @Version
-    @Column(nullable = false)
+    @Column(name = "version", nullable = false)
     private Integer version = 1;
 }

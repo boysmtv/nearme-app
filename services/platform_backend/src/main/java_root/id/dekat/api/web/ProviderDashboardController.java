@@ -13,9 +13,13 @@ import id.dekat.identity.domain.User;
 import id.dekat.identity.domain.UserRepository;
 import id.dekat.platformconfig.domain.ConfigVersion;
 import id.dekat.platformconfig.domain.ConfigVersionRepository;
+import id.dekat.review.application.ReviewService;
 import id.dekat.review.domain.PublicReview;
 import id.dekat.review.domain.PublicReviewRepository;
+import id.dekat.review.domain.ReviewResponse;
 import id.dekat.sharedkernel.web.ApiResponse;
+import id.dekat.tenant.domain.BlockedDate;
+import id.dekat.tenant.domain.BlockedDateRepository;
 import id.dekat.tenant.domain.ProviderListing;
 import id.dekat.tenant.domain.ProviderListingRepository;
 import org.springframework.data.domain.Page;
@@ -49,6 +53,8 @@ public class ProviderDashboardController {
     private final UserRepository userRepository;
     private final PublicReviewRepository publicReviewRepository;
     private final ConfigVersionRepository configVersionRepository;
+    private final ReviewService reviewService;
+    private final BlockedDateRepository blockedDateRepository;
 
     public ProviderDashboardController(BookingRepository bookingRepository,
                                        BookingService bookingService,
@@ -57,7 +63,9 @@ public class ProviderDashboardController {
                                        CustomerProfileRepository customerProfileRepository,
                                        UserRepository userRepository,
                                        PublicReviewRepository publicReviewRepository,
-                                       ConfigVersionRepository configVersionRepository) {
+                                       ConfigVersionRepository configVersionRepository,
+                                       ReviewService reviewService,
+                                       BlockedDateRepository blockedDateRepository) {
         this.bookingRepository = bookingRepository;
         this.bookingService = bookingService;
         this.serviceOfferingRepository = serviceOfferingRepository;
@@ -66,6 +74,8 @@ public class ProviderDashboardController {
         this.userRepository = userRepository;
         this.publicReviewRepository = publicReviewRepository;
         this.configVersionRepository = configVersionRepository;
+        this.reviewService = reviewService;
+        this.blockedDateRepository = blockedDateRepository;
     }
 
     @GetMapping("/dashboard/stats")
@@ -378,6 +388,64 @@ public class ProviderDashboardController {
         return ResponseEntity.ok(ApiResponse.ok(settings));
     }
 
+    @GetMapping("/blocked-dates")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getBlockedDates(
+            @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantIdHeader) {
+        UUID tenantId = resolveTenant(tenantIdHeader);
+        List<BlockedDate> dates = blockedDateRepository.findByTenantId(tenantId);
+        List<Map<String, Object>> result = dates.stream().map(d -> {
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("id", d.getId().toString());
+            row.put("date", d.getBlockedDate().toString());
+            row.put("reason", d.getReason());
+            row.put("createdAt", d.getCreatedAt());
+            return row;
+        }).collect(Collectors.toList());
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    @PostMapping("/blocked-dates")
+    @Transactional
+    public ResponseEntity<ApiResponse<Map<String, Object>>> addBlockedDate(
+            @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantIdHeader,
+            @RequestBody Map<String, Object> request) {
+        UUID tenantId = resolveTenant(tenantIdHeader);
+        String dateStr = Objects.toString(request.get("date"), null);
+        if (dateStr == null) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("date is required"));
+        }
+        LocalDate date;
+        try {
+            date = LocalDate.parse(dateStr);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("date must be yyyy-MM-dd"));
+        }
+        String reason = Objects.toString(request.get("reason"), null);
+        BlockedDate blocked = new BlockedDate(tenantId, date, reason);
+        BlockedDate saved = blockedDateRepository.save(blocked);
+        Map<String, Object> row = new LinkedHashMap<>();
+        row.put("id", saved.getId().toString());
+        row.put("date", saved.getBlockedDate().toString());
+        row.put("reason", saved.getReason());
+        return ResponseEntity.ok(ApiResponse.ok(row, "Blocked date added"));
+    }
+
+    @DeleteMapping("/blocked-dates/{date}")
+    @Transactional
+    public ResponseEntity<ApiResponse<Void>> removeBlockedDate(
+            @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantIdHeader,
+            @PathVariable String date) {
+        UUID tenantId = resolveTenant(tenantIdHeader);
+        LocalDate blockedDate;
+        try {
+            blockedDate = LocalDate.parse(date);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("date must be yyyy-MM-dd"));
+        }
+        blockedDateRepository.deleteByTenantIdAndBlockedDate(tenantId, blockedDate);
+        return ResponseEntity.ok(ApiResponse.ok(null, "Blocked date removed"));
+    }
+
     @PutMapping("/settings")
     @Transactional
     public ResponseEntity<ApiResponse<Map<String, Object>>> updateSettings(
@@ -396,6 +464,65 @@ public class ProviderDashboardController {
         config.setCreatedBy(actorHeader != null ? actorHeader : tenantId);
         ConfigVersion saved = configVersionRepository.save(config);
         return ResponseEntity.ok(ApiResponse.ok(saved.getConfigValue(), "Settings updated"));
+    }
+
+    @GetMapping("/reviews")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> listReviews(
+            @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantIdHeader,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "20") int limit) {
+        UUID tenantId = resolveTenant(tenantIdHeader);
+        int safePage = Math.max(1, page);
+        int safeLimit = Math.max(1, limit);
+        var reviewsPage = publicReviewRepository.findByTenantIdAndStatusOrderByCreatedAtDesc(
+                tenantId, PublicReview.ReviewStatus.PUBLISHED,
+                PageRequest.of(safePage - 1, safeLimit));
+        List<Map<String, Object>> data = reviewsPage.getContent().stream()
+                .map(r -> {
+                    Map<String, Object> row = new LinkedHashMap<String, Object>();
+                    row.put("id", r.getId().toString());
+                    row.put("rating", r.getRating());
+                    row.put("title", r.getTitle());
+                    row.put("body", r.getBody());
+                    row.put("createdAt", r.getCreatedAt());
+                    row.put("customerName", resolveCustomerName(r.getCustomerId()));
+                    return row;
+                })
+                .collect(Collectors.toList());
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("data", data);
+        payload.put("pagination", Map.of(
+                "page", safePage,
+                "limit", safeLimit,
+                "total", reviewsPage.getTotalElements(),
+                "totalPages", reviewsPage.getTotalPages()));
+        return ResponseEntity.ok(ApiResponse.ok(payload));
+    }
+
+    @PostMapping("/reviews/{id}/respond")
+    @Transactional
+    public ResponseEntity<ApiResponse<Map<String, Object>>> respondToReview(
+            @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantIdHeader,
+            @RequestHeader(value = "X-Actor-Id", required = false) UUID actorHeader,
+            @PathVariable UUID id,
+            @RequestBody Map<String, String> body) {
+        UUID tenantId = resolveTenant(tenantIdHeader);
+        UUID authorId = actorHeader != null ? actorHeader : tenantId;
+        String responseText = body.get("body");
+        if (responseText == null || responseText.isBlank()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("body is required"));
+        }
+        try {
+            ReviewResponse response = reviewService.respondToReview(id, responseText, authorId);
+            Map<String, Object> result = new LinkedHashMap<>();
+            result.put("id", response.getId().toString());
+            result.put("reviewId", response.getReviewId().toString());
+            result.put("body", response.getBody());
+            result.put("createdAt", response.getCreatedAt());
+            return ResponseEntity.ok(ApiResponse.ok(result, "Response added"));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     private UUID resolveTenant(UUID tenantIdHeader) {

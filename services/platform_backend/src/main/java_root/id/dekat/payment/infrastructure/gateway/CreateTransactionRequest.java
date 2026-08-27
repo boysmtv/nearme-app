@@ -3,7 +3,6 @@ package id.dekat.payment.infrastructure.gateway;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -11,7 +10,7 @@ import java.util.List;
 @Builder
 public class CreateTransactionRequest {
     private String orderId;
-    private BigDecimal amount;
+    private Integer amount;
     private String currency;
     private String customerName;
     private String customerEmail;
@@ -25,7 +24,7 @@ public class CreateTransactionRequest {
     public static class OrderItem {
         private String id;
         private String name;
-        private BigDecimal price;
+        private Integer price;
         private Integer quantity;
     }
 }

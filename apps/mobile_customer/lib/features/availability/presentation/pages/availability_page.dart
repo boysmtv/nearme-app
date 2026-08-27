@@ -72,7 +72,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
             onFormatChanged: (format) => setState(() => _calendarFormat = format),
             calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
-              todayDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.3), shape: BoxShape.circle),
+              todayDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), shape: BoxShape.circle),
               selectedDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
             ),
             headerStyle: const HeaderStyle(formatButtonVisible: false, titleCentered: true),
@@ -165,7 +165,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -5))],
         ),
         child: SafeArea(
           child: ElevatedButton(

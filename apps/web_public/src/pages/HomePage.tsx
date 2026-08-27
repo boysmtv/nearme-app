@@ -112,7 +112,7 @@ export default function HomePage() {
                 categories.map((cat) => (
                   <Link
                     key={cat.id}
-                    to={`/search?category=${cat.slug}`}
+                    to={`/search?category=${cat.id}`}
                     className="group flex flex-col items-center rounded-xl border border-gray-200 p-6 transition-all hover:border-primary-200 hover:bg-primary-50 hover:shadow-md"
                   >
                     <span className="text-4xl">{cat.icon}</span>

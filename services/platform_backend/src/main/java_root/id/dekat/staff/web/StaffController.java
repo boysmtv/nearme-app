@@ -44,8 +44,7 @@ public class StaffController {
     public ResponseEntity<ApiResponse<Staff>> updateStaff(
             @PathVariable UUID id,
             @RequestBody Staff staff) {
-        staff.setId(id);
-        Staff updated = staffService.activateStaff(id);
+        Staff updated = staffService.updateStaff(id, staff);
         return ResponseEntity.ok(ApiResponse.ok(updated));
     }
 
@@ -56,11 +55,11 @@ public class StaffController {
     }
 
     @PostMapping("/{id}/schedule")
-    public ResponseEntity<Void> addSchedule(
+    public ResponseEntity<ApiResponse<StaffSchedule>> addSchedule(
             @PathVariable UUID id,
             @RequestBody StaffSchedule schedule) {
-        schedule.setStaffId(id);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        StaffSchedule saved = staffService.addSchedule(id, schedule);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(saved));
     }
 
     private UUID resolveTenant(UUID tenantId) {

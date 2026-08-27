@@ -46,7 +46,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
           onFormatChanged: (f) => setState(() => _calendarFormat = f),
           calendarStyle: CalendarStyle(
             outsideDaysVisible: false,
-            todayDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.3), shape: BoxShape.circle),
+            todayDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), shape: BoxShape.circle),
             selectedDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
             markerDecoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
             markerSize: 8, markersMaxCount: 3,
@@ -56,11 +56,13 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         const Divider(),
         Expanded(child: bookingsAsync.when(
           data: (bookings) {
-            if (bookings.isEmpty) return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(Icons.event_available, size: 80, color: Colors.grey[300]),
-              const SizedBox(height: 16),
-              Text('No bookings for this day', style: TextStyle(color: Colors.grey)),
-            ]));
+            if (bookings.isEmpty) {
+              return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(Icons.event_available, size: 80, color: Colors.grey[300]),
+                const SizedBox(height: 16),
+                Text('No bookings for this day', style: TextStyle(color: Colors.grey)),
+              ]));
+            }
             return ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: bookings.length,
@@ -77,7 +79,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
                     leading: CircleAvatar(
-                      backgroundColor: color.withOpacity(0.1),
+                      backgroundColor: color.withValues(alpha: 0.1),
                       child: Icon(Icons.person, color: color),
                     ),
                     title: Text(b.customerName, style: const TextStyle(fontWeight: FontWeight.bold)),
@@ -85,7 +87,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                     trailing: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
-                        color: color.withOpacity(0.1),
+                        color: color.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Text(status.isNotEmpty ? status[0] + status.substring(1).toLowerCase() : '-',

@@ -1,7 +1,6 @@
 package id.dekat.payment.web.dto;
 
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
 import java.util.UUID;
 
 public class PaymentIntentRequest {
@@ -10,7 +9,7 @@ public class PaymentIntentRequest {
     private UUID tenantId;
 
     @NotNull
-    private BigDecimal amount;
+    private Integer amount;
 
     @NotNull
     private String currency;
@@ -19,8 +18,8 @@ public class PaymentIntentRequest {
 
     public UUID getTenantId() { return tenantId; }
     public void setTenantId(UUID tenantId) { this.tenantId = tenantId; }
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
+    public Integer getAmount() { return amount; }
+    public void setAmount(Integer amount) { this.amount = amount; }
     public String getCurrency() { return currency; }
     public void setCurrency(String currency) { this.currency = currency; }
     public String getMethod() { return method; }

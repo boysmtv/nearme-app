@@ -4,16 +4,16 @@ import type { Booking } from '../../lib/types';
 
 const mockBooking: Booking = {
   id: '1',
-  code: 'DKT-001',
+  bookingCode: 'DKT-001',
   customerName: 'Siti Aminah',
   customerEmail: 'siti@example.com',
   customerPhone: '081234567890',
   serviceName: 'Potong Rambut',
   staffName: 'Andi',
-  startTime: '2026-08-25T10:00:00Z',
-  endTime: '2026-08-25T10:30:00Z',
+  time: '10:00',
+  endTime: '10:30',
   status: 'CONFIRMED',
-  totalAmount: 50000,
+  amount: 50000,
   depositPaid: 10000,
   notes: '',
   createdAt: '2026-08-24T08:00:00Z',
@@ -76,7 +76,7 @@ describe('BookingTable', () => {
     const second: Booking = {
       ...mockBooking,
       id: '2',
-      code: 'DKT-002',
+      bookingCode: 'DKT-002',
       customerName: 'Budi',
       status: 'PENDING_PAYMENT',
     };

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import id.dekat.payment.infrastructure.gateway.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -20,6 +21,7 @@ import java.util.*;
 
 @Slf4j
 @Component
+@Primary
 public class MidtransGatewayAdapter implements PaymentGatewayPort {
 
     private static final String SHA512_ALGORITHM = "HmacSHA512";
@@ -137,7 +139,7 @@ public class MidtransGatewayAdapter implements PaymentGatewayPort {
         HttpHeaders headers = createAuthHeaders();
 
         Map<String, Object> body = new HashMap<>();
-        body.put("refund_amount", request.getAmount().toPlainString());
+        body.put("refund_amount", request.getAmount().toString());
         body.put("reason", request.getReason() != null ? request.getReason() : "Refund requested");
 
         try {
@@ -220,7 +222,7 @@ public class MidtransGatewayAdapter implements PaymentGatewayPort {
                     .orderId(orderId)
                     .referenceId(orderId)
                     .status(status)
-                    .amount(amount)
+                    .amount(amount != null ? amount.intValue() : null)
                     .signature(signatureKey)
                     .timestamp(transactionTime)
                     .build();
@@ -237,7 +239,7 @@ public class MidtransGatewayAdapter implements PaymentGatewayPort {
 
         transaction.put("transaction_details", Map.of(
                 "order_id", request.getOrderId(),
-                "gross_amount", request.getAmount().toPlainString()
+                "gross_amount", request.getAmount().toString()
         ));
 
         if (request.getCustomerName() != null || request.getCustomerEmail() != null || request.getCustomerPhone() != null) {
@@ -253,7 +255,7 @@ public class MidtransGatewayAdapter implements PaymentGatewayPort {
                     .map(item -> Map.<String, Object>of(
                             "id", item.getId(),
                             "name", item.getName(),
-                            "price", item.getPrice().toPlainString(),
+                            "price", item.getPrice().toString(),
                             "quantity", item.getQuantity()
                     ))
                     .toList();

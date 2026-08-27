@@ -12,8 +12,6 @@ const serviceSchema = z.object({
   description: z.string().min(10),
   duration: z.number().min(15),
   price: z.number().min(0),
-  depositAmount: z.number().min(0),
-  category: z.string().min(1),
 });
 type FormData = z.infer<typeof serviceSchema>;
 function fmt(n: number) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n); }
@@ -25,8 +23,8 @@ export default function ServicesPage() {
   const { data: res, isLoading } = useQuery({ queryKey: ['services'], queryFn: () => providerApi.services.list() });
   const services = res?.data ?? [];
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(serviceSchema) });
-  const createMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.create({ name: d.name, price: d.price, duration: d.duration }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); } });
-  const updateMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.update(edit!.id, d), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); setEdit(null); } });
+  const createMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.create({ name: d.name, description: d.description, price: d.price, duration: d.duration }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); } });
+  const updateMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.update(edit!.id, { name: d.name, description: d.description, price: d.price, duration: d.duration }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); setEdit(null); } });
   const deleteMut = useMutation({ mutationFn: (id: string) => providerApi.services.delete(id), onSuccess: () => qc.invalidateQueries({ queryKey: ['services'] }) });
 
   return (
@@ -34,7 +32,7 @@ export default function ServicesPage() {
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div><h1 className="text-2xl font-bold text-gray-900">Layanan</h1><p className="mt-1 text-sm text-gray-500">Kelola katalog layanan bisnis Anda</p></div>
-          <button onClick={() => { setEdit(null); reset({ name: '', description: '', duration: 30, price: 0, depositAmount: 0, category: '' }); setShow(true); }} className="rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">+ Tambah Layanan</button>
+          <button onClick={() => { setEdit(null); reset({ name: '', description: '', duration: 30, price: 0 }); setShow(true); }} className="rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700">+ Tambah Layanan</button>
         </div>
         {isLoading ? <div className="space-y-3">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="animate-pulse rounded-xl bg-white p-6 shadow-sm"><div className="h-5 w-1/3 rounded bg-gray-200" /></div>)}</div>
         : services.length === 0 ? <div className="rounded-xl bg-white p-12 text-center shadow-sm ring-1 ring-gray-100"><h3 className="text-lg font-semibold text-gray-900">Belum ada layanan</h3><p className="mt-2 text-gray-500">Tambahkan layanan pertama Anda</p></div>
@@ -42,12 +40,12 @@ export default function ServicesPage() {
           <div key={s.id} className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <div className="flex items-center gap-3"><h3 className="font-semibold text-gray-900">{s.name}</h3><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{s.isActive ? 'Aktif' : 'Nonaktif'}</span></div>
+                <div className="flex items-center gap-3"><h3 className="font-semibold text-gray-900">{s.name}</h3><span className={`rounded-full px-2 py-0.5 text-xs font-medium ${s.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{s.active ? 'Aktif' : 'Nonaktif'}</span></div>
                 <p className="mt-1 text-sm text-gray-500">{s.description}</p>
-                <div className="mt-2 flex items-center gap-4 text-xs text-gray-500"><span>{s.duration} menit</span><span>{fmt(s.price)}</span>{s.depositAmount > 0 && <span>Deposit: {fmt(s.depositAmount)}</span>}<span className="rounded-full bg-gray-100 px-2 py-0.5">{s.category}</span></div>
+                <div className="mt-2 flex items-center gap-4 text-xs text-gray-500"><span>{s.duration} menit</span><span>{fmt(s.price)}</span></div>
               </div>
               <div className="flex items-center gap-2">
-                <button onClick={() => { setEdit(s); reset({ name: s.name, description: s.description, duration: s.duration, price: s.price, depositAmount: s.depositAmount, category: s.category }); setShow(true); }} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Edit</button>
+                <button onClick={() => { setEdit(s); reset({ name: s.name, description: s.description, duration: s.duration, price: s.price }); setShow(true); }} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Edit</button>
                 <button onClick={() => { if (confirm('Hapus layanan ini?')) deleteMut.mutate(s.id); }} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">Hapus</button>
               </div>
             </div>
@@ -63,11 +61,7 @@ export default function ServicesPage() {
               <div><label className="block text-sm font-medium text-gray-700">Deskripsi</label><textarea {...register('description')} rows={3} className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none" />{errors.description && <p className="mt-1 text-sm text-red-600">{errors.description.message}</p>}</div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-sm font-medium text-gray-700">Durasi (menit)</label><input type="number" {...register('duration', { valueAsNumber: true })} className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none" /></div>
-                <div><label className="block text-sm font-medium text-gray-700">Kategori</label><select {...register('category')} className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm"><option value="">Pilih</option><option value="barbershop">Barbershop</option><option value="salon">Salon</option><option value="spa-massage">Spa & Massage</option><option value="kecantikan">Kecantikan</option></select></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-sm font-medium text-gray-700">Harga (Rp)</label><input type="number" {...register('price', { valueAsNumber: true })} className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none" /></div>
-                <div><label className="block text-sm font-medium text-gray-700">Deposit (Rp)</label><input type="number" {...register('depositAmount', { valueAsNumber: true })} className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none" /></div>
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => { setShow(false); setEdit(null); }} className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50">Batal</button>

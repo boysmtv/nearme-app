@@ -14,32 +14,38 @@ public class BookingHold {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(nullable = false)
+    @Column(name = "location_id", nullable = false)
     private UUID locationId;
 
-    @Column(nullable = false)
+    @Column(name = "service_id", nullable = false)
     private UUID serviceId;
 
+    @Column(name = "staff_id")
     private UUID staffId;
+
+    @Column(name = "resource_id")
     private UUID resourceId;
+
+    @Column(name = "customer_id")
     private UUID customerId;
 
-    @Column(nullable = false)
+    @Column(name = "starts_at", nullable = false)
     private OffsetDateTime startsAt;
 
-    @Column(nullable = false)
+    @Column(name = "ends_at", nullable = false)
     private OffsetDateTime endsAt;
 
-    @Column(nullable = false)
+    @Column(name = "expires_at", nullable = false)
     private OffsetDateTime expiresAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private HoldStatus status;
 
     protected BookingHold() {}

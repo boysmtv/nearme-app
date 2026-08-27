@@ -66,7 +66,7 @@ export const providerApi = {
 
   services: {
     list: () => apiClient.get<ApiResponse<ProviderService[]>>('/provider/services'),
-    create: (data: { name: string; price: number; duration: number }) =>
+    create: (data: { name: string; description: string; price: number; duration: number }) =>
       apiClient.post<ApiResponse<ProviderService>>('/provider/services', data),
     update: (id: string, data: Partial<ProviderService>) =>
       apiClient.put<ApiResponse<ProviderService>>(`/provider/services/${id}`, data),

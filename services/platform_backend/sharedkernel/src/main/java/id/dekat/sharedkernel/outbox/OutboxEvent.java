@@ -39,7 +39,7 @@ public class OutboxEvent {
     @Column(name = "available_at", nullable = false)
     private Instant availableAt;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
     @Column(name = "published_at")

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.Normalizer;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
@@ -27,10 +28,12 @@ public class TenantService {
         Tenant tenant = Tenant.builder()
                 .name(request.getName())
                 .slug(slug)
-                .category(request.getCategory())
-                .contactEmail(request.getContactEmail())
-                .contactPhone(request.getContactPhone())
-                .status(VerificationStatus.DRAFT)
+                .legalName(request.getLegalName())
+                .taxId(request.getTaxId())
+                .phone(request.getPhone())
+                .email(request.getEmail())
+                .status(TenantStatus.ACTIVE)
+                .verificationStatus("UNVERIFIED")
                 .build();
 
         return tenantRepository.save(tenant);
@@ -41,8 +44,8 @@ public class TenantService {
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + id));
 
-        if (tenant.getStatus() != VerificationStatus.DRAFT && tenant.getStatus() != VerificationStatus.REJECTED) {
-            throw new IllegalStateException("Tenant can only be updated in DRAFT or REJECTED status");
+        if (!"UNVERIFIED".equals(tenant.getVerificationStatus()) && !"REJECTED".equals(tenant.getVerificationStatus())) {
+            throw new IllegalStateException("Tenant can only be updated when UNVERIFIED or REJECTED");
         }
 
         String newSlug = tenant.getSlug();
@@ -56,9 +59,10 @@ public class TenantService {
         Tenant updated = tenant.toBuilder()
                 .name(request.getName())
                 .slug(newSlug)
-                .category(request.getCategory())
-                .contactEmail(request.getContactEmail())
-                .contactPhone(request.getContactPhone())
+                .legalName(request.getLegalName())
+                .taxId(request.getTaxId())
+                .phone(request.getPhone())
+                .email(request.getEmail())
                 .build();
 
         return tenantRepository.save(updated);
@@ -69,14 +73,14 @@ public class TenantService {
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + id));
 
-        if (tenant.getStatus() != VerificationStatus.DRAFT) {
-            throw new IllegalStateException("Only DRAFT tenants can be submitted for review. Current status: " + tenant.getStatus());
+        if (!"UNVERIFIED".equals(tenant.getVerificationStatus())) {
+            throw new IllegalStateException("Only UNVERIFIED tenants can be submitted for review. Current status: " + tenant.getVerificationStatus());
         }
 
         validateTenantForSubmission(tenant);
 
         Tenant updated = tenant.toBuilder()
-                .status(VerificationStatus.SUBMITTED)
+                .verificationStatus("PENDING_REVIEW")
                 .build();
 
         return tenantRepository.save(updated);
@@ -87,12 +91,13 @@ public class TenantService {
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + id));
 
-        if (tenant.getStatus() != VerificationStatus.SUBMITTED && tenant.getStatus() != VerificationStatus.UNDER_REVIEW) {
-            throw new IllegalStateException("Only SUBMITTED or UNDER_REVIEW tenants can be approved. Current status: " + tenant.getStatus());
+        if (!"PENDING_REVIEW".equals(tenant.getVerificationStatus()) && !"UNDER_REVIEW".equals(tenant.getVerificationStatus())) {
+            throw new IllegalStateException("Only PENDING_REVIEW or UNDER_REVIEW tenants can be approved.");
         }
 
         Tenant updated = tenant.toBuilder()
-                .status(VerificationStatus.APPROVED)
+                .verificationStatus("VERIFIED")
+                .verifiedAt(LocalDateTime.now())
                 .build();
 
         return tenantRepository.save(updated);
@@ -103,12 +108,14 @@ public class TenantService {
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + id));
 
-        if (tenant.getStatus() != VerificationStatus.SUBMITTED && tenant.getStatus() != VerificationStatus.UNDER_REVIEW) {
-            throw new IllegalStateException("Only SUBMITTED or UNDER_REVIEW tenants can be rejected. Current status: " + tenant.getStatus());
+        if (!"PENDING_REVIEW".equals(tenant.getVerificationStatus()) && !"UNDER_REVIEW".equals(tenant.getVerificationStatus())) {
+            throw new IllegalStateException("Only PENDING_REVIEW or UNDER_REVIEW tenants can be rejected.");
         }
 
         Tenant updated = tenant.toBuilder()
-                .status(VerificationStatus.REJECTED)
+                .verificationStatus("REJECTED")
+                .rejectedAt(LocalDateTime.now())
+                .rejectionReason(reason)
                 .build();
 
         return tenantRepository.save(updated);
@@ -119,18 +126,15 @@ public class TenantService {
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + id));
 
-        if (tenant.getStatus() != VerificationStatus.APPROVED) {
-            throw new IllegalStateException("Only APPROVED tenants can be suspended. Current status: " + tenant.getStatus());
+        if (tenant.getStatus() != TenantStatus.ACTIVE) {
+            throw new IllegalStateException("Only ACTIVE tenants can be suspended.");
         }
 
         Tenant updated = tenant.toBuilder()
-                .status(VerificationStatus.SUSPENDED)
+                .status(TenantStatus.SUSPENDED)
                 .build();
 
-        Tenant saved = tenantRepository.save(updated);
-
-        // TODO: Notify provider about suspension via NotificationService
-        return saved;
+        return tenantRepository.save(updated);
     }
 
     @Transactional
@@ -138,12 +142,12 @@ public class TenantService {
         Tenant tenant = tenantRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + id));
 
-        if (tenant.getStatus() != VerificationStatus.SUSPENDED) {
-            throw new IllegalStateException("Only SUSPENDED tenants can be reactivated. Current status: " + tenant.getStatus());
+        if (tenant.getStatus() != TenantStatus.SUSPENDED) {
+            throw new IllegalStateException("Only SUSPENDED tenants can be reactivated.");
         }
 
         Tenant updated = tenant.toBuilder()
-                .status(VerificationStatus.APPROVED)
+                .status(TenantStatus.ACTIVE)
                 .build();
 
         return tenantRepository.save(updated);
@@ -154,7 +158,7 @@ public class TenantService {
         Tenant tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found: " + tenantId));
 
-        if (tenant.getStatus() != VerificationStatus.APPROVED && tenant.getStatus() != VerificationStatus.DRAFT) {
+        if (tenant.getStatus() != TenantStatus.ACTIVE) {
             throw new IllegalStateException("Cannot add location to tenant in status: " + tenant.getStatus());
         }
 
@@ -238,10 +242,7 @@ public class TenantService {
         if (tenant.getName() == null || tenant.getName().isBlank()) {
             throw new IllegalStateException("Tenant name is required for submission");
         }
-        if (tenant.getCategory() == null || tenant.getCategory().isBlank()) {
-            throw new IllegalStateException("Tenant category is required for submission");
-        }
-        if (tenant.getContactEmail() == null || tenant.getContactEmail().isBlank()) {
+        if (tenant.getEmail() == null || tenant.getEmail().isBlank()) {
             throw new IllegalStateException("Contact email is required for submission");
         }
 

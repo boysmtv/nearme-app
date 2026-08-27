@@ -20,31 +20,31 @@ public class TimeOff {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(columnDefinition = "uuid")
+    @Column(name = "id", columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "staff_id", nullable = false, columnDefinition = "uuid")
     private UUID staffId;
 
-    @Column(nullable = false)
+    @Column(name = "start_date", nullable = false)
     private Instant startDate;
 
-    @Column(nullable = false)
+    @Column(name = "end_date", nullable = false)
     private Instant endDate;
 
-    @Column(columnDefinition = "text")
+    @Column(name = "reason", columnDefinition = "text")
     private String reason;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     @Builder.Default
     private TimeOffStatus status = TimeOffStatus.PENDING;
 
-    @Column(columnDefinition = "uuid")
+    @Column(name = "approved_by", columnDefinition = "uuid")
     private UUID approvedBy;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
 
     public enum TimeOffStatus {

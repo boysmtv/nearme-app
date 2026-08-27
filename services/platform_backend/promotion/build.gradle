@@ -8,7 +8,6 @@ description = 'DEKAT Promotion - coupons, discounts, referral'
 dependencies {
     api project(':sharedkernel')
     api project(':tenant')
-    api project(':customer')
 
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 

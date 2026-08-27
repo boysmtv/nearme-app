@@ -14,6 +14,7 @@ public class ProviderLocation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
@@ -22,7 +23,7 @@ public class ProviderLocation {
     @Column(name = "business_id")
     private UUID businessId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "address_line1")
@@ -31,24 +32,28 @@ public class ProviderLocation {
     @Column(name = "address_line2")
     private String addressLine2;
 
+    @Column(name = "city")
     private String city;
 
+    @Column(name = "province")
     private String province;
 
     @Column(name = "postal_code", length = 10)
     private String postalCode;
 
-    @Column(length = 2, nullable = false)
+    @Column(name = "country", length = 2, nullable = false)
     private String country = "ID";
 
+    @Column(name = "latitude")
     private BigDecimal latitude;
 
+    @Column(name = "longitude")
     private BigDecimal longitude;
 
-    @Column(length = 20)
+    @Column(name = "phone", length = 20)
     private String phone;
 
-    @Column(length = 50, nullable = false)
+    @Column(name = "timezone", length = 50, nullable = false)
     private String timezone = "Asia/Jakarta";
 
     @Column(name = "is_active", nullable = false)

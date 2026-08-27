@@ -10,15 +10,16 @@ public class ServiceCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "parent_id")
     private UUID parentId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "slug", nullable = false, unique = true)
     private String slug;
 
     @Column(name = "icon_url")
@@ -27,7 +28,7 @@ public class ServiceCategory {
     @Column(name = "sort_order")
     private Integer sortOrder;
 
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "created_at", nullable = false, updatable = false)

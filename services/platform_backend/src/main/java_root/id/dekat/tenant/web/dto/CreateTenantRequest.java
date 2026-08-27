@@ -11,22 +11,24 @@ public class CreateTenantRequest {
     @NotBlank(message = "Slug is required")
     private String slug;
 
-    @NotBlank(message = "Category is required")
-    private String category;
+    private String legalName;
+
+    private String taxId;
+
+    private String phone;
 
     @Email(message = "Invalid email format")
-    private String contactEmail;
-
-    private String contactPhone;
+    private String email;
 
     public CreateTenantRequest() {}
 
-    public CreateTenantRequest(String name, String slug, String category, String contactEmail, String contactPhone) {
+    public CreateTenantRequest(String name, String slug, String legalName, String taxId, String phone, String email) {
         this.name = name;
         this.slug = slug;
-        this.category = category;
-        this.contactEmail = contactEmail;
-        this.contactPhone = contactPhone;
+        this.legalName = legalName;
+        this.taxId = taxId;
+        this.phone = phone;
+        this.email = email;
     }
 
     public String getName() { return name; }
@@ -35,12 +37,15 @@ public class CreateTenantRequest {
     public String getSlug() { return slug; }
     public void setSlug(String slug) { this.slug = slug; }
 
-    public String getCategory() { return category; }
-    public void setCategory(String category) { this.category = category; }
+    public String getLegalName() { return legalName; }
+    public void setLegalName(String legalName) { this.legalName = legalName; }
 
-    public String getContactEmail() { return contactEmail; }
-    public void setContactEmail(String contactEmail) { this.contactEmail = contactEmail; }
+    public String getTaxId() { return taxId; }
+    public void setTaxId(String taxId) { this.taxId = taxId; }
 
-    public String getContactPhone() { return contactPhone; }
-    public void setContactPhone(String contactPhone) { this.contactPhone = contactPhone; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 }

@@ -34,7 +34,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
         padding: const EdgeInsets.all(16),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Card(color: Theme.of(context).colorScheme.primary, child: Padding(padding: const EdgeInsets.all(24), child: Center(child: Column(children: [
-            Text('Total Amount', style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16)),
+            Text('Total Amount', style: TextStyle(color: Colors.white.withValues(alpha: 0.8), fontSize: 16)),
             const SizedBox(height: 8),
             Text(formatRupiah(widget.amount), style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
           ])))),
@@ -62,7 +62,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -5))]),
+        decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -5))]),
         child: SafeArea(child: ElevatedButton(
           onPressed: _isProcessing ? null : _handlePayment,
           style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
@@ -120,7 +120,7 @@ class _PaymentMethodCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: isSelected ? Theme.of(context).colorScheme.primary.withOpacity(0.1) : null,
+      color: isSelected ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.1) : null,
       child: ListTile(leading: Icon(icon), title: Text(title), subtitle: Text(subtitle),
         trailing: Radio<String>(value: title.toLowerCase(), groupValue: isSelected ? title.toLowerCase() : '', onChanged: (_) => onTap(), activeColor: Theme.of(context).colorScheme.primary),
         onTap: onTap),

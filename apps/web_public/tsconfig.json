@@ -25,6 +25,7 @@
     }
   },
   "include": ["src", "vite-env.d.ts"],
+  "exclude": ["src/test", "src/**/__tests__", "src/**/*.test.ts", "src/**/*.test.tsx"],
   "references": [
     { "path": "../../packages/web_ui" },
     { "path": "../../packages/web_api_client" },

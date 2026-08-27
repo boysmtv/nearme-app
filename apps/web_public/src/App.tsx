@@ -1,5 +1,6 @@
 import { Routes, Route, Link } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
+import ProtectedRoute from './lib/ProtectedRoute';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
@@ -7,6 +8,14 @@ const ProviderPage = lazy(() => import('./pages/ProviderPage'));
 const BookingPage = lazy(() => import('./pages/BookingPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+
+const ProviderDashboardPage = lazy(() => import('./pages/provider/DashboardPage'));
+const ProviderCalendarPage = lazy(() => import('./pages/provider/CalendarPage'));
+const ProviderServicesPage = lazy(() => import('./pages/provider/ServicesPage'));
+const ProviderStaffPage = lazy(() => import('./pages/provider/StaffPage'));
+const ProviderCustomersPage = lazy(() => import('./pages/provider/CustomersPage'));
+const ProviderReportsPage = lazy(() => import('./pages/provider/ReportsPage'));
+const ProviderSettingsPage = lazy(() => import('./pages/provider/SettingsPage'));
 
 function LoadingFallback() {
   return (
@@ -42,6 +51,15 @@ export function App() {
         <Route path="/booking/:providerId" element={<BookingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+
+        <Route path="/provider/dashboard" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderDashboardPage /></ProtectedRoute>} />
+        <Route path="/provider/calendar" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCalendarPage /></ProtectedRoute>} />
+        <Route path="/provider/services" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderServicesPage /></ProtectedRoute>} />
+        <Route path="/provider/staff" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderStaffPage /></ProtectedRoute>} />
+        <Route path="/provider/customers" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCustomersPage /></ProtectedRoute>} />
+        <Route path="/provider/reports" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderReportsPage /></ProtectedRoute>} />
+        <Route path="/provider/settings" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderSettingsPage /></ProtectedRoute>} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>

@@ -14,6 +14,7 @@ public class ServiceOffering {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
@@ -22,10 +23,10 @@ public class ServiceOffering {
     @Column(name = "category_id")
     private UUID categoryId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "short_description", length = 500)
@@ -37,10 +38,10 @@ public class ServiceOffering {
     @Column(name = "buffer_minutes", nullable = false)
     private Integer bufferMinutes = 0;
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price = BigDecimal.ZERO;
 
-    @Column(nullable = false, length = 3)
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency = "IDR";
 
     @Column(name = "image_url", columnDefinition = "TEXT")
@@ -62,7 +63,7 @@ public class ServiceOffering {
     private OffsetDateTime updatedAt;
 
     @Version
-    @Column(nullable = false)
+    @Column(name = "version", nullable = false)
     private Integer version = 1;
 
     @PrePersist

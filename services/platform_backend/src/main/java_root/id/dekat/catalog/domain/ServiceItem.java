@@ -11,6 +11,7 @@ public class ServiceItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
@@ -19,13 +20,13 @@ public class ServiceItem {
     @Column(name = "category_id", nullable = false)
     private UUID categoryId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "slug", nullable = false)
     private String slug;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "duration_minutes", nullable = false)
@@ -38,7 +39,7 @@ public class ServiceItem {
     @Column(name = "base_price_amount", precision = 12, scale = 2)
     private BigDecimal basePriceAmount;
 
-    @Column(length = 3)
+    @Column(name = "currency", length = 3)
     private String currency;
 
     @Column(name = "deposit_amount", precision = 12, scale = 2)
@@ -53,10 +54,10 @@ public class ServiceItem {
     @Column(name = "buffer_after_minutes")
     private Integer bufferAfterMinutes;
 
-    @Column(nullable = false)
+    @Column(name = "visibility", nullable = false)
     private String visibility;
 
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -1,7 +1,9 @@
 package id.dekat.notification.web;
 
-import id.dekat.notification.domain.DeliveryRecord;
-import id.dekat.notification.domain.DeliveryRecordRepository;
+import id.dekat.notification.domain.DeviceToken;
+import id.dekat.notification.domain.DeviceTokenRepository;
+import id.dekat.notification.domain.NotificationDelivery;
+import id.dekat.notification.domain.NotificationRepository;
 import id.dekat.sharedkernel.web.ApiResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -19,10 +22,13 @@ import java.util.UUID;
 @RequestMapping("/notifications")
 public class NotificationController {
 
-    private final DeliveryRecordRepository deliveryRecordRepository;
+    private final NotificationRepository notificationRepository;
+    private final DeviceTokenRepository deviceTokenRepository;
 
-    public NotificationController(DeliveryRecordRepository deliveryRecordRepository) {
-        this.deliveryRecordRepository = deliveryRecordRepository;
+    public NotificationController(NotificationRepository notificationRepository,
+                                   DeviceTokenRepository deviceTokenRepository) {
+        this.notificationRepository = notificationRepository;
+        this.deviceTokenRepository = deviceTokenRepository;
     }
 
     @GetMapping
@@ -39,7 +45,7 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error("Authenticated recipient required"));
         }
-        Page<DeliveryRecord> result = deliveryRecordRepository.findByRecipientIdOrderByCreatedAtDesc(
+        Page<NotificationDelivery> result = notificationRepository.findByRecipientIdOrderByCreatedAtDesc(
                 recipientId, PageRequest.of(Math.max(0, page - 1), Math.max(1, limit)));
         Map<String, Object> payload = new LinkedHashMap<>();
         payload.put("data", result.getContent().stream().map(this::toRow).toList());
@@ -65,15 +71,16 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error("Authenticated recipient required"));
         }
-        var found = deliveryRecordRepository.findByIdAndRecipientId(id, recipientId);
-        if (found.isEmpty()) {
+        var found = notificationRepository.findById(id);
+        if (found.isEmpty() || !found.get().getRecipientId().equals(recipientId)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Notification not found"));
         }
-        DeliveryRecord record = found.get();
-        if ("PENDING".equals(record.getStatus()) || "SENT".equals(record.getStatus())) {
-            record.setStatus("DELIVERED");
-            record.setDeliveredAt(java.time.OffsetDateTime.now());
-            record = deliveryRecordRepository.save(record);
+        NotificationDelivery record = found.get();
+        if (record.getStatus() == NotificationDelivery.DeliveryStatus.PENDING
+                || record.getStatus() == NotificationDelivery.DeliveryStatus.SENT) {
+            record.setStatus(NotificationDelivery.DeliveryStatus.DELIVERED);
+            record.setDeliveredAt(Instant.now());
+            record = notificationRepository.save(record);
         }
         return ResponseEntity.ok(ApiResponse.ok(toRow(record), "Notification marked as read"));
     }
@@ -91,18 +98,60 @@ public class NotificationController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(ApiResponse.error("Authenticated recipient required"));
         }
-        int updated = deliveryRecordRepository.markAllRead(recipientId);
+        int updated = notificationRepository.markAllRead(recipientId);
         return ResponseEntity.ok(ApiResponse.ok(Map.of("updated", updated), "Notifications marked as read"));
     }
 
-    private Map<String, Object> toRow(DeliveryRecord record) {
+    @PostMapping("/device-tokens")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> registerDeviceToken(
+            @RequestBody DeviceToken deviceToken,
+            Principal principal,
+            @RequestHeader(value = "X-Recipient-Id", required = false) UUID recipientHeader) {
+        UUID userId = currentUserId(principal);
+        if (userId == null) {
+            userId = recipientHeader;
+        }
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Authenticated user required"));
+        }
+        deviceToken.setUserId(userId);
+        if (deviceToken.getCreatedAt() == null) {
+            deviceToken.setCreatedAt(Instant.now());
+        }
+        DeviceToken saved = deviceTokenRepository.save(deviceToken);
+        Map<String, Object> payload = new LinkedHashMap<>();
+        payload.put("id", saved.getId().toString());
+        payload.put("token", saved.getToken());
+        payload.put("deviceType", saved.getDeviceType());
+        return ResponseEntity.ok(ApiResponse.ok(payload, "Device token registered"));
+    }
+
+    @GetMapping("/unread-count")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> unreadCount(
+            Principal principal,
+            @RequestHeader(value = "X-Recipient-Id", required = false) UUID recipientHeader) {
+        UUID recipientId = currentUserId(principal);
+        if (recipientId == null) {
+            recipientId = recipientHeader;
+        }
+        if (recipientId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.error("Authenticated recipient required"));
+        }
+        long count = notificationRepository.findByRecipientIdAndStatus(
+                recipientId, NotificationDelivery.DeliveryStatus.PENDING).size();
+        return ResponseEntity.ok(ApiResponse.ok(Map.of("unreadCount", count)));
+    }
+
+    private Map<String, Object> toRow(NotificationDelivery record) {
         Map<String, Object> row = new LinkedHashMap<>();
         row.put("id", record.getId().toString());
         row.put("channel", record.getChannel());
         row.put("subject", record.getSubject());
         row.put("body", record.getBody());
-        row.put("status", record.getStatus());
-        row.put("read", "DELIVERED".equals(record.getStatus()));
+        row.put("status", record.getStatus().name());
+        row.put("read", record.getStatus() == NotificationDelivery.DeliveryStatus.DELIVERED);
         row.put("createdAt", record.getCreatedAt());
         row.put("deliveredAt", record.getDeliveredAt());
         return row;

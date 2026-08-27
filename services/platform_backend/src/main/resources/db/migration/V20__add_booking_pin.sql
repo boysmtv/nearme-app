@@ -1,0 +1,2 @@
+ALTER TABLE bookings ADD COLUMN confirmation_pin VARCHAR(6);
+ALTER TABLE bookings ADD COLUMN pin_verified BOOLEAN NOT NULL DEFAULT FALSE;

@@ -1,7 +1,6 @@
 package id.dekat.payment.domain;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -11,69 +10,68 @@ public class PaymentIntent {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "booking_id", nullable = false)
     private UUID bookingId;
 
-    @Column(nullable = false)
+    @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal amount;
+    @Column(name = "amount", nullable = false)
+    private Integer amount;
 
-    @Column(nullable = false, length = 3)
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
+    @Column(name = "method")
     private String method;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private PaymentStatus status;
 
+    @Column(name = "gateway_reference")
     private String gatewayReference;
 
+    @Column(name = "expires_at")
     private OffsetDateTime expiresAt;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
-    @Column(nullable = false)
+    @Column(name = "updated_at", nullable = false)
     private OffsetDateTime updatedAt;
 
     protected PaymentIntent() {}
 
-    public PaymentIntent(UUID bookingId, UUID tenantId, BigDecimal amount,
+    public PaymentIntent(UUID bookingId, UUID tenantId, Integer amount,
                          String currency, String method, OffsetDateTime expiresAt) {
         this.bookingId = bookingId;
         this.tenantId = tenantId;
         this.amount = amount;
         this.currency = currency;
         this.method = method;
-        this.status = PaymentStatus.CREATED;
+        this.status = PaymentStatus.PENDING;
         this.expiresAt = expiresAt;
         this.createdAt = OffsetDateTime.now();
         this.updatedAt = OffsetDateTime.now();
     }
 
-    public void markPending(String gatewayReference) {
-        this.status = PaymentStatus.PENDING;
+    public void markAuthorized(String gatewayReference) {
+        this.status = PaymentStatus.AUTHORIZED;
         this.gatewayReference = gatewayReference;
         this.updatedAt = OffsetDateTime.now();
     }
 
-    public void markPaid() {
-        this.status = PaymentStatus.PAID;
+    public void markCaptured() {
+        this.status = PaymentStatus.CAPTURED;
         this.updatedAt = OffsetDateTime.now();
     }
 
     public void markFailed() {
         this.status = PaymentStatus.FAILED;
-        this.updatedAt = OffsetDateTime.now();
-    }
-
-    public void markExpired() {
-        this.status = PaymentStatus.EXPIRED;
         this.updatedAt = OffsetDateTime.now();
     }
 
@@ -87,15 +85,10 @@ public class PaymentIntent {
         this.updatedAt = OffsetDateTime.now();
     }
 
-    public void markPartialRefund() {
-        this.status = PaymentStatus.PARTIAL_REFUND;
-        this.updatedAt = OffsetDateTime.now();
-    }
-
     public UUID getId() { return id; }
     public UUID getBookingId() { return bookingId; }
     public UUID getTenantId() { return tenantId; }
-    public BigDecimal getAmount() { return amount; }
+    public Integer getAmount() { return amount; }
     public String getCurrency() { return currency; }
     public String getMethod() { return method; }
     public PaymentStatus getStatus() { return status; }

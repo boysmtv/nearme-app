@@ -1,5 +1,6 @@
 package id.dekat.notification.application;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import id.dekat.notification.domain.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +17,7 @@ import java.util.UUID;
 public class NotificationWorker {
 
     private final NotificationService notificationService;
+    private final ObjectMapper objectMapper;
 
     @KafkaListener(topics = "notification.requests.v1", groupId = "notification-consumer")
     public void handleNotificationRequest(String message) {
@@ -50,7 +52,11 @@ public class NotificationWorker {
         }
     }
 
-    private Map<String, String> parseMessage(String message) {
-        return Map.of("type", "BOOKING_CONFIRMATION", "bookingId", "", "recipientId", "");
+    @SuppressWarnings("unchecked")
+    private Map<String, String> parseMessage(String message) throws Exception {
+        Map<String, Object> raw = objectMapper.readValue(message, Map.class);
+        Map<String, String> result = new java.util.HashMap<>();
+        raw.forEach((k, v) -> result.put(k, v != null ? v.toString() : null));
+        return result;
     }
 }

@@ -19,17 +19,19 @@ public class Permission {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "module", nullable = false)
     private String module;
 
-    @Column(nullable = false)
+    @Column(name = "action", nullable = false)
     private String action;
 
+    @Column(name = "description")
     private String description;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

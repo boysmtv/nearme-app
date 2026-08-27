@@ -44,7 +44,10 @@ export default function BookingPage() {
   const [selectedDate, setSelectedDate] = useState<string>(() => {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0] ?? '';
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   });
   const [createdBooking, setCreatedBooking] = useState<BookingResponse | null>(null);
 
@@ -77,11 +80,8 @@ export default function BookingPage() {
       publicApi.bookings.create({
         providerId: providerId!,
         serviceId: selectedService!.id,
-        staffId: selectedStaff!.id,
-        slotId: selectedSlot!.id,
         startsAt: selectedSlot!.startTime,
         endsAt: selectedSlot!.endTime,
-        addons: selectedAddons.map((a) => a.id),
         ...data,
         notes: data.notes || '',
         idempotencyKey: crypto.randomUUID(),
@@ -367,7 +367,13 @@ export default function BookingPage() {
                         setSelectedDate(e.target.value);
                         setSelectedSlot(null);
                       }}
-                      min={new Date().toISOString().split('T')[0]}
+                      min={(() => {
+                        const d = new Date();
+                        const y = d.getFullYear();
+                        const m = String(d.getMonth() + 1).padStart(2, '0');
+                        const day = String(d.getDate()).padStart(2, '0');
+                        return `${y}-${m}-${day}`;
+                      })()}
                       className="mt-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     />
                   </div>

@@ -2,6 +2,7 @@ package id.dekat.payment.web;
 
 import id.dekat.payment.application.PaymentService;
 import id.dekat.payment.domain.PaymentIntent;
+import id.dekat.payment.infrastructure.gateway.PaymentGatewayPort;
 import id.dekat.payment.web.dto.PaymentIntentRequest;
 import id.dekat.payment.web.dto.PaymentResponse;
 import id.dekat.payment.web.dto.WebhookEvent;
@@ -15,9 +16,11 @@ import java.util.UUID;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final PaymentGatewayPort gateway;
 
-    public PaymentController(PaymentService paymentService) {
+    public PaymentController(PaymentService paymentService, PaymentGatewayPort gateway) {
         this.paymentService = paymentService;
+        this.gateway = gateway;
     }
 
     @PostMapping("/bookings/{id}/payment-intents")
@@ -39,7 +42,11 @@ public class PaymentController {
 
     @PostMapping("/webhooks/payments/{provider}")
     public ResponseEntity<Void> handleWebhook(@PathVariable String provider,
+                                              @RequestHeader(value = "X-Signature", required = false) String signature,
                                               @RequestBody WebhookEvent event) {
+        if (signature != null && !gateway.verifyWebhookSignature(event.getPayload().toString(), signature)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         paymentService.processWebhook(provider, event.getPayload());
         return ResponseEntity.ok().build();
     }

@@ -10,6 +10,7 @@ public class Business {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "tenant_id", nullable = false)

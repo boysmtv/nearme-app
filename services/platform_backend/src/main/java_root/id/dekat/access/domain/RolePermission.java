@@ -10,15 +10,16 @@ public class RolePermission {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "role_id", nullable = false)
     private UUID roleId;
 
-    @Column(nullable = false)
+    @Column(name = "permission_id", nullable = false)
     private UUID permissionId;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

@@ -1,6 +1,8 @@
 package id.dekat.notification.application;
 
 import id.dekat.notification.domain.*;
+import id.dekat.notification.infrastructure.email.EmailPort;
+import id.dekat.notification.infrastructure.push.PushNotificationPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,12 +22,14 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationTemplateRepository templateRepository;
     private final DeviceTokenRepository deviceTokenRepository;
+    private final EmailPort emailPort;
+    private final PushNotificationPort pushPort;
 
     @Transactional
     public NotificationDelivery sendBookingConfirmation(UUID tenantId, UUID recipientId,
                                                          String bookingCode, String serviceName,
                                                          String providerName, Instant bookingTime) {
-        NotificationTemplate template = templateRepository.findByCodeAndActiveTrue("BOOKING_CONFIRMATION")
+        NotificationTemplate template = templateRepository.findByEventType("BOOKING_CONFIRMATION")
                 .orElse(null);
 
         String subject = "Booking Confirmed - " + bookingCode;
@@ -42,9 +46,8 @@ public class NotificationService {
         }
 
         NotificationDelivery delivery = NotificationDelivery.builder()
-                .tenantId(tenantId)
                 .recipientId(recipientId)
-                .channel(NotificationTemplate.NotificationType.EMAIL)
+                .channel("EMAIL")
                 .subject(subject)
                 .body(body)
                 .status(NotificationDelivery.DeliveryStatus.PENDING)
@@ -54,6 +57,7 @@ public class NotificationService {
         log.info("Booking confirmation notification sent for booking {} to user {}", bookingCode, recipientId);
 
         sendPushNotification(recipientId, subject, body);
+        sendEmailNotification(recipientId, subject, body);
 
         return saved;
     }
@@ -64,7 +68,7 @@ public class NotificationService {
                                               String providerName, Instant bookingTime,
                                               int hoursBefore) {
         String templateCode = hoursBefore >= 24 ? "REMINDER_H24" : "REMINDER_H2";
-        NotificationTemplate template = templateRepository.findByCodeAndActiveTrue(templateCode)
+        NotificationTemplate template = templateRepository.findByEventType(templateCode)
                 .orElse(null);
 
         String subject = "Booking Reminder - " + bookingCode;
@@ -81,9 +85,8 @@ public class NotificationService {
         }
 
         NotificationDelivery delivery = NotificationDelivery.builder()
-                .tenantId(tenantId)
                 .recipientId(recipientId)
-                .channel(NotificationTemplate.NotificationType.PUSH)
+                .channel("PUSH")
                 .subject(subject)
                 .body(body)
                 .status(NotificationDelivery.DeliveryStatus.PENDING)
@@ -100,7 +103,7 @@ public class NotificationService {
     @Transactional
     public NotificationDelivery sendCancellation(UUID tenantId, UUID recipientId,
                                                    String bookingCode, String reason) {
-        NotificationTemplate template = templateRepository.findByCodeAndActiveTrue("CANCELLATION")
+        NotificationTemplate template = templateRepository.findByEventType("CANCELLATION")
                 .orElse(null);
 
         String subject = "Booking Cancelled - " + bookingCode;
@@ -116,9 +119,8 @@ public class NotificationService {
         }
 
         NotificationDelivery delivery = NotificationDelivery.builder()
-                .tenantId(tenantId)
                 .recipientId(recipientId)
-                .channel(NotificationTemplate.NotificationType.EMAIL)
+                .channel("EMAIL")
                 .subject(subject)
                 .body(body)
                 .status(NotificationDelivery.DeliveryStatus.PENDING)
@@ -128,6 +130,7 @@ public class NotificationService {
         log.info("Cancellation notification sent for booking {} to user {}", bookingCode, recipientId);
 
         sendPushNotification(recipientId, subject, body);
+        sendEmailNotification(recipientId, subject, body);
 
         return saved;
     }
@@ -136,7 +139,7 @@ public class NotificationService {
     public NotificationDelivery sendPaymentReceipt(UUID tenantId, UUID recipientId,
                                                      String bookingCode, String amount,
                                                      String currency) {
-        NotificationTemplate template = templateRepository.findByCodeAndActiveTrue("PAYMENT_RECEIPT")
+        NotificationTemplate template = templateRepository.findByEventType("PAYMENT_RECEIPT")
                 .orElse(null);
 
         String subject = "Payment Receipt - " + bookingCode;
@@ -153,9 +156,8 @@ public class NotificationService {
         }
 
         NotificationDelivery delivery = NotificationDelivery.builder()
-                .tenantId(tenantId)
                 .recipientId(recipientId)
-                .channel(NotificationTemplate.NotificationType.EMAIL)
+                .channel("EMAIL")
                 .subject(subject)
                 .body(body)
                 .status(NotificationDelivery.DeliveryStatus.PENDING)
@@ -163,6 +165,8 @@ public class NotificationService {
 
         NotificationDelivery saved = notificationRepository.save(delivery);
         log.info("Payment receipt notification sent for booking {} to user {}", bookingCode, recipientId);
+
+        sendEmailNotification(recipientId, subject, body);
 
         return saved;
     }
@@ -188,7 +192,7 @@ public class NotificationService {
 
     @Transactional(readOnly = true)
     public List<NotificationDelivery> getPendingNotifications(UUID tenantId, UUID recipientId) {
-        return notificationRepository.findByTenantAndRecipient(tenantId, recipientId).stream()
+        return notificationRepository.findByRecipientId(recipientId).stream()
                 .filter(n -> n.getStatus() == NotificationDelivery.DeliveryStatus.PENDING)
                 .toList();
     }
@@ -196,22 +200,34 @@ public class NotificationService {
     @Transactional
     public void markAsRead(UUID notificationId) {
         notificationRepository.findById(notificationId).ifPresent(notification -> {
-            notification.setReadAt(Instant.now());
-            notification.setStatus(NotificationDelivery.DeliveryStatus.READ);
+            notification.setStatus(NotificationDelivery.DeliveryStatus.DELIVERED);
             notificationRepository.save(notification);
         });
     }
 
     private void sendPushNotification(UUID userId, String title, String body) {
-        List<DeviceToken> deviceTokens = deviceTokenRepository.findByUserIdAndActiveTrue(userId);
+        List<DeviceToken> deviceTokens = deviceTokenRepository.findByUserId(userId);
         if (deviceTokens.isEmpty()) {
             log.debug("No active device tokens for user {}", userId);
             return;
         }
 
         for (DeviceToken deviceToken : deviceTokens) {
-            log.info("Sending push notification to {} ({})", deviceToken.getToken(), deviceToken.getPlatform());
-            // In production, integrate with FCM/APNs here
+            try {
+                pushPort.sendPush(deviceToken.getToken(), title, body, Map.of());
+                log.info("Push notification sent to {} ({})", deviceToken.getToken(), deviceToken.getDeviceType());
+            } catch (Exception e) {
+                log.warn("Failed to send push to {}: {}", deviceToken.getToken(), e.getMessage());
+            }
+        }
+    }
+
+    private void sendEmailNotification(UUID userId, String subject, String body) {
+        try {
+            emailPort.sendEmail(userId.toString(), subject, body);
+            log.info("Email notification sent to user {}", userId);
+        } catch (Exception e) {
+            log.warn("Failed to send email to user {}: {}", userId, e.getMessage());
         }
     }
 }

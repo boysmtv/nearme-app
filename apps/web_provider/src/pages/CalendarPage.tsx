@@ -46,7 +46,7 @@ export default function CalendarPage() {
 
   const getBookingsForDate = (date: Date) => {
     const dateStr = date.toISOString().split('T')[0];
-    return bookings.filter((b) => b.startTime.split('T')[0] === dateStr);
+    return bookings.filter((b) => (b.startsAt ?? '').split('T')[0] === dateStr);
   };
 
   const navigateWeek = (direction: number) => {
@@ -148,7 +148,7 @@ export default function CalendarPage() {
                   </div>
                   {getWeekDays().map((day, di) => {
                     const dayBookings = getBookingsForDate(day).filter((b) => {
-                      const h = new Date(b.startTime).getHours();
+                      const h = b.startsAt ? new Date(b.startsAt).getHours() : -1;
                       return h === hour;
                     });
                     return (
@@ -189,7 +189,7 @@ export default function CalendarPage() {
                     <div className={`text-sm font-medium ${isToday ? 'text-primary-600' : 'text-gray-700'}`}>{i + 1}</div>
                     {dayBookings.slice(0, 3).map((b) => (
                       <div key={b.id} className={`mt-0.5 rounded px-1 py-0.5 text-[10px] font-medium truncate ${statusColors[b.status] || 'bg-gray-100 text-gray-600'}`}>
-                        {new Date(b.startTime).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false })} {b.customerName}
+                        {b.startsAt ? new Date(b.startsAt).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false }) : b.time} {b.customerName}
                       </div>
                     ))}
                     {dayBookings.length > 3 && (

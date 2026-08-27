@@ -106,8 +106,15 @@ public class BookingController {
     }
 
     @PostMapping("/{id}/confirm")
-    public ResponseEntity<ApiResponse<Booking>> confirmBooking(@PathVariable UUID id) {
-        return ResponseEntity.ok(ApiResponse.ok(bookingService.getBooking(id)));
+    public ResponseEntity<ApiResponse<Booking>> confirmBooking(@PathVariable UUID id,
+                                                  @RequestHeader("X-Actor-Id") UUID actorId) {
+        return ResponseEntity.ok(ApiResponse.ok(bookingService.confirmExistingBooking(id, actorId)));
+    }
+
+    @PostMapping("/{id}/verify-pin")
+    public ResponseEntity<ApiResponse<Booking>> verifyPin(@PathVariable UUID id,
+                                              @RequestBody VerifyPinRequest request) {
+        return ResponseEntity.ok(ApiResponse.ok(bookingService.verifyPin(id, request.getPin())));
     }
 
     @PostMapping("/{id}/reschedule")

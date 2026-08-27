@@ -10,12 +10,13 @@ public class ServiceVariant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "service_id", nullable = false)
     private UUID serviceId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Column(name = "price_amount", precision = 12, scale = 2)
@@ -24,7 +25,7 @@ public class ServiceVariant {
     @Column(name = "duration_minutes")
     private Integer durationMinutes;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     public ServiceVariant() {}

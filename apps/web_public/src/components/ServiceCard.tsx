@@ -23,7 +23,7 @@ function formatDuration(minutes: number): string {
   return mins > 0 ? `${hours}j ${mins}m` : `${hours} jam`;
 }
 
-export default function ServiceCard({ service, providerSlug, providerId }: ServiceCardProps) {
+export default function ServiceCard({ service, providerId }: ServiceCardProps) {
   return (
     <Link
       to={providerId ? `/booking/${providerId}?service=${service.id}` : '/search'}

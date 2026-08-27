@@ -1,7 +1,6 @@
 package id.dekat.payment.domain;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -15,33 +14,37 @@ public class Refund {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "booking_id", nullable = false)
     private UUID bookingId;
 
-    @Column(nullable = false)
+    @Column(name = "payment_intent_id", nullable = false)
     private UUID paymentIntentId;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal amount;
+    @Column(name = "amount", nullable = false)
+    private Integer amount;
 
+    @Column(name = "reason")
     private String reason;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private RefundStatus status;
 
+    @Column(name = "gateway_reference")
     private String gatewayReference;
 
+    @Column(name = "approved_by")
     private UUID approvedBy;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     protected Refund() {}
 
-    public Refund(UUID bookingId, UUID paymentIntentId, BigDecimal amount,
+    public Refund(UUID bookingId, UUID paymentIntentId, Integer amount,
                   String reason) {
         this.bookingId = bookingId;
         this.paymentIntentId = paymentIntentId;
@@ -72,7 +75,7 @@ public class Refund {
     public UUID getId() { return id; }
     public UUID getBookingId() { return bookingId; }
     public UUID getPaymentIntentId() { return paymentIntentId; }
-    public BigDecimal getAmount() { return amount; }
+    public Integer getAmount() { return amount; }
     public String getReason() { return reason; }
     public RefundStatus getStatus() { return status; }
     public String getGatewayReference() { return gatewayReference; }

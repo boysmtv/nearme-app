@@ -3,16 +3,19 @@ package id.dekat.booking.application;
 import id.dekat.booking.domain.*;
 import id.dekat.common.IdempotencyException;
 import id.dekat.common.NotFoundException;
+import id.dekat.customer.application.CustomerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class BookingService {
     private final BookingStatusHistoryRepository statusHistoryRepository;
     private final BookingItemRepository bookingItemRepository;
     private final BookingAssignmentRepository bookingAssignmentRepository;
+    private final CustomerService customerService;
 
     @Transactional
     public BookingHold createHold(UUID tenantId, UUID locationId, UUID serviceId,
@@ -80,6 +84,8 @@ public class BookingService {
             booking.setItems(items);
         }
         booking.recalculateTotal();
+        String pin = String.format("%06d", new Random().nextInt(999999));
+        booking.setConfirmationPin(pin);
         booking.confirm();
 
         Booking savedBooking = bookingRepository.save(booking);
@@ -87,9 +93,9 @@ public class BookingService {
         if (items != null) {
             for (BookingItem item : items) {
                 BookingItem newItem = new BookingItem(
-                        savedBooking.getId(), item.getServiceId(), item.getVariantId(),
-                        item.getNameSnapshot(), item.getPriceSnapshot(),
-                        item.getDurationSnapshot(), item.getQuantity()
+                        savedBooking.getId(), item.getServiceId(), item.getStaffId(),
+                        item.getResourceId(), item.getStartsAt(), item.getEndsAt(),
+                        item.getPrice(), item.getDiscount(), item.getTax(), item.getNotes()
                 );
                 bookingItemRepository.save(newItem);
             }
@@ -97,7 +103,7 @@ public class BookingService {
 
         if (hold.getStaffId() != null) {
             BookingAssignment assignment = new BookingAssignment(
-                    savedBooking.getId(), hold.getStaffId(), hold.getResourceId(),
+                    savedBooking.getId(), hold.getStaffId(),
                     hold.getStartsAt(), hold.getEndsAt()
             );
             bookingAssignmentRepository.save(assignment);
@@ -108,8 +114,52 @@ public class BookingService {
                 customerId, "Booking confirmed from hold");
         statusHistoryRepository.save(history);
 
+        if (customerId != null) {
+            customerService.incrementBookingStats(customerId, tenantId, booking.getTotal());
+        }
+
         hold.markConverted();
         bookingHoldRepository.save(hold);
+
+        return savedBooking;
+    }
+
+    @Transactional
+    public Booking confirmExistingBooking(UUID bookingId, UUID actorId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
+
+        BookingStatus fromStatus = booking.getStatus();
+        booking.confirm();
+        Booking savedBooking = bookingRepository.save(booking);
+
+        statusHistoryRepository.save(new BookingStatusHistory(
+                bookingId, fromStatus, BookingStatus.CONFIRMED,
+                actorId, "Booking confirmed"));
+
+        return savedBooking;
+    }
+
+    @Transactional
+    public Booking verifyPin(UUID bookingId, String pin) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
+
+        if (booking.getConfirmationPin() == null) {
+            throw new IllegalStateException("This booking does not have a confirmation PIN");
+        }
+        if (!booking.getConfirmationPin().equals(pin)) {
+            throw new IllegalArgumentException("Invalid PIN");
+        }
+
+        BookingStatus fromStatus = booking.getStatus();
+        booking.setPinVerified(true);
+        booking.confirm();
+        Booking savedBooking = bookingRepository.save(booking);
+
+        statusHistoryRepository.save(new BookingStatusHistory(
+                bookingId, fromStatus, BookingStatus.CONFIRMED,
+                null, "PIN verified, booking confirmed"));
 
         return savedBooking;
     }
@@ -181,7 +231,7 @@ public class BookingService {
 
         List<BookingAssignment> assignments = bookingAssignmentRepository.findByBookingId(bookingId);
         for (BookingAssignment assignment : assignments) {
-            assignment.cancel();
+            assignment.decline();
             bookingAssignmentRepository.save(assignment);
         }
 
@@ -242,7 +292,7 @@ public class BookingService {
         List<BookingAssignment> assignments = bookingAssignmentRepository.findByBookingId(bookingId);
         for (BookingAssignment assignment : assignments) {
             if (assignment.getStatus() == BookingAssignment.AssignmentStatus.ASSIGNED
-                    || assignment.getStatus() == BookingAssignment.AssignmentStatus.CONFIRMED) {
+                    || assignment.getStatus() == BookingAssignment.AssignmentStatus.ACCEPTED) {
                 assignment.complete();
                 bookingAssignmentRepository.save(assignment);
             }

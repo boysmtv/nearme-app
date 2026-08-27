@@ -6,11 +6,10 @@ import org.hibernate.annotations.GenericGenerator;
 
 import java.time.Instant;
 import java.time.LocalTime;
-import java.time.DayOfWeek;
 import java.util.UUID;
 
 @Entity
-@Table(name = "staff_schedule")
+@Table(name = "staff_schedules")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,24 +23,25 @@ public class StaffSchedule {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false, columnDefinition = "uuid")
+    @Column(name = "staff_id", nullable = false, columnDefinition = "uuid")
     private UUID staffId;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private DayOfWeek dayOfWeek;
+    @Column(name = "day_of_week", nullable = false)
+    private Integer dayOfWeek;
 
-    @Column(nullable = false)
+    @Column(name = "start_time", nullable = false)
     private LocalTime startTime;
 
-    @Column(nullable = false)
+    @Column(name = "end_time", nullable = false)
     private LocalTime endTime;
 
-    @Column(columnDefinition = "uuid")
-    private UUID locationId;
+    @Column(name = "is_active", nullable = false)
+    @Builder.Default
+    private Boolean isActive = true;
 
-    @Column(nullable = false)
-    private Instant effectiveFrom;
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
 
-    private Instant effectiveUntil;
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt;
 }

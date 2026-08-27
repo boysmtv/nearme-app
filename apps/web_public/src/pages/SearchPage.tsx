@@ -49,7 +49,7 @@ export default function SearchPage() {
     staleTime: 2 * 60 * 1000,
   });
 
-  const results = data?.data?.providers ?? [];
+  const results = Array.isArray(data?.data) ? data.data : (data?.data?.providers ?? []);
   const pagination = data?.data?.pagination;
 
   const handleFilterChange = (key: keyof SearchFilters, value: string | number) => {

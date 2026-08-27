@@ -14,37 +14,39 @@ public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column(name = "address", nullable = false)
     private String address;
 
-    @Column
+    @Column(name = "latitude")
     private Double latitude;
 
-    @Column
+    @Column(name = "longitude")
     private Double longitude;
 
     @Column(name = "timezone", length = 50)
     private String timezone;
 
+    @Column(name = "phone")
     private String phone;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "service_modes", columnDefinition = "jsonb")
     private List<String> serviceModes;
 
     @Type(JsonType.class)
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "operating_hours", columnDefinition = "jsonb")
     private Map<String, Object> operatingHours;
 
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private String status;
 
     @Column(name = "created_at", nullable = false, updatable = false)

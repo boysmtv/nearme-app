@@ -5,7 +5,13 @@ Future<void> initCore() async {
     environment: Environment.development,
   );
 
-  await AnalyticsService.initialize();
-  await NotificationService.initialize();
-  await LocalizationService.initialize();
+  try {
+    await AnalyticsService.initialize();
+  } catch (_) {}
+  try {
+    await NotificationService.initialize();
+  } catch (_) {}
+  try {
+    await LocalizationService.initialize();
+  } catch (_) {}
 }

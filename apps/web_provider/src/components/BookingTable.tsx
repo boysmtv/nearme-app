@@ -75,7 +75,7 @@ export default function BookingTable({ bookings, onStatusChange: _onStatusChange
               return (
                 <tr key={booking.id} className="hover:bg-gray-50">
                   <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-primary-600">
-                    {booking.code}
+                    {booking.bookingCode}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <div className="text-sm font-medium text-gray-900">{booking.customerName}</div>
@@ -89,24 +89,11 @@ export default function BookingTable({ bookings, onStatusChange: _onStatusChange
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <div className="text-sm text-gray-900">
-                      {new Date(booking.startTime).toLocaleDateString('id-ID', {
-                        day: 'numeric',
-                        month: 'short',
-                      })}
+                      {booking.time}
                     </div>
-                    <div className="text-xs text-gray-500">
-                      {new Date(booking.startTime).toLocaleTimeString('id-ID', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                      })}{' '}
-                      -{' '}
-                      {new Date(booking.endTime).toLocaleTimeString('id-ID', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        hour12: false,
-                      })}
-                    </div>
+                    {booking.time}
+                      {' '}-{' '}
+                      {booking.endTime}
                   </td>
                   <td className="whitespace-nowrap px-6 py-4">
                     <span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${status.color}`}>
@@ -114,7 +101,7 @@ export default function BookingTable({ bookings, onStatusChange: _onStatusChange
                     </span>
                   </td>
                   <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-                    {formatPrice(booking.totalAmount)}
+                    {formatPrice(booking.amount)}
                   </td>
                 </tr>
               );

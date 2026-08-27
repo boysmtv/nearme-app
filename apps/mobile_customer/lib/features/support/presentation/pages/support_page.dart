@@ -31,7 +31,7 @@ class _SupportPageState extends ConsumerState<SupportPage> {
           Text('Submit a Ticket', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: _selectedCategory,
+            initialValue: _selectedCategory,
             decoration: const InputDecoration(labelText: 'Category', prefixIcon: Icon(Icons.category_outlined)),
             items: const [
               DropdownMenuItem(value: 'general', child: Text('General Inquiry')),

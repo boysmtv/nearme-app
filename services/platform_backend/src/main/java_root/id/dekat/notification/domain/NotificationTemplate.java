@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Entity
-@Table(name = "notification_template")
+@Table(name = "notification_templates")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,34 +23,31 @@ public class NotificationTemplate {
     @Column(columnDefinition = "uuid")
     private UUID id;
 
-    @Column(nullable = false)
-    private String code;
+    @Column(name = "event_type", nullable = false, length = 64)
+    private String eventType;
 
-    @Column(nullable = false)
-    private String name;
+    @Column(name = "channel", nullable = false, length = 16)
+    private String channel;
 
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private NotificationType type;
+    @Column(name = "locale", nullable = false, length = 10)
+    private String locale;
 
-    @Column(nullable = false)
-    private String subject;
+    @Column(name = "version", nullable = false)
+    private Integer version;
 
-    @Column(columnDefinition = "text")
+    @Column(name = "subject_template", length = 512)
+    private String subjectTemplate;
+
+    @Column(name = "body_template", nullable = false, columnDefinition = "text")
     private String bodyTemplate;
 
-    @Column(columnDefinition = "text")
-    private String pushTemplate;
+    @Column(name = "variables", columnDefinition = "jsonb")
+    private String variables;
 
-    @Column(nullable = false)
-    @Builder.Default
-    private boolean active = true;
+    @Column(name = "status", nullable = false, length = 16)
+    private String status;
 
     @CreationTimestamp
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
-
-    public enum NotificationType {
-        EMAIL, PUSH, SMS, IN_APP
-    }
 }

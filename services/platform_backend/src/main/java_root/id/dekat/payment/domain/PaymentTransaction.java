@@ -3,7 +3,6 @@ package id.dekat.payment.domain;
 import jakarta.persistence.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.Map;
 import java.util.UUID;
@@ -13,39 +12,41 @@ import java.util.UUID;
 public class PaymentTransaction {
 
     public enum TransactionStatus {
-        INITIATED, SUCCEEDED, FAILED, PENDING
+        INITIATED, SUCCESS, FAILED, PENDING
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "payment_intent_id", nullable = false)
     private UUID paymentIntentId;
 
-    @Column(nullable = false)
+    @Column(name = "gateway_provider", nullable = false)
     private String gatewayProvider;
 
+    @Column(name = "gateway_reference")
     private String gatewayReference;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal amount;
+    @Column(name = "amount", nullable = false)
+    private Integer amount;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private TransactionStatus status;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "raw_response", columnDefinition = "jsonb")
     private Map<String, Object> rawResponse;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     protected PaymentTransaction() {}
 
     public PaymentTransaction(UUID paymentIntentId, String gatewayProvider,
-                              BigDecimal amount, TransactionStatus status,
+                              Integer amount, TransactionStatus status,
                               Map<String, Object> rawResponse) {
         this.paymentIntentId = paymentIntentId;
         this.gatewayProvider = gatewayProvider;
@@ -55,8 +56,8 @@ public class PaymentTransaction {
         this.createdAt = OffsetDateTime.now();
     }
 
-    public void markSucceeded(String gatewayReference) {
-        this.status = TransactionStatus.SUCCEEDED;
+    public void markSuccess(String gatewayReference) {
+        this.status = TransactionStatus.SUCCESS;
         this.gatewayReference = gatewayReference;
     }
 
@@ -68,7 +69,7 @@ public class PaymentTransaction {
     public UUID getPaymentIntentId() { return paymentIntentId; }
     public String getGatewayProvider() { return gatewayProvider; }
     public String getGatewayReference() { return gatewayReference; }
-    public BigDecimal getAmount() { return amount; }
+    public Integer getAmount() { return amount; }
     public TransactionStatus getStatus() { return status; }
     public Map<String, Object> getRawResponse() { return rawResponse; }
     public OffsetDateTime getCreatedAt() { return createdAt; }

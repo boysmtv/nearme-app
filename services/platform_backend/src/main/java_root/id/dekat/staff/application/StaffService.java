@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -58,6 +57,21 @@ public class StaffService {
         }
 
         staff.setIsActive(true);
+        return staffRepository.save(staff);
+    }
+
+    @Transactional
+    public Staff updateStaff(UUID staffId, Staff update) {
+        Staff staff = staffRepository.findById(staffId)
+                .orElseThrow(() -> new IllegalArgumentException("Staff not found: " + staffId));
+
+        if (update.getDisplayName() != null) staff.setDisplayName(update.getDisplayName());
+        if (update.getTitle() != null) staff.setTitle(update.getTitle());
+        if (update.getBio() != null) staff.setBio(update.getBio());
+        if (update.getAvatarUrl() != null) staff.setAvatarUrl(update.getAvatarUrl());
+        if (update.getSortOrder() != null) staff.setSortOrder(update.getSortOrder());
+        if (update.getIsActive() != null) staff.setIsActive(update.getIsActive());
+
         return staffRepository.save(staff);
     }
 
@@ -130,21 +144,22 @@ public class StaffService {
 
     @Transactional(readOnly = true)
     public List<StaffSchedule> getStaffSchedule(UUID staffId, LocalDate startDate, LocalDate endDate) {
-        Instant start = startDate.atStartOfDay(ZoneId.of("Asia/Jakarta")).toInstant();
-        Instant end = endDate.plusDays(1).atStartOfDay(ZoneId.of("Asia/Jakarta")).toInstant();
-
+        // StaffSchedule now uses dayOfWeek-based weekly recurring schedules,
+        // not date-ranged effective periods. Filter by day of week for the given range.
         List<StaffSchedule> schedules = staffScheduleRepository.findByStaffId(staffId);
 
         return schedules.stream()
-                .filter(s -> !s.getEffectiveFrom().isAfter(end))
-                .filter(s -> s.getEffectiveUntil() == null || !s.getEffectiveUntil().isBefore(start))
+                .filter(StaffSchedule::getIsActive)
                 .toList();
     }
 
     @Transactional(readOnly = true)
     public List<StaffSchedule> getActiveSchedule(UUID staffId, Instant date) {
-        return staffScheduleRepository.findByStaffIdAndEffectiveFromLessThanEqualAndEffectiveUntilGreaterThanEqual(
-                staffId, date, date);
+        // StaffSchedule no longer has effectiveFrom/effectiveUntil fields.
+        // Return all active schedules for this staff member.
+        return staffScheduleRepository.findByStaffId(staffId).stream()
+                .filter(StaffSchedule::getIsActive)
+                .toList();
     }
 
     @Transactional(readOnly = true)

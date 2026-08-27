@@ -13,27 +13,28 @@ public class BusinessProfile {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
     @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(length = 100)
+    @Column(name = "industry", length = 100)
     private String industry;
 
     @Column(name = "website_url", columnDefinition = "TEXT")
     private String websiteUrl;
 
-    @Column(length = 320)
+    @Column(name = "email", length = 320)
     private String email;
 
-    @Column(length = 20)
+    @Column(name = "phone", length = 20)
     private String phone;
 
     @Column(name = "logo_url", columnDefinition = "TEXT")
@@ -43,7 +44,7 @@ public class BusinessProfile {
     private String bannerUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "status", nullable = false)
     private BusinessStatus status = BusinessStatus.ACTIVE;
 
     public enum BusinessStatus {

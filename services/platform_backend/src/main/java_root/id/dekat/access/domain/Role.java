@@ -19,17 +19,19 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(unique = true, nullable = false)
+    @Column(name = "name", unique = true, nullable = false)
     private String name;
 
+    @Column(name = "description")
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "is_system", nullable = false)
     private Boolean isSystem;
 
-    @Column(nullable = false, updatable = false)
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist

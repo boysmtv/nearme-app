@@ -1,7 +1,6 @@
 package id.dekat.payment.domain;
 
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -10,38 +9,40 @@ import java.util.UUID;
 public class LedgerEntry {
 
     public enum EntryType {
-        PAYMENT, REFUND, FEE, ADJUSTMENT
+        REVENUE, REFUND, COMMISSION, FEE, TAX, DEPOSIT, ADJUSTMENT
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(name = "tenant_id", nullable = false)
     private UUID tenantId;
 
-    @Column(nullable = false)
+    @Column(name = "booking_id", nullable = false)
     private UUID bookingId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "entry_type", nullable = false)
     private EntryType entryType;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    private BigDecimal amount;
+    @Column(name = "amount", nullable = false)
+    private Integer amount;
 
-    @Column(nullable = false, length = 3)
+    @Column(name = "currency", nullable = false, length = 3)
     private String currency;
 
+    @Column(name = "description")
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = "created_at", nullable = false)
     private OffsetDateTime createdAt;
 
     protected LedgerEntry() {}
 
     public LedgerEntry(UUID tenantId, UUID bookingId, EntryType entryType,
-                       BigDecimal amount, String currency, String description) {
+                       Integer amount, String currency, String description) {
         this.tenantId = tenantId;
         this.bookingId = bookingId;
         this.entryType = entryType;
@@ -55,7 +56,7 @@ public class LedgerEntry {
     public UUID getTenantId() { return tenantId; }
     public UUID getBookingId() { return bookingId; }
     public EntryType getEntryType() { return entryType; }
-    public BigDecimal getAmount() { return amount; }
+    public Integer getAmount() { return amount; }
     public String getCurrency() { return currency; }
     public String getDescription() { return description; }
     public OffsetDateTime getCreatedAt() { return createdAt; }

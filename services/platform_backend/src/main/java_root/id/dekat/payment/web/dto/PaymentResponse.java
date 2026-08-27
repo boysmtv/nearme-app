@@ -3,7 +3,6 @@ package id.dekat.payment.web.dto;
 import id.dekat.payment.domain.PaymentIntent;
 import id.dekat.payment.domain.PaymentStatus;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -12,7 +11,7 @@ public class PaymentResponse {
     private UUID id;
     private UUID bookingId;
     private UUID tenantId;
-    private BigDecimal amount;
+    private Integer amount;
     private String currency;
     private String method;
     private PaymentStatus status;
@@ -40,7 +39,7 @@ public class PaymentResponse {
     public UUID getId() { return id; }
     public UUID getBookingId() { return bookingId; }
     public UUID getTenantId() { return tenantId; }
-    public BigDecimal getAmount() { return amount; }
+    public Integer getAmount() { return amount; }
     public String getCurrency() { return currency; }
     public String getMethod() { return method; }
     public PaymentStatus getStatus() { return status; }

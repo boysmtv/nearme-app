@@ -41,10 +41,10 @@ class AuthInterceptor extends Interceptor {
         try {
           final refreshResponse = await Dio().post(
             '${err.requestOptions.baseUrl}/auth/refresh',
-            data: {'refresh_token': refreshToken},
+            queryParameters: {'refreshToken': refreshToken},
           );
-          final newAccessToken = refreshResponse.data['access_token'] as String?;
-          final newRefreshToken = refreshResponse.data['refresh_token'] as String?;
+          final newAccessToken = refreshResponse.data['accessToken'] as String?;
+          final newRefreshToken = refreshResponse.data['refreshToken'] as String?;
 
           if (newAccessToken != null) {
             await SecureStorageService.write(StorageKeys.accessToken, newAccessToken);

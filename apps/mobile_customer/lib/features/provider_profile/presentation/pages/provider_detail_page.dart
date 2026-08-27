@@ -125,7 +125,7 @@ class ProviderDetailPage extends ConsumerWidget {
                           contentPadding: const EdgeInsets.all(12),
                           leading: Container(
                             width: 48, height: 48,
-                            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                            decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                             child: Icon(Icons.spa, color: Theme.of(context).colorScheme.primary),
                           ),
                           title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold)),

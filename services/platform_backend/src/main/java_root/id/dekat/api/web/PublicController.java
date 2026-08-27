@@ -52,6 +52,7 @@ public class PublicController {
     private final CustomerProfileRepository customerProfileRepository;
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
+    private final BlockedDateRepository blockedDateRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -65,7 +66,8 @@ public class PublicController {
                             PublicReviewRepository publicReviewRepository,
                             CustomerProfileRepository customerProfileRepository,
                             UserRepository userRepository,
-                            BookingRepository bookingRepository) {
+                            BookingRepository bookingRepository,
+                            BlockedDateRepository blockedDateRepository) {
         this.categoryRepository = categoryRepository;
         this.serviceOfferingRepository = serviceOfferingRepository;
         this.providerListingRepository = providerListingRepository;
@@ -76,6 +78,7 @@ public class PublicController {
         this.customerProfileRepository = customerProfileRepository;
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
+        this.blockedDateRepository = blockedDateRepository;
     }
 
     @GetMapping("/categories")
@@ -265,6 +268,19 @@ public class PublicController {
                 "limit", limit,
                 "total", reviewsPage.getTotalElements(),
                 "totalPages", reviewsPage.getTotalPages()));
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    @GetMapping("/providers/{providerId}/blocked-dates")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getProviderBlockedDates(
+            @PathVariable UUID providerId) {
+        List<BlockedDate> dates = blockedDateRepository.findByTenantId(providerId);
+        List<Map<String, Object>> result = dates.stream().map(d -> {
+            Map<String, Object> row = new LinkedHashMap<String, Object>();
+            row.put("date", d.getBlockedDate().toString());
+            row.put("reason", d.getReason());
+            return row;
+        }).collect(Collectors.toList());
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
