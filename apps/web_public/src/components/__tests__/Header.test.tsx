@@ -34,9 +34,9 @@ describe('Header', () => {
     expect(screen.getByText('DEKAT')).toBeInTheDocument();
   });
 
-  it('menampilkan teks Booking Platform', () => {
+  it('menampilkan teks Booking', () => {
     renderHeader();
-    expect(screen.getByText('Booking Platform')).toBeInTheDocument();
+    expect(screen.getByText('Booking')).toBeInTheDocument();
   });
 
   it('menampilkan form search dengan placeholder', () => {
