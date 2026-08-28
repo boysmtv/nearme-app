@@ -42,42 +42,8 @@ public class SecurityConfig {
                 .requestMatchers("/public/**").permitAll()
                 .anyRequest().authenticated()
             )
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> {
-                    String path = request.getRequestURI();
-                    if (path.startsWith("/public/") || path.startsWith("/auth/") || path.startsWith("/actuator/")) {
-                        request.setAttribute("SPRING_SECURITY_LAST_EXCEPTION", authException);
-                        // For public endpoints with invalid/missing token, continue as anonymous instead of 401
-                        // Let the filter chain proceed as anonymous
-                        response.setStatus(401);
-                        response.setContentType("application/json");
-                        response.getWriter().write("{\"success\":false,\"message\":\"Unauthorized\",\"data\":null}");
-                        return;
-                    }
-                    response.setStatus(401);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"success\":false,\"message\":\"Unauthorized\",\"data\":null}");
-                })
-            )
             .oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt.decoder(jwtDecoder()))
-                .authenticationEntryPoint((request, response, authException) -> {
-                    String path = request.getRequestURI();
-                    // Public endpoints should not enforce JWT - allow anonymous access
-                    if (path.startsWith("/public/") || path.startsWith("/auth/")) {
-                        // Do not send 401 for public endpoints with invalid token, treat as anonymous
-                        response.setStatus(401);
-                        response.setContentType("application/json");
-                        // Instead of 401, we let SecurityConfig's permitAll handle it by not blocking
-                        // But since BearerToken filter already failed, we return 200-style? Actually keep 401 for invalid token on public with token present?
-                        // Flutter/Web already fix to not send token for public, so this is fallback
-                        response.getWriter().write("{\"success\":false,\"message\":\"Unauthorized\",\"data\":null}");
-                        return;
-                    }
-                    response.setStatus(401);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"success\":false,\"message\":\"Unauthorized\",\"data\":null}");
-                })
             );
         return http.build();
     }
