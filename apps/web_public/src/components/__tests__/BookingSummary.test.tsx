@@ -95,13 +95,13 @@ describe('BookingSummary', () => {
 
   it('menampilkan deposit jika depositRequired true', () => {
     renderSummary({ depositRequired: true, slot });
-    expect(screen.getByText(/Deposit sekarang/)).toBeInTheDocument();
+    expect(screen.getByText('Deposit yang perlu dibayar sekarang')).toBeInTheDocument();
     expect(screen.getAllByText(/Rp\s*20\.000/).length).toBeGreaterThanOrEqual(1);
   });
 
   it('tidak menampilkan deposit jika depositRequired false', () => {
     renderSummary({ slot });
-    expect(screen.queryByText(/Deposit sekarang/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Deposit yang perlu dibayar sekarang')).not.toBeInTheDocument();
   });
 
   it('tombol konfirmasi disabled jika isPending', () => {

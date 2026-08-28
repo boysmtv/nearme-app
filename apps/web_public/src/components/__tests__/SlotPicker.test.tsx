@@ -96,6 +96,6 @@ describe('SlotPicker', () => {
   it('slot yang dipilih memiliki styling berbeda', () => {
     renderPicker([morningSlot], false, 'slot-1');
     const btn = screen.getByText('09.00');
-    expect(btn).toHaveClass('border-[#8B8CFF]');
+    expect(btn).toHaveClass('border-primary-500');
   });
 });

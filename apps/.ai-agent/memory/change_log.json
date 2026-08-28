@@ -166,26 +166,6 @@
         "logout"
       ],
       "recorded_at": "2026-08-24T14:02:52.939214+00:00"
-    },
-    {
-      "run_id": "colorful_soft_palette_all_screens::2026-08-28",
-      "final_status": "completed",
-      "summary": "Applied colorful soft pastel palette across ALL screens (80 files). Soft violet/pink/mint/peach/sky/lavender gradients, modern rounded icons, smooth animations. Search page shows all providers on empty query, removed back button from search bar. Fixed 6 web test failures from text changes.",
-      "changed_artifacts": [
-        "packages/flutter_design_system/lib/src/colors.dart",
-        "apps/mobile_customer/lib/**",
-        "apps/mobile_partner/lib/**",
-        "apps/web_public/src/**",
-        "apps/web_admin/src/**",
-        "apps/web_provider/src/**"
-      ],
-      "features": [
-        "ui-colorful-soft-palette",
-        "search-show-all-providers",
-        "modern-icons",
-        "smooth-animations"
-      ],
-      "recorded_at": "2026-08-28T19:56:00.000000+00:00"
     }
   ]
 }

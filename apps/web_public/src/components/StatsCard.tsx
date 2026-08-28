@@ -7,27 +7,26 @@ interface StatsCardProps {
 }
 
 const colorMap = {
-  blue: { bg: 'bg-[#e8f2ff]', text: 'text-[#5a7ab3]', ring: 'ring-[#dbe9ff]', iconBg: 'from-[#e8f2ff] to-[#e8e8ff]' },
-  green: { bg: 'bg-[#e6f7ee]', text: 'text-emerald-600', ring: 'ring-emerald-100', iconBg: 'from-[#e6f7ee] to-[#e8f2ff]' },
-  purple: { bg: 'bg-[#f0e8ff]', text: 'text-[#8B8CFF]', ring: 'ring-[#e8e8ff]', iconBg: 'from-[#f0e8ff] to-[#e8e8ff]' },
-  amber: { bg: 'bg-[#fff4d6]', text: 'text-amber-600', ring: 'ring-amber-100', iconBg: 'from-[#fff4d6] to-[#ffe8ec]' },
-  red: { bg: 'bg-[#ffe8ec]', text: 'text-rose-600', ring: 'ring-rose-100', iconBg: 'from-[#ffe8ec] to-[#fff4d6]' },
+  blue: 'bg-blue-50 text-blue-600',
+  green: 'bg-green-50 text-green-600',
+  purple: 'bg-purple-50 text-purple-600',
+  amber: 'bg-amber-50 text-amber-600',
+  red: 'bg-red-50 text-red-600',
 };
 
 export default function StatsCard({ label, value, icon, color, change }: StatsCardProps) {
-  const c = colorMap[color];
   return (
-    <div className={`rounded-2xl bg-white p-6 shadow-sm ring-1 ${c.ring} transition-all hover:shadow-md hover:-translate-y-0.5`}>
+    <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
       <div className="flex items-center justify-between">
-        <div className={`flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br ${c.iconBg} ${c.text} shadow-sm`}>
+        <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${colorMap[color]}`}>
           <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
           </svg>
         </div>
         {change && (
           <span
-            className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${
-              change.isPositive ? 'bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100' : 'bg-rose-50 text-rose-600 ring-1 ring-rose-100'
+            className={`flex items-center gap-1 text-xs font-medium ${
+              change.isPositive ? 'text-green-600' : 'text-red-600'
             }`}
           >
             {change.isPositive ? (
@@ -43,9 +42,8 @@ export default function StatsCard({ label, value, icon, color, change }: StatsCa
           </span>
         )}
       </div>
-      <p className="mt-4 text-2xl font-black text-gray-900">{value}</p>
-      <p className="mt-1 text-sm font-medium text-gray-500">{label}</p>
-      <div className={`mt-3 h-1 rounded-full bg-gradient-to-r ${c.iconBg} opacity-60`} />
+      <p className="mt-4 text-2xl font-bold text-gray-900">{value}</p>
+      <p className="mt-1 text-sm text-gray-500">{label}</p>
     </div>
   );
 }

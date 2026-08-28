@@ -6,41 +6,36 @@ import 'core/router/app_router.dart';
 
 final lightTheme = ThemeData(
   useMaterial3: true,
-  scaffoldBackgroundColor: DEKATColors.backgroundLight,
   colorScheme: DEKATColorScheme.lightColorScheme,
   textTheme: GoogleFonts.poppinsTextTheme(),
   appBarTheme: AppBarTheme(
     elevation: 0,
     centerTitle: true,
-    backgroundColor: DEKATColors.backgroundLight,
-    scrolledUnderElevation: 0,
-    surfaceTintColor: Colors.transparent,
+    backgroundColor: Colors.transparent,
     titleTextStyle: GoogleFonts.poppins(
       fontSize: 18,
       fontWeight: FontWeight.w600,
-      color: DEKATColors.textPrimary,
+      color: Colors.black87,
     ),
-    iconTheme: const IconThemeData(color: DEKATColors.textPrimary),
   ),
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
-    fillColor: Colors.white,
-    hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+    fillColor: Colors.grey[100],
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: BorderSide(color: DEKATColors.primary.withValues(alpha: 0.12)),
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: BorderSide(color: Colors.grey[200]!),
+      borderRadius: BorderRadius.circular(12),
+      borderSide: BorderSide.none,
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: DEKATColors.primary, width: 1.6),
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: DEKATColors.primary, width: 2),
     ),
     errorBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: DEKATColors.error, width: 1),
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: Colors.red, width: 1),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
   ),
@@ -49,13 +44,12 @@ final lightTheme = ThemeData(
       backgroundColor: DEKATColors.primary,
       foregroundColor: Colors.white,
       elevation: 0,
-      shadowColor: DEKATColors.primary.withValues(alpha: 0.3),
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
       ),
       textStyle: GoogleFonts.poppins(
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: FontWeight.w600,
       ),
     ),
@@ -64,38 +58,27 @@ final lightTheme = ThemeData(
     style: OutlinedButton.styleFrom(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
       ),
-      side: BorderSide(color: Colors.grey[300]!),
     ),
   ),
   cardTheme: CardThemeData(
-    elevation: 0,
-    color: Colors.white,
+    elevation: 2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),
-      side: BorderSide(color: Colors.grey[100]!),
     ),
     margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-  ),
-  chipTheme: ChipThemeData(
-    backgroundColor: Colors.white,
-    selectedColor: DEKATColors.primaryLight,
-    checkmarkColor: DEKATColors.primary,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: Colors.grey[200]!)),
   ),
 );
 
 final darkTheme = ThemeData(
   useMaterial3: true,
-  scaffoldBackgroundColor: DEKATColors.backgroundDark,
   colorScheme: DEKATColorScheme.darkColorScheme,
   textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
   appBarTheme: AppBarTheme(
     elevation: 0,
     centerTitle: true,
-    backgroundColor: DEKATColors.backgroundDark,
-    scrolledUnderElevation: 0,
+    backgroundColor: Colors.transparent,
     titleTextStyle: GoogleFonts.poppins(
       fontSize: 18,
       fontWeight: FontWeight.w600,
@@ -104,18 +87,18 @@ final darkTheme = ThemeData(
   ),
   inputDecorationTheme: InputDecorationTheme(
     filled: true,
-    fillColor: const Color(0xFF2A2A2A),
+    fillColor: Colors.grey[800],
     border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide.none,
     ),
     enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(12),
       borderSide: BorderSide.none,
     ),
     focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: DEKATColors.primary, width: 1.6),
+      borderRadius: BorderRadius.circular(12),
+      borderSide: const BorderSide(color: DEKATColors.primary, width: 2),
     ),
     contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
   ),
@@ -126,17 +109,16 @@ final darkTheme = ThemeData(
       elevation: 0,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(12),
       ),
       textStyle: GoogleFonts.poppins(
-        fontSize: 15,
+        fontSize: 16,
         fontWeight: FontWeight.w600,
       ),
     ),
   ),
   cardTheme: CardThemeData(
-    elevation: 0,
-    color: const Color(0xFF1E1E1E),
+    elevation: 2,
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(16),
     ),

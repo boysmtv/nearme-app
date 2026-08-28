@@ -57,9 +57,9 @@ describe('ServiceCard', () => {
     expect(screen.getByText(/Rp\s*50\.000/)).toBeInTheDocument();
   });
 
-  it('menampilkan label Mulai dari untuk STARTING_FROM', () => {
+  it('menampilkan label Mulai untuk STARTING_FROM', () => {
     renderCard({ ...baseService, priceType: 'STARTING_FROM' });
-    expect(screen.getByText('Mulai dari')).toBeInTheDocument();
+    expect(screen.getByText('Mulai')).toBeInTheDocument();
     expect(screen.getByText(/Rp\s*50\.000/)).toBeInTheDocument();
   });
 
@@ -69,9 +69,9 @@ describe('ServiceCard', () => {
     expect(screen.getByText(/Rp\s*50\.000/)).toBeInTheDocument();
   });
 
-  it('menampilkan Konsultasi untuk QUOTE_REQUIRED tanpa harga', () => {
+  it('menampilkan Harga untuk QUOTE_REQUIRED tanpa harga', () => {
     renderCard({ ...baseService, priceType: 'QUOTE_REQUIRED', price: 0 });
-    expect(screen.getByText('Konsultasi')).toBeInTheDocument();
+    expect(screen.getByText('Harga')).toBeInTheDocument();
     expect(screen.queryByText('Rp0')).not.toBeInTheDocument();
   });
 

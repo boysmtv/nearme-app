@@ -80,7 +80,7 @@ export default function BookingPage() {
   const [pinMsg, setPinMsg] = useState<string | null>(null);
   const verifyPinMut = useMutation({
     mutationFn: () => publicApi.bookings.verifyPin(createdBooking!.id, pin),
-    onSuccess: () => setPinMsg('PIN terverifikasi, booking dikonfirmasi! 🎉'),
+    onSuccess: () => setPinMsg('PIN terverifikasi, booking dikonfirmasi!'),
     onError: (e) => setPinMsg(e instanceof Error ? e.message : 'PIN salah'),
   });
 
@@ -150,12 +150,12 @@ export default function BookingPage() {
     confirm: 4,
   };
 
-  const steps: { key: BookingStep; label: string; icon: string; color: string }[] = [
-    { key: 'service', label: 'Layanan', icon: 'M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10', color: 'from-[#e8e8ff] to-[#e8f2ff]' },
-    { key: 'staff', label: 'Staf', icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', color: 'from-[#ffe8ec] to-[#fff4d6]' },
-    { key: 'slot', label: 'Jadwal', icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', color: 'from-[#e6f7ee] to-[#e8f2ff]' },
-    { key: 'contact', label: 'Kontak', icon: 'M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z', color: 'from-[#f0e8ff] to-[#e8e8ff]' },
-    { key: 'confirm', label: 'Konfirmasi', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z', color: 'from-[#fff4d6] to-[#ffe8ec]' },
+  const steps: { key: BookingStep; label: string }[] = [
+    { key: 'service', label: 'Layanan' },
+    { key: 'staff', label: 'Staf' },
+    { key: 'slot', label: 'Jadwal' },
+    { key: 'contact', label: 'Kontak' },
+    { key: 'confirm', label: 'Konfirmasi' },
   ];
 
   const handleServiceSelect = (service: Service) => {
@@ -197,115 +197,109 @@ export default function BookingPage() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#FAF9FF]">
+    <div className="flex min-h-screen flex-col">
       <Header />
 
-      <main className="flex-1">
+      <main className="flex-1 bg-gray-50">
         <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <nav className="mb-6 flex items-center gap-2 text-sm">
-            <Link to="/search" className="inline-flex items-center gap-1 rounded-full bg-white px-3 py-1 text-[#6a6acc] ring-1 ring-[#E8E8FF] hover:bg-[#FAF9FF]">← Cari Layanan</Link>
-            <span className="text-gray-300">/</span>
-            <span className="rounded-full bg-gradient-to-r from-[#8B8CFF] to-[#A5A6FF] px-3 py-1 text-xs font-bold text-white">✦ Booking</span>
+          <nav className="mb-6 text-sm text-gray-500">
+            <Link to="/search" className="hover:text-primary-600">Cari Layanan</Link>
+            <span className="mx-2">/</span>
+            <span className="text-gray-900">Booking</span>
           </nav>
 
           {/* Progress Steps */}
-          <div className="mb-8 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-[#E8E8FF] overflow-x-auto">
-            <div className="flex items-center min-w-max">
-              {steps.map((s, idx) => {
-                const isDone = stepIndex[step] > idx;
-                const isCurrent = stepIndex[step] === idx;
-                return (
-                  <div key={s.key} className="flex items-center">
-                    <div className="flex items-center gap-2">
-                      <div
-                        className={`flex h-10 w-10 items-center justify-center rounded-xl text-sm font-bold transition-all ${
-                          isDone
-                            ? 'bg-gradient-to-br from-emerald-400 to-emerald-500 text-white shadow-md'
-                            : isCurrent
-                              ? 'bg-gradient-to-br from-[#8B8CFF] to-[#A5A6FF] text-white shadow-lg shadow-[#8B8CFF]/25 ring-2 ring-[#d0d0ff]'
-                              : 'bg-[#FAF9FF] text-gray-400 ring-1 ring-[#E8E8FF]'
-                        }`}
-                      >
-                        {isDone ? (
-                          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                        ) : (
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={s.icon} /></svg>
-                        )}
-                      </div>
-                      <span
-                        className={`text-sm font-bold whitespace-nowrap ${
-                          isDone || isCurrent ? 'text-gray-900' : 'text-gray-400'
-                        }`}
-                      >
-                        {s.label}
-                      </span>
-                    </div>
-                    {idx < steps.length - 1 && (
-                      <div className="mx-2 sm:mx-3 flex items-center">
-                        <div className={`h-1 w-8 sm:w-12 rounded-full ${isDone ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : isCurrent ? 'bg-[#e8e8ff]' : 'bg-[#E8E8FF]'}`} />
-                      </div>
+          <div className="mb-8">
+            <div className="flex items-center">
+              {steps.map((s, idx) => (
+                <div key={s.key} className="flex items-center">
+                  <div
+                    className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ${
+                      stepIndex[step] > idx
+                        ? 'bg-primary-600 text-white'
+                          : stepIndex[step] === idx
+                            ? 'bg-primary-100 text-primary-700 ring-2 ring-primary-500'
+                            : 'bg-gray-100 text-gray-400'
+                    }`}
+                  >
+                    {stepIndex[step] > idx ? (
+                      <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path
+                          fillRule="evenodd"
+                          d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    ) : (
+                      idx + 1
                     )}
                   </div>
-                );
-              })}
+                  <span
+                    className={`ml-2 text-sm font-medium ${
+                      stepIndex[step] >= idx ? 'text-gray-900' : 'text-gray-400'
+                    }`}
+                  >
+                    {s.label}
+                  </span>
+                  {idx < steps.length - 1 && (
+                    <div
+                      className={`mx-4 h-px w-12 sm:w-16 ${
+                        stepIndex[step] > idx ? 'bg-primary-500' : 'bg-gray-200'
+                      }`}
+                    />
+                  )}
+                </div>
+              ))}
             </div>
           </div>
 
           {createdBooking ? (
-            <div className="mx-auto max-w-xl overflow-hidden rounded-2xl border border-[#e6f7ee] bg-white shadow-xl shadow-emerald-100/40">
-              <div className="bg-gradient-to-r from-emerald-400 to-teal-400 p-[1px]">
-                <div className="bg-white rounded-[15px] p-8 text-center">
-                  <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-[#e6f7ee] to-[#e8f2ff] text-emerald-600 shadow-inner">
-                    <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                  </div>
-                  <h2 className="mt-4 text-xl font-black text-gray-900">Booking Berhasil! 🎉</h2>
-                  <p className="mt-2 text-sm text-gray-500">
-                    Simpan kode booking berikut sebagai referensi Anda
-                  </p>
-                  <div className="mx-auto mt-4 w-fit rounded-2xl bg-gradient-to-r from-[#8B8CFF] to-[#A5A6FF] p-[1.5px]">
-                    <div className="rounded-[14px] bg-[#FAF9FF] px-6 py-3 text-lg font-black tracking-widest text-[#6a6acc]">
-                      {createdBooking.bookingCode}
-                    </div>
-                  </div>
-                  <p className="mt-3 inline-flex rounded-full bg-[#e6f7ee] px-3 py-1 text-xs font-bold uppercase tracking-widest text-emerald-700">
-                    Status: {createdBooking.status}
-                  </p>
-                  {createdBooking.confirmationPin && (
-                    <div className="mx-auto mt-4 w-fit rounded-2xl bg-gradient-to-br from-[#fff4d6] to-[#ffe8ec] p-[1.5px]">
-                      <div className="rounded-[14px] bg-[#fff8e1] px-6 py-3 text-center">
-                        <p className="text-xs font-bold uppercase tracking-widest text-amber-700">PIN Konfirmasi (tunjukkan ke staf)</p>
-                        <p className="text-2xl font-black tracking-[0.3em] text-amber-700">{createdBooking.confirmationPin}</p>
-                      </div>
-                    </div>
-                  )}
-                  <div className="mt-6 rounded-2xl border border-[#E8E8FF] bg-[#FAF9FF] p-4 text-left">
-                    <h3 className="flex items-center gap-2 text-sm font-black text-gray-900"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#e8e8ff] text-[#6a6acc] text-xs">✦</span> Verifikasi PIN</h3>
-                    <p className="mt-1 text-xs text-gray-500">Masukkan 6-digit PIN untuk check-in</p>
-                    <div className="mt-3 flex gap-2">
-                      <input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="6-digit PIN" maxLength={6} className="flex-1 rounded-xl border border-[#E8E8FF] bg-white px-3 py-2.5 text-sm focus:border-[#8B8CFF] focus:outline-none focus:ring-2 focus:ring-[#e8e8ff] text-center tracking-widest font-bold" />
-                      <button onClick={() => verifyPinMut.mutate()} disabled={verifyPinMut.isPending || pin.length !== 6} className="rounded-xl bg-gradient-to-r from-[#8B8CFF] to-[#A5A6FF] px-5 py-2.5 text-sm font-bold text-white shadow hover:shadow-md disabled:opacity-50">{verifyPinMut.isPending ? '...' : 'Verifikasi'}</button>
-                    </div>
-                    {pinMsg && <p className="mt-2 rounded-xl bg-[#e6f7ee] px-3 py-2 text-sm font-medium text-emerald-700">{pinMsg}</p>}
-                    {verifyPinMut.isError && <p className="mt-1 text-sm text-rose-600">{(verifyPinMut.error as Error).message}</p>}
-                  </div>
-                  <div className="mt-6 flex justify-center gap-3">
-                    <Link
-                      to="/"
-                      className="rounded-full border border-[#E8E8FF] bg-white px-5 py-2.5 text-sm font-bold text-gray-700 hover:bg-[#FAF9FF]"
-                    >
-                      Beranda
-                    </Link>
-                    <Link
-                      to="/search"
-                      className="rounded-full bg-gradient-to-r from-[#8B8CFF] to-[#A5A6FF] px-5 py-2.5 text-sm font-bold text-white shadow"
-                    >
-                      Cari Layanan Lain
-                    </Link>
-                  </div>
+            <div className="mx-auto max-w-xl rounded-xl border border-green-200 bg-white p-8 text-center shadow-sm">
+              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
+                <svg className="h-7 w-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h2 className="mt-4 text-xl font-semibold text-gray-900">Booking Berhasil Dibuat</h2>
+              <p className="mt-2 text-sm text-gray-500">
+                Simpan kode booking berikut sebagai referensi Anda
+              </p>
+              <div className="mx-auto mt-4 w-fit rounded-lg bg-gray-100 px-6 py-3 text-lg font-bold tracking-widest text-gray-900">
+                {createdBooking.bookingCode}
+              </div>
+              <p className="mt-3 text-xs uppercase tracking-wide text-gray-400">
+                Status: {createdBooking.status}
+              </p>
+              {createdBooking.confirmationPin && (
+                <div className="mx-auto mt-4 w-fit rounded-lg bg-yellow-50 border border-yellow-200 px-6 py-3">
+                  <p className="text-xs text-yellow-700">PIN Konfirmasi (tunjukkan ke staf)</p>
+                  <p className="text-xl font-bold tracking-widest text-yellow-900">{createdBooking.confirmationPin}</p>
                 </div>
+              )}
+              <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left">
+                <h3 className="text-sm font-semibold text-gray-900">Verifikasi PIN</h3>
+                <p className="mt-1 text-xs text-gray-500">POST /bookings/{'{id}'}/verify-pin — masukkan 6-digit PIN untuk check-in</p>
+                <div className="mt-3 flex gap-2">
+                  <input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="6-digit PIN" maxLength={6} className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
+                  <button onClick={() => verifyPinMut.mutate()} disabled={verifyPinMut.isPending || pin.length !== 6} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{verifyPinMut.isPending ? '...' : 'Verifikasi'}</button>
+                </div>
+                {pinMsg && <p className="mt-2 text-sm text-green-600">{pinMsg}</p>}
+                {verifyPinMut.isError && <p className="mt-1 text-sm text-red-600">{(verifyPinMut.error as Error).message}</p>}
+              </div>
+              <div className="mt-6 flex justify-center gap-3">
+                <Link
+                  to="/"
+                  className="rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                >
+                  Beranda
+                </Link>
+                <Link
+                  to="/search"
+                  className="rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
+                >
+                  Cari Layanan Lain
+                </Link>
               </div>
             </div>
           ) : (
@@ -315,40 +309,36 @@ export default function BookingPage() {
               {/* Step: Service Selection */}
               {step === 'service' && (
                 <div>
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#e8e8ff] to-[#f0e8ff] text-[#6a6acc]"><svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg></span>
-                    <h2 className="text-xl font-black text-gray-900">Pilih Layanan</h2>
-                    <span className="rounded-full bg-[#e8e8ff] px-2.5 py-1 text-xs font-bold text-[#6a6acc]">{services.length} pilihan</span>
-                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900">Pilih Layanan</h2>
                   <div className="mt-4 space-y-3">
                     {services.map((service) => (
                       <button
                         key={service.id}
                         onClick={() => handleServiceSelect(service)}
-                        className={`w-full rounded-2xl border p-5 text-left transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
+                        className={`w-full rounded-xl border p-5 text-left transition-all ${
                           selectedService?.id === service.id
-                            ? 'border-[#8B8CFF] bg-gradient-to-br from-[#e8e8ff] to-white ring-2 ring-[#d0d0ff] shadow-lg shadow-[#8B8CFF]/10'
-                            : 'border-[#E8E8FF] bg-white hover:border-[#d0d0ff] hover:shadow-sm'
+                            ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200'
+                            : 'border-gray-200 bg-white hover:border-primary-300 hover:shadow-sm'
                         }`}
                       >
-                        <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-start justify-between">
                           <div>
-                            <h3 className="font-bold text-gray-900">{service.name}</h3>
-                            <p className="mt-1 text-sm text-gray-500 leading-relaxed">{service.description}</p>
-                            <span className="mt-2 inline-flex items-center gap-1 rounded-full bg-[#e8f2ff] px-2.5 py-1 text-xs font-semibold text-[#5a7ab3]">{service.duration} menit ⏱</span>
+                            <h3 className="font-semibold text-gray-900">{service.name}</h3>
+                            <p className="mt-1 text-sm text-gray-500">{service.description}</p>
+                            <p className="mt-2 text-sm text-gray-400">{service.duration} menit</p>
                           </div>
-                          <span className="rounded-xl bg-gradient-to-br from-[#8B8CFF] to-[#A5A6FF] px-3 py-1.5 text-sm font-black text-white shadow-sm">
+                          <span className="text-lg font-bold text-primary-600">
                             {formatPrice(service.price)}
                           </span>
                         </div>
                         {(service.addons?.length ?? 0) > 0 && (
-                          <div className="mt-3 border-t border-[#E8E8FF] pt-3">
-                            <p className="text-xs font-bold uppercase tracking-widest text-gray-400">Add-on tersedia:</p>
-                            <div className="mt-1.5 flex flex-wrap gap-2">
+                          <div className="mt-3 border-t border-gray-100 pt-3">
+                            <p className="text-xs font-medium text-gray-500">Add-on tersedia:</p>
+                            <div className="mt-1 flex flex-wrap gap-2">
                               {service.addons.map((addon) => (
                                 <span
                                   key={addon.id}
-                                  className="rounded-full bg-[#fff4d6] px-2.5 py-1 text-xs font-medium text-amber-700"
+                                  className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600"
                                 >
                                   {addon.name} (+{formatPrice(addon.price)})
                                 </span>
@@ -365,62 +355,57 @@ export default function BookingPage() {
               {/* Step: Staff Selection */}
               {step === 'staff' && (
                 <div>
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#ffe8ec] to-[#fff4d6] text-rose-500"><svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg></span>
-                    <h2 className="text-xl font-black text-gray-900">Pilih Staf</h2>
-                    <span className="rounded-full bg-[#ffe8ec] px-2.5 py-1 text-xs font-bold text-rose-600">{filteredStaff.length} staf</span>
-                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900">Pilih Staf</h2>
                   <div className="mt-4 grid gap-3 sm:grid-cols-2">
                     {filteredStaff.map((s) => (
                       <button
                         key={s.id}
                         onClick={() => handleStaffSelect(s)}
-                        className={`flex items-center gap-4 rounded-2xl border p-4 text-left transition-all hover:-translate-y-0.5 ${
+                        className={`flex items-center gap-4 rounded-xl border p-4 text-left transition-all ${
                           selectedStaff?.id === s.id
-                            ? 'border-[#8B8CFF] bg-gradient-to-br from-[#e8e8ff] to-white ring-2 ring-[#d0d0ff] shadow-md'
-                            : 'border-[#E8E8FF] bg-white hover:border-[#d0d0ff] hover:shadow-sm'
+                            ? 'border-primary-500 bg-primary-50 ring-2 ring-primary-200'
+                            : 'border-gray-200 bg-white hover:border-primary-300 hover:shadow-sm'
                         }`}
                       >
-                        <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-2xl bg-gradient-to-br from-[#e8e8ff] to-[#ffe8ec] ring-1 ring-[#E8E8FF]">
+                        <div className="h-14 w-14 flex-shrink-0 overflow-hidden rounded-full bg-primary-100">
                           {s.avatarUrl ? (
                             <img src={s.avatarUrl} alt={s.name} className="h-full w-full object-cover" />
                           ) : (
-                            <div className="flex h-full items-center justify-center text-sm font-black text-[#6a6acc]">
+                            <div className="flex h-full items-center justify-center text-sm font-bold text-primary-600">
                               {s.name.slice(0, 2).toUpperCase()}
                             </div>
                           )}
                         </div>
-                        <div className="min-w-0">
-                          <h4 className="font-bold text-gray-900 truncate">{s.name}</h4>
+                        <div>
+                          <h4 className="font-medium text-gray-900">{s.name}</h4>
                           {s.rating > 0 && (
                             <div className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
-                              <span className="rounded-full bg-[#fff4d6] px-1.5 py-0.5 font-bold text-amber-700">⭐ {s.rating.toFixed(1)}</span>
-                              <span>({s.reviewCount})</span>
+                              <svg className="h-3 w-3 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                              </svg>
+                              <span>{s.rating.toFixed(1)} ({s.reviewCount})</span>
                             </div>
                           )}
-                          <p className="mt-1 text-xs text-gray-500 line-clamp-1">{s.bio}</p>
+                          <p className="mt-1 text-[13px] text-gray-500 line-clamp-1">{s.bio}</p>
                         </div>
                       </button>
                     ))}
                   </div>
                   <button
                     onClick={() => { setSelectedStaff(null); setStep('service'); }}
-                    className="mt-4 inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#6a6acc] ring-1 ring-[#E8E8FF] hover:bg-[#FAF9FF]"
+                    className="mt-4 text-sm text-primary-600 hover:underline"
                   >
-                    ← Kembali ke layanan
+                    &larr; Kembali ke layanan
                   </button>
                 </div>
               )}
 
               {/* Step: Slot Selection */}
               {step === 'slot' && (
-                <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-[#E8E8FF]">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#e6f7ee] to-[#e8f2ff] text-emerald-600"><svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg></span>
-                    <h2 className="text-xl font-black text-gray-900">Pilih Jadwal</h2>
-                  </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Pilih Jadwal</h2>
                   <div className="mt-4">
-                    <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">Tanggal</label>
+                    <label className="block text-sm font-medium text-gray-700">Tanggal</label>
                     <input
                       type="date"
                       value={selectedDate}
@@ -435,7 +420,7 @@ export default function BookingPage() {
                         const day = String(d.getDate()).padStart(2, '0');
                         return `${y}-${m}-${day}`;
                       })()}
-                      className="mt-1.5 rounded-xl border border-[#E8E8FF] bg-[#FAF9FF] px-3 py-2.5 text-sm focus:border-[#8B8CFF] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#e8e8ff]"
+                      className="mt-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                     />
                   </div>
                   <div className="mt-4">
@@ -448,15 +433,15 @@ export default function BookingPage() {
                   </div>
                   {selectedService && (selectedService.addons?.length ?? 0) > 0 && (
                     <div className="mt-6">
-                      <h3 className="flex items-center gap-2 text-sm font-black text-gray-700"><span className="flex h-6 w-6 items-center justify-center rounded-full bg-[#fff4d6] text-amber-600 text-xs">＋</span> Tambah Add-on</h3>
+                      <h3 className="text-sm font-medium text-gray-700">Tambah Add-on</h3>
                       <div className="mt-2 space-y-2">
                         {selectedService.addons.map((addon) => (
                           <label
                             key={addon.id}
-                            className={`flex cursor-pointer items-center justify-between rounded-xl border p-3 transition-all ${
+                            className={`flex cursor-pointer items-center justify-between rounded-lg border p-3 transition-colors ${
                               selectedAddons.find((a) => a.id === addon.id)
-                                ? 'border-[#8B8CFF] bg-[#e8e8ff] ring-1 ring-[#d0d0ff]'
-                                : 'border-[#E8E8FF] bg-[#FAF9FF] hover:bg-white'
+                                ? 'border-primary-300 bg-primary-50'
+                                : 'border-gray-200 bg-white hover:bg-gray-50'
                             }`}
                           >
                             <div className="flex items-center gap-3">
@@ -464,14 +449,14 @@ export default function BookingPage() {
                                 type="checkbox"
                                 checked={!!selectedAddons.find((a) => a.id === addon.id)}
                                 onChange={() => handleAddonToggle(addon)}
-                                className="h-4 w-4 rounded border-gray-300 text-[#8B8CFF] focus:ring-[#8B8CFF]"
+                                className="h-4 w-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                               />
                               <div>
-                                <span className="text-sm font-bold text-gray-900">{addon.name}</span>
-                                <span className="ml-2 rounded-full bg-white px-2 py-0.5 text-xs font-medium text-gray-500">+{addon.duration} menit</span>
+                                <span className="text-sm font-medium text-gray-900">{addon.name}</span>
+                                <span className="ml-2 text-xs text-gray-500">+{addon.duration} menit</span>
                               </div>
                             </div>
-                            <span className="rounded-full bg-white px-2.5 py-1 text-sm font-black text-[#6a6acc] ring-1 ring-[#E8E8FF]">{formatPrice(addon.price)}</span>
+                            <span className="text-sm font-medium text-primary-600">{formatPrice(addon.price)}</span>
                           </label>
                         ))}
                       </div>
@@ -479,26 +464,23 @@ export default function BookingPage() {
                   )}
                   <button
                     onClick={() => { setSelectedSlot(null); setStep('staff'); }}
-                    className="mt-4 inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-medium text-[#6a6acc] ring-1 ring-[#E8E8FF] hover:bg-[#FAF9FF]"
+                    className="mt-4 text-sm text-primary-600 hover:underline"
                   >
-                    ← Kembali ke pemilihan staf
+                    &larr; Kembali ke pemilihan staf
                   </button>
                 </div>
               )}
 
               {/* Step: Contact Info */}
               {step === 'contact' && (
-                <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-[#E8E8FF]">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#f0e8ff] to-[#e8e8ff] text-[#8B8CFF]"><svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg></span>
-                    <h2 className="text-xl font-black text-gray-900">Informasi Kontak</h2>
-                  </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Informasi Kontak</h2>
                   {isAuthenticated ? (
-                    <p className="mt-2 inline-flex rounded-full bg-[#e6f7ee] px-3 py-1 text-xs font-bold text-emerald-700">
-                      ✓ Otomatis terisi dari profil — hanya catatan dapat diedit
+                    <p className="mt-1 text-sm text-green-600">
+                      Otomatis terisi dari profil — hanya catatan dapat diedit
                     </p>
                   ) : (
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="mt-1 text-sm text-gray-500">
                       Isi data diri Anda untuk menyelesaikan booking
                     </p>
                   )}
@@ -507,60 +489,60 @@ export default function BookingPage() {
                     className="mt-6 space-y-4"
                   >
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">Nama Lengkap</label>
+                      <label className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
                       <input
                         {...contactForm.register('customerName')}
                         readOnly={isAuthenticated}
                         disabled={isAuthenticated}
-                        className={`mt-1.5 block w-full rounded-xl border px-4 py-3 text-sm focus:border-[#8B8CFF] focus:outline-none focus:ring-2 focus:ring-[#e8e8ff] ${isAuthenticated ? 'border-[#E8E8FF] bg-[#FAF9FF] text-gray-600' : 'border-[#E8E8FF] bg-white'}`}
+                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
                         placeholder="Masukkan nama Anda"
                       />
                       {contactForm.formState.errors.customerName && (
-                        <p className="mt-1 text-sm text-rose-600">
+                        <p className="mt-1 text-sm text-red-600">
                           {contactForm.formState.errors.customerName.message}
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">Email</label>
+                      <label className="block text-sm font-medium text-gray-700">Email</label>
                       <input
                         {...contactForm.register('customerEmail')}
                         type="email"
                         readOnly={isAuthenticated}
                         disabled={isAuthenticated}
-                        className={`mt-1.5 block w-full rounded-xl border px-4 py-3 text-sm focus:border-[#8B8CFF] focus:outline-none focus:ring-2 focus:ring-[#e8e8ff] ${isAuthenticated ? 'border-[#E8E8FF] bg-[#FAF9FF] text-gray-600' : 'border-[#E8E8FF] bg-white'}`}
+                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
                         placeholder="email@contoh.com"
                       />
                       {contactForm.formState.errors.customerEmail && (
-                        <p className="mt-1 text-sm text-rose-600">
+                        <p className="mt-1 text-sm text-red-600">
                           {contactForm.formState.errors.customerEmail.message}
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">Nomor Telepon</label>
+                      <label className="block text-sm font-medium text-gray-700">Nomor Telepon</label>
                       <input
                         {...contactForm.register('customerPhone')}
                         type="tel"
                         readOnly={isAuthenticated}
                         disabled={isAuthenticated}
-                        className={`mt-1.5 block w-full rounded-xl border px-4 py-3 text-sm focus:border-[#8B8CFF] focus:outline-none focus:ring-2 focus:ring-[#e8e8ff] ${isAuthenticated ? 'border-[#E8E8FF] bg-[#FAF9FF] text-gray-600' : 'border-[#E8E8FF] bg-white'}`}
+                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
                         placeholder="08xxxxxxxxxx"
                       />
                       {contactForm.formState.errors.customerPhone && (
-                        <p className="mt-1 text-sm text-rose-600">
+                        <p className="mt-1 text-sm text-red-600">
                           {contactForm.formState.errors.customerPhone.message}
                         </p>
                       )}
                     </div>
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-widest text-gray-500">
-                        Catatan <span className="text-gray-400 normal-case tracking-normal">(opsional)</span>
+                      <label className="block text-sm font-medium text-gray-700">
+                        Catatan <span className="text-gray-400">(opsional)</span>
                       </label>
                       <textarea
                         {...contactForm.register('notes')}
                         rows={3}
-                        className="mt-1.5 block w-full rounded-xl border border-[#E8E8FF] bg-white px-4 py-3 text-sm focus:border-[#8B8CFF] focus:outline-none focus:ring-2 focus:ring-[#e8e8ff]"
+                        className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                         placeholder="Permintaan khusus, alergi, dll."
                       />
                     </div>
@@ -568,15 +550,15 @@ export default function BookingPage() {
                       <button
                         type="button"
                         onClick={() => setStep('slot')}
-                        className="rounded-full border border-[#E8E8FF] bg-white px-6 py-3 text-sm font-bold text-gray-700 hover:bg-[#FAF9FF]"
+                        className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                       >
                         Kembali
                       </button>
                       <button
                         type="submit"
-                        className="flex-1 rounded-full bg-gradient-to-r from-[#8B8CFF] to-[#A5A6FF] px-6 py-3 text-sm font-black text-white shadow-md hover:shadow-lg transition"
+                        className="rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-700"
                       >
-                        Lanjutkan ✦
+                        Lanjutkan
                       </button>
                     </div>
                   </form>
@@ -585,32 +567,29 @@ export default function BookingPage() {
 
               {/* Step: Confirm */}
               {step === 'confirm' && (
-                <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-[#E8E8FF]">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#fff4d6] to-[#e6f7ee] text-amber-600"><svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></span>
-                    <h2 className="text-xl font-black text-gray-900">Konfirmasi Booking</h2>
-                  </div>
+                <div>
+                  <h2 className="text-xl font-semibold text-gray-900">Konfirmasi Booking</h2>
                   <p className="mt-1 text-sm text-gray-500">
                     Pastikan semua data sudah benar sebelum melanjutkan
                   </p>
-                  <div className="mt-4 rounded-2xl border border-[#E8E8FF] bg-[#FAF9FF] p-5">
+                  <div className="mt-4 rounded-xl border border-gray-200 bg-white p-5">
                     <div className="space-y-3 text-sm">
-                      <div className="flex justify-between bg-white rounded-xl px-3 py-2 ring-1 ring-[#E8E8FF]/50">
+                      <div className="flex justify-between">
                         <span className="text-gray-500">Layanan</span>
-                        <span className="font-bold text-gray-900">{selectedService?.name}</span>
+                        <span className="font-medium text-gray-900">{selectedService?.name}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Durasi</span>
-                        <span className="font-medium text-gray-700 rounded-full bg-white px-2.5 py-1 ring-1 ring-[#E8E8FF] text-xs">{selectedService?.duration} menit</span>
+                        <span className="text-gray-700">{selectedService?.duration} menit</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Staf</span>
-                        <span className="font-medium text-gray-700">{selectedStaff?.name}</span>
+                        <span className="text-gray-700">{selectedStaff?.name}</span>
                       </div>
                       {selectedSlot && (
-                        <div className="flex justify-between gap-2">
-                          <span className="text-gray-500 shrink-0">Waktu</span>
-                          <span className="text-right font-medium text-gray-700">
+                        <div className="flex justify-between">
+                          <span className="text-gray-500">Waktu</span>
+                          <span className="text-gray-700">
                             {new Date(selectedSlot.startTime).toLocaleString('id-ID', {
                               weekday: 'long',
                               day: 'numeric',
@@ -622,45 +601,45 @@ export default function BookingPage() {
                           </span>
                         </div>
                       )}
-                      <div className="flex justify-between bg-white rounded-xl px-3 py-2 ring-1 ring-[#E8E8FF]/50">
+                      <div className="flex justify-between">
                         <span className="text-gray-500">Nama</span>
-                        <span className="font-medium text-gray-700">{contactForm.getValues('customerName')}</span>
+                        <span className="text-gray-700">{contactForm.getValues('customerName')}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Email</span>
-                        <span className="text-gray-700 text-xs truncate max-w-[180px]">{contactForm.getValues('customerEmail')}</span>
+                        <span className="text-gray-700">{contactForm.getValues('customerEmail')}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-500">Telepon</span>
-                        <span className="font-medium text-gray-700">{contactForm.getValues('customerPhone')}</span>
+                        <span className="text-gray-700">{contactForm.getValues('customerPhone')}</span>
                       </div>
                     </div>
-                    <div className="mt-4">
+                    <div className="mt-4 flex gap-3">
                       <button
                         onClick={() => setStep('contact')}
-                        className="rounded-full bg-white px-4 py-2 text-sm font-bold text-[#6a6acc] ring-1 ring-[#E8E8FF] hover:bg-[#FAF9FF]"
+                        className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                       >
-                        ✎ Edit Kontak
+                        Edit
                       </button>
                     </div>
                   </div>
                   <div className="mt-6 flex gap-3">
                     <button
                       onClick={() => setStep('contact')}
-                      className="rounded-full border border-[#E8E8FF] bg-white px-6 py-3 text-sm font-bold text-gray-700 hover:bg-[#FAF9FF]"
+                      className="rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
                     >
-                      ← Kembali
+                      &larr; Kembali
                     </button>
                     <button
                       onClick={handleConfirm}
                       disabled={createBooking.isPending}
-                      className="flex-1 rounded-full bg-gradient-to-r from-[#8B8CFF] to-[#FF8E9E] px-6 py-3 text-sm font-black text-white shadow-md hover:shadow-lg disabled:opacity-50 transition"
+                      className="flex-1 rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50"
                     >
-                      {createBooking.isPending ? '⏳ Memproses...' : '✦ Konfirmasi Booking'}
+                      {createBooking.isPending ? 'Memproses...' : 'Konfirmasi Booking'}
                     </button>
                   </div>
                   {createBooking.isError && (
-                    <p className="mt-3 rounded-xl bg-[#ffe8ec] px-3 py-2 text-sm font-medium text-rose-600 ring-1 ring-rose-200">
+                    <p className="mt-3 text-sm text-red-600">
                       {(createBooking.error as Error).message}
                     </p>
                   )}
