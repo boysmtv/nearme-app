@@ -237,6 +237,9 @@ pnpm install && pnpm dev
 - `Provider` model renamed to `ProviderModel` to avoid conflict with Riverpod's `Provider`
 - `DEKATColorScheme.light`/`.dark` → `.lightColorScheme`/`.darkColorScheme`
 - `CardTheme` → `CardThemeData` (Flutter 3.x API change)
+- Search page: no back button, shows all providers on empty query (not empty state)
+- Navbar protected tabs (Bookings/Alerts/Account): uses `context.push('/login')` instead of `context.go` so back button works properly
+- `DEKATColors` has soft palette constants (softViolet, softPink, softMint, softPeach, softSky, softLavender) — reverted to original primary #6C63FF per user preference
 
 ### Docker
 - PostgreSQL: `postgis/postgis:17-3.4` (NOT `postgres:18-alpine` which needs `/var/lib/postgresql`)
@@ -309,11 +312,11 @@ pnpm install && pnpm dev
 - Sessions table requires V18 (`device_info`, `token_family`) and V19 (`ip_address` type fix) migrations
 - CORS allowed origins in `WebConfig.java`: `localhost:4100, 3001, 3002, 8081, 4101, 4102`
 
-### Known Issues (2026-08-27)
+### Known Issues (2026-08-28)
 - `POST /public/bookings` returns 401 Unauthorized — SecurityConfig has `/public/**` permitAll but something blocks it. Need to check if JWT decoder rejects requests with no token or if there's a filter chain issue.
-- Booking PIN flow: backend endpoints created (`POST /bookings/{id}/verify-pin`), frontend not yet wired
-- Profile completion page (`/profile/complete`) not yet created in frontend
-- Provider blocked dates UI not yet added to Settings page
+- Booking PIN flow: backend endpoints created (`POST /bookings/{id}/verify-pin`), frontend wired
+- Profile completion page (`/profile/complete`) created in frontend
+- Provider blocked dates UI added to Settings page
 - web_provider app is now DEPRECATED — all its routes are in web_public
 
 ## Deployment

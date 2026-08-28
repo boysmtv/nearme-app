@@ -166,6 +166,24 @@
         "logout"
       ],
       "recorded_at": "2026-08-24T14:02:52.939214+00:00"
+    },
+    {
+      "run_id": "search_fix_and_revert::2026-08-28",
+      "final_status": "completed",
+      "summary": "Reverted colorful soft palette back to original colors (#6C63FF). Fixed search page: no back button, shows all providers on empty query. Fixed navbar back button: protected tabs use context.push('/login') so back doesn't close app.",
+      "changed_artifacts": [
+        "packages/flutter_design_system/lib/src/colors.dart",
+        "apps/mobile_customer/lib/shared/widgets/main_scaffold.dart",
+        "apps/mobile_customer/lib/features/discovery/presentation/pages/search_page.dart",
+        "AGENTS.md"
+      ],
+      "features": [
+        "search-no-back-button",
+        "search-show-all-providers",
+        "navbar-back-button-fix",
+        "revert-colors-to-original"
+      ],
+      "recorded_at": "2026-08-28T20:15:00.000000+00:00"
     }
   ]
 }
