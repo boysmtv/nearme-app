@@ -1,24 +1,37 @@
 @import "tailwindcss";
 
 @theme {
-  --color-primary-50: oklch(0.96 0.03 250);
-  --color-primary-100: oklch(0.92 0.06 250);
-  --color-primary-200: oklch(0.84 0.12 250);
-  --color-primary-300: oklch(0.74 0.18 250);
-  --color-primary-400: oklch(0.64 0.22 250);
-  --color-primary-500: oklch(0.55 0.25 250);
-  --color-primary-600: oklch(0.47 0.25 250);
-  --color-primary-700: oklch(0.40 0.22 250);
-  --color-primary-800: oklch(0.33 0.18 250);
-  --color-primary-900: oklch(0.27 0.14 250);
+  --color-primary-50: #f0f0ff;
+  --color-primary-100: #e8e8ff;
+  --color-primary-200: #d0d0ff;
+  --color-primary-300: #b8b5ff;
+  --color-primary-400: #a5a6ff;
+  --color-primary-500: #8b8cff;
+  --color-primary-600: #7a7ae6;
+  --color-primary-700: #6a6acc;
+  --color-primary-800: #5a5ab3;
+  --color-primary-900: #4a4a99;
+  --color-primary-950: #3a3a80;
+  --color-secondary-50: #fff0f3;
+  --color-secondary-100: #ffe8ec;
+  --color-secondary-200: #ffb5c2;
+  --color-secondary-300: #ff8e9e;
+  --color-secondary-400: #ff6b80;
+  --color-secondary-500: #ff4d6a;
+  --color-soft-violet: #e8e8ff;
+  --color-soft-pink: #ffe8ec;
+  --color-soft-mint: #e6f7ee;
+  --color-soft-peach: #fff4d6;
+  --color-soft-sky: #e8f2ff;
+  --color-soft-lavender: #f0e8ff;
 }
 
 @layer base {
-  html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
-  body {
-    font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
-  }
+  html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+  body { font-family: "Inter", ui-sans-serif, system-ui, sans-serif; background: #fbf8ff; }
+}
+
+@layer utilities {
+  .line-clamp-1 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 1; }
+  .line-clamp-2 { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 }
