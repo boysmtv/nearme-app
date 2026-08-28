@@ -1,5 +1,8 @@
 package id.dekat.identity.application;
 
+import id.dekat.access.domain.Role;
+import id.dekat.access.domain.RoleAssignmentRepository;
+import id.dekat.access.domain.RoleRepository;
 import id.dekat.identity.domain.*;
 import id.dekat.identity.web.dto.*;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,8 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
     private final StringRedisTemplate redisTemplate;
+    private final RoleAssignmentRepository roleAssignmentRepository;
+    private final RoleRepository roleRepository;
 
     private static final String OTP_KEY_PREFIX = "otp:";
     private static final String OTP_ATTEMPT_PREFIX = "otp_attempts:";
@@ -216,7 +221,16 @@ public class AuthService {
     private TokenResponse createTokenResponse(User user, String existingTokenFamily) {
         String tokenFamily = existingTokenFamily != null ? existingTokenFamily : UUID.randomUUID().toString();
 
-        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getEmail());
+        List<String> roles = roleAssignmentRepository.findByUserId(user.getId()).stream()
+                .map(ra -> roleRepository.findById(ra.getRoleId()).orElse(null))
+                .filter(r -> r != null)
+                .map(Role::getName)
+                .toList();
+        if (roles.isEmpty()) {
+            // Fallback: assign default customer role if no explicit assignment
+            roles = List.of("ROLE_CUSTOMER");
+        }
+        String accessToken = jwtTokenProvider.generateAccessToken(user.getId(), user.getEmail(), roles);
 
         String refreshTokenPlain = jwtTokenProvider.generateRefreshToken(user.getId());
         String refreshTokenHash = jwtTokenProvider.hashRefreshToken(refreshTokenPlain);

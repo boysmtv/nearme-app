@@ -92,7 +92,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     if (u.role === 'ROLE_CUSTOMER') navigate('/');
     else if (u.role.startsWith('ROLE_PROVIDER')) navigate('/provider/dashboard');
-    else navigate('/admin/dashboard');
+    else if (u.role === 'ROLE_PLATFORM_ADMIN') {
+      // Admin uses separate web_admin app (port 3002) — external redirect
+      window.location.href = 'http://localhost:3002';
+      return;
+    } else navigate('/');
   }, [navigate, buildUser, syncHasProfile]);
 
   const register = useCallback(async (name: string, email: string, phone: string, password: string) => {

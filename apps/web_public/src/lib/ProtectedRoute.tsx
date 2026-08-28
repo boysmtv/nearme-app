@@ -14,10 +14,19 @@ export default function ProtectedRoute({
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && user?.role !== requiredRole) {
-    if (user?.role === 'ROLE_CUSTOMER') return <Navigate to="/" replace />;
-    if (user?.role?.startsWith('ROLE_PROVIDER')) return <Navigate to="/provider/dashboard" replace />;
-    return <Navigate to="/" replace />;
+  if (requiredRole) {
+    const hasAccess = user?.role === requiredRole
+      || (requiredRole.startsWith('ROLE_PROVIDER') && user?.role?.startsWith('ROLE_PROVIDER'))
+      || (requiredRole === 'ROLE_PLATFORM_ADMIN' && user?.role === 'ROLE_PLATFORM_ADMIN');
+    if (!hasAccess) {
+      if (user?.role === 'ROLE_CUSTOMER') return <Navigate to="/" replace />;
+      if (user?.role?.startsWith('ROLE_PROVIDER')) return <Navigate to="/provider/dashboard" replace />;
+      if (user?.role === 'ROLE_PLATFORM_ADMIN') {
+        window.location.href = 'http://localhost:3002';
+        return null as unknown as React.ReactElement;
+      }
+      return <Navigate to="/" replace />;
+    }
   }
 
   return <>{children}</>;

@@ -40,6 +40,10 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(UUID userId, String email) {
+        return generateAccessToken(userId, email, List.of());
+    }
+
+    public String generateAccessToken(UUID userId, String email, List<String> roles) {
         Date now = new Date();
         Date expiry = new Date(now.getTime() + accessTokenValidityMs);
 
@@ -47,6 +51,7 @@ public class JwtTokenProvider {
                 .header().add(KID_HEADER, currentKid).and()
                 .subject(userId.toString())
                 .claim("email", email)
+                .claim("roles", roles)
                 .claim("token_type", "access")
                 .issuedAt(now)
                 .expiration(expiry)
