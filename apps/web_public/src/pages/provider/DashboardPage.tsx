@@ -81,21 +81,21 @@ export default function DashboardPage() {
               ) : recentBookings.length > 0 ? (
                 <div className="space-y-3">
                   {recentBookings.slice(0, 5).map((booking) => (
-                    <div key={booking.id} className="flex items-center justify-between rounded-lg border border-gray-100 p-3 hover:bg-gray-50">
+                    <div key={booking.id} className="flex items-center justify-between rounded-lg border border-gray-100 p-4 hover:bg-gray-50">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-600">
                           {booking.customerName[0]}
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">{booking.customerName}</p>
-                          <p className="text-xs text-gray-500">
+                          <p className="text-[13px] text-gray-500">
                             {booking.serviceName} - {booking.staffName}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-medium text-gray-900">{formatPrice(booking.amount ?? 0)}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-[13px] text-gray-500">
                           {booking.time ?? '-'}
                         </p>
                       </div>
@@ -138,11 +138,11 @@ export default function DashboardPage() {
                     <input
                       readOnly
                       value={bookingLink}
-                      className="flex-1 rounded-lg bg-white/10 px-3 py-2 text-xs text-white placeholder-white/50 backdrop-blur"
+                      className="flex-1 rounded-lg bg-white/10 px-3 py-2.5 text-sm h-9 text-white placeholder-white/50 backdrop-blur"
                     />
                     <button
                       onClick={() => { navigator.clipboard.writeText(bookingLink).catch(() => {}); }}
-                      className="rounded-lg bg-white px-3 py-2 text-xs font-medium text-primary-700 hover:bg-primary-50"
+                      className="rounded-lg bg-white px-3 py-2.5 text-sm h-9 font-medium text-primary-700 hover:bg-primary-50"
                     >
                       Salin
                     </button>

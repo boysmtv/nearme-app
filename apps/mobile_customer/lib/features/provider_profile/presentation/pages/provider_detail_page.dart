@@ -120,18 +120,18 @@ class ProviderDetailPage extends ConsumerWidget {
                     (context, index) {
                       final s = services[index];
                       return Card(
-                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         child: ListTile(
-                          contentPadding: const EdgeInsets.all(12),
+                          contentPadding: const EdgeInsets.all(16),
                           leading: Container(
-                            width: 48, height: 48,
+                            width: 56, height: 56,
                             decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                             child: Icon(Icons.spa, color: Theme.of(context).colorScheme.primary),
                           ),
-                          title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          title: Text(s.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                           subtitle: Text('${s.durationMinutes} min'),
                           trailing: Text(formatRupiah(s.price),
-                              style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.primary)),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Theme.of(context).colorScheme.primary)),
                           onTap: () => context.push(
                             '/provider/${provider.id}/availability?serviceId=${s.id}${provider.firstLocationId != null ? '&locationId=${provider.firstLocationId}' : ''}',
                           ),

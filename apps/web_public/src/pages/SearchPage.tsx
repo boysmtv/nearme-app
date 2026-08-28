@@ -139,7 +139,7 @@ export default function SearchPage() {
                   />
                 </svg>
                 {activeFilterCount > 0 && (
-                  <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary-600 text-[10px] font-bold text-white">
+                  <span className="absolute -right-2 -top-2 flex h-6 w-6 items-center justify-center rounded-full bg-primary-600 text-xs font-bold text-white">
                     {activeFilterCount}
                   </span>
                 )}

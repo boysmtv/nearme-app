@@ -65,22 +65,22 @@ export default function StaffPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 truncate">{s.displayName}</h3>
-                  <p className="text-xs text-gray-500 truncate">{s.title || s.email || 'Staf'}</p>
-                  <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{s.isActive ? 'Aktif' : 'Nonaktif'}</span>
+                  <p className="text-[13px] text-gray-500 truncate">{s.title || s.email || 'Staf'}</p>
+                  <span className={`mt-1 inline-block rounded-full px-2.5 py-1 text-[13px] font-medium ${s.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{s.isActive ? 'Aktif' : 'Nonaktif'}</span>
                 </div>
               </div>
               {editingId === s.id ? (
                 <form onSubmit={(e) => { e.preventDefault(); if (editName.trim()) renameMut.mutate({ id: s.id, displayName: editName.trim() }); }} className="mt-4 flex gap-2">
-                  <input value={editName} onChange={(e) => setEditName(e.target.value)} autoFocus className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:border-primary-500 focus:outline-none" />
-                  <button type="submit" disabled={renameMut.isPending} className="rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-primary-700 disabled:opacity-50">Simpan</button>
-                  <button type="button" onClick={() => setEditingId(null)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Batal</button>
+                  <input value={editName} onChange={(e) => setEditName(e.target.value)} autoFocus className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none h-9" />
+                  <button type="submit" disabled={renameMut.isPending} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50">Simpan</button>
+                  <button type="button" onClick={() => setEditingId(null)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">Batal</button>
                 </form>
               ) : (
                 <div className="mt-4 flex flex-wrap gap-2">
-                  <button onClick={() => { setEditingId(s.id); setEditName(s.displayName); }} className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Edit</button>
-                  <button onClick={() => setScheduleFor(s.id)} className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Jadwal</button>
+                  <button onClick={() => { setEditingId(s.id); setEditName(s.displayName); }} className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">Edit</button>
+                  <button onClick={() => setScheduleFor(s.id)} className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50">Jadwal</button>
                   {s.isActive && (
-                    <button onClick={() => { if (confirm('Nonaktifkan staf ini?')) deactivateMut.mutate(s.id); }} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">Nonaktifkan</button>
+                    <button onClick={() => { if (confirm('Nonaktifkan staf ini?')) deactivateMut.mutate(s.id); }} className="rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50">Nonaktifkan</button>
                   )}
                 </div>
               )}
@@ -89,19 +89,19 @@ export default function StaffPage() {
                   <h4 className="text-sm font-semibold text-gray-900">Atur Jadwal — POST /provider/staff/{'{id}'}/schedule</h4>
                   <div className="mt-2 space-y-2">
                     {schedule.map((sc, idx) => (
-                      <div key={sc.dayOfWeek} className="flex items-center gap-2 text-xs">
+                      <div key={sc.dayOfWeek} className="flex items-center gap-2 text-[13px]">
                         <span className="w-16 font-medium text-gray-700">{dayNames[sc.dayOfWeek]}</span>
                         <label className="flex items-center gap-1"><input type="checkbox" checked={!sc.isOff} onChange={(e) => setSchedule(prev => prev.map((p,i)=> i===idx ? {...p, isOff: !e.target.checked} : p))} className="rounded border-gray-300" /> Buka</label>
-                        {!sc.isOff && (<><input type="time" value={sc.startTime} onChange={(e)=> setSchedule(prev=> prev.map((p,i)=> i===idx ? {...p, startTime: e.target.value} :p))} className="rounded border border-gray-300 px-2 py-1 text-xs" /><span>-</span><input type="time" value={sc.endTime} onChange={(e)=> setSchedule(prev=> prev.map((p,i)=> i===idx ? {...p, endTime: e.target.value} :p))} className="rounded border border-gray-300 px-2 py-1 text-xs" /></>)}
+                        {!sc.isOff && (<><input type="time" value={sc.startTime} onChange={(e)=> setSchedule(prev=> prev.map((p,i)=> i===idx ? {...p, startTime: e.target.value} :p))} className="rounded border border-gray-300 px-3 py-2 text-sm h-9" /><span>-</span><input type="time" value={sc.endTime} onChange={(e)=> setSchedule(prev=> prev.map((p,i)=> i===idx ? {...p, endTime: e.target.value} :p))} className="rounded border border-gray-300 px-3 py-2 text-sm h-9" /></>)}
                       </div>
                     ))}
                   </div>
                   <div className="mt-3 flex gap-2">
-                    <button onClick={() => scheduleMut.mutate()} disabled={scheduleMut.isPending} className="rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{scheduleMut.isPending ? 'Menyimpan...' : 'Simpan Jadwal'}</button>
-                    <button onClick={() => setScheduleFor(null)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50">Tutup</button>
+                    <button onClick={() => scheduleMut.mutate()} disabled={scheduleMut.isPending} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{scheduleMut.isPending ? 'Menyimpan...' : 'Simpan Jadwal'}</button>
+                    <button onClick={() => setScheduleFor(null)} className="rounded-lg border border-gray-300 px-4 py-2 text-sm text-gray-600 hover:bg-gray-50">Tutup</button>
                   </div>
-                  {scheduleMut.isSuccess && <p className="mt-2 text-xs text-green-600">Jadwal tersimpan</p>}
-                  {scheduleMut.isError && <p className="mt-2 text-xs text-red-600">{(scheduleMut.error as Error).message}</p>}
+                  {scheduleMut.isSuccess && <p className="mt-2 text-sm text-green-600">Jadwal tersimpan</p>}
+                  {scheduleMut.isError && <p className="mt-2 text-sm text-red-600">{(scheduleMut.error as Error).message}</p>}
                 </div>
               )}
             </div>

@@ -124,7 +124,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                 }
                 return GridView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4, childAspectRatio: 2, crossAxisSpacing: 8, mainAxisSpacing: 8),
+                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, childAspectRatio: 2.4, crossAxisSpacing: 8, mainAxisSpacing: 8),
                   itemCount: slots.length,
                   itemBuilder: (context, index) {
                     final slot = slots[index];
@@ -137,9 +137,9 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                         backgroundColor: isSelected ? Theme.of(context).colorScheme.primary : Colors.white,
                         foregroundColor: isSelected ? Colors.white : Colors.black87,
                         side: BorderSide(color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey[300]!),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: Text(slot.time),
+                      child: Text(slot.time, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
                     );
                   },
                 );

@@ -22,14 +22,14 @@ export default function UsersPage() {
   });
 
   const columns = [
-    { key: 'name', label: 'Nama', render: (u: User) => <div><p className="font-medium text-gray-900">{u.name}</p><p className="text-xs text-gray-500">{u.email}</p></div> },
+    { key: 'name', label: 'Nama', render: (u: User) => <div><p className="font-medium text-gray-900">{u.name}</p><p className="text-[13px] text-gray-500">{u.email}</p></div> },
     { key: 'role', label: 'Role', render: (u: User) => <span className="capitalize text-gray-700">{u.role}</span> },
     { key: 'status', label: 'Status', render: (u: User) => <StatusBadge status={u.status} /> },
     { key: 'lastLoginAt', label: 'Login Terakhir', render: (u: User) => <span className="text-gray-500">{u.lastLoginAt ? new Date(u.lastLoginAt).toLocaleDateString('id-ID') : '-'}</span> },
     { key: 'actions', label: '', render: (u: User) => (
       <div className="flex gap-2">
-        {u.status === 'ACTIVE' && <button disabled={statusMut.isPending} onClick={() => statusMut.mutate({ id: u.id, status: 'SUSPENDED' })} className="text-xs text-red-600 hover:underline disabled:opacity-50">Suspend</button>}
-        {u.status === 'SUSPENDED' && <button disabled={statusMut.isPending} onClick={() => statusMut.mutate({ id: u.id, status: 'ACTIVE' })} className="text-xs text-green-600 hover:underline disabled:opacity-50">Reactivate</button>}
+        {u.status === 'ACTIVE' && <button disabled={statusMut.isPending} onClick={() => statusMut.mutate({ id: u.id, status: 'SUSPENDED' })} className="text-sm px-2 py-1 text-red-600 hover:underline disabled:opacity-50">Suspend</button>}
+        {u.status === 'SUSPENDED' && <button disabled={statusMut.isPending} onClick={() => statusMut.mutate({ id: u.id, status: 'ACTIVE' })} className="text-sm px-2 py-1 text-green-600 hover:underline disabled:opacity-50">Reactivate</button>}
       </div>
     )},
   ];

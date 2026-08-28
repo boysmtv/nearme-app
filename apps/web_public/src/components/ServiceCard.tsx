@@ -35,9 +35,9 @@ export default function ServiceCard({ service, providerId }: ServiceCardProps) {
             {service.name}
           </h3>
           <p className="mt-1 text-sm text-gray-500 line-clamp-2">{service.description}</p>
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-gray-500">
+          <div className="mt-3 flex flex-wrap items-center gap-3 text-[13px] text-gray-500">
             <span className="flex items-center gap-1">
-              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
@@ -48,7 +48,7 @@ export default function ServiceCard({ service, providerId }: ServiceCardProps) {
               {formatDuration(service.duration)}
             </span>
             {service.depositAmount > 0 && (
-              <span className="rounded-full bg-amber-50 px-2 py-0.5 text-amber-700">
+              <span className="rounded-full bg-amber-50 px-2.5 py-1 text-[13px] text-amber-700">
                 Deposit {formatPrice(service.depositAmount)}
               </span>
             )}

@@ -55,7 +55,7 @@ class BookingHistoryPage extends ConsumerWidget {
                 itemBuilder: (context, index) {
                   final b = bookings[index];
                   return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
+                    margin: const EdgeInsets.only(bottom: 8),
                     child: ListTile(
                       title: Text(b.bookingCode.isEmpty ? b.id : b.bookingCode, style: const TextStyle(fontWeight: FontWeight.bold)),
                       subtitle: Text(b.startsAt != null
@@ -64,7 +64,7 @@ class BookingHistoryPage extends ConsumerWidget {
                       trailing: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
                         _StatusChip(status: b.status),
                         const SizedBox(height: 4),
-                        Text(formatRupiah(b.total), style: TextStyle(fontSize: 12, color: Colors.grey[700])),
+                        Text(formatRupiah(b.total), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey[700])),
                       ]),
                       onTap: () => context.push('/booking/${b.id}'),
                     ),
@@ -121,7 +121,7 @@ class _StatusChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
       child: Text(status.isNotEmpty ? status[0].toUpperCase() + status.substring(1).toLowerCase() : '-',
-          style: TextStyle(color: color, fontSize: 12, fontWeight: FontWeight.w500)),
+          style: TextStyle(color: color, fontSize: 13, fontWeight: FontWeight.w500)),
     );
   }
 }

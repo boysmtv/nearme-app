@@ -172,18 +172,19 @@ class StaffListPage extends ConsumerWidget {
         return AlertDialog(
           title: const Text('Edit Schedule'),
           content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
-            const Text('POST /provider/staff/{id}/schedule', style: TextStyle(fontSize: 10, color: Colors.grey)),
-            const SizedBox(height: 8),
             ...schedule.asMap().entries.map((e) {
               final idx = e.key;
               final sc = e.value;
-              return Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
-                SizedBox(width: 60, child: Text(dayNames[sc['dayOfWeek'] as int], style: const TextStyle(fontSize: 12))),
+              return Container(
+                  constraints: const BoxConstraints(minHeight: 44),
+                  padding: const EdgeInsets.symmetric(vertical: 4),
+                  child: Row(children: [
+                SizedBox(width: 60, child: Text(dayNames[sc['dayOfWeek'] as int], style: const TextStyle(fontSize: 13))),
                 Checkbox(value: !(sc['isOff'] as bool), onChanged: (v)=> setState(()=> schedule[idx]['isOff'] = !(v??false))),
                 if (!(sc['isOff'] as bool)) ...[
-                  SizedBox(width: 70, child: TextFormField(initialValue: sc['startTime'] as String, onChanged: (v)=> schedule[idx]['startTime']=v, decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)))),
+                  SizedBox(width: 70, child: TextFormField(initialValue: sc['startTime'] as String, onChanged: (v)=> schedule[idx]['startTime']=v, style: const TextStyle(fontSize: 12), decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)))),
                   const Text(' - '),
-                  SizedBox(width: 70, child: TextFormField(initialValue: sc['endTime'] as String, onChanged: (v)=> schedule[idx]['endTime']=v, decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)))),
+                  SizedBox(width: 70, child: TextFormField(initialValue: sc['endTime'] as String, onChanged: (v)=> schedule[idx]['endTime']=v, style: const TextStyle(fontSize: 12), decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)))),
                 ] else const Text('Libur', style: TextStyle(fontSize: 12, color: Colors.grey)),
               ]));
             }),

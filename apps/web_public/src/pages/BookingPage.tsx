@@ -215,7 +215,7 @@ export default function BookingPage() {
               {steps.map((s, idx) => (
                 <div key={s.key} className="flex items-center">
                   <div
-                    className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold ${
+                    className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold ${
                       stepIndex[step] > idx
                         ? 'bg-primary-600 text-white'
                           : stepIndex[step] === idx
@@ -244,7 +244,7 @@ export default function BookingPage() {
                   </span>
                   {idx < steps.length - 1 && (
                     <div
-                      className={`mx-4 h-px w-8 sm:w-16 ${
+                      className={`mx-4 h-px w-12 sm:w-16 ${
                         stepIndex[step] > idx ? 'bg-primary-500' : 'bg-gray-200'
                       }`}
                     />
@@ -325,7 +325,7 @@ export default function BookingPage() {
                           <div>
                             <h3 className="font-semibold text-gray-900">{service.name}</h3>
                             <p className="mt-1 text-sm text-gray-500">{service.description}</p>
-                            <p className="mt-2 text-xs text-gray-400">{service.duration} menit</p>
+                            <p className="mt-2 text-sm text-gray-400">{service.duration} menit</p>
                           </div>
                           <span className="text-lg font-bold text-primary-600">
                             {formatPrice(service.price)}
@@ -338,7 +338,7 @@ export default function BookingPage() {
                               {service.addons.map((addon) => (
                                 <span
                                   key={addon.id}
-                                  className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                                  className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600"
                                 >
                                   {addon.name} (+{formatPrice(addon.price)})
                                 </span>
@@ -386,7 +386,7 @@ export default function BookingPage() {
                               <span>{s.rating.toFixed(1)} ({s.reviewCount})</span>
                             </div>
                           )}
-                          <p className="mt-1 text-xs text-gray-500 line-clamp-1">{s.bio}</p>
+                          <p className="mt-1 text-[13px] text-gray-500 line-clamp-1">{s.bio}</p>
                         </div>
                       </button>
                     ))}

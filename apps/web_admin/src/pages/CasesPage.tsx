@@ -24,13 +24,13 @@ export default function CasesPage() {
     { key: 'caseNumber', label: 'No.', render: (c: SupportCase) => <span className="font-medium text-primary-600">{c.caseNumber}</span> },
     { key: 'subject', label: 'Subjek', render: (c: SupportCase) => <span className="text-gray-900">{c.subject}</span> },
     { key: 'customerName', label: 'Pelanggan', render: (c: SupportCase) => <span className="text-gray-700">{c.customerName}</span> },
-    { key: 'severity', label: 'Severity', render: (c: SupportCase) => <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${severityColors[c.severity] || 'bg-gray-100 text-gray-600'}`}>{c.severity}</span> },
+    { key: 'severity', label: 'Severity', render: (c: SupportCase) => <span className={`inline-flex rounded-full px-2.5 py-1 text-[13px] font-medium ${severityColors[c.severity] || 'bg-gray-100 text-gray-600'}`}>{c.severity}</span> },
     { key: 'status', label: 'Status', render: (c: SupportCase) => <StatusBadge status={c.status} /> },
     { key: 'assignee', label: 'Assignee', render: (c: SupportCase) => <span className="text-gray-700">{c.assignee || '-'}</span> },
     { key: 'actions', label: '', render: (c: SupportCase) => (
       <div className="flex gap-2">
-        {c.status === 'OPEN' && <button onClick={() => statusMut.mutate({ id: c.id, status: 'IN_PROGRESS' })} className="text-xs text-blue-600 hover:underline">Take</button>}
-        {c.status === 'IN_PROGRESS' && <button onClick={() => statusMut.mutate({ id: c.id, status: 'RESOLVED' })} className="text-xs text-green-600 hover:underline">Resolve</button>}
+        {c.status === 'OPEN' && <button onClick={() => statusMut.mutate({ id: c.id, status: 'IN_PROGRESS' })} className="text-sm px-2 py-1 text-blue-600 hover:underline">Take</button>}
+        {c.status === 'IN_PROGRESS' && <button onClick={() => statusMut.mutate({ id: c.id, status: 'RESOLVED' })} className="text-sm px-2 py-1 text-green-600 hover:underline">Resolve</button>}
       </div>
     )},
   ];

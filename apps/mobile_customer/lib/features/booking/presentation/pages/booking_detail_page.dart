@@ -91,20 +91,20 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
               ]),
               const SizedBox(height: 16),
               _Section(title: 'PIN Verifikasi', children: [
-                const Text('Tunjukkan PIN 6-digit ke staf saat check-in. POST /bookings/{id}/verify-pin', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const Text('Tunjukkan PIN 6-digit ke staf saat check-in.', style: TextStyle(fontSize: 13, color: Colors.grey)),
                 const SizedBox(height: 8),
                 if ((booking.confirmationPin ?? '').isNotEmpty)
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     decoration: BoxDecoration(color: Colors.amber.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.amber.shade200)),
                     child: Row(children: [
-                      const Icon(Icons.lock_outline, size: 18, color: Colors.amber),
+                      const Icon(Icons.lock_outline, size: 20, color: Colors.amber),
                       const SizedBox(width: 8),
                       Text(booking.confirmationPin!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 4)),
                       const Spacer(),
-                      Icon(booking.pinVerified == true ? Icons.verified : Icons.hourglass_empty, color: booking.pinVerified == true ? Colors.green : Colors.orange, size: 18),
+                      Icon(booking.pinVerified == true ? Icons.verified : Icons.hourglass_empty, color: booking.pinVerified == true ? Colors.green : Colors.orange, size: 20),
                       const SizedBox(width: 4),
-                      Text(booking.pinVerified == true ? 'Terverifikasi' : 'Belum', style: TextStyle(fontSize: 12, color: booking.pinVerified == true ? Colors.green : Colors.orange)),
+                      Text(booking.pinVerified == true ? 'Terverifikasi' : 'Belum', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: booking.pinVerified == true ? Colors.green : Colors.orange)),
                     ]),
                   ),
                 const SizedBox(height: 12),
@@ -175,7 +175,7 @@ class _Section extends StatelessWidget {
   const _Section({required this.title, required this.children});
   @override
   Widget build(BuildContext context) {
-    return Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    return Card(child: Padding(padding: const EdgeInsets.all(20), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
       const SizedBox(height: 12), ...children,
     ])));

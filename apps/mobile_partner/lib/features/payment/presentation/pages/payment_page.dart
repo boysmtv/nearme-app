@@ -66,8 +66,6 @@ class PaymentPage extends ConsumerWidget {
                           ),
                           child: Text(status, style: TextStyle(color: isCompleted ? Colors.green : Colors.orange)),
                         ),
-                        const SizedBox(height: 8),
-                        Text('GET /payments/$paymentId via ApiService.getPayment()', style: const TextStyle(fontSize: 10, color: Colors.grey)),
                       ],
                     ),
                   ),

@@ -25,15 +25,15 @@ export default function TenantsPage() {
   const rejectMut = useMutation({ mutationFn: () => adminApi.tenants.reject(rejectId!, rejectReason), onSuccess: () => { qc.invalidateQueries({ queryKey: ['admin', 'tenants'] }); setRejectId(null); setRejectReason(''); } });
 
   const columns = [
-    { key: 'name', label: 'Nama', render: (t: Tenant) => <div><p className="font-medium text-gray-900">{t.name}</p><p className="text-xs text-gray-500">{t.category}</p></div> },
+    { key: 'name', label: 'Nama', render: (t: Tenant) => <div><p className="font-medium text-gray-900">{t.name}</p><p className="text-[13px] text-gray-500">{t.category}</p></div> },
     { key: 'ownerName', label: 'Owner', render: (t: Tenant) => <span className="text-gray-700">{t.ownerName}</span> },
     { key: 'status', label: 'Status', render: (t: Tenant) => <StatusBadge status={t.status} /> },
     { key: 'totalBookings', label: 'Bookings', render: (t: Tenant) => <span className="text-gray-700">{t.totalBookings}</span> },
     { key: 'totalRevenue', label: 'Revenue', render: (t: Tenant) => <span className="text-gray-700">{fmt(t.totalRevenue)}</span> },
     { key: 'actions', label: '', render: (t: Tenant) => (
       <div className="flex gap-2">
-        {t.status === 'SUBMITTED' && <button onClick={() => approveMut.mutate(t.id)} className="text-xs text-green-600 hover:underline">Approve</button>}
-        {t.status === 'SUBMITTED' && <button onClick={() => setRejectId(t.id)} className="text-xs text-red-600 hover:underline">Reject</button>}
+        {t.status === 'SUBMITTED' && <button onClick={() => approveMut.mutate(t.id)} className="text-sm px-2 py-1 text-green-600 hover:underline">Approve</button>}
+        {t.status === 'SUBMITTED' && <button onClick={() => setRejectId(t.id)} className="text-sm px-2 py-1 text-red-600 hover:underline">Reject</button>}
       </div>
     )},
   ];

@@ -127,12 +127,12 @@ export default function CalendarPage() {
         ) : view === 'week' ? (
           <div className="rounded-xl bg-white shadow-sm ring-1 ring-gray-100 overflow-hidden">
             <div className="grid grid-cols-8 border-b border-gray-200">
-              <div className="border-r border-gray-200 px-3 py-3 text-xs font-medium text-gray-500">Waktu</div>
+              <div className="border-r border-gray-200 px-3 py-3 text-sm font-medium text-gray-600">Waktu</div>
               {getWeekDays().map((day, i) => {
                 const isToday = day.toISOString().split('T')[0] === new Date().toISOString().split('T')[0];
                 return (
-                  <div key={i} className={`border-r border-gray-100 px-2 py-3 text-center ${isToday ? 'bg-primary-50' : ''}`}>
-                    <div className="text-xs text-gray-500">{DAYS[day.getDay()]}</div>
+                  <div key={i} className={`border-r border-gray-100 px-2.5 py-3 text-center ${isToday ? 'bg-primary-50' : ''}`}>
+                    <div className="text-sm text-gray-600">{DAYS[day.getDay()]}</div>
                     <div className={`mt-1 text-lg font-semibold ${isToday ? 'text-primary-600' : 'text-gray-900'}`}>
                       {day.getDate()}
                     </div>
@@ -140,10 +140,10 @@ export default function CalendarPage() {
                 );
               })}
             </div>
-            <div className="max-h-[600px] overflow-y-auto">
+            <div className="max-h-[640px] overflow-y-auto">
               {hours.map((hour) => (
                 <div key={hour} className="grid grid-cols-8 border-b border-gray-100">
-                  <div className="border-r border-gray-200 px-3 py-3 text-xs text-gray-500">
+                  <div className="border-r border-gray-200 px-3 py-4 text-sm text-gray-600">
                     {String(hour).padStart(2, '0')}:00
                   </div>
                   {getWeekDays().map((day, di) => {
@@ -152,14 +152,14 @@ export default function CalendarPage() {
                       return h === hour;
                     });
                     return (
-                      <div key={di} className="border-r border-gray-50 p-1 min-h-[60px]">
+                      <div key={di} className="border-r border-gray-50 p-1.5 min-h-[96px]">
                         {dayBookings.map((b) => (
                           <div
                             key={b.id}
-                            className={`mb-1 rounded border px-2 py-1 text-xs ${statusColors[b.status] || 'bg-gray-100 text-gray-600'}`}
+                            className={`mb-1 rounded-md border px-2.5 py-1.5 text-xs font-medium ${statusColors[b.status] || 'bg-gray-100 text-gray-600'}`}
                           >
-                            <div className="font-medium truncate">{b.customerName}</div>
-                            <div className="truncate">{b.serviceName}</div>
+                            <div className="font-semibold truncate">{b.customerName}</div>
+                            <div className="truncate text-[13px]">{b.serviceName}</div>
                           </div>
                         ))}
                       </div>

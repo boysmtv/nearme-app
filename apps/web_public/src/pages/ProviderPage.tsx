@@ -16,7 +16,7 @@ function StarRating({ rating }: { rating: number }) {
       {[1, 2, 3, 4, 5].map((star) => (
         <svg
           key={star}
-          className={`h-4 w-4 ${star <= rating ? 'text-yellow-400' : 'text-gray-200'}`}
+          className={`h-[18px] w-[18px] ${star <= rating ? 'text-yellow-400' : 'text-gray-200'}`}
           fill="currentColor"
           viewBox="0 0 20 20"
         >
@@ -88,7 +88,7 @@ function ReviewForm({ providerId }: { providerId: string }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5">
       <h4 className="font-semibold text-gray-900">Tulis Ulasan</h4>
-      <p className="mt-1 text-xs text-gray-500">Ulasan memerlukan Booking ID yang sudah COMPLETED untuk provider ini. Lihat halaman booking Anda untuk menyalin ID.</p>
+      <p className="mt-1 text-[13px] text-gray-500">Ulasan memerlukan Booking ID yang sudah COMPLETED untuk provider ini. Lihat halaman booking Anda untuk menyalin ID.</p>
       <div className="mt-4 space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Booking ID <span className="text-red-500">*</span></label>
@@ -262,7 +262,7 @@ export default function ProviderPage() {
             <div className="flex-1 pb-2">
               <div className="flex flex-wrap items-center gap-3">
                 <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">{provider.name}</h1>
-                <span className="rounded-full bg-primary-100 px-3 py-1 text-xs font-medium text-primary-700">
+                <span className="rounded-full bg-primary-100 px-3 py-1 text-sm font-medium text-primary-700">
                   {provider.category}
                 </span>
               </div>
@@ -375,7 +375,7 @@ export default function ProviderPage() {
                         <div>
                           <h4 className="font-medium text-gray-900">{s.name}</h4>
                           {s.rating > 0 && (
-                            <div className="flex items-center gap-1 text-xs text-gray-500">
+                            <div className="flex items-center gap-1 text-[13px] text-gray-500">
                               <StarRating rating={s.rating} />
                               <span>{s.rating.toFixed(1)}</span>
                             </div>
@@ -387,7 +387,7 @@ export default function ProviderPage() {
                           {s.specialties.map((spec) => (
                             <span
                               key={spec}
-                              className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                              className="rounded-full bg-gray-100 px-2 py-0.5 text-sm text-gray-600"
                             >
                               {spec}
                             </span>
@@ -422,7 +422,7 @@ export default function ProviderPage() {
                                 className="h-full w-full object-cover"
                               />
                             ) : (
-                              <div className="flex h-full items-center justify-center text-xs font-bold text-gray-500">
+                              <div className="flex h-full items-center justify-center text-sm font-bold text-gray-500">
                                 {review.customerName?.[0] ?? '?'}
                               </div>
                             )}
