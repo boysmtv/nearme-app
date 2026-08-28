@@ -6,6 +6,14 @@ interface AdminUser { id: string; email: string; name: string; role: string; mfa
 interface AuthCtx { user: AdminUser | null; isAuthenticated: boolean; login: (e: string, p: string, mfa?: string) => Promise<boolean>; logout: () => void; }
 const AuthContext = createContext<AuthCtx | null>(null);
 
+function decodeToken(token: string): Record<string, unknown> | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3 || !parts[1]) return null;
+    return JSON.parse(atob(parts[1]));
+  } catch { return null; }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AdminUser | null>(() => { const s = localStorage.getItem('admin_user'); return s ? JSON.parse(s) : null; });
   const navigate = useNavigate();
@@ -17,7 +25,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (res.data.refreshToken) {
       localStorage.setItem('auth_refresh', res.data.refreshToken);
     }
-    const u: AdminUser = { id: '', email, name: '', role: 'ADMIN', mfaVerified: !!mfaCode };
+    const payload = decodeToken(res.data.accessToken) ?? {};
+    const roles = (payload.roles ?? []) as string[];
+    const role = roles[0] ?? 'ROLE_PLATFORM_ADMIN';
+    // Single login handling: if not admin, redirect to appropriate portal (web_public)
+    if (role === 'ROLE_CUSTOMER') {
+      window.location.href = 'http://localhost:4100';
+      return true;
+    }
+    if (role.startsWith('ROLE_PROVIDER')) {
+      window.location.href = 'http://localhost:4100/provider/dashboard';
+      return true;
+    }
+    const u: AdminUser = { id: (payload.sub ?? '') as string, email: (payload.email ?? email) as string, name: (payload.name ?? '') as string, role, mfaVerified: !!mfaCode };
     localStorage.setItem('admin_user', JSON.stringify(u));
     setUser(u);
     navigate('/dashboard');

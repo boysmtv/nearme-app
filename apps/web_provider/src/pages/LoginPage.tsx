@@ -30,6 +30,20 @@ export default function LoginPage() {
     onSuccess: (res) => {
       localStorage.setItem('auth_token', res.data.accessToken);
       localStorage.setItem('auth_refresh', res.data.refreshToken);
+      try {
+        const token = res.data.accessToken as string;
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        const roles = (payload.roles ?? []) as string[];
+        const role = roles[0] ?? '';
+        if (role === 'ROLE_CUSTOMER') {
+          window.location.href = 'http://localhost:4100';
+          return;
+        }
+        if (role === 'ROLE_PLATFORM_ADMIN') {
+          window.location.href = 'http://localhost:3002';
+          return;
+        }
+      } catch {}
       navigate('/dashboard');
     },
     onError: () => {
