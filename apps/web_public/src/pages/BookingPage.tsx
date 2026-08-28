@@ -9,6 +9,7 @@ import Footer from '../components/Footer';
 import SlotPicker from '../components/SlotPicker';
 import BookingSummary from '../components/BookingSummary';
 import { publicApi } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import type { Service, Staff, TimeSlot, Addon, BookingResponse } from '../lib/types';
 
 const contactSchema = z.object({
@@ -119,6 +120,27 @@ export default function BookingPage() {
   const contactForm = useForm<ContactFormData>({
     resolver: zodResolver(contactSchema),
   });
+
+  const { user, isAuthenticated } = useAuth();
+  const { data: profileRes } = useQuery({
+    queryKey: ['customerProfile'],
+    queryFn: () => publicApi.customer.getProfile(),
+    enabled: isAuthenticated,
+  });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const data = (profileRes as unknown as { data?: { nickname?: string; name?: string; email?: string; phone?: string } })?.data ?? (profileRes as unknown as { nickname?: string; name?: string; email?: string; phone?: string });
+      const profile = (data as { nickname?: string; name?: string; email?: string; phone?: string }) ?? {};
+      const name = profile.nickname || profile.name || user?.name || '';
+      const email = profile.email || user?.email || '';
+      const phone = profile.phone || '';
+      if (name || email || phone) {
+        const currentNotes = contactForm.getValues('notes') || '';
+        contactForm.reset({ customerName: name, customerEmail: email, customerPhone: phone, notes: currentNotes });
+      }
+    }
+  }, [isAuthenticated, profileRes, user]);
 
   const stepIndex: Record<BookingStep, number> = {
     service: 0,
@@ -453,9 +475,15 @@ export default function BookingPage() {
               {step === 'contact' && (
                 <div>
                   <h2 className="text-xl font-semibold text-gray-900">Informasi Kontak</h2>
-                  <p className="mt-1 text-sm text-gray-500">
-                    Isi data diri Anda untuk menyelesaikan booking
-                  </p>
+                  {isAuthenticated ? (
+                    <p className="mt-1 text-sm text-green-600">
+                      Otomatis terisi dari profil — hanya catatan dapat diedit
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-sm text-gray-500">
+                      Isi data diri Anda untuk menyelesaikan booking
+                    </p>
+                  )}
                   <form
                     onSubmit={contactForm.handleSubmit(handleContactSubmit)}
                     className="mt-6 space-y-4"
@@ -464,7 +492,9 @@ export default function BookingPage() {
                       <label className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
                       <input
                         {...contactForm.register('customerName')}
-                        className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        readOnly={isAuthenticated}
+                        disabled={isAuthenticated}
+                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
                         placeholder="Masukkan nama Anda"
                       />
                       {contactForm.formState.errors.customerName && (
@@ -478,7 +508,9 @@ export default function BookingPage() {
                       <input
                         {...contactForm.register('customerEmail')}
                         type="email"
-                        className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        readOnly={isAuthenticated}
+                        disabled={isAuthenticated}
+                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
                         placeholder="email@contoh.com"
                       />
                       {contactForm.formState.errors.customerEmail && (
@@ -492,7 +524,9 @@ export default function BookingPage() {
                       <input
                         {...contactForm.register('customerPhone')}
                         type="tel"
-                        className="mt-1 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                        readOnly={isAuthenticated}
+                        disabled={isAuthenticated}
+                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
                         placeholder="08xxxxxxxxxx"
                       />
                       {contactForm.formState.errors.customerPhone && (
@@ -596,7 +630,19 @@ export default function BookingPage() {
                     >
                       &larr; Kembali
                     </button>
+                    <button
+                      onClick={handleConfirm}
+                      disabled={createBooking.isPending}
+                      className="flex-1 rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50"
+                    >
+                      {createBooking.isPending ? 'Memproses...' : 'Konfirmasi Booking'}
+                    </button>
                   </div>
+                  {createBooking.isError && (
+                    <p className="mt-3 text-sm text-red-600">
+                      {(createBooking.error as Error).message}
+                    </p>
+                  )}
                 </div>
               )}
             </div>

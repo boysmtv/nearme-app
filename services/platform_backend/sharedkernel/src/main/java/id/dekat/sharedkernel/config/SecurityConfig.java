@@ -18,6 +18,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver;
+import org.springframework.security.oauth2.server.resource.web.DefaultBearerTokenResolver;
+
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -30,7 +34,29 @@ public class SecurityConfig {
     private String accessSecret;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public BearerTokenResolver bearerTokenResolver() {
+        DefaultBearerTokenResolver resolver = new DefaultBearerTokenResolver();
+        resolver.setAllowFormEncodedBodyParameter(false);
+        resolver.setAllowUriQueryParameter(false);
+        return request -> {
+            String uri = request.getRequestURI();
+            // Skip JWT resolution for public/auth endpoints — allow anonymous access even if Authorization header present with invalid token
+            if (uri.startsWith("/api/v1/public/") || uri.startsWith("/public/")
+                    || uri.startsWith("/api/v1/auth/") || uri.startsWith("/auth/")
+                    || uri.startsWith("/api/v1/actuator/") || uri.startsWith("/actuator/")) {
+                return null;
+            }
+            // Also check servletPath as fallback
+            String servletPath = request.getServletPath();
+            if (servletPath != null && (servletPath.startsWith("/public/") || servletPath.startsWith("/auth/"))) {
+                return null;
+            }
+            return resolver.resolve(request);
+        };
+    }
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, BearerTokenResolver bearerTokenResolver) throws Exception {
         http
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -43,6 +69,7 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2
+                .bearerTokenResolver(bearerTokenResolver)
                 .jwt(jwt -> jwt.decoder(jwtDecoder()))
             );
         return http.build();
