@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { providerApi } from '../../lib/api';
 import ProviderLayout from '../../components/ProviderLayout';
+import type { StaffSchedule } from '../../lib/types';
 
 export default function StaffPage() {
   const [showInvite, setShowInvite] = useState(false);
@@ -28,6 +29,22 @@ export default function StaffPage() {
       providerApi.staff.update(id, { displayName }),
     onSuccess: () => { qc.invalidateQueries({ queryKey: ['staff'] }); setEditingId(null); },
   });
+
+  const [scheduleFor, setScheduleFor] = useState<string | null>(null);
+  const [schedule, setSchedule] = useState<StaffSchedule[]>([
+    { dayOfWeek: 0, startTime: '09:00', endTime: '17:00', isOff: false },
+    { dayOfWeek: 1, startTime: '09:00', endTime: '17:00', isOff: false },
+    { dayOfWeek: 2, startTime: '09:00', endTime: '17:00', isOff: false },
+    { dayOfWeek: 3, startTime: '09:00', endTime: '17:00', isOff: false },
+    { dayOfWeek: 4, startTime: '09:00', endTime: '17:00', isOff: false },
+    { dayOfWeek: 5, startTime: '09:00', endTime: '17:00', isOff: false },
+    { dayOfWeek: 6, startTime: '09:00', endTime: '17:00', isOff: true },
+  ]);
+  const scheduleMut = useMutation({
+    mutationFn: () => providerApi.staff.updateSchedule(scheduleFor!, schedule),
+    onSuccess: () => { setScheduleFor(null); },
+  });
+  const dayNames = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
 
   return (
     <ProviderLayout>
@@ -59,11 +76,32 @@ export default function StaffPage() {
                   <button type="button" onClick={() => setEditingId(null)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Batal</button>
                 </form>
               ) : (
-                <div className="mt-4 flex gap-2">
+                <div className="mt-4 flex flex-wrap gap-2">
                   <button onClick={() => { setEditingId(s.id); setEditName(s.displayName); }} className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Edit</button>
+                  <button onClick={() => setScheduleFor(s.id)} className="flex-1 rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Jadwal</button>
                   {s.isActive && (
                     <button onClick={() => { if (confirm('Nonaktifkan staf ini?')) deactivateMut.mutate(s.id); }} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">Nonaktifkan</button>
                   )}
+                </div>
+              )}
+              {scheduleFor === s.id && (
+                <div className="mt-4 rounded-lg border border-gray-200 p-3">
+                  <h4 className="text-sm font-semibold text-gray-900">Atur Jadwal — POST /provider/staff/{'{id}'}/schedule</h4>
+                  <div className="mt-2 space-y-2">
+                    {schedule.map((sc, idx) => (
+                      <div key={sc.dayOfWeek} className="flex items-center gap-2 text-xs">
+                        <span className="w-16 font-medium text-gray-700">{dayNames[sc.dayOfWeek]}</span>
+                        <label className="flex items-center gap-1"><input type="checkbox" checked={!sc.isOff} onChange={(e) => setSchedule(prev => prev.map((p,i)=> i===idx ? {...p, isOff: !e.target.checked} : p))} className="rounded border-gray-300" /> Buka</label>
+                        {!sc.isOff && (<><input type="time" value={sc.startTime} onChange={(e)=> setSchedule(prev=> prev.map((p,i)=> i===idx ? {...p, startTime: e.target.value} :p))} className="rounded border border-gray-300 px-2 py-1 text-xs" /><span>-</span><input type="time" value={sc.endTime} onChange={(e)=> setSchedule(prev=> prev.map((p,i)=> i===idx ? {...p, endTime: e.target.value} :p))} className="rounded border border-gray-300 px-2 py-1 text-xs" /></>)}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <button onClick={() => scheduleMut.mutate()} disabled={scheduleMut.isPending} className="rounded-lg bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{scheduleMut.isPending ? 'Menyimpan...' : 'Simpan Jadwal'}</button>
+                    <button onClick={() => setScheduleFor(null)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-gray-50">Tutup</button>
+                  </div>
+                  {scheduleMut.isSuccess && <p className="mt-2 text-xs text-green-600">Jadwal tersimpan</p>}
+                  {scheduleMut.isError && <p className="mt-2 text-xs text-red-600">{(scheduleMut.error as Error).message}</p>}
                 </div>
               )}
             </div>

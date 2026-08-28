@@ -83,6 +83,8 @@ export default function SettingsPage() {
             </div>
           </div>
 
+          <BlockedDatesSection />
+
           <div className="flex justify-end gap-3">
             <button type="submit" disabled={updateMut.isPending} className="rounded-lg bg-primary-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50">
               {updateMut.isPending ? 'Menyimpan...' : 'Simpan Pengaturan'}
@@ -91,5 +93,46 @@ export default function SettingsPage() {
         </form>
       </div>
     </ProviderLayout>
+  );
+}
+
+function BlockedDatesSection() {
+  const qc = useQueryClient();
+  const [date, setDate] = useState('');
+  const [reason, setReason] = useState('');
+  const { data: res, isLoading } = useQuery({ queryKey: ['blockedDates'], queryFn: () => providerApi.blockedDates.list() });
+  const blocked = (res as unknown as { data?: { date: string; reason?: string }[] })?.data ?? [];
+  const addMut = useMutation({
+    mutationFn: () => providerApi.blockedDates.add({ date, reason: reason || undefined }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['blockedDates'] }); setDate(''); setReason(''); },
+  });
+  const delMut = useMutation({
+    mutationFn: (d: string) => providerApi.blockedDates.remove(d),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['blockedDates'] }),
+  });
+  return (
+    <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+      <h2 className="text-lg font-semibold text-gray-900">Tanggal Blokir</h2>
+      <p className="mt-1 text-sm text-gray-500">Tutup booking pada tanggal tertentu (libur, cuti, maintenance). GET/POST/DELETE /provider/blocked-dates</p>
+      <div className="mt-4 flex flex-wrap gap-3">
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
+        <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Alasan (opsional)" className="flex-1 min-w-[180px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
+        <button type="button" onClick={() => date && addMut.mutate()} disabled={!date || addMut.isPending} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{addMut.isPending ? 'Menambah...' : '+ Blokir'}</button>
+      </div>
+      {(addMut.isError || delMut.isError) && <p className="mt-2 text-sm text-red-600">Gagal memperbarui tanggal blokir</p>}
+      {addMut.isSuccess && <p className="mt-2 text-sm text-green-600">Berhasil menambah tanggal blokir</p>}
+      <div className="mt-4">
+        {isLoading ? <p className="text-sm text-gray-400">Memuat...</p> : blocked.length === 0 ? <p className="text-sm text-gray-500">Belum ada tanggal diblokir</p> : (
+          <ul className="space-y-2">
+            {blocked.map((b) => (
+              <li key={b.date} className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-2">
+                <div><span className="text-sm font-medium text-gray-900">{b.date}</span>{b.reason && <span className="ml-2 text-xs text-gray-500">— {b.reason}</span>}</div>
+                <button type="button" onClick={() => delMut.mutate(b.date)} disabled={delMut.isPending} className="text-xs font-medium text-red-600 hover:text-red-700 disabled:opacity-50">Hapus</button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }

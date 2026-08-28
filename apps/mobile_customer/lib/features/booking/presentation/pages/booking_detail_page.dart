@@ -11,13 +11,46 @@ final bookingDetailProvider2 = FutureProvider.autoDispose.family<BookingRow, Str
   return BookingRow.fromJson(response.data['data'] as Map<String, dynamic>);
 });
 
-class BookingDetailPage extends ConsumerWidget {
+class BookingDetailPage extends ConsumerStatefulWidget {
   final String bookingId;
   const BookingDetailPage({super.key, required this.bookingId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final bookingAsync = ref.watch(bookingDetailProvider2(bookingId));
+  ConsumerState<BookingDetailPage> createState() => _BookingDetailPageState();
+}
+
+class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
+  final _pinController = TextEditingController();
+  bool _verifying = false;
+  String? _pinMsg;
+
+  @override
+  void dispose() {
+    _pinController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _verifyPin() async {
+    final pin = _pinController.text.trim();
+    if (pin.length != 6) {
+      setState(() => _pinMsg = 'PIN harus 6 digit');
+      return;
+    }
+    setState(() { _verifying = true; _pinMsg = null; });
+    try {
+      await ApiService().dio.post('/bookings/${widget.bookingId}/verify-pin', data: {'pin': pin});
+      setState(() => _pinMsg = 'PIN terverifikasi!');
+      ref.invalidate(bookingDetailProvider2(widget.bookingId));
+    } catch (e) {
+      setState(() => _pinMsg = 'Gagal: $e');
+    } finally {
+      setState(() => _verifying = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final bookingAsync = ref.watch(bookingDetailProvider2(widget.bookingId));
     return Scaffold(
       appBar: AppBar(title: const Text('Booking Details')),
       body: bookingAsync.when(
@@ -56,6 +89,32 @@ class BookingDetailPage extends ConsumerWidget {
                 if (booking.fee > 0) _InfoRow(label: 'Fee', value: formatRupiah(booking.fee)),
                 _InfoRow(label: 'Total', value: formatRupiah(booking.total)),
               ]),
+              const SizedBox(height: 16),
+              _Section(title: 'PIN Verifikasi', children: [
+                const Text('Tunjukkan PIN 6-digit ke staf saat check-in. POST /bookings/{id}/verify-pin', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                const SizedBox(height: 8),
+                if ((booking.confirmationPin ?? '').isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    decoration: BoxDecoration(color: Colors.amber.shade50, borderRadius: BorderRadius.circular(8), border: Border.all(color: Colors.amber.shade200)),
+                    child: Row(children: [
+                      const Icon(Icons.lock_outline, size: 18, color: Colors.amber),
+                      const SizedBox(width: 8),
+                      Text(booking.confirmationPin!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 4)),
+                      const Spacer(),
+                      Icon(booking.pinVerified == true ? Icons.verified : Icons.hourglass_empty, color: booking.pinVerified == true ? Colors.green : Colors.orange, size: 18),
+                      const SizedBox(width: 4),
+                      Text(booking.pinVerified == true ? 'Terverifikasi' : 'Belum', style: TextStyle(fontSize: 12, color: booking.pinVerified == true ? Colors.green : Colors.orange)),
+                    ]),
+                  ),
+                const SizedBox(height: 12),
+                Row(children: [
+                  Expanded(child: TextField(controller: _pinController, keyboardType: TextInputType.number, maxLength: 6, decoration: const InputDecoration(hintText: '6-digit PIN', counterText: '', border: OutlineInputBorder()))),
+                  const SizedBox(width: 8),
+                  ElevatedButton(onPressed: _verifying ? null : _verifyPin, child: _verifying ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)) : const Text('Verifikasi')),
+                ]),
+                if (_pinMsg != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(_pinMsg!, style: TextStyle(color: _pinMsg!.contains('terverifikasi') ? Colors.green : Colors.red, fontSize: 12))),
+              ]),
             ]),
           );
         },
@@ -65,7 +124,7 @@ class BookingDetailPage extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text('Failed to load booking: $e'),
-              TextButton(onPressed: () => ref.invalidate(bookingDetailProvider2(bookingId)), child: const Text('Retry')),
+              TextButton(onPressed: () => ref.invalidate(bookingDetailProvider2(widget.bookingId)), child: const Text('Retry')),
             ],
           ),
         ),
@@ -89,11 +148,11 @@ class BookingDetailPage extends ConsumerWidget {
           try {
             final actorId = await SecureStorageService.read(StorageKeys.userId);
             await ApiService().dio.post(
-                  '/bookings/$bookingId/cancel',
+                  '/bookings/${widget.bookingId}/cancel',
                   queryParameters: {'reason': 'Cancelled by customer'},
                   options: Options(headers: {'X-Actor-Id': actorId}),
                 );
-            ref.invalidate(bookingDetailProvider2(bookingId));
+            ref.invalidate(bookingDetailProvider2(widget.bookingId));
             if (context.mounted) context.go('/bookings');
           } catch (e) {
             if (context.mounted) {

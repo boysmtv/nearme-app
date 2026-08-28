@@ -19,6 +19,11 @@ function fmt(n: number) { return new Intl.NumberFormat('id-ID', { style: 'curren
 export default function ServicesPage() {
   const [show, setShow] = useState(false);
   const [edit, setEdit] = useState<ProviderService | null>(null);
+  const [addonsFor, setAddonsFor] = useState<string | null>(null);
+  const [addons, setAddons] = useState<{ name: string; price: number; duration: number }[]>([]);
+  const [addonName, setAddonName] = useState('');
+  const [addonPrice, setAddonPrice] = useState<number>(0);
+  const [addonDur, setAddonDur] = useState<number>(15);
   const qc = useQueryClient();
   const { data: res, isLoading } = useQuery({ queryKey: ['services'], queryFn: () => providerApi.services.list() });
   const services = res?.data ?? [];
@@ -26,6 +31,10 @@ export default function ServicesPage() {
   const createMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.create({ name: d.name, description: d.description, price: d.price, duration: d.duration }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); } });
   const updateMut = useMutation({ mutationFn: (d: FormData) => providerApi.services.update(edit!.id, { name: d.name, description: d.description, price: d.price, duration: d.duration }), onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setShow(false); setEdit(null); } });
   const deleteMut = useMutation({ mutationFn: (id: string) => providerApi.services.delete(id), onSuccess: () => qc.invalidateQueries({ queryKey: ['services'] }) });
+  const saveAddonsMut = useMutation({
+    mutationFn: () => providerApi.services.update(addonsFor!, { addons } as unknown as Partial<ProviderService>),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['services'] }); setAddonsFor(null); setAddons([]); },
+  });
 
   return (
     <ProviderLayout>
@@ -46,8 +55,34 @@ export default function ServicesPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => { setEdit(s); reset({ name: s.name, description: s.description, duration: s.duration, price: s.price }); setShow(true); }} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Edit</button>
+                <button onClick={() => { setAddonsFor(s.id); setAddons((s as unknown as { addons?: { name: string; price: number; duration: number }[] }).addons ?? []); }} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-50">Add-on</button>
                 <button onClick={() => { if (confirm('Hapus layanan ini?')) deleteMut.mutate(s.id); }} className="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 hover:bg-red-50">Hapus</button>
               </div>
+              {addonsFor === s.id && (
+                <div className="mt-4 rounded-lg border border-gray-200 p-3 bg-gray-50">
+                  <h4 className="text-sm font-semibold text-gray-900">Add-ons — PUT /provider/services/{'{id}'} dengan field addons</h4>
+                  <div className="mt-2 space-y-2">
+                    {addons.length === 0 ? <p className="text-xs text-gray-500">Belum ada add-on</p> : addons.map((a, idx) => (
+                      <div key={idx} className="flex items-center justify-between rounded border bg-white px-3 py-2 text-xs">
+                        <span>{a.name} — {fmt(a.price)} · {a.duration} min</span>
+                        <button onClick={() => setAddons(prev => prev.filter((_, i) => i !== idx))} className="text-red-600 hover:underline">Hapus</button>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <input value={addonName} onChange={(e)=> setAddonName(e.target.value)} placeholder="Nama add-on" className="flex-1 min-w-[120px] rounded border border-gray-300 px-2 py-1.5 text-xs" />
+                    <input type="number" value={addonPrice} onChange={(e)=> setAddonPrice(parseInt(e.target.value)||0)} placeholder="Harga" className="w-24 rounded border border-gray-300 px-2 py-1.5 text-xs" />
+                    <input type="number" value={addonDur} onChange={(e)=> setAddonDur(parseInt(e.target.value)||15)} placeholder="Dur (min)" className="w-20 rounded border border-gray-300 px-2 py-1.5 text-xs" />
+                    <button onClick={() => { if (!addonName.trim()) return; setAddons(prev=> [...prev, { name: addonName.trim(), price: addonPrice, duration: addonDur }]); setAddonName(''); setAddonPrice(0); }} className="rounded bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-700">+ Tambah</button>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <button onClick={() => saveAddonsMut.mutate()} disabled={saveAddonsMut.isPending} className="rounded bg-primary-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{saveAddonsMut.isPending ? 'Menyimpan...' : 'Simpan Add-ons'}</button>
+                    <button onClick={() => { setAddonsFor(null); setAddons([]); }} className="rounded border border-gray-300 px-3 py-1.5 text-xs text-gray-600 hover:bg-white">Batal</button>
+                  </div>
+                  {saveAddonsMut.isSuccess && <p className="mt-2 text-xs text-green-600">Add-ons tersimpan</p>}
+                  {saveAddonsMut.isError && <p className="mt-2 text-xs text-red-600">{(saveAddonsMut.error as Error).message}</p>}
+                </div>
+              )}
             </div>
           </div>
         ))}</div>}

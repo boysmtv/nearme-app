@@ -62,6 +62,9 @@ class StaffListPage extends ConsumerWidget {
                             await ApiService().dio.delete('/provider/staff/${s.id}');
                           } else if (action == 'activate') {
                             await ApiService().updateStaff(s.id, {});
+                          } else if (action == 'schedule') {
+                            if (context.mounted) _showScheduleDialog(context, ref, s.id);
+                            return;
                           }
                           ref.invalidate(staffProvider);
                         } catch (e) {
@@ -73,6 +76,7 @@ class StaffListPage extends ConsumerWidget {
                         }
                       },
                       itemBuilder: (_) => [
+                        const PopupMenuItem(value: 'schedule', child: Text('Edit Schedule')),
                         if (isActive)
                           const PopupMenuItem(value: 'deactivate', child: Text('Deactivate'))
                         else
@@ -154,6 +158,51 @@ class StaffListPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showScheduleDialog(BuildContext context, WidgetRef ref, String staffId) {
+    // Simple schedule editor: Mon-Sun 09:00-17:00, POST /provider/staff/{id}/schedule
+    final dayNames = ['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+    List<Map<String, dynamic>> schedule = List.generate(7, (i) => {'dayOfWeek': i, 'startTime': '09:00', 'endTime': '17:00', 'isOff': i==6});
+    bool saving = false;
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(builder: (context, setState) {
+        return AlertDialog(
+          title: const Text('Edit Schedule'),
+          content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
+            const Text('POST /provider/staff/{id}/schedule', style: TextStyle(fontSize: 10, color: Colors.grey)),
+            const SizedBox(height: 8),
+            ...schedule.asMap().entries.map((e) {
+              final idx = e.key;
+              final sc = e.value;
+              return Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [
+                SizedBox(width: 60, child: Text(dayNames[sc['dayOfWeek'] as int], style: const TextStyle(fontSize: 12))),
+                Checkbox(value: !(sc['isOff'] as bool), onChanged: (v)=> setState(()=> schedule[idx]['isOff'] = !(v??false))),
+                if (!(sc['isOff'] as bool)) ...[
+                  SizedBox(width: 70, child: TextFormField(initialValue: sc['startTime'] as String, onChanged: (v)=> schedule[idx]['startTime']=v, decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)))),
+                  const Text(' - '),
+                  SizedBox(width: 70, child: TextFormField(initialValue: sc['endTime'] as String, onChanged: (v)=> schedule[idx]['endTime']=v, decoration: const InputDecoration(isDense: true, contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 8)))),
+                ] else const Text('Libur', style: TextStyle(fontSize: 12, color: Colors.grey)),
+              ]));
+            }),
+          ])),
+          actions: [
+            TextButton(onPressed: ()=> Navigator.pop(ctx), child: const Text('Batal')),
+            TextButton(onPressed: saving ? null : () async {
+              setState(()=> saving=true);
+              try {
+                await ApiService().dio.post('/provider/staff/$staffId/schedule', data: schedule);
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Jadwal tersimpan'), backgroundColor: Colors.green));
+              } catch (e) {
+                if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red));
+              } finally { if (ctx.mounted) setState(()=> saving=false); }
+            }, child: Text(saving ? 'Menyimpan...' : 'Simpan')),
+          ],
+        );
+      }),
     );
   }
 }

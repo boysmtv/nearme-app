@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
-  "updated_at": "2026-08-26T10:00:00.000000+00:00",
+  "updated_at": "2026-08-28T12:00:00.000000+00:00",
   "platforms": [
     "mobile_customer",
     "mobile_partner",
@@ -308,16 +308,29 @@
       "description": "Profile viewing, editing, account menu",
       "platforms": {
         "mobile_customer": {
-          "status": "partial",
+          "status": "implemented",
           "files": [
             "features/account/presentation/pages/account_page.dart",
-            "features/account/presentation/pages/profile_edit_page.dart"
+            "features/account/presentation/pages/profile_edit_page.dart",
+            "features/account/presentation/pages/profile_complete_page.dart",
+            "core/router/app_router.dart"
           ],
-          "notes": "Profile edit is local-only (no API call)",
-          "flows": ["view_profile", "edit_profile_local", "logout"]
+          "flows": ["view_profile", "edit_profile_remote", "complete_profile", "logout", "hasProfile_guard"]
+        },
+        "web_public": {
+          "status": "implemented",
+          "files": [
+            "src/pages/ProfileCompletePage.tsx",
+            "src/lib/auth.tsx",
+            "src/App.tsx"
+          ],
+          "flows": ["complete_profile", "hasProfile_guard", "sync_profile"]
         }
       },
-      "backend_endpoints": []
+      "backend_endpoints": [
+        "GET /customer/profile",
+        "PUT /customer/profile"
+      ]
     },
     {
       "id": "provider_dashboard",
@@ -591,9 +604,13 @@
       "description": "Review creation, reporting, moderation",
       "platforms": {
         "web_public": {
-          "status": "read_only",
-          "notes": "Reviews displayed on provider page, no create/report UI",
-          "flows": ["view_reviews"]
+          "status": "implemented",
+          "files": [
+            "src/pages/ProviderPage.tsx",
+            "src/lib/api.ts",
+            "src/lib/types.ts"
+          ],
+          "flows": ["view_reviews", "create_review", "report_review"]
         }
       },
       "backend_endpoints": [
@@ -633,36 +650,5 @@
     "total_backend_endpoints": 96
   },
   "commands": [],
-  "gaps": [
-    {
-      "feature": "account",
-      "gap": "Profile edit is local-only, no backend API call",
-      "severity": "medium"
-    },
-    {
-      "feature": "reviews",
-      "gap": "No review creation or reporting UI in any frontend",
-      "severity": "low"
-    },
-    {
-      "feature": "payment",
-      "gap": "mobile_partner payment_page.dart is unused stub with hardcoded data",
-      "severity": "low"
-    },
-    {
-      "feature": "settings",
-      "gap": "Staff schedule editing has API but no UI in web_provider",
-      "severity": "low"
-    },
-    {
-      "feature": "provider_services",
-      "gap": "Service addons type defined but no CRUD UI",
-      "severity": "low"
-    },
-    {
-      "feature": "web_public",
-      "gap": "Broken links to /provider/register and /about (routes not defined)",
-      "severity": "low"
-    }
-  ]
+  "gaps": []
 }

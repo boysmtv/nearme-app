@@ -34,6 +34,9 @@ class Endpoints {
   static const String providerReports = '/provider/reports';
   static const String providerSettings = '/provider/settings';
 
+  // Customer profile
+  static const String customerProfile = '/customer/profile';
+
   // Password
   static const String forgotPassword = '/auth/forgot-password';
 

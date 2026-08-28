@@ -20,6 +20,7 @@ import type {
   Customer,
   ReportData,
   Settings,
+  CustomerProfile,
 } from './types';
 
 export const publicApi = {
@@ -94,11 +95,30 @@ export const publicApi = {
         `/public/providers/${providerId}/reviews?${params.toString()}`,
       );
     },
+    create: (bookingId: string, data: { rating: number; title?: string; body: string }) =>
+      apiClient.post<ApiResponse<Review>>(`/bookings/${bookingId}/review`, data),
+    report: (reviewId: string) =>
+      apiClient.post<ApiResponse<Review>>(`/reviews/${reviewId}/report`, {}),
+  },
+
+  blockedDates: {
+    listByProvider: (providerId: string) =>
+      apiClient.get<ApiResponse<{ date: string; reason?: string }[]>>(`/public/providers/${providerId}/blocked-dates`),
+  },
+
+  customer: {
+    getProfile: () => apiClient.get<ApiResponse<CustomerProfile>>('/customer/profile'),
+    updateProfile: (data: { nickname?: string; name?: string; email?: string; phone?: string }) =>
+      apiClient.put<ApiResponse<CustomerProfile>>('/customer/profile', data),
   },
 
   bookings: {
     create: (data: BookingRequest) =>
       apiClient.post<ApiResponse<BookingResponse>>('/public/bookings', data),
+    verifyPin: (bookingId: string, pin: string) =>
+      apiClient.post<ApiResponse<{ pinVerified: boolean; status: string }>>(`/bookings/${bookingId}/verify-pin`, { pin }),
+    getById: (id: string) =>
+      apiClient.get<ApiResponse<BookingResponse>>(`/bookings/${id}`),
 
     hold: (providerId: string, slotId: string, serviceId: string) =>
       apiClient.post<ApiResponse<{ holdId: string; expiresAt: string }>>(
@@ -211,5 +231,18 @@ export const providerApi = {
     get: () => apiClient.get<ApiResponse<Settings>>('/provider/settings'),
     update: (data: Partial<Settings>) =>
       apiClient.put<ApiResponse<Settings>>('/provider/settings', data),
+  },
+
+  blockedDates: {
+    list: () => apiClient.get<ApiResponse<{ date: string; reason?: string }[]>>('/provider/blocked-dates'),
+    add: (data: { date: string; reason?: string }) =>
+      apiClient.post<ApiResponse<{ date: string }>>('/provider/blocked-dates', data),
+    remove: (date: string) =>
+      apiClient.delete<ApiResponse<void>>(`/provider/blocked-dates/${date}`),
+  },
+
+  bookingsProvider: {
+    verifyPin: (bookingId: string, pin: string) =>
+      apiClient.post<ApiResponse<{ pinVerified: boolean }>>(`/bookings/${bookingId}/verify-pin`, { pin }),
   },
 };

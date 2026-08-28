@@ -145,13 +145,22 @@ class ApiClient {
     return _dio.get('/payments/$id');
   }
 
-  // User Profile
+  // User Profile (canonical backend is /customer/profile)
   Future<Response> getProfile() {
-    return _dio.get('/user/profile');
+    return _dio.get('/customer/profile');
   }
 
   Future<Response> updateProfile(Map<String, dynamic> data) {
-    return _dio.put('/user/profile', data: data);
+    return _dio.put('/customer/profile', data: data);
+  }
+
+  // Alias for explicit customer profile
+  Future<Response> getCustomerProfile() {
+    return getProfile();
+  }
+
+  Future<Response> updateCustomerProfile(Map<String, dynamic> data) {
+    return updateProfile(data);
   }
 
   Future<Response> uploadAvatar(String filePath) async {

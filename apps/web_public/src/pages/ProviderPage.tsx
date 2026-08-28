@@ -1,10 +1,11 @@
 import { useParams, Link } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ServiceCard from '../components/ServiceCard';
 import { publicApi } from '../lib/api';
+import { useAuth } from '../lib/auth';
 import type { Review } from '../lib/types';
 
 const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
@@ -22,6 +23,125 @@ function StarRating({ rating }: { rating: number }) {
           <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
         </svg>
       ))}
+    </div>
+  );
+}
+
+function StarInput({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  const [hover, setHover] = useState(0);
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <button
+          key={star}
+          type="button"
+          onMouseEnter={() => setHover(star)}
+          onMouseLeave={() => setHover(0)}
+          onClick={() => onChange(star)}
+          aria-label={`Rate ${star}`}
+          className="p-0.5"
+        >
+          <svg
+            className={`h-7 w-7 ${star <= (hover || value) ? 'text-yellow-400' : 'text-gray-200'} transition-colors`}
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+          </svg>
+        </button>
+      ))}
+      <span className="ml-2 text-sm text-gray-500">{value ? `${value}/5` : 'Pilih rating'}</span>
+    </div>
+  );
+}
+
+function ReviewForm({ providerId }: { providerId: string }) {
+  const { isAuthenticated } = useAuth();
+  const queryClient = useQueryClient();
+  const [rating, setRating] = useState(0);
+  const [title, setTitle] = useState('');
+  const [body, setBody] = useState('');
+  const [bookingId, setBookingId] = useState('');
+
+  const mutation = useMutation({
+    mutationFn: () => {
+      if (!bookingId.trim()) throw new Error('Booking ID wajib diisi');
+      if (rating < 1) throw new Error('Rating wajib diisi');
+      if (!body.trim()) throw new Error('Komentar wajib diisi');
+      return publicApi.reviews.create(bookingId.trim(), { rating, title: title.trim() || undefined, body: body.trim() });
+    },
+    onSuccess: () => {
+      setRating(0); setTitle(''); setBody(''); setBookingId('');
+      queryClient.invalidateQueries({ queryKey: ['reviews', providerId] });
+    },
+  });
+
+  if (!isAuthenticated) {
+    return (
+      <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-4 text-center">
+        <p className="text-sm text-gray-600">Masuk untuk menulis ulasan setelah booking selesai.</p>
+        <Link to="/login" className="mt-2 inline-block text-sm font-medium text-primary-600 hover:underline">Masuk</Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-gray-200 bg-white p-5">
+      <h4 className="font-semibold text-gray-900">Tulis Ulasan</h4>
+      <p className="mt-1 text-xs text-gray-500">Ulasan memerlukan Booking ID yang sudah COMPLETED untuk provider ini. Lihat halaman booking Anda untuk menyalin ID.</p>
+      <div className="mt-4 space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Booking ID <span className="text-red-500">*</span></label>
+          <input
+            value={bookingId}
+            onChange={(e) => setBookingId(e.target.value)}
+            placeholder="Contoh: 3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Rating <span className="text-red-500">*</span></label>
+          <div className="mt-1"><StarInput value={rating} onChange={setRating} /></div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Judul <span className="text-gray-400">(opsional)</span></label>
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Ringkasan pengalaman Anda"
+            maxLength={120}
+            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Komentar <span className="text-red-500">*</span></label>
+          <textarea
+            value={body}
+            onChange={(e) => setBody(e.target.value)}
+            rows={3}
+            placeholder="Bagaimana pengalaman Anda?"
+            maxLength={2000}
+            className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+          />
+          <p className="mt-1 text-xs text-gray-400">{body.length}/2000</p>
+        </div>
+        {mutation.isError && (
+          <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            {(mutation.error as Error).message}
+          </div>
+        )}
+        {mutation.isSuccess && (
+          <div className="rounded-lg bg-green-50 p-3 text-sm text-green-700">Ulasan berhasil dikirim. Terima kasih!</div>
+        )}
+        <button
+          onClick={() => mutation.mutate()}
+          disabled={mutation.isPending}
+          className="w-full rounded-lg bg-primary-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50"
+        >
+          {mutation.isPending ? 'Mengirim...' : 'Kirim Ulasan'}
+        </button>
+        <p className="text-xs text-gray-400 text-center">POST /bookings/{'{id}'}/review dikirim dengan rating + comment — memerlukan JWT.</p>
+      </div>
     </div>
   );
 }
@@ -50,15 +170,31 @@ export default function ProviderPage() {
     enabled: !!provider?.id,
   });
 
-  const { data: reviewsRes } = useQuery({
+  const { data: reviewsRes, refetch: refetchReviews } = useQuery({
     queryKey: ['reviews', provider?.id],
     queryFn: () => publicApi.reviews.listByProvider(provider!.id),
     enabled: !!provider?.id && activeTab === 'reviews',
   });
 
+  const queryClient = useQueryClient();
+  const [reportingId, setReportingId] = useState<string | null>(null);
+  const [reportMsg, setReportMsg] = useState<string | null>(null);
+  const reportMutation = useMutation({
+    mutationFn: (reviewId: string) => publicApi.reviews.report(reviewId),
+    onMutate: (id) => { setReportingId(id); setReportMsg(null); },
+    onSuccess: () => {
+      setReportMsg('Laporan terkirim, review akan dimoderasi.');
+      // reviews are filtered to PUBLISHED only, reported becomes HIDDEN, so refetch
+      queryClient.invalidateQueries({ queryKey: ['reviews', provider?.id] });
+      refetchReviews();
+    },
+    onError: (e) => setReportMsg(e instanceof Error ? e.message : 'Gagal melaporkan'),
+    onSettled: () => setReportingId(null),
+  });
+
   const services = servicesRes?.data ?? [];
   const staffList = staffRes?.data ?? [];
-  const reviews = reviewsRes?.data?.data ?? [];
+  const reviews = (reviewsRes as unknown as { data?: { data: Review[] } })?.data?.data ?? (reviewsRes as unknown as { data?: Review[] })?.data ?? [];
 
   if (isLoading) {
     return (
@@ -268,45 +404,62 @@ export default function ProviderPage() {
             )}
 
             {activeTab === 'reviews' && (
-              <div className="space-y-4">
-                {reviews.length > 0 ? (
-                  reviews.map((review: Review) => (
-                    <div key={review.id} className="rounded-xl border border-gray-200 bg-white p-5">
-                      <div className="flex items-start gap-3">
-                        <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-100">
-                          {review.customerAvatar ? (
-                            <img
-                              src={review.customerAvatar}
-                              alt={review.customerName}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center text-xs font-bold text-gray-500">
-                              {review.customerName[0]}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <div>
-                              <h4 className="text-sm font-medium text-gray-900">{review.customerName}</h4>
-                              <p className="text-xs text-gray-500">{review.serviceName}</p>
-                            </div>
-                            <span className="text-xs text-gray-400">
-                              {new Date(review.createdAt).toLocaleDateString('id-ID')}
-                            </span>
+              <div className="space-y-6">
+                <ReviewForm providerId={provider.id} />
+                {reportMsg && (
+                  <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-700">{reportMsg}</div>
+                )}
+                <div className="space-y-4">
+                  {reviews.length > 0 ? (
+                    reviews.map((review: Review) => (
+                      <div key={review.id} className="rounded-xl border border-gray-200 bg-white p-5">
+                        <div className="flex items-start gap-3">
+                          <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-100 flex-shrink-0">
+                            {review.customerAvatar ? (
+                              <img
+                                src={review.customerAvatar}
+                                alt={review.customerName}
+                                className="h-full w-full object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-full items-center justify-center text-xs font-bold text-gray-500">
+                                {review.customerName?.[0] ?? '?'}
+                              </div>
+                            )}
                           </div>
-                          <div className="mt-1">
-                            <StarRating rating={review.rating} />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <div>
+                                <h4 className="text-sm font-medium text-gray-900">{review.customerName}</h4>
+                                <p className="text-xs text-gray-500">{review.serviceName}</p>
+                              </div>
+                              <span className="text-xs text-gray-400">
+                                {review.createdAt ? new Date(review.createdAt).toLocaleDateString('id-ID') : ''}
+                              </span>
+                            </div>
+                            <div className="mt-1">
+                              <StarRating rating={review.rating} />
+                            </div>
+                            {review.title && <p className="mt-1 text-sm font-medium text-gray-800">{review.title}</p>}
+                            <p className="mt-1 text-sm text-gray-600 break-words">{review.comment ?? review.body ?? ''}</p>
+                            <div className="mt-3 flex items-center gap-3">
+                              <button
+                                onClick={() => reportMutation.mutate(review.id)}
+                                disabled={reportingId === review.id}
+                                className="text-xs text-gray-400 hover:text-red-600 disabled:opacity-50"
+                              >
+                                {reportingId === review.id ? 'Melaporkan...' : 'Laporkan'}
+                              </button>
+                              <span className="text-xs text-gray-300">POST /reviews/{'{id}'}/report</span>
+                            </div>
                           </div>
-                          <p className="mt-2 text-sm text-gray-600">{review.comment}</p>
                         </div>
                       </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-center text-gray-500">Belum ada ulasan</p>
-                )}
+                    ))
+                  ) : (
+                    <p className="text-center text-gray-500">Belum ada ulasan</p>
+                  )}
+                </div>
               </div>
             )}
           </div>

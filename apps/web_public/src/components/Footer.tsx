@@ -4,9 +4,15 @@ const exploreLinks = [
   { label: 'Cari Layanan', to: '/search' },
   { label: 'Masuk', to: '/login' },
   { label: 'Daftar Akun', to: '/register' },
+  { label: 'Daftar Provider', to: '/provider/register' },
+  { label: 'Tentang DEKAT', to: '/about' },
 ];
 
-const infoItems = ['Syarat & Ketentuan', 'Kebijakan Privasi', 'Bantuan & FAQ'];
+const infoLinks = [
+  { label: 'Syarat & Ketentuan', to: '/about' },
+  { label: 'Kebijakan Privasi', to: '/about' },
+  { label: 'Bantuan & FAQ', to: '/about' },
+];
 
 export default function Footer() {
   return (
@@ -45,9 +51,11 @@ export default function Footer() {
               Informasi
             </h3>
             <ul className="mt-4 space-y-3">
-              {infoItems.map((item) => (
-                <li key={item} className="text-sm text-gray-500">
-                  {item}
+              {infoLinks.map((link) => (
+                <li key={link.to + link.label}>
+                  <Link to={link.to} className="text-sm text-gray-500 transition-colors hover:text-primary-600">
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>

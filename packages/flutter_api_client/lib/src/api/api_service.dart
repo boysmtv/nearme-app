@@ -122,6 +122,14 @@ class ApiService {
     return _dio.post(Endpoints.supportTickets, data: data);
   }
 
+  Future<Response> getCustomerProfile() {
+    return _dio.get(Endpoints.customerProfile);
+  }
+
+  Future<Response> updateCustomerProfile(Map<String, dynamic> data) {
+    return _dio.put(Endpoints.customerProfile, data: data);
+  }
+
   // Provider dashboard (partner app)
   Future<Response> getPartnerBookings({Map<String, dynamic>? params}) {
     return _dio.get(Endpoints.providerBookings, queryParameters: params);

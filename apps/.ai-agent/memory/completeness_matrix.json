@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
-  "updated_at": "2026-08-26T10:00:00.000000+00:00",
+  "updated_at": "2026-08-28T12:00:00.000000+00:00",
   "status": "active",
   "rows": [
     {
@@ -185,12 +185,14 @@
         "User can view profile",
         "User can edit profile"
       ],
-      "platforms": ["mobile_customer"],
-      "api_endpoints": [],
+      "platforms": ["mobile_customer", "web_public"],
+      "api_endpoints": [
+        "GET /customer/profile",
+        "PUT /customer/profile"
+      ],
       "tests": [],
       "runtime_proof": [],
-      "status": "partial",
-      "notes": "Profile edit is local-only, no backend API call",
+      "status": "implemented",
       "evidence": [{"path": "feature_catalog.json:account"}]
     },
     {
@@ -413,31 +415,21 @@
       ],
       "tests": [],
       "runtime_proof": [],
-      "status": "read_only",
-      "notes": "Reviews displayed on provider page, no create/report UI yet",
+      "status": "implemented",
       "evidence": [{"path": "feature_catalog.json:reviews"}]
     }
   ],
-  "blockers": [
-    {
-      "requirement": "account",
-      "reason": "profile_edit_is_local_only_no_api"
-    },
-    {
-      "requirement": "reviews",
-      "reason": "no_create_or_report_ui"
-    }
-  ],
+  "blockers": [],
   "release_readiness": {
     "blocked": false,
     "blocking_rules": []
   },
   "coverage": {
     "requirement_count": 21,
-    "implemented_count": 19,
-    "partial_count": 1,
-    "read_only_count": 1,
+    "implemented_count": 21,
+    "partial_count": 0,
+    "read_only_count": 0,
     "test_mapped_requirement_count": 0,
-    "implementation_percentage": 90.5
+    "implementation_percentage": 100
   }
 }

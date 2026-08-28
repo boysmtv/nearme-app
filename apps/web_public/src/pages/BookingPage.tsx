@@ -75,6 +75,14 @@ export default function BookingPage() {
     enabled: !!providerId && !!selectedService?.id && !!selectedStaff?.id && !!selectedDate,
   });
 
+  const [pin, setPin] = useState('');
+  const [pinMsg, setPinMsg] = useState<string | null>(null);
+  const verifyPinMut = useMutation({
+    mutationFn: () => publicApi.bookings.verifyPin(createdBooking!.id, pin),
+    onSuccess: () => setPinMsg('PIN terverifikasi, booking dikonfirmasi!'),
+    onError: (e) => setPinMsg(e instanceof Error ? e.message : 'PIN salah'),
+  });
+
   const createBooking = useMutation({
     mutationFn: (data: z.infer<typeof contactSchema>) =>
       publicApi.bookings.create({
@@ -241,6 +249,22 @@ export default function BookingPage() {
               <p className="mt-3 text-xs uppercase tracking-wide text-gray-400">
                 Status: {createdBooking.status}
               </p>
+              {createdBooking.confirmationPin && (
+                <div className="mx-auto mt-4 w-fit rounded-lg bg-yellow-50 border border-yellow-200 px-6 py-3">
+                  <p className="text-xs text-yellow-700">PIN Konfirmasi (tunjukkan ke staf)</p>
+                  <p className="text-xl font-bold tracking-widest text-yellow-900">{createdBooking.confirmationPin}</p>
+                </div>
+              )}
+              <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left">
+                <h3 className="text-sm font-semibold text-gray-900">Verifikasi PIN</h3>
+                <p className="mt-1 text-xs text-gray-500">POST /bookings/{'{id}'}/verify-pin — masukkan 6-digit PIN untuk check-in</p>
+                <div className="mt-3 flex gap-2">
+                  <input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="6-digit PIN" maxLength={6} className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
+                  <button onClick={() => verifyPinMut.mutate()} disabled={verifyPinMut.isPending || pin.length !== 6} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{verifyPinMut.isPending ? '...' : 'Verifikasi'}</button>
+                </div>
+                {pinMsg && <p className="mt-2 text-sm text-green-600">{pinMsg}</p>}
+                {verifyPinMut.isError && <p className="mt-1 text-sm text-red-600">{(verifyPinMut.error as Error).message}</p>}
+              </div>
               <div className="mt-6 flex justify-center gap-3">
                 <Link
                   to="/"

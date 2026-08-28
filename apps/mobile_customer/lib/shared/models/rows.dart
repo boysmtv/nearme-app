@@ -119,6 +119,8 @@ class BookingRow {
   final DateTime? startsAt;
   final DateTime? endsAt;
   final DateTime? createdAt;
+  final String? confirmationPin;
+  final bool? pinVerified;
 
   const BookingRow({
     required this.id,
@@ -133,6 +135,8 @@ class BookingRow {
     this.startsAt,
     this.endsAt,
     this.createdAt,
+    this.confirmationPin,
+    this.pinVerified,
   });
 
   factory BookingRow.fromJson(Map<String, dynamic> json) => BookingRow(
@@ -148,6 +152,8 @@ class BookingRow {
         startsAt: _parseDate(json['startsAt']),
         endsAt: _parseDate(json['endsAt']),
         createdAt: _parseDate(json['createdAt']),
+        confirmationPin: json['confirmationPin'] as String?,
+        pinVerified: json['pinVerified'] as bool?,
       );
 }
 

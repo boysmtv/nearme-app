@@ -22,6 +22,7 @@ import '../../features/notification/presentation/pages/notification_page.dart';
 import '../../features/support/presentation/pages/support_page.dart';
 import '../../features/account/presentation/pages/account_page.dart';
 import '../../features/account/presentation/pages/profile_edit_page.dart';
+import '../../features/account/presentation/pages/profile_complete_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
@@ -33,12 +34,16 @@ class AuthState {
   final bool isLoggedIn;
   final User? user;
   final String? error;
+  final bool hasProfile;
+  final bool profileChecked;
 
   const AuthState({
     this.isLoading = false,
     this.isLoggedIn = false,
     this.user,
     this.error,
+    this.hasProfile = true,
+    this.profileChecked = false,
   });
 
   AuthState copyWith({
@@ -46,12 +51,16 @@ class AuthState {
     bool? isLoggedIn,
     User? user,
     String? error,
+    bool? hasProfile,
+    bool? profileChecked,
   }) {
     return AuthState(
       isLoading: isLoading ?? this.isLoading,
       isLoggedIn: isLoggedIn ?? this.isLoggedIn,
       user: user ?? this.user,
       error: error,
+      hasProfile: hasProfile ?? this.hasProfile,
+      profileChecked: profileChecked ?? this.profileChecked,
     );
   }
 }
@@ -86,8 +95,26 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final user = userFromAccessToken(token, email) ??
           User(id: userId ?? '', email: email ?? '', name: name);
       state = state.copyWith(isLoggedIn: true, user: user);
+      // async profile check, don't block
+      _fetchProfileStatus();
     } else {
-      state = state.copyWith(isLoggedIn: false);
+      state = state.copyWith(isLoggedIn: false, profileChecked: true);
+    }
+  }
+
+  Future<void> _fetchProfileStatus() async {
+    try {
+      final res = await _apiService.getCustomerProfile();
+      final data = res.data is Map<String, dynamic> ? res.data['data'] ?? res.data : null;
+      final exists = data is Map && data['exists'] == true;
+      final nickname = data is Map ? (data['nickname'] ?? data['name']) as String? : null;
+      final hasProfile = exists && nickname != null && nickname.trim().isNotEmpty;
+      // allow fallback: if we have a stored name, consider hasProfile true
+      final fallback = state.user?.name != null && state.user!.name!.trim().isNotEmpty;
+      state = state.copyWith(hasProfile: hasProfile || fallback, profileChecked: true);
+    } catch (_) {
+      // if 401/404 network error, assume hasProfile true to avoid blocking login
+      state = state.copyWith(profileChecked: true);
     }
   }
 
@@ -110,7 +137,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
           await SecureStorageService.write(StorageKeys.userName, user.name!);
         }
       }
-      state = state.copyWith(isLoading: false, isLoggedIn: true, user: user);
+      state = state.copyWith(isLoading: false, isLoggedIn: true, user: user, profileChecked: false, hasProfile: true);
+      await _fetchProfileStatus();
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
@@ -205,7 +233,44 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (updated.name != null) {
       SecureStorageService.write(StorageKeys.userName, updated.name!);
     }
-    state = state.copyWith(user: updated);
+    state = state.copyWith(user: updated, hasProfile: true, profileChecked: true);
+  }
+
+  Future<bool> updateProfileRemote({required String name, String? email, String? phone}) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      final payload = <String, dynamic>{
+        'nickname': name.trim(),
+        'name': name.trim(),
+        if (email != null && email.isNotEmpty) 'email': email.trim(),
+        if (phone != null && phone.isNotEmpty) 'phone': phone.trim(),
+      };
+      final res = await _apiService.updateCustomerProfile(payload);
+      final data = res.data is Map<String, dynamic> ? (res.data['data'] ?? res.data) as Map<String, dynamic>? : null;
+      final resolvedName = (data?['nickname'] ?? data?['name'] ?? name) as String;
+      final resolvedEmail = (data?['email'] ?? email ?? state.user?.email ?? '') as String;
+      final resolvedPhone = (data?['phone'] ?? phone) as String?;
+      final user = state.user;
+      if (user != null) {
+        final updated = User(
+          id: user.id,
+          email: resolvedEmail,
+          name: resolvedName,
+          phone: resolvedPhone ?? user.phone,
+          avatarUrl: user.avatarUrl,
+          role: user.role,
+        );
+        await SecureStorageService.write(StorageKeys.userEmail, updated.email);
+        if (updated.name != null) await SecureStorageService.write(StorageKeys.userName, updated.name!);
+        state = state.copyWith(isLoading: false, user: updated, hasProfile: true, profileChecked: true);
+      } else {
+        state = state.copyWith(isLoading: false, hasProfile: true, profileChecked: true);
+      }
+      return true;
+    } catch (e) {
+      state = state.copyWith(isLoading: false, error: e.toString().replaceAll('Exception: ', ''));
+      return false;
+    }
   }
 
   void clearError() {
@@ -350,12 +415,18 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'profileEdit',
         builder: (context, state) => const ProfileEditPage(),
       ),
+      GoRoute(
+        path: '/profile/complete',
+        name: 'profileComplete',
+        builder: (context, state) => const ProfileCompletePage(),
+      ),
     ],
     redirect: (context, state) {
       final auth = ref.read(authProvider);
       final isAuthRoute = state.matchedLocation == '/login' ||
           state.matchedLocation == '/register' ||
           state.matchedLocation == '/forgot-password';
+      final isCompleteRoute = state.matchedLocation == '/profile/complete';
 
       if (auth.isLoading) return null;
 
@@ -364,6 +435,15 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (auth.isLoggedIn && isAuthRoute) {
+        if (!auth.hasProfile && auth.profileChecked) return '/profile/complete';
+        return '/discovery';
+      }
+
+      if (auth.isLoggedIn && !auth.hasProfile && auth.profileChecked && !isCompleteRoute) {
+        return '/profile/complete';
+      }
+
+      if (auth.isLoggedIn && auth.hasProfile && isCompleteRoute) {
         return '/discovery';
       }
 

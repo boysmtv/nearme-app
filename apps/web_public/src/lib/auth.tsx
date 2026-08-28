@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { publicApi } from './api';
 
@@ -17,6 +17,7 @@ interface AuthContextType {
   register: (name: string, email: string, phone: string, password: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => void;
+  completeProfile: (data: { nickname?: string; name?: string; phone?: string; email?: string }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -38,18 +39,41 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
   const navigate = useNavigate();
 
-  const buildUser = useCallback((token: string): AuthUser => {
+  const buildUser = useCallback((token: string, hasProfileOverride?: boolean): AuthUser => {
     const payload = decodeToken(token) ?? {};
     const roles = (payload.roles ?? []) as string[];
     const role = roles[0] ?? 'ROLE_CUSTOMER';
+    // hasProfile defaults from localStorage / override, fallback to JWT heuristic
+    const storedHasProfile = localStorage.getItem('has_profile');
+    const hasProfile = hasProfileOverride !== undefined
+      ? hasProfileOverride
+      : storedHasProfile !== null ? storedHasProfile === 'true' : (roles.includes('has_profile') || role !== 'ROLE_CUSTOMER');
     return {
       id: (payload.sub ?? '') as string,
       email: (payload.email ?? '') as string,
       name: (payload.name ?? '') as string,
       role: role as AuthUser['role'],
-      hasProfile: roles.includes('has_profile') || role !== 'ROLE_CUSTOMER',
+      hasProfile,
     };
   }, []);
+
+  const syncHasProfile = useCallback(async (token: string) => {
+    try {
+      const res = await publicApi.customer.getProfile() as unknown as { success: boolean; data: { exists: boolean; nickname?: string; name?: string } };
+      const exists = res?.data?.exists === true;
+      // treat hasProfile true only if exists and nickname/name present
+      const nickname = res?.data?.nickname ?? res?.data?.name ?? '';
+      const hasProfile = exists && String(nickname).trim().length > 0;
+      // persist
+      localStorage.setItem('has_profile', String(hasProfile));
+      const updated = buildUser(token, hasProfile);
+      localStorage.setItem('auth_user', JSON.stringify(updated));
+      setUser(updated);
+      return hasProfile;
+    } catch {
+      return null;
+    }
+  }, [buildUser]);
 
   const login = useCallback(async (email: string, password: string) => {
     const res = await publicApi.auth.login(email, password);
@@ -59,17 +83,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const u = buildUser(token);
     localStorage.setItem('auth_user', JSON.stringify(u));
     setUser(u);
+    // Try to resolve real hasProfile from backend
+    const hp = await syncHasProfile(token);
+    const effectiveHasProfile = hp !== null ? hp : u.hasProfile;
+    if (effectiveHasProfile === false && u.role === 'ROLE_CUSTOMER') {
+      navigate('/profile/complete');
+      return;
+    }
     if (u.role === 'ROLE_CUSTOMER') navigate('/');
     else if (u.role.startsWith('ROLE_PROVIDER')) navigate('/provider/dashboard');
     else navigate('/admin/dashboard');
-  }, [navigate, buildUser]);
+  }, [navigate, buildUser, syncHasProfile]);
 
   const register = useCallback(async (name: string, email: string, phone: string, password: string) => {
     const res = await publicApi.auth.register(name, email, phone, password);
     const token = res.data.accessToken;
     localStorage.setItem('auth_token', token);
     localStorage.setItem('auth_refresh', res.data.refreshToken);
-    const u = buildUser(token);
+    // new customer has no profile yet (needs phone/name completion verify)
+    localStorage.setItem('has_profile', 'false');
+    const u = buildUser(token, false);
     localStorage.setItem('auth_user', JSON.stringify(u));
     setUser(u);
     navigate('/profile/complete');
@@ -79,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_refresh');
     localStorage.removeItem('auth_user');
+    localStorage.removeItem('has_profile');
     setUser(null);
     navigate('/');
   }, [navigate]);
@@ -89,11 +123,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const u = buildUser(token);
       localStorage.setItem('auth_user', JSON.stringify(u));
       setUser(u);
+      // also try background sync
+      syncHasProfile(token);
+    }
+  }, [buildUser, syncHasProfile]);
+
+  const completeProfile = useCallback(async (data: { nickname?: string; name?: string; phone?: string }) => {
+    await publicApi.customer.updateProfile(data);
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      localStorage.setItem('has_profile', 'true');
+      const u = buildUser(token, true);
+      localStorage.setItem('auth_user', JSON.stringify(u));
+      setUser(u);
     }
   }, [buildUser]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (token && user) {
+      // best-effort background profile check on mount
+      syncHasProfile(token);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, logout, refreshUser }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, register, logout, refreshUser, completeProfile } as AuthContextType}>
       {children}
     </AuthContext.Provider>
   );

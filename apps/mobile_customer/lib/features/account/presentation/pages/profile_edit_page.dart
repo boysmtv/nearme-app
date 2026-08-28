@@ -84,18 +84,24 @@ class _ProfileEditPageState extends ConsumerState<ProfileEditPage> {
   }
 
   Future<void> _handleSave() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() => _isSaving = true);
-      ref.read(authProvider.notifier).updateLocal(
-            name: _nameController.text.trim(),
-            email: _emailController.text.trim(),
-            phone: _phoneController.text.trim(),
-          );
-      await Future<void>.delayed(const Duration(milliseconds: 200));
+    if (!_formKey.currentState!.validate()) return;
+    setState(() => _isSaving = true);
+    final success = await ref.read(authProvider.notifier).updateProfileRemote(
+          name: _nameController.text.trim(),
+          email: _emailController.text.trim(),
+          phone: _phoneController.text.trim(),
+        );
+    if (!mounted) return;
+    setState(() => _isSaving = false);
+    if (success) {
       if (mounted) {
-        setState(() => _isSaving = false);
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated'), backgroundColor: Colors.green));
         context.pop();
+      }
+    } else {
+      final err = ref.read(authProvider).error ?? 'Failed to update profile';
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(err), backgroundColor: Colors.red));
       }
     }
   }

@@ -1,6 +1,7 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import { Suspense, lazy } from 'react';
 import ProtectedRoute from './lib/ProtectedRoute';
+import { useAuth } from './lib/auth';
 
 const HomePage = lazy(() => import('./pages/HomePage'));
 const SearchPage = lazy(() => import('./pages/SearchPage'));
@@ -16,6 +17,9 @@ const ProviderStaffPage = lazy(() => import('./pages/provider/StaffPage'));
 const ProviderCustomersPage = lazy(() => import('./pages/provider/CustomersPage'));
 const ProviderReportsPage = lazy(() => import('./pages/provider/ReportsPage'));
 const ProviderSettingsPage = lazy(() => import('./pages/provider/SettingsPage'));
+const ProfileCompletePage = lazy(() => import('./pages/ProfileCompletePage'));
+const AboutPage = lazy(() => import('./pages/AboutPage'));
+const ProviderRegisterPage = lazy(() => import('./pages/ProviderRegisterPage'));
 
 function LoadingFallback() {
   return (
@@ -41,16 +45,34 @@ function NotFound() {
   );
 }
 
+function ProfileCompleteGuard({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, user } = useAuth();
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (user?.hasProfile) return <Navigate to="/" replace />;
+  return <>{children}</>;
+}
+
+function RequireProfileGuard({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, user } = useAuth();
+  if (isAuthenticated && user && !user.hasProfile && user.role === 'ROLE_CUSTOMER') {
+    return <Navigate to="/profile/complete" replace />;
+  }
+  return <>{children}</>;
+}
+
 export function App() {
   return (
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/search" element={<SearchPage />} />
-        <Route path="/provider/:slug" element={<ProviderPage />} />
-        <Route path="/booking/:providerId" element={<BookingPage />} />
+        <Route path="/" element={<RequireProfileGuard><HomePage /></RequireProfileGuard>} />
+        <Route path="/search" element={<RequireProfileGuard><SearchPage /></RequireProfileGuard>} />
+        <Route path="/provider/:slug" element={<RequireProfileGuard><ProviderPage /></RequireProfileGuard>} />
+        <Route path="/booking/:providerId" element={<RequireProfileGuard><BookingPage /></RequireProfileGuard>} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/about" element={<AboutPage />} />
+        <Route path="/provider/register" element={<ProviderRegisterPage />} />
+        <Route path="/profile/complete" element={<ProfileCompleteGuard><ProfileCompletePage /></ProfileCompleteGuard>} />
 
         <Route path="/provider/dashboard" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderDashboardPage /></ProtectedRoute>} />
         <Route path="/provider/calendar" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCalendarPage /></ProtectedRoute>} />

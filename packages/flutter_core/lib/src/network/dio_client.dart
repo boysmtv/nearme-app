@@ -46,11 +46,19 @@ class _AuthInterceptor extends Interceptor {
   bool _isRefreshing = false;
   String? _pendingToken;
 
+  static bool _isPublicEndpoint(String path) {
+    return path.startsWith('/public/') || path.startsWith('/auth/') || path.contains('/public/');
+  }
+
   @override
   void onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    if (_isPublicEndpoint(options.path)) {
+      handler.next(options);
+      return;
+    }
     final token = await SecureStorageService.read('access_token');
     if (token != null) {
       options.headers['Authorization'] = 'Bearer $token';

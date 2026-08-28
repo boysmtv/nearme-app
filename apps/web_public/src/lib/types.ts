@@ -96,8 +96,28 @@ export interface Review {
   customerAvatar: string;
   rating: number;
   comment: string;
+  title?: string;
+  body?: string;
   serviceName: string;
   createdAt: string;
+}
+
+export interface CreateReviewRequest {
+  rating: number;
+  title?: string;
+  body: string;
+}
+
+export interface CustomerProfile {
+  exists: boolean;
+  id?: string;
+  nickname?: string;
+  name?: string;
+  email?: string;
+  phone?: string;
+  loyaltyPoints?: number;
+  totalBookings?: number;
+  totalSpent?: number;
 }
 
 export interface BookingRequest {
@@ -119,6 +139,8 @@ export interface BookingResponse {
   totalAmount?: number;
   depositAmount?: number;
   createdAt?: string;
+  confirmationPin?: string;
+  pinVerified?: boolean;
 }
 
 export interface SearchFilters {

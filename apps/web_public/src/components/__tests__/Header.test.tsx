@@ -12,6 +12,10 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+vi.mock('../../lib/auth', () => ({
+  useAuth: () => ({ user: null, isAuthenticated: false, logout: vi.fn() }),
+}));
+
 function renderHeader() {
   return render(
     <MemoryRouter>
