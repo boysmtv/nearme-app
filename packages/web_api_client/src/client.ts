@@ -30,8 +30,13 @@ class ApiClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Unknown error' }));
-      throw new Error(error.message || `HTTP error ${response.status}`);
+      const error = await response.json().catch(() => ({ message: `HTTP error ${response.status}` }));
+      const msg = (error as Record<string, unknown>).message as string | undefined
+        || (error as Record<string, unknown>).error as string | undefined
+        || (error as Record<string, unknown>).msg as string | undefined
+        || (error as Record<string, unknown>).detail as string | undefined
+        || `HTTP error ${response.status}`;
+      throw new Error(msg);
     }
 
     return response.json();

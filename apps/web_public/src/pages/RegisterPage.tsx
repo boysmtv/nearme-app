@@ -9,7 +9,7 @@ import { publicApi } from '../lib/api';
 const registerSchema = z.object({
   name: z.string().min(2, 'Nama harus minimal 2 karakter').max(100),
   email: z.string().email('Email tidak valid'),
-  phone: z.string().regex(/^\+?[1-9]\d{1,14}$/, 'Nomor telepon tidak valid').optional().or(z.literal('')),
+  phone: z.string().regex(/^\+?[0-9]{10,15}$/, 'Nomor telepon tidak valid (10-15 digit, boleh awalan 0 atau +62)').optional().or(z.literal('')),
   password: z.string().min(8, 'Password harus minimal 8 karakter'),
   confirmPassword: z.string(),
 }).refine((data) => data.password === data.confirmPassword, {

@@ -6,6 +6,7 @@ import id.dekat.identity.domain.User;
 import id.dekat.identity.domain.UserRepository;
 import id.dekat.tenant.domain.ProviderListingRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -88,27 +89,43 @@ public class CustomerController {
         if (nicknameRaw == null) nicknameRaw = body.get("name");
         final String nickname = nicknameRaw;
         // Update User entity if name/email/phone supplied
-        userRepository.findById(userId).ifPresent(user -> {
-            boolean dirty = false;
-            String nameVal = body.get("name") != null ? body.get("name") : nickname;
-            if (nameVal != null && !nameVal.isBlank() && !nameVal.equals(user.getName())) {
-                user.setName(nameVal.trim());
-                dirty = true;
+        try {
+            userRepository.findById(userId).ifPresent(user -> {
+                boolean dirty = false;
+                String nameVal = body.get("name") != null ? body.get("name") : nickname;
+                if (nameVal != null && !nameVal.isBlank() && !nameVal.equals(user.getName())) {
+                    user.setName(nameVal.trim());
+                    dirty = true;
+                }
+                String emailVal = body.get("email");
+                if (emailVal != null && !emailVal.isBlank() && !emailVal.equals(user.getEmail())) {
+                    user.setEmail(emailVal.trim());
+                    dirty = true;
+                }
+                String phoneVal = body.get("phone");
+                if (phoneVal != null && !phoneVal.isBlank() && !phoneVal.equals(user.getPhone())) {
+                    // Normalize phone: keep as provided (allow 0-leading)
+                    user.setPhone(phoneVal.trim());
+                    dirty = true;
+                }
+                if (dirty) userRepository.save(user);
+            });
+        } catch (DataIntegrityViolationException ex) {
+            String msg = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
+            if (msg != null && msg.toLowerCase().contains("uq_users_phone")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Nomor telepon sudah terdaftar, gunakan nomor lain"));
             }
-            String emailVal = body.get("email");
-            if (emailVal != null && !emailVal.isBlank() && !emailVal.equals(user.getEmail())) {
-                user.setEmail(emailVal.trim());
-                dirty = true;
+            if (msg != null && msg.toLowerCase().contains("uq_users_email")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Email sudah terdaftar"));
             }
-            String phoneVal = body.get("phone");
-            if (phoneVal != null && !phoneVal.isBlank() && !phoneVal.equals(user.getPhone())) {
-                user.setPhone(phoneVal.trim());
-                dirty = true;
-            }
-            if (dirty) userRepository.save(user);
-        });
-        CustomerProfile profile = customerService.createOrUpdateProfile(
-                userId, tenantId, nickname);
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Data sudah terdaftar: " + msg));
+        }
+        CustomerProfile profile;
+        try {
+            profile = customerService.createOrUpdateProfile(userId, tenantId, nickname);
+        } catch (DataIntegrityViolationException ex) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Gagal menyimpan profil, data mungkin duplikat"));
+        }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("id", profile.getId());
         result.put("nickname", profile.getNickname() != null ? profile.getNickname() : "");

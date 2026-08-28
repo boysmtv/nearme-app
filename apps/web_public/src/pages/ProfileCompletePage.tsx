@@ -7,7 +7,7 @@ import { useAuth } from '../lib/auth';
 
 const schema = z.object({
   name: z.string().min(2, 'Nama harus minimal 2 karakter'),
-  phone: z.string().min(10, 'Nomor telepon minimal 10 digit'),
+  phone: z.string().min(10, 'Nomor telepon minimal 10 digit').regex(/^\+?[0-9]{10,15}$/, 'Nomor telepon tidak valid (10-15 digit, boleh awalan 0 atau +62)'),
 });
 
 type FormData = z.infer<typeof schema>;
