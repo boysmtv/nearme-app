@@ -423,14 +423,21 @@ final routerProvider = Provider<GoRouter>((ref) {
     ],
     redirect: (context, state) {
       final auth = ref.read(authProvider);
-      final isAuthRoute = state.matchedLocation == '/login' ||
-          state.matchedLocation == '/register' ||
-          state.matchedLocation == '/forgot-password';
-      final isCompleteRoute = state.matchedLocation == '/profile/complete';
+      final location = state.matchedLocation;
+      final isAuthRoute = location == '/login' ||
+          location == '/register' ||
+          location == '/forgot-password';
+      final isCompleteRoute = location == '/profile/complete';
+      final isPublicRoute = location == '/discovery' ||
+          location == '/search' ||
+          location == '/providers' ||
+          location.startsWith('/provider/') ||
+          location == '/support';
 
       if (auth.isLoading) return null;
 
-      if (!auth.isLoggedIn && !isAuthRoute) {
+      // Guest allowed for public + auth routes; protect others (bookings, account, booking flow, payment)
+      if (!auth.isLoggedIn && !isAuthRoute && !isPublicRoute && !isCompleteRoute) {
         return '/login';
       }
 
