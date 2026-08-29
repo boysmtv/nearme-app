@@ -179,9 +179,15 @@ public class BookingController {
         if (principal == null) {
             return null;
         }
+        String name = principal.getName();
+        if (name == null) {
+            return null;
+        }
         try {
-            return UUID.fromString(principal.getName());
+            return UUID.fromString(name);
         } catch (IllegalArgumentException e) {
+            return null;
+        } catch (NullPointerException e) {
             return null;
         }
     }

@@ -16,29 +16,27 @@ class BookingAssignmentTest {
     void constructor_createsAssignmentWithAssignedStatus() {
         UUID bookingId = UUID.randomUUID();
         UUID staffId = UUID.randomUUID();
-        UUID resourceId = UUID.randomUUID();
         OffsetDateTime startsAt = OffsetDateTime.now().plusHours(1);
         OffsetDateTime endsAt = startsAt.plusHours(1);
 
         BookingAssignment assignment = new BookingAssignment(
-                bookingId, staffId, resourceId, startsAt, endsAt);
+                bookingId, staffId, startsAt, endsAt);
 
         assertThat(assignment.getBookingId()).isEqualTo(bookingId);
         assertThat(assignment.getStaffId()).isEqualTo(staffId);
-        assertThat(assignment.getResourceId()).isEqualTo(resourceId);
         assertThat(assignment.getStartsAt()).isEqualTo(startsAt);
         assertThat(assignment.getEndsAt()).isEqualTo(endsAt);
         assertThat(assignment.getStatus()).isEqualTo(BookingAssignment.AssignmentStatus.ASSIGNED);
     }
 
     @Test
-    @DisplayName("confirm - should transition to CONFIRMED")
+    @DisplayName("accept - should transition to ACCEPTED")
     void confirm_transitionsToConfirmed() {
         BookingAssignment assignment = createDefaultAssignment();
 
-        assignment.confirm();
+        assignment.accept();
 
-        assertThat(assignment.getStatus()).isEqualTo(BookingAssignment.AssignmentStatus.CONFIRMED);
+        assertThat(assignment.getStatus()).isEqualTo(BookingAssignment.AssignmentStatus.ACCEPTED);
     }
 
     @Test
@@ -55,7 +53,7 @@ class BookingAssignmentTest {
     @DisplayName("complete - should transition to COMPLETED")
     void complete_transitionsToCompleted() {
         BookingAssignment assignment = createDefaultAssignment();
-        assignment.confirm();
+        assignment.accept();
 
         assignment.complete();
 
@@ -63,18 +61,18 @@ class BookingAssignmentTest {
     }
 
     @Test
-    @DisplayName("cancel - should transition to CANCELLED")
+    @DisplayName("decline via cancel path - should transition to DECLINED")
     void cancel_transitionsToCancelled() {
         BookingAssignment assignment = createDefaultAssignment();
 
-        assignment.cancel();
+        assignment.decline();
 
-        assertThat(assignment.getStatus()).isEqualTo(BookingAssignment.AssignmentStatus.CANCELLED);
+        assertThat(assignment.getStatus()).isEqualTo(BookingAssignment.AssignmentStatus.DECLINED);
     }
 
     private BookingAssignment createDefaultAssignment() {
         return new BookingAssignment(
-                UUID.randomUUID(), UUID.randomUUID(), null,
+                UUID.randomUUID(), UUID.randomUUID(),
                 OffsetDateTime.now().plusHours(1),
                 OffsetDateTime.now().plusHours(2));
     }

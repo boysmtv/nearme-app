@@ -32,6 +32,8 @@ class BookingServiceTest {
     private BookingItemRepository bookingItemRepository;
     @Mock
     private BookingAssignmentRepository bookingAssignmentRepository;
+    @Mock
+    private id.dekat.customer.application.CustomerService customerService;
 
     @InjectMocks
     private BookingService bookingService;
@@ -142,7 +144,6 @@ class BookingServiceTest {
         when(hold.getStartsAt()).thenReturn(startsAt);
         when(hold.getEndsAt()).thenReturn(endsAt);
         when(hold.getStaffId()).thenReturn(staffId);
-        when(hold.getResourceId()).thenReturn(null);
         when(bookingHoldRepository.findById(holdId)).thenReturn(Optional.of(hold));
         when(bookingRepository.findByBookingCode(anyString())).thenReturn(Optional.empty());
         when(bookingRepository.save(any(Booking.class)))

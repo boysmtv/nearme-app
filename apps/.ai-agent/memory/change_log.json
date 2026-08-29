@@ -184,6 +184,81 @@
         "revert-colors-to-original"
       ],
       "recorded_at": "2026-08-28T20:15:00.000000+00:00"
+    },
+    {
+      "run_id": "backend_fix_and_full_validation::2026-08-29",
+      "final_status": "completed",
+      "summary": "Fixed backend domain test mismatch (BookingAssignment 4-param + ACCEPTED/DECLINED/COMPLETED, BookingItem int price/Instant + lineTotal price) and controller NPE (currentUserId null handling) + BookingService missing CustomerService mock + BookingController unnecessary stubbing. Validated 368 tests all green (82 backend, 187 web, 87 flutter, 12 e2e). Docker runtime verified: 4 containers healthy, GET /public/providers + guest POST /public/bookings works even with invalid Bearer token via BearerTokenResolver, auth login + provider/admin dashboards ok. Updated .gitignore for final/test-* artifacts and AGENTS.md Known Issues.",
+      "changed_artifacts": [
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingAssignmentTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingItemTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingServiceTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/web/BookingControllerTest.java",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/web/BookingController.java",
+        ".gitignore",
+        "AGENTS.md",
+        "apps/.ai-agent/memory/project_metrics.json"
+      ],
+      "features": [
+        "backend-domain-fix",
+        "controller-npe-fix",
+        "booking-service-mock-fix",
+        "gitignore-cleanup",
+        "docker-runtime-proof",
+        "guest-booking-401-verified"
+      ],
+      "metrics": {
+        "total_tests": 368,
+        "backend": 82,
+        "web": 187,
+        "flutter": 87,
+        "e2e": 12,
+        "all_passing": true,
+        "containers_healthy": 4
+      },
+      "recorded_at": "2026-08-29T02:00:00.000000+00:00"
+    },
+    {
+      "run_id": "search_no_autokeyboard_and_attractive_cards::2026-08-29",
+      "final_status": "completed",
+      "summary": "Fix search: remove auto keyboard (initState no requestFocus), show all providers on empty via getProviders(), no back button (only TextField), attractive provider cards (64x64 storefront primary 0.08, category chip primary 0.1, star + price Mulai Rp). Verified via flutter build apk → Mi A1 192.168.100.70.",
+      "changed_artifacts": [
+        "apps/mobile_customer/lib/features/discovery/presentation/pages/search_page.dart",
+        "packages/flutter_design_system/lib/src/colors.dart",
+        "AGENTS.md"
+      ],
+      "features": [
+        "search-no-autokeyboard",
+        "search-attractive-cards",
+        "search-show-all-on-empty"
+      ],
+      "metrics": {
+        "tests_passing": 368
+      },
+      "recorded_at": "2026-08-29T17:15:00.000000+00:00"
+    },
+    {
+      "run_id": "availability_attractive_and_loop_fix::2026-08-29",
+      "final_status": "completed",
+      "summary": "Fix availability: infinite loop due to Map identity in FutureProvider.family (70ms loop) → String key 'providerId|date', layout attractive (card calendar radius 20 shadow, service dropdown card, Available Times grouped Morning/Afternoon/Evening Wrap chips AnimatedContainer primary selected, shimmer loading, error retry), usesCleartextTraffic for http://192.168.100.55:8080 on Android 9. Verified via curl availability 8 slots and adb logcat no loop, build apk 55.7s success.",
+      "changed_artifacts": [
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+        "apps/mobile_customer/android/app/src/main/AndroidManifest.xml",
+        "apps/mobile_partner/android/app/src/main/AndroidManifest.xml",
+        "AGENTS.md"
+      ],
+      "features": [
+        "availability-loop-fix",
+        "availability-attractive-layout",
+        "availability-grouped-times",
+        "android-cleartext-fix"
+      ],
+      "metrics": {
+        "tests_passing": 368,
+        "availability_slots": 8
+      },
+      "recorded_at": "2026-08-29T17:30:00.000000+00:00"
     }
   ]
 }

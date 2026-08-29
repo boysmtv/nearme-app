@@ -205,7 +205,6 @@ class BookingControllerTest {
 
         org.springframework.security.oauth2.jwt.Jwt jwt =
                 mock(org.springframework.security.oauth2.jwt.Jwt.class);
-        when(jwt.getSubject()).thenReturn(customerId.toString());
 
         ResponseEntity<ApiResponse<BookingHold>> response =
                 bookingController.createHold(jwt, request);
@@ -289,7 +288,6 @@ class BookingControllerTest {
 
         org.springframework.security.oauth2.jwt.Jwt jwt =
                 mock(org.springframework.security.oauth2.jwt.Jwt.class);
-        when(jwt.getSubject()).thenReturn(customerId.toString());
 
         ResponseEntity<ApiResponse<Booking>> response =
                 bookingController.createBooking(jwt, request);

@@ -4,7 +4,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
-import java.time.Duration;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.UUID;
@@ -228,12 +228,13 @@ class BookingTest {
     @DisplayName("recalculateTotal - should calculate total from items")
     void recalculateTotal_withItems_calculatesCorrectly() {
         Booking booking = createDefaultBooking();
+        Instant now = Instant.now();
         BookingItem item1 = new BookingItem(
-                booking.getId(), UUID.randomUUID(), null,
-                "Haircut", new BigDecimal("50000"), Duration.ofMinutes(30), 1);
+                UUID.randomUUID(), UUID.randomUUID(), null, null,
+                now, now.plusSeconds(1800), 50000, 0, 0, "Haircut");
         BookingItem item2 = new BookingItem(
-                booking.getId(), UUID.randomUUID(), null,
-                "Shave", new BigDecimal("25000"), Duration.ofMinutes(15), 2);
+                UUID.randomUUID(), UUID.randomUUID(), null, null,
+                now, now.plusSeconds(900), 50000, 0, 0, "Shave");
         booking.setItems(java.util.List.of(item1, item2));
         booking.setDiscount(new BigDecimal("5000"));
         booking.setTax(new BigDecimal("7500"));
@@ -241,7 +242,7 @@ class BookingTest {
 
         booking.recalculateTotal();
 
-        assertThat(booking.getSubtotal()).isEqualTo(new BigDecimal("100000")); // 50000*1 + 25000*2
+        assertThat(booking.getSubtotal()).isEqualTo(new BigDecimal("100000")); // 50000 + 50000
         assertThat(booking.getTotal()).isEqualTo(new BigDecimal("105000")); // 100000 - 5000 + 7500 + 2500
     }
 

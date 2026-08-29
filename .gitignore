@@ -65,8 +65,16 @@ test-results/
 .agent_memory/
 apps/.ai-agent/
 services/platform_backend/.ai-agent/
+.opencode/
 node_modules/
 build/
 .gradle/
 .dart_tool/
 dist/
+
+# E2E / manual proof artifacts (not to commit)
+final/
+test-*.png
+test-*.js
+test-admin-*.png
+test-provider-*.png

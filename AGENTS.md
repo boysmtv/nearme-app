@@ -312,12 +312,16 @@ pnpm install && pnpm dev
 - Sessions table requires V18 (`device_info`, `token_family`) and V19 (`ip_address` type fix) migrations
 - CORS allowed origins in `WebConfig.java`: `localhost:4100, 3001, 3002, 8081, 4101, 4102`
 
-### Known Issues (2026-08-28)
-- `POST /public/bookings` returns 401 Unauthorized — SecurityConfig has `/public/**` permitAll but something blocks it. Need to check if JWT decoder rejects requests with no token or if there's a filter chain issue.
-- Booking PIN flow: backend endpoints created (`POST /bookings/{id}/verify-pin`), frontend wired
-- Profile completion page (`/profile/complete`) created in frontend
-- Provider blocked dates UI added to Settings page
-- web_provider app is now DEPRECATED — all its routes are in web_public
+### Known Issues (2026-08-29 - verified)
+- `POST /public/bookings` 401 FIXED — `SecurityConfig.java:37` `BearerTokenResolver` now returns null for `/public/**` & `/auth/**` even if invalid Authorization header present; guest booking creates PENDING_VERIFICATION user via customerEmail (verified 2026-08-28 `100_percent_completion`)
+- Booking PIN flow: backend endpoints created (`POST /bookings/{id}/verify-pin`), frontend wired (web + mobile), auto-generated 6-digit `confirmation_pin`
+- Profile completion page (`/profile/complete`) created in frontend (guard `hasProfile`)
+- Provider blocked dates UI added to Settings page (`GET/POST/DELETE /provider/blocked-dates` + public `GET /public/providers/{id}/blocked-dates`)
+- web_provider app is now DEPRECATED — all its routes are in web_public unified app (role-based routing via `useAuth()`)
+- Docker daemon must be running for `compose.local.yaml` — `postgis/postgis:17-3.4` + `apache/kafka:4.3.1` KRaft + `redis:8.2-alpine`
+- **Search page FIXED 2026-08-29** — `search_page.dart:46` no `requestFocus` (no auto keyboard), `searchResultsProvider:8` `getProviders()` on empty → all providers, `search_page.dart:54` no back button (hanya TextField), list `search_page.dart:51` attractive card `DEKATColors.primary` 64×64 `storefront_rounded`, chip category, rating `star_rounded` + price `Mulai Rp` + chevron, verified via `flutter build apk` → Mi A1 `192.168.100.70`
+- **Availability FIXED 2026-08-29** — `availability_page.dart:11` `String key` `'$providerId|$date'` fix infinite loop (Map identity bug → 70ms loop), layout `availability_page.dart:39` card calendar `radius 20` shadow, service dropdown card, `Available Times` grouped Morning/Afternoon/Evening `Wrap` chip `AnimatedContainer` primary selected, shimmer loading, `usesCleartextTraffic` di `AndroidManifest.xml:4` untuk `http://192.168.100.55:8080` di Android 9
+- **Backend tests FIXED 2026-08-29** — `BookingAssignmentTest` 4-param + `ACCEPTED/DECLINED`, `BookingItemTest` `int price/Instant`, `BookingController` NPE `currentUserId` null, `BookingServiceTest` missing `CustomerService` mock → 82 tests pass, 368 total green
 
 ## Deployment
 
