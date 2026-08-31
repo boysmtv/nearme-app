@@ -270,25 +270,14 @@ pnpm install && pnpm dev
 - Profile completion route: `/profile/complete` (required before booking)
 
 ### Testing
-- **Total: 358 tests** across 6 platforms, all passing
-- Backend: 72 tests (BookingService, Booking domain, JwtTokenProvider) — JUnit 5 + Mockito
-- web_public: 80 tests (8 files) — Vitest + @testing-library/react
+- **Total: 489 tests** across 6 platforms, all passing (164 backend + 101 web_public + 58 web_provider + 49 web_admin + 86 mobile + 19 e2e + 12 weird)
+- Backend: 164 tests (BookingService 18+16 weird, Booking 17+26 weird, Coupon 19, Payment 21, Jwt 19) — JUnit 5 + Mockito
+- web_public: 101 tests (9 files, +21 weird.test.ts) — Vitest + @testing-library/react
 - web_provider: 58 tests (5 files) — Vitest + @testing-library/react
 - web_admin: 49 tests (5 files) — Vitest + @testing-library/react
-- mobile_customer: 56 tests (models, utils, router) — flutter_test
+- mobile_customer: 86 tests (weird_test 30 + rows 27 + utils) — flutter_test (dart analyze pass, device Mi A1)
 - mobile_partner: 31 tests (models, utils) — flutter_test
-- E2E Playwright: 12 tests (web-public runtime proof)
-- Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
-
-### Testing
-- **Total: 358 tests** across 6 platforms, all passing
-- Backend: 72 tests (BookingService, Booking domain, JwtTokenProvider) — JUnit 5 + Mockito
-- web_public: 80 tests (8 files) — Vitest + @testing-library/react
-- web_provider: 58 tests (5 files) — Vitest + @testing-library/react
-- web_admin: 49 tests (5 files) — Vitest + @testing-library/react
-- mobile_customer: 56 tests (models, utils, router) — flutter_test
-- mobile_partner: 31 tests (models, utils) — flutter_test
-- E2E Playwright: 12 tests (web-public runtime proof)
+- E2E Playwright: 19 tests (12 web-public + 7 booking-weird) — `booking-weird.spec.ts` XSS/race/PIN/coupon
 - Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
 
 ### Backend Runtime (verified 2026-08-27)
@@ -321,7 +310,10 @@ pnpm install && pnpm dev
 - Docker daemon must be running for `compose.local.yaml` — `postgis/postgis:17-3.4` + `apache/kafka:4.3.1` KRaft + `redis:8.2-alpine`
 - **Search page FIXED 2026-08-29** — `search_page.dart:46` no `requestFocus` (no auto keyboard), `searchResultsProvider:8` `getProviders()` on empty → all providers, `search_page.dart:54` no back button (hanya TextField), list `search_page.dart:51` attractive card `DEKATColors.primary` 64×64 `storefront_rounded`, chip category, rating `star_rounded` + price `Mulai Rp` + chevron, verified via `flutter build apk` → Mi A1 `192.168.100.70`
 - **Availability FIXED 2026-08-29** — `availability_page.dart:11` `String key` `'$providerId|$date'` fix infinite loop (Map identity bug → 70ms loop), layout `availability_page.dart:39` card calendar `radius 20` shadow, service dropdown card, `Available Times` grouped Morning/Afternoon/Evening `Wrap` chip `AnimatedContainer` primary selected, shimmer loading, `usesCleartextTraffic` di `AndroidManifest.xml:4` untuk `http://192.168.100.55:8080` di Android 9
-- **Backend tests FIXED 2026-08-29** — `BookingAssignmentTest` 4-param + `ACCEPTED/DECLINED`, `BookingItemTest` `int price/Instant`, `BookingController` NPE `currentUserId` null, `BookingServiceTest` missing `CustomerService` mock → 82 tests pass, 368 total green
+ - **Backend tests FIXED 2026-08-29** — `BookingAssignmentTest` 4-param + `ACCEPTED/DECLINED`, `BookingItemTest` `int price/Instant`, `BookingController` NPE `currentUserId` null, `BookingServiceTest` missing `CustomerService` mock → 82 tests pass, 368 total green
+ - **Comprehensive weird tests 2026-08-31** — `docs/TEST_CASES_COMPREHENSIVE.md` 330 scenario P/N/E/A, `BookingWeirdCasesTest 26` + `BookingServiceWeirdTest 16` + `CouponServiceWeirdTest 19` + `PaymentServiceWeirdTest 21` + `web_public weird 21` + `flutter weird 30` + `e2e booking-weird 7`, backend 164 total, `playwright.config.ts` 3000→4100, `app_config.dart` default 192.168.100.55
+ - **Availability popup 2026-08-31** — `availability_page.dart:82` inline month 320px → popup button `Tanggal Sen, 31 Aug 2026` + `showModalBottomSheet` month full, service picker `PILIH LAYANAN` card gradient + bottom sheet, separator `Atur Jadwal` divider, week→popup via hot-restart
+ - **Provider detail & booking form 2026-08-31** — `provider_detail_page.dart:78` gradient header + white card overlay + Layanan `Pilih →` card, `booking_form_page.dart:16` Map key infinite loop fix `String key providerId|serviceId`, design `Ringkasan Booking` + `_InfoChip` + `_PaymentCard`, `auth_interceptor.dart:54` refresh parse `data['data']['accessToken']`, `app_router.dart:9` `GoRouterRefresh` + `redirect?redirect=` flow pilih jam→login→konfirmasi, `discovery_page.dart:110` `value.clamp(0,1)` fix red opacity, `availability_page.dart:42` date persist `SecureStorage selected_date` + focused sync
 
 ## Deployment
 

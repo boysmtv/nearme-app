@@ -112,8 +112,8 @@ class DiscoveryPage extends ConsumerWidget {
                           duration: Duration(milliseconds: 320 + index * 55),
                           curve: Curves.easeOutBack,
                           builder: (context, value, child) => Opacity(
-                            opacity: value,
-                            child: Transform.scale(scale: 0.92 + 0.08 * value, child: child),
+                            opacity: value.clamp(0.0, 1.0),
+                            child: Transform.scale(scale: 0.92 + 0.08 * value.clamp(0.0, 1.0), child: child),
                           ),
                           child: _CategoryItem(icon: _iconForCategory(cat.name), label: cat.name, onTap: () => context.push('/search?category=${cat.name}')),
                         );

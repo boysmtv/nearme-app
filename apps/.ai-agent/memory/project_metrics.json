@@ -1,8 +1,8 @@
 {
   "schema_version": 2,
   "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps",
-  "updated_at": "2026-08-29T17:35:00.000000+00:00",
-  "memory_completeness_score": 0.97,
+  "updated_at": "2026-08-31T15:30:00.000000+00:00",
+  "memory_completeness_score": 0.99,
   "graph_coverage_score": 1.0,
   "symbol_extraction_confidence": 1.0,
   "api_contract_coverage": 1.0,
@@ -13,25 +13,45 @@
   "security_readiness_score": 0.85,
   "hotspot_risk": "low",
   "blast_radius_risk": "low",
-  "release_readiness_score": 0.98,
+  "release_readiness_score": 0.99,
   "release_readiness": "ready",
   "test_summary": {
-    "total_tests": 368,
-    "backend": 82,
-    "web_public": 80,
+    "total_tests": 489,
+    "backend": 164,
+    "web_public": 101,
     "web_provider": 58,
     "web_admin": 49,
-    "mobile_customer": 56,
+    "mobile_customer": 86,
     "mobile_partner": 31,
-    "e2e_playwright": 12,
+    "e2e_playwright": 19,
     "all_passing": true
   },
   "platform_summary": {
-    "mobile_customer": {"features": 8, "pages": 16, "widgets": 5},
-    "mobile_partner": {"features": 5, "pages": 7, "widgets": 1},
-    "web_public": {"features": 3, "pages": 6, "components": 6},
-    "web_provider": {"features": 7, "pages": 8, "components": 3},
-    "web_admin": {"features": 6, "pages": 8, "components": 4}
+    "mobile_customer": {
+      "features": 8,
+      "pages": 16,
+      "widgets": 5
+    },
+    "mobile_partner": {
+      "features": 5,
+      "pages": 7,
+      "widgets": 1
+    },
+    "web_public": {
+      "features": 3,
+      "pages": 6,
+      "components": 6
+    },
+    "web_provider": {
+      "features": 7,
+      "pages": 8,
+      "components": 3
+    },
+    "web_admin": {
+      "features": 6,
+      "pages": 8,
+      "components": 4
+    }
   },
   "backend_summary": {
     "controllers": 14,

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
@@ -24,6 +25,13 @@ import '../../features/account/presentation/pages/account_page.dart';
 import '../../features/account/presentation/pages/profile_edit_page.dart';
 import '../../features/account/presentation/pages/profile_complete_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
+
+class GoRouterRefresh extends ChangeNotifier {
+  GoRouterRefresh(this.ref) {
+    ref.listen(authProvider, (_, __) => notifyListeners());
+  }
+  final Ref ref;
+}
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier();
@@ -279,7 +287,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
+  final refresh = GoRouterRefresh(ref);
   return GoRouter(
+    refreshListenable: refresh,
     initialLocation: '/discovery',
     debugLogDiagnostics: true,
     routes: [
@@ -438,11 +448,20 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // Guest allowed for public + auth routes; protect others (bookings, account, booking flow, payment)
       if (!auth.isLoggedIn && !isAuthRoute && !isPublicRoute && !isCompleteRoute) {
-        return '/login';
+        final from = state.uri.toString();
+        return '/login?redirect=${Uri.encodeComponent(from)}';
       }
 
       if (auth.isLoggedIn && isAuthRoute) {
         if (!auth.hasProfile && auth.profileChecked) return '/profile/complete';
+        final redirect = state.uri.queryParameters['redirect'];
+        if (redirect != null && redirect.isNotEmpty) {
+          try {
+            return Uri.decodeComponent(redirect);
+          } catch (_) {
+            return redirect;
+          }
+        }
         return '/discovery';
       }
 
@@ -451,6 +470,14 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       if (auth.isLoggedIn && auth.hasProfile && isCompleteRoute) {
+        final redirect = state.uri.queryParameters['redirect'];
+        if (redirect != null && redirect.isNotEmpty) {
+          try {
+            return Uri.decodeComponent(redirect);
+          } catch (_) {
+            return redirect;
+          }
+        }
         return '/discovery';
       }
 

@@ -51,8 +51,10 @@ class AuthInterceptor extends Interceptor {
             '${err.requestOptions.baseUrl}/auth/refresh',
             queryParameters: {'refreshToken': refreshToken},
           );
-          final newAccessToken = refreshResponse.data['accessToken'] as String?;
-          final newRefreshToken = refreshResponse.data['refreshToken'] as String?;
+          final respData = refreshResponse.data;
+          final dataMap = respData is Map<String, dynamic> ? (respData['data'] as Map<String, dynamic>?) ?? respData : null;
+          final newAccessToken = (dataMap?['accessToken'] ?? respData['accessToken']) as String?;
+          final newRefreshToken = (dataMap?['refreshToken'] ?? respData['refreshToken']) as String?;
 
           if (newAccessToken != null) {
             await SecureStorageService.write(StorageKeys.accessToken, newAccessToken);

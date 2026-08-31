@@ -259,6 +259,85 @@
         "availability_slots": 8
       },
       "recorded_at": "2026-08-29T17:30:00.000000+00:00"
+    },
+    {
+      "run_id": "comprehensive_weird_tests::2026-08-31",
+      "final_status": "completed",
+      "summary": "330 scenario P/N/E/A: BookingWeirdCasesTest 26, BookingServiceWeirdTest 16, CouponServiceWeirdTest 19, PaymentServiceWeirdTest 21, web_public weird 21, flutter weird 30, e2e booking-weird 7. Backend 164 total, playwright 3000->4100, app_config default 192.168.100.55",
+      "changed_artifacts": [
+        "docs/TEST_CASES_COMPREHENSIVE.md",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingWeirdCasesTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingServiceWeirdTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/promotion/application/CouponServiceWeirdTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/payment/application/PaymentServiceWeirdTest.java",
+        "apps/web_public/src/lib/__tests__/weird.test.ts",
+        "apps/mobile_customer/test/models/weird_test.dart",
+        "e2e/booking-weird.spec.ts",
+        "playwright.config.ts",
+        "packages/flutter_core/lib/src/config/app_config.dart"
+      ],
+      "features": [
+        "weird-tests",
+        "coupon",
+        "payment",
+        "e2e-race",
+        "pin-leading-zero",
+        "xss"
+      ],
+      "metrics": {
+        "total_tests": 489,
+        "backend": 164,
+        "web": 208,
+        "flutter": 117,
+        "e2e": 19,
+        "all_passing": true
+      },
+      "recorded_at": "2026-08-31T01:30:00.000000+00:00"
+    },
+    {
+      "run_id": "availability_popup_and_service_picker::2026-08-31",
+      "final_status": "completed",
+      "summary": "Availability popup full month bottom sheet (Tanggal Sen,31 Aug) + PILIH LAYANAN gradient card + bottom sheet + separator Atur Jadwal divider, week->popup via hot-restart, SecureStorage selected_date persist + focused sync",
+      "changed_artifacts": [
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+        "packages/flutter_core/lib/src/config/app_config.dart"
+      ],
+      "features": [
+        "availability-popup",
+        "service-picker",
+        "separator",
+        "date-persist"
+      ],
+      "metrics": {
+        "tests_passing": 489
+      },
+      "recorded_at": "2026-08-31T12:00:00.000000+00:00"
+    },
+    {
+      "run_id": "provider_detail_and_booking_form::2026-08-31",
+      "final_status": "completed",
+      "summary": "Provider detail gradient header+white card overlay+ Layanan Pilih card, booking_form Map key infinite loop fix String key providerId|serviceId, design Ringkasan Booking+_InfoChip+_PaymentCard, auth_interceptor refresh parse data['data']['accessToken'], app_router GoRouterRefresh + redirect?redirect=, discovery clamp fix, booking form instant providerName",
+      "changed_artifacts": [
+        "apps/mobile_customer/lib/features/provider_profile/presentation/pages/provider_detail_page.dart",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_form_page.dart",
+        "packages/flutter_api_client/lib/src/interceptors/auth_interceptor.dart",
+        "apps/mobile_customer/lib/core/router/app_router.dart",
+        "apps/mobile_customer/lib/features/discovery/presentation/pages/discovery_page.dart",
+        "AGENTS.md"
+      ],
+      "features": [
+        "provider-detail",
+        "booking-form",
+        "auth-refresh",
+        "login-redirect",
+        "discovery-opacity",
+        "booking-summary-fix"
+      ],
+      "metrics": {
+        "total_tests": 489,
+        "all_passing": true
+      },
+      "recorded_at": "2026-08-31T15:30:00.000000+00:00"
     }
   ]
 }
