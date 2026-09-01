@@ -87,11 +87,67 @@ class ApiService {
   }
 
   Future<Response> rescheduleBooking(String id, Map<String, dynamic> data) {
-    return _dio.put('${Endpoints.bookings}/$id/reschedule', data: data);
+    // BookingController uses POST /bookings/{id}/reschedule with expectedVersion
+    return _dio.post('${Endpoints.bookings}/$id/reschedule', data: data);
   }
 
   Future<Response> cancelBooking(String id, {String? reason}) {
     return _dio.post('${Endpoints.bookings}/$id/cancel', data: {'reason': reason});
+  }
+
+  Future<Response> getBookingIcs(String id) {
+    return _dio.get('${Endpoints.bookings}/$id/ics', options: Options(responseType: ResponseType.plain));
+  }
+
+  Future<Response> getBookingCalendarLink(String id) {
+    return _dio.get('${Endpoints.bookings}/$id/calendar-link');
+  }
+
+  // Bundle B - FAQ & Policies
+  Future<Response> getPublicFaqs({String? tenantId, String? category}) {
+    return _dio.get(Endpoints.publicFaqs, queryParameters: {
+      if (tenantId != null) 'tenantId': tenantId,
+      if (category != null) 'category': category,
+    });
+  }
+
+  Future<Response> getPublicPolicies({String? tenantId, String? type}) {
+    return _dio.get(Endpoints.publicPolicies, queryParameters: {
+      if (tenantId != null) 'tenantId': tenantId,
+      if (type != null) 'type': type,
+    });
+  }
+
+  Future<Response> getProviderFaqs() {
+    return _dio.get(Endpoints.providerFaqs);
+  }
+
+  Future<Response> createProviderFaq(Map<String, dynamic> data) {
+    return _dio.post(Endpoints.providerFaqs, data: data);
+  }
+
+  Future<Response> updateProviderFaq(String id, Map<String, dynamic> data) {
+    return _dio.put('${Endpoints.providerFaqs}/$id', data: data);
+  }
+
+  Future<Response> deleteProviderFaq(String id) {
+    return _dio.delete('${Endpoints.providerFaqs}/$id');
+  }
+
+  Future<Response> getProviderPolicies() {
+    return _dio.get(Endpoints.providerPolicies);
+  }
+
+  Future<Response> createProviderPolicy(Map<String, dynamic> data) {
+    return _dio.post(Endpoints.providerPolicies, data: data);
+  }
+
+  Future<Response> updateProviderPolicy(String id, Map<String, dynamic> data) {
+    return _dio.put('${Endpoints.providerPolicies}/$id', data: data);
+  }
+
+  Future<Response> deleteProviderPolicy(String id) {
+    return _dio.delete('${Endpoints.providerPolicies}/$id');
   }
 
   Future<Response> createPaymentIntent(String bookingId, String method) {
@@ -189,5 +245,84 @@ class ApiService {
 
   Future<Response> updateSettings(Map<String, dynamic> data) {
     return _dio.put(Endpoints.providerSettings, data: data);
+  }
+
+  Future<Response> getProviderMedia(String providerId) {
+    return _dio.get('${Endpoints.publicProviderMedia}/$providerId/media');
+  }
+
+  Future<Response> getStaffPortfolio(String staffId) {
+    return _dio.get('${Endpoints.publicStaffMedia}/$staffId/media');
+  }
+
+  Future<Response> getProviderGallery() {
+    return _dio.get(Endpoints.providerMedia);
+  }
+
+  Future<Response> uploadMedia(String filePath, String ownerType, String ownerId, {int sortOrder = 0}) async {
+    final form = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+      'ownerType': ownerType,
+      'ownerId': ownerId,
+      'sortOrder': sortOrder,
+    });
+    return _dio.post(Endpoints.mediaUpload, data: form);
+  }
+
+  Future<Response> deleteMedia(String mediaId) {
+    return _dio.delete('${Endpoints.providerMedia}/$mediaId');
+  }
+
+  Future<Response> reorderMedia(List<String> orderedIds) {
+    return _dio.put('${Endpoints.providerMedia}/reorder', data: {'orderedIds': orderedIds});
+  }
+
+  Future<Response> getFavorites() {
+    return _dio.get(Endpoints.customerFavorites);
+  }
+
+  Future<Response> addFavorite(String staffId) {
+    return _dio.post('${Endpoints.customerFavorites}/$staffId');
+  }
+
+  Future<Response> removeFavorite(String staffId) {
+    return _dio.delete('${Endpoints.customerFavorites}/$staffId');
+  }
+
+  Future<Response> getReviewPhotos(String reviewId) {
+    return _dio.get('/reviews/$reviewId/photos');
+  }
+
+  // Bundle C - Chat
+  Future<Response> getChats() {
+    return _dio.get(Endpoints.chats);
+  }
+
+  Future<Response> getChat(String id) {
+    return _dio.get('${Endpoints.chats}/$id');
+  }
+
+  Future<Response> createChat(Map<String, dynamic> data) {
+    return _dio.post(Endpoints.chats, data: data);
+  }
+
+  Future<Response> getChatMessages(String id, {int page = 1, int limit = 50}) {
+    return _dio.get('${Endpoints.chats}/$id/messages', queryParameters: {'page': page, 'limit': limit});
+  }
+
+  Future<Response> sendChatMessage(String id, Map<String, dynamic> data) {
+    return _dio.post('${Endpoints.chats}/$id/messages', data: data);
+  }
+
+  Future<Response> getBookingChat(String bookingId) {
+    return _dio.get('${Endpoints.bookings}/$bookingId/chat');
+  }
+
+  Future<Response> getAnalytics({Map<String, dynamic>? params}) {
+    return _dio.get(Endpoints.providerAnalytics, queryParameters: params);
+  }
+
+  Future<Response> exportAnalytics({Map<String, dynamic>? params}) {
+    return _dio.get(Endpoints.providerReportsExport, queryParameters: params);
   }
 }

@@ -77,10 +77,14 @@ export interface Staff {
   providerId: string;
   name: string;
   avatarUrl: string;
+  avatar?: string;
+  title?: string;
   bio: string;
   specialties: string[];
   rating: number;
   reviewCount: number;
+  portfolio?: { id: string; url: string; fileName: string; sortOrder: number }[];
+  portfolioCount?: number;
 }
 
 export interface TimeSlot {
@@ -100,6 +104,8 @@ export interface Review {
   body?: string;
   serviceName: string;
   createdAt: string;
+  verifiedBooking?: boolean;
+  photos?: { id: string; url: string; fileName?: string }[];
 }
 
 export interface CreateReviewRequest {
@@ -138,9 +144,38 @@ export interface BookingResponse {
   status: string;
   totalAmount?: number;
   depositAmount?: number;
+  depositRequired?: boolean;
+  cancelDeadline?: string;
+  rescheduleCount?: number;
+  maxReschedule?: number;
+  cancelPolicy?: string;
   createdAt?: string;
+  startsAt?: string;
+  endsAt?: string;
   confirmationPin?: string;
   pinVerified?: boolean;
+}
+
+export interface Faq {
+  id: string;
+  tenantId?: string | null;
+  question: string;
+  answer: string;
+  category?: string;
+  sortOrder: number;
+  isActive?: boolean;
+  createdAt?: string;
+}
+
+export interface Policy {
+  id: string;
+  tenantId?: string | null;
+  title: string;
+  body: string;
+  type: string;
+  version?: number;
+  isActive?: boolean;
+  createdAt?: string;
 }
 
 export interface SearchFilters {
@@ -267,4 +302,42 @@ export interface NotificationSettings {
   emailBookingReminder: boolean;
   smsBookingReminder: boolean;
   reminderHoursBefore: number;
+}
+
+export interface Conversation {
+  id: string;
+  bookingId?: string | null;
+  tenantId: string;
+  customerId: string;
+  providerId: string;
+  subject?: string | null;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  lastMessage?: { body: string; createdAt: string; senderRole: string } | null;
+  messageCount?: number;
+}
+
+export interface ChatMessage {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  senderRole: string;
+  body: string;
+  messageType: string;
+  attachmentUrl?: string | null;
+  createdAt: string;
+}
+
+export interface AnalyticsData {
+  revenueByDay: { date: string; revenue: number; count: number }[];
+  bookingsByStatus: Record<string, number>;
+  retention: { totalCustomers: number; returningCustomers: number; newCustomers: number; retentionRate: number; retentionPercent: number };
+  funnel: Record<string, number>;
+  topServices: { serviceId: string; serviceName: string; bookingCount: number; revenue: number }[];
+  staffUtilization: { staffId: string; staffName: string; bookingCount: number }[];
+  currency: string;
+  startDate: string;
+  endDate: string;
+  granularity: string;
 }

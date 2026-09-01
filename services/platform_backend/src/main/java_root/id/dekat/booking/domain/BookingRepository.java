@@ -37,6 +37,13 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
 
     List<Booking> findByCustomerIdAndStartsAtBetween(UUID customerId, OffsetDateTime startsAt, OffsetDateTime endsAt);
 
+    List<Booking> findByStartsAtBetween(OffsetDateTime start, OffsetDateTime end);
+
+    List<Booking> findByStartsAtBetweenAndStatus(OffsetDateTime start, OffsetDateTime end, BookingStatus status);
+
+    @Query("SELECT b FROM Booking b WHERE b.startsAt BETWEEN :from AND :to AND b.status = :status")
+    List<Booking> findUpcoming(@Param("from") OffsetDateTime from, @Param("to") OffsetDateTime to, @Param("status") BookingStatus status);
+
     @Query("""
         SELECT b FROM Booking b
         WHERE b.tenantId = :tenantId

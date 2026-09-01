@@ -21,6 +21,8 @@ import type {
   ReportData,
   Settings,
   CustomerProfile,
+  Faq,
+  Policy,
 } from './types';
 
 export const publicApi = {
@@ -95,10 +97,14 @@ export const publicApi = {
         `/public/providers/${providerId}/reviews?${params.toString()}`,
       );
     },
-    create: (bookingId: string, data: { rating: number; title?: string; body: string }) =>
+    create: (bookingId: string, data: { rating: number; title?: string; body: string; photoIds?: string[] }) =>
       apiClient.post<ApiResponse<Review>>(`/bookings/${bookingId}/review`, data),
     report: (reviewId: string) =>
       apiClient.post<ApiResponse<Review>>(`/reviews/${reviewId}/report`, {}),
+    getPhotos: (reviewId: string) =>
+      apiClient.get<ApiResponse<{ id: string; url: string }[]>>(`/reviews/${reviewId}/photos`),
+    addPhoto: (reviewId: string, mediaId: string) =>
+      apiClient.post<ApiResponse<unknown>>(`/reviews/${reviewId}/photos/${mediaId}`, {}),
   },
 
   blockedDates: {
@@ -106,10 +112,25 @@ export const publicApi = {
       apiClient.get<ApiResponse<{ date: string; reason?: string }[]>>(`/public/providers/${providerId}/blocked-dates`),
   },
 
+  media: {
+    publicProviderGallery: (providerId: string) =>
+      apiClient.get<ApiResponse<{ id: string; url: string; fileName: string; sortOrder: number }[]>>(`/public/providers/${providerId}/media`),
+    publicStaffPortfolio: (staffId: string) =>
+      apiClient.get<ApiResponse<{ id: string; url: string; fileName: string }[]>>(`/public/staff/${staffId}/media`),
+    publicReviewPhotos: (reviewId: string) =>
+      apiClient.get<ApiResponse<{ id: string; url: string }[]>>(`/public/reviews/${reviewId}/media`),
+  },
+
   customer: {
     getProfile: () => apiClient.get<ApiResponse<CustomerProfile>>('/customer/profile'),
     updateProfile: (data: { nickname?: string; name?: string; email?: string; phone?: string }) =>
       apiClient.put<ApiResponse<CustomerProfile>>('/customer/profile', data),
+  },
+
+  favorites: {
+    list: () => apiClient.get<ApiResponse<{ id: string; staffId: string; staffName?: string; title?: string; avatarUrl?: string }[]>>('/customer/favorites'),
+    add: (staffId: string) => apiClient.post<ApiResponse<unknown>>(`/customer/favorites/${staffId}`, {}),
+    remove: (staffId: string) => apiClient.delete<ApiResponse<void>>(`/customer/favorites/${staffId}`),
   },
 
   bookings: {
@@ -119,6 +140,17 @@ export const publicApi = {
       apiClient.post<ApiResponse<{ pinVerified: boolean; status: string }>>(`/bookings/${bookingId}/verify-pin`, { pin }),
     getById: (id: string) =>
       apiClient.get<ApiResponse<BookingResponse>>(`/bookings/${id}`),
+    reschedule: (id: string, data: { newStartsAt: string; newEndsAt: string; expectedVersion: number }) =>
+      apiClient.post<ApiResponse<BookingResponse>>(`/bookings/${id}/reschedule`, data),
+    cancel: (id: string, reason?: string) => {
+      const actor = localStorage.getItem('auth_user') ? (JSON.parse(localStorage.getItem('auth_user') as string).id as string) : '';
+      const qs = reason ? `?reason=${encodeURIComponent(reason)}` : '';
+      const headers = actor ? { 'X-Actor-Id': actor } : undefined;
+      return apiClient.post<ApiResponse<BookingResponse>>(`/bookings/${id}/cancel${qs}`, null, headers);
+    },
+    ics: (id: string) => apiClient.get<string>(`/bookings/${id}/ics`),
+    calendarLink: (id: string) =>
+      apiClient.get<ApiResponse<{ googleCalendarUrl: string; icsUrl: string; icsContent: string }>>(`/bookings/${id}/calendar-link`),
 
     hold: (providerId: string, slotId: string, serviceId: string) =>
       apiClient.post<ApiResponse<{ holdId: string; expiresAt: string }>>(
@@ -126,6 +158,78 @@ export const publicApi = {
         { serviceId },
       ),
   },
+
+  faqs: {
+    listPublic: (tenantId?: string, category?: string) => {
+      const params = new URLSearchParams();
+      if (tenantId) params.set('tenantId', tenantId);
+      if (category) params.set('category', category);
+      const qs = params.toString() ? `?${params.toString()}` : '';
+      return apiClient.get<ApiResponse<Faq[]>>(`/public/faqs${qs}`);
+    },
+    listProvider: () => apiClient.get<ApiResponse<Faq[]>>('/provider/faqs'),
+    createProvider: (data: { question: string; answer: string; category?: string; sortOrder?: number }) =>
+      apiClient.post<ApiResponse<Faq>>('/provider/faqs', data),
+    updateProvider: (id: string, data: Partial<Faq>) =>
+      apiClient.put<ApiResponse<Faq>>(`/provider/faqs/${id}`, data),
+    deleteProvider: (id: string) => apiClient.delete(`/provider/faqs/${id}`),
+    listAdmin: (tenantId?: string) => {
+      const qs = tenantId ? `?tenantId=${tenantId}` : '';
+      return apiClient.get<ApiResponse<Faq[]>>(`/admin/faqs${qs}`);
+    },
+    createAdmin: (data: { tenantId?: string | null; question: string; answer: string; category?: string; sortOrder?: number }) =>
+      apiClient.post<ApiResponse<Faq>>('/admin/faqs', data),
+    updateAdmin: (id: string, data: Partial<Faq>) =>
+      apiClient.put<ApiResponse<Faq>>(`/admin/faqs/${id}`, data),
+    deleteAdmin: (id: string) => apiClient.delete(`/admin/faqs/${id}`),
+  },
+
+  policies: {
+    listPublic: (tenantId?: string, type?: string) => {
+      const params = new URLSearchParams();
+      if (tenantId) params.set('tenantId', tenantId);
+      if (type) params.set('type', type);
+      const qs = params.toString() ? `?${params.toString()}` : '';
+      return apiClient.get<ApiResponse<Policy[]>>(`/public/policies${qs}`);
+    },
+    listProvider: () => apiClient.get<ApiResponse<Policy[]>>('/provider/policies'),
+    createProvider: (data: { title: string; body: string; type: string; version?: number }) =>
+      apiClient.post<ApiResponse<Policy>>('/provider/policies', data),
+    updateProvider: (id: string, data: Partial<Policy>) =>
+      apiClient.put<ApiResponse<Policy>>(`/provider/policies/${id}`, data),
+    deleteProvider: (id: string) => apiClient.delete(`/provider/policies/${id}`),
+    listAdmin: (tenantId?: string) => {
+      const qs = tenantId ? `?tenantId=${tenantId}` : '';
+      return apiClient.get<ApiResponse<Policy[]>>(`/admin/policies${qs}`);
+    },
+    createAdmin: (data: { tenantId?: string | null; title: string; body: string; type: string; version?: number }) =>
+      apiClient.post<ApiResponse<Policy>>('/admin/policies', data),
+    updateAdmin: (id: string, data: Partial<Policy>) =>
+      apiClient.put<ApiResponse<Policy>>(`/admin/policies/${id}`, data),
+    deleteAdmin: (id: string) => apiClient.delete(`/admin/policies/${id}`),
+  },
+};
+
+export const mediaApi = {
+  upload: (file: File, ownerType: 'provider' | 'staff' | 'review', ownerId?: string, sortOrder?: number) => {
+    const fd = new FormData();
+    fd.append('file', file);
+    fd.append('ownerType', ownerType);
+    if (ownerId) fd.append('ownerId', ownerId);
+    if (sortOrder !== undefined) fd.append('sortOrder', String(sortOrder));
+    return apiClient.post<ApiResponse<{ id: string; url: string; fileName: string; sortOrder: number }>>('/media/upload', fd);
+  },
+  list: (params?: { ownerType?: string; ownerId?: string }) => {
+    const q = new URLSearchParams();
+    if (params?.ownerType) q.set('ownerType', params.ownerType);
+    if (params?.ownerId) q.set('ownerId', params.ownerId);
+    const suffix = q.toString() ? `?${q.toString()}` : '';
+    return apiClient.get<ApiResponse<{ id: string; url: string; fileName: string; sortOrder: number; ownerType: string; ownerId: string }[]>>(`/provider/media${suffix}`);
+  },
+  delete: (id: string) => apiClient.delete<ApiResponse<void>>(`/provider/media/${id}`),
+  reorder: (orderedIds: string[]) => apiClient.put<ApiResponse<void>>('/provider/media/reorder', { orderedIds }),
+  getProviderGallery: (providerId: string) =>
+    apiClient.get<ApiResponse<{ id: string; url: string }[]>>(`/public/providers/${providerId}/media`),
 };
 
 export const providerApi = {
@@ -244,5 +348,34 @@ export const providerApi = {
   bookingsProvider: {
     verifyPin: (bookingId: string, pin: string) =>
       apiClient.post<ApiResponse<{ pinVerified: boolean }>>(`/bookings/${bookingId}/verify-pin`, { pin }),
+  },
+};
+
+export const chatApi = {
+  list: () => apiClient.get<ApiResponse<import('./types').Conversation[]>>('/chats'),
+  get: (id: string) => apiClient.get<ApiResponse<import('./types').Conversation>>(`/chats/${id}`),
+  create: (data: { bookingId?: string; tenantId?: string; providerId?: string; subject?: string }) =>
+    apiClient.post<ApiResponse<import('./types').Conversation>>('/chats', data),
+  getMessages: (id: string, page = 1, limit = 50) =>
+    apiClient.get<ApiResponse<import('./types').ChatMessage[]>>(`/chats/${id}/messages?page=${page}&limit=${limit}`),
+  sendMessage: (id: string, data: { body: string; messageType?: string; attachmentUrl?: string }) =>
+    apiClient.post<ApiResponse<import('./types').ChatMessage>>(`/chats/${id}/messages`, data),
+  getBookingChat: (bookingId: string) =>
+    apiClient.get<ApiResponse<import('./types').Conversation & { messages: import('./types').ChatMessage[] }>>(`/bookings/${bookingId}/chat`),
+  streamUrl: (id: string) => {
+    const base = (apiClient as unknown as { baseUrl?: string })['baseUrl'] || '';
+    // SSE endpoint needs Authorization header, but we also support query token for WS
+    return `${base}/chats/${id}/events`;
+  },
+};
+
+export const analyticsApi = {
+  getAnalytics: (params: { startDate: string; endDate: string; granularity?: string }) => {
+    const q = new URLSearchParams(params as Record<string, string>).toString();
+    return apiClient.get<ApiResponse<import('./types').AnalyticsData>>(`/provider/reports/analytics?${q}`);
+  },
+  exportCsv: (params: { startDate: string; endDate: string }) => {
+    const q = new URLSearchParams(params as Record<string, string>).toString();
+    return apiClient.get<string>(`/provider/reports/export?${q}&format=csv`);
   },
 };

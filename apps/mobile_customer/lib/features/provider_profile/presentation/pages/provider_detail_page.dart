@@ -63,6 +63,22 @@ final providerServicesProvider =
       .toList();
 });
 
+final providerGalleryProvider =
+    FutureProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, providerId) async {
+  final response = await ApiService().getProviderMedia(providerId);
+  final data = response.data['data'] as List?;
+  if (data == null) return [];
+  return data.cast<Map<String, dynamic>>();
+});
+
+final providerStaffWithPortfolioProvider =
+    FutureProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, providerId) async {
+  final response = await ApiService().getProviderStaff(providerId);
+  final data = response.data['data'] as List?;
+  if (data == null) return [];
+  return data.cast<Map<String, dynamic>>();
+});
+
 class ProviderDetailPage extends ConsumerWidget {
   final String providerSlug;
   const ProviderDetailPage({super.key, required this.providerSlug});
@@ -182,6 +198,146 @@ class ProviderDetailPage extends ConsumerWidget {
                         ]),
                       ),
                     ]),
+                    const SizedBox(height: 16),
+                    // Gallery carousel 3 cols grid
+                    Consumer(builder: (context, ref2, _) {
+                      final galleryAsync = ref.watch(providerGalleryProvider(provider.id));
+                      return galleryAsync.when(
+                        data: (gallery) {
+                          if (gallery.isEmpty) {
+                            return Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey[200]!)),
+                              child: Row(children: [
+                                Icon(Icons.photo_library_outlined, color: Colors.grey[400]),
+                                const SizedBox(width: 8),
+                                Text('Belum ada foto galeri', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                                const Spacer(),
+                                Text('GET /public/providers/${provider.id}/media', style: TextStyle(color: Colors.grey[400], fontSize: 10)),
+                              ]),
+                            );
+                          }
+                          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Row(children: [
+                              Container(width: 4, height: 18, decoration: BoxDecoration(color: DEKATColors.primary, borderRadius: BorderRadius.circular(4))),
+                              const SizedBox(width: 8),
+                              const Text('Galeri', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                              const Spacer(),
+                              Text('${gallery.length} foto', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                            ]),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              height: 120,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: gallery.length,
+                                separatorBuilder: (_, __) => const SizedBox(width: 8),
+                                itemBuilder: (context, idx) {
+                                  final item = gallery[idx];
+                                  final url = item['url'] as String? ?? '';
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(12),
+                                    child: url.isNotEmpty
+                                        ? Image.network(url, width: 120, height: 120, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(width: 120, height: 120, color: Colors.grey[200], child: const Icon(Icons.broken_image, color: Colors.grey)))
+                                        : Container(width: 120, height: 120, color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            // 3-col grid alternative (compact)
+                            GridView.builder(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 1),
+                              itemCount: gallery.length > 6 ? 6 : gallery.length,
+                              itemBuilder: (context, idx) {
+                                final item = gallery[idx];
+                                final url = item['url'] as String? ?? '';
+                                return ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: url.isNotEmpty
+                                      ? Image.network(url, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey[200], child: const Icon(Icons.broken_image, color: Colors.grey)))
+                                      : Container(color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
+                                );
+                              },
+                            ),
+                          ]);
+                        },
+                        loading: () => const SizedBox(height: 120, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
+                        error: (_, __) => Container(padding: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12)), child: const Text('Gagal memuat galeri', style: TextStyle(fontSize: 12))),
+                      );
+                    }),
+                    const SizedBox(height: 16),
+                    // Staff with favorites & portfolio
+                    Consumer(builder: (context, ref2, _) {
+                      final staffAsync = ref.watch(providerStaffWithPortfolioProvider(provider.id));
+                      return staffAsync.when(
+                        data: (staffList) {
+                          if (staffList.isEmpty) return const SizedBox.shrink();
+                          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Row(children: [
+                              Container(width: 4, height: 18, decoration: BoxDecoration(color: DEKATColors.primary, borderRadius: BorderRadius.circular(4))),
+                              const SizedBox(width: 8),
+                              Text('Staf (${staffList.length})', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                            ]),
+                            const SizedBox(height: 8),
+                            ...staffList.map((s) {
+                              final specialties = (s['specialties'] as List?)?.cast<String>() ?? [];
+                              final portfolio = (s['portfolio'] as List?)?.cast<Map<String, dynamic>>() ?? [];
+                              final staffId = s['id'] as String;
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 8),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey[200]!)),
+                                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                  Row(children: [
+                                    CircleAvatar(backgroundColor: DEKATColors.primary.withOpacity(0.12), child: Text((s['name'] as String? ?? '?').substring(0, 1).toUpperCase(), style: const TextStyle(color: DEKATColors.primary, fontWeight: FontWeight.w800))),
+                                    const SizedBox(width: 10),
+                                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                      Text(s['name'] as String? ?? '-', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                                      if (s['title'] != null) Text(s['title'] as String, style: TextStyle(color: Colors.grey[600], fontSize: 11)),
+                                      if (specialties.isNotEmpty) Wrap(spacing: 4, children: specialties.map((sp) => Chip(label: Text(sp, style: const TextStyle(fontSize: 10)), visualDensity: VisualDensity.compact, padding: EdgeInsets.zero)).toList()),
+                                    ])),
+                                    IconButton(
+                                      icon: const Icon(Icons.favorite_border, size: 20),
+                                      color: Colors.grey[400],
+                                      onPressed: () async {
+                                        try {
+                                          await ApiService().addFavorite(staffId);
+                                          if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Ditambahkan ke favorit'), backgroundColor: Colors.green));
+                                        } catch (e) {
+                                          if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal favorit: $e'), backgroundColor: Colors.red));
+                                        }
+                                      },
+                                    ),
+                                  ]),
+                                  if (portfolio.isNotEmpty) ...[
+                                    const SizedBox(height: 8),
+                                    SizedBox(
+                                      height: 60,
+                                      child: ListView.separated(
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: portfolio.length > 5 ? 5 : portfolio.length,
+                                        separatorBuilder: (_, __) => const SizedBox(width: 6),
+                                        itemBuilder: (context, idx) {
+                                          final p = portfolio[idx];
+                                          final url = p['url'] as String? ?? '';
+                                          return ClipRRect(borderRadius: BorderRadius.circular(8), child: url.isNotEmpty ? Image.network(url, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(width: 60, height: 60, color: Colors.grey[200])) : Container(width: 60, height: 60, color: Colors.grey[200]));
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                ]),
+                              );
+                            }),
+                          ]);
+                        },
+                        loading: () => const SizedBox(height: 60, child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
+                        error: (_, __) => const SizedBox.shrink(),
+                      );
+                    }),
                   ]),
                 ),
               ),

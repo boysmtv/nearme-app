@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ServiceCard from '../components/ServiceCard';
-import { publicApi } from '../lib/api';
+import { publicApi, mediaApi } from '../lib/api';
 import { useAuth } from '../lib/auth';
 import type { Review } from '../lib/types';
 
@@ -62,16 +62,30 @@ function ReviewForm({ providerId }: { providerId: string }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [bookingId, setBookingId] = useState('');
+  const [photoIds, setPhotoIds] = useState<string[]>([]);
+
+  const uploadMut = useMutation({
+    mutationFn: async (file: File) => {
+      // upload as review photo with dummy owner, will be reassigned to reviewId server-side after creation
+      // For now upload with ownerType review and ownerId bookingId (will be moved to review id)
+      const res = await mediaApi.upload(file, 'review', bookingId.trim() || providerId);
+      return (res as unknown as { data: { id: string } }).data.id;
+    },
+    onSuccess: (id) => {
+      if (photoIds.length < 8) setPhotoIds((p) => [...p, id]);
+    },
+  });
 
   const mutation = useMutation({
     mutationFn: () => {
       if (!bookingId.trim()) throw new Error('Booking ID wajib diisi');
       if (rating < 1) throw new Error('Rating wajib diisi');
       if (!body.trim()) throw new Error('Komentar wajib diisi');
-      return publicApi.reviews.create(bookingId.trim(), { rating, title: title.trim() || undefined, body: body.trim() });
+      if (photoIds.length > 8) throw new Error('Maksimal 8 foto');
+      return publicApi.reviews.create(bookingId.trim(), { rating, title: title.trim() || undefined, body: body.trim(), photoIds });
     },
     onSuccess: () => {
-      setRating(0); setTitle(''); setBody(''); setBookingId('');
+      setRating(0); setTitle(''); setBody(''); setBookingId(''); setPhotoIds([]);
       queryClient.invalidateQueries({ queryKey: ['reviews', providerId] });
     },
   });
@@ -88,7 +102,7 @@ function ReviewForm({ providerId }: { providerId: string }) {
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-5">
       <h4 className="font-semibold text-gray-900">Tulis Ulasan</h4>
-      <p className="mt-1 text-[13px] text-gray-500">Ulasan memerlukan Booking ID yang sudah COMPLETED untuk provider ini. Lihat halaman booking Anda untuk menyalin ID.</p>
+      <p className="mt-1 text-[13px] text-gray-500">Ulasan memerlukan Booking ID yang sudah COMPLETED untuk provider ini. Maks 8 foto (jpeg/png/webp).</p>
       <div className="mt-4 space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700">Booking ID <span className="text-red-500">*</span></label>
@@ -124,6 +138,26 @@ function ReviewForm({ providerId }: { providerId: string }) {
             className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
           />
           <p className="mt-1 text-xs text-gray-400">{body.length}/2000</p>
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700">Foto Ulasan (maks 8)</label>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+            onChange={(e) => {
+              const files = Array.from(e.target.files || []);
+              files.slice(0, 8 - photoIds.length).forEach((f) => {
+                if (f.size > 10 * 1024 * 1024) { alert('File too large max 10MB'); return; }
+                uploadMut.mutate(f);
+              });
+              e.target.value = '';
+            }}
+            className="mt-1 block w-full text-sm text-gray-600 file:mr-3 file:rounded-lg file:border-0 file:bg-primary-50 file:px-3 file:py-2 file:text-sm file:font-medium file:text-primary-700 hover:file:bg-primary-100"
+          />
+          {uploadMut.isPending && <p className="mt-1 text-xs text-primary-600">Uploading...</p>}
+          {photoIds.length > 0 && <p className="mt-1 text-xs text-gray-500">{photoIds.length}/8 foto terupload</p>}
+          {uploadMut.isError && <p className="mt-1 text-xs text-red-600">{(uploadMut.error as Error).message}</p>}
         </div>
         {mutation.isError && (
           <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
@@ -176,15 +210,22 @@ export default function ProviderPage() {
     enabled: !!provider?.id && activeTab === 'reviews',
   });
 
+  const { data: galleryRes } = useQuery({
+    queryKey: ['gallery', provider?.id],
+    queryFn: () => publicApi.media.publicProviderGallery(provider!.id),
+    enabled: !!provider?.id,
+  });
+
+  const { isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const [reportingId, setReportingId] = useState<string | null>(null);
   const [reportMsg, setReportMsg] = useState<string | null>(null);
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const reportMutation = useMutation({
     mutationFn: (reviewId: string) => publicApi.reviews.report(reviewId),
     onMutate: (id) => { setReportingId(id); setReportMsg(null); },
     onSuccess: () => {
       setReportMsg('Laporan terkirim, review akan dimoderasi.');
-      // reviews are filtered to PUBLISHED only, reported becomes HIDDEN, so refetch
       queryClient.invalidateQueries({ queryKey: ['reviews', provider?.id] });
       refetchReviews();
     },
@@ -192,8 +233,26 @@ export default function ProviderPage() {
     onSettled: () => setReportingId(null),
   });
 
+  const favMut = useMutation({
+    mutationFn: async ({ staffId, favorited }: { staffId: string; favorited: boolean }) => {
+      if (favorited) return publicApi.favorites.remove(staffId);
+      return publicApi.favorites.add(staffId);
+    },
+    onSuccess: (_data, vars) => {
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        if (vars.favorited) next.delete(vars.staffId);
+        else next.add(vars.staffId);
+        return next;
+      });
+    },
+  });
+
   const services = servicesRes?.data ?? [];
   const staffList = staffRes?.data ?? [];
+  const gallery = (galleryRes as unknown as { data: unknown[]; })?.data ?? (galleryRes as unknown as { data: { data: unknown[] } })?.data ?? [];
+  // normalize gallery to array
+  const galleryItems: { id: string; url: string; fileName?: string }[] = Array.isArray(gallery) ? (gallery as never[]) : [];
   const reviews = (reviewsRes as unknown as { data?: { data: Review[] } })?.data?.data ?? (reviewsRes as unknown as { data?: Review[] })?.data ?? [];
 
   if (isLoading) {
@@ -301,6 +360,23 @@ export default function ProviderPage() {
             <p className="text-gray-600 leading-relaxed">{provider.description}</p>
           </div>
 
+          {/* Gallery Grid 3 cols */}
+          <div className="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+            <h3 className="font-semibold text-gray-900">Galeri</h3>
+            {galleryItems.length > 0 ? (
+              <div className="mt-3 grid grid-cols-3 gap-3">
+                {galleryItems.map((item) => (
+                  <div key={item.id} className="group relative aspect-square overflow-hidden rounded-xl bg-gray-100">
+                    <img src={item.url} alt={item.fileName || 'gallery'} className="h-full w-full object-cover transition-transform group-hover:scale-105" />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-3 text-sm text-gray-500">Belum ada foto galeri. Provider dapat upload via dashboard Media.</p>
+            )}
+            <p className="mt-2 text-xs text-gray-400">GET /public/providers/{'{id}'}/media • {galleryItems.length} foto</p>
+          </div>
+
           {/* Operating Hours */}
           {provider.openingHours && provider.openingHours.length > 0 && (
             <div className="mt-6 rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
@@ -372,7 +448,7 @@ export default function ProviderPage() {
                             </div>
                           )}
                         </div>
-                        <div>
+                        <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-gray-900">{s.name}</h4>
                           {s.rating > 0 && (
                             <div className="flex items-center gap-1 text-[13px] text-gray-500">
@@ -380,7 +456,21 @@ export default function ProviderPage() {
                               <span>{s.rating.toFixed(1)}</span>
                             </div>
                           )}
+                          {s.title && <p className="text-xs text-gray-500">{s.title}</p>}
                         </div>
+                        {isAuthenticated && (
+                          <button
+                            onClick={() => favMut.mutate({ staffId: s.id, favorited: favorites.has(s.id) })}
+                            disabled={favMut.isPending}
+                            className={`rounded-full p-2 ${favorites.has(s.id) ? 'bg-pink-100 text-pink-600' : 'bg-gray-100 text-gray-400 hover:text-pink-500'}`}
+                            aria-label="Favorite"
+                            title={favorites.has(s.id) ? 'Hapus favorit' : 'Favoritkan'}
+                          >
+                            <svg className="h-4 w-4" fill={favorites.has(s.id) ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                            </svg>
+                          </button>
+                        )}
                       </div>
                       {s.specialties?.length > 0 && (
                         <div className="mt-3 flex flex-wrap gap-1">
@@ -393,6 +483,19 @@ export default function ProviderPage() {
                             </span>
                           ))}
                         </div>
+                      )}
+                      {/* portfolio carousel */}
+                      {s.portfolio && s.portfolio.length > 0 ? (
+                        <div className="mt-3 flex gap-2 overflow-x-auto pb-1">
+                          {s.portfolio.slice(0, 5).map((p) => (
+                            <img key={p.id} src={p.url} alt={p.fileName} className="h-16 w-16 flex-shrink-0 rounded-lg object-cover" />
+                          ))}
+                          {s.portfolio.length > 5 && (
+                            <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100 text-xs font-medium text-gray-600">+{s.portfolio.length - 5}</div>
+                          )}
+                        </div>
+                      ) : (
+                        <p className="mt-3 text-xs text-gray-400">Belum ada portfolio</p>
                       )}
                       <p className="mt-2 text-sm text-gray-500 line-clamp-2">{s.bio}</p>
                     </div>
@@ -430,7 +533,14 @@ export default function ProviderPage() {
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center justify-between gap-2">
                               <div>
-                                <h4 className="text-sm font-medium text-gray-900">{review.customerName}</h4>
+                                <h4 className="text-sm font-medium text-gray-900 flex items-center gap-2">
+                                  {review.customerName}
+                                  {review.verifiedBooking && (
+                                    <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-[11px] font-semibold text-green-700">
+                                      ✓ Verified booking
+                                    </span>
+                                  )}
+                                </h4>
                                 <p className="text-xs text-gray-500">{review.serviceName}</p>
                               </div>
                               <span className="text-xs text-gray-400">
@@ -442,6 +552,13 @@ export default function ProviderPage() {
                             </div>
                             {review.title && <p className="mt-1 text-sm font-medium text-gray-800">{review.title}</p>}
                             <p className="mt-1 text-sm text-gray-600 break-words">{review.comment ?? review.body ?? ''}</p>
+                            {review.photos && review.photos.length > 0 && (
+                              <div className="mt-3 grid grid-cols-4 gap-2">
+                                {review.photos.slice(0, 8).map((ph) => (
+                                  <img key={ph.id} src={ph.url} alt={ph.fileName || 'review'} className="h-20 w-full rounded-lg object-cover" />
+                                ))}
+                              </div>
+                            )}
                             <div className="mt-3 flex items-center gap-3">
                               <button
                                 onClick={() => reportMutation.mutate(review.id)}

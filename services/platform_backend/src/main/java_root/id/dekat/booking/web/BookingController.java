@@ -120,18 +120,33 @@ public class BookingController {
     @PostMapping("/{id}/reschedule")
     public ResponseEntity<ApiResponse<Booking>> reschedule(@PathVariable UUID id,
                                               @RequestBody RescheduleRequest request) {
-        Booking booking = bookingService.rescheduleBooking(
-                id, request.getNewStartsAt(), request.getNewEndsAt(),
-                request.getExpectedVersion()
-        );
-        return ResponseEntity.ok(ApiResponse.ok(booking));
+        try {
+            Booking booking = bookingService.rescheduleBooking(
+                    id, request.getNewStartsAt(), request.getNewEndsAt(),
+                    request.getExpectedVersion()
+            );
+            return ResponseEntity.ok(ApiResponse.ok(booking));
+        } catch (IllegalStateException e) {
+            String msg = e.getMessage() != null && e.getMessage().contains("Reschedule limit") ? e.getMessage() : "Time slot not available or reschedule not allowed: " + e.getMessage();
+            // 409 for reschedule limit exceeded
+            if (e.getMessage() != null && e.getMessage().contains("Reschedule limit")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(msg));
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @PostMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<Booking>> cancel(@PathVariable UUID id,
                                           @RequestParam(required = false) String reason,
                                           @RequestHeader("X-Actor-Id") UUID actorId) {
-        return ResponseEntity.ok(ApiResponse.ok(bookingService.cancelBooking(id, reason, actorId)));
+        try {
+            return ResponseEntity.ok(ApiResponse.ok(bookingService.cancelBooking(id, reason, actorId)));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @PostMapping("/{id}/check-in")

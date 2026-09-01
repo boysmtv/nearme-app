@@ -39,6 +39,9 @@ public class Staff {
     @Column(name = "avatar_url", columnDefinition = "text")
     private String avatarUrl;
 
+    @Column(name = "specialties", columnDefinition = "text")
+    private String specialties;
+
     @Column(name = "is_active", nullable = false)
     @Builder.Default
     private Boolean isActive = true;

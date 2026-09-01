@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../../shared/models/rows.dart';
 
 final staffProvider = FutureProvider.autoDispose<List<PartnerStaffRow>>((ref) async {
@@ -8,6 +9,13 @@ final staffProvider = FutureProvider.autoDispose<List<PartnerStaffRow>>((ref) as
   return ((response.data['data'] ?? []) as List)
       .map((e) => PartnerStaffRow.fromJson(e as Map<String, dynamic>))
       .toList();
+});
+
+final staffPortfolioProvider = FutureProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, staffId) async {
+  final resp = await ApiService().getStaffPortfolio(staffId);
+  final data = resp.data['data'] as List?;
+  if (data == null) return [];
+  return data.cast<Map<String, dynamic>>();
 });
 
 class StaffListPage extends ConsumerWidget {
@@ -36,54 +44,129 @@ class StaffListPage extends ConsumerWidget {
             itemBuilder: (context, index) {
               final s = staffList[index];
               final isActive = s.isActive;
+              final portfolioAsync = ref.watch(staffPortfolioProvider(s.id));
               return Card(
-                margin: const EdgeInsets.only(bottom: 8),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: isActive ? 0.1 : 0.05),
-                    child: Icon(Icons.person, color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey),
-                  ),
-                  title: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(s.title ?? '-'),
-                  trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: isActive ? Colors.green[50] : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
+                margin: const EdgeInsets.only(bottom: 12),
+                child: Column(
+                  children: [
+                    ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: isActive ? 0.1 : 0.05),
+                        child: Icon(Icons.person, color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey),
                       ),
-                      child: Text(isActive ? 'Active' : 'Inactive',
-                          style: TextStyle(fontSize: 12, color: isActive ? Colors.green : Colors.grey, fontWeight: FontWeight.w500)),
+                      title: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text(s.title ?? '-'),
+                        if (s.specialties != null && s.specialties!.isNotEmpty)
+                          Wrap(spacing: 4, children: s.specialties!.map((sp) => Chip(label: Text(sp, style: const TextStyle(fontSize: 10)), visualDensity: VisualDensity.compact, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap)).toList()),
+                      ]),
+                      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isActive ? Colors.green[50] : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(isActive ? 'Active' : 'Inactive',
+                              style: TextStyle(fontSize: 12, color: isActive ? Colors.green : Colors.grey, fontWeight: FontWeight.w500)),
+                        ),
+                        PopupMenuButton<String>(
+                          onSelected: (action) async {
+                            try {
+                              if (action == 'deactivate') {
+                                await ApiService().dio.delete('/provider/staff/${s.id}');
+                              } else if (action == 'activate') {
+                                await ApiService().updateStaff(s.id, {});
+                              } else if (action == 'schedule') {
+                                if (context.mounted) _showScheduleDialog(context, ref, s.id);
+                                return;
+                              } else if (action == 'portfolio') {
+                                if (context.mounted) _pickAndUploadPortfolio(context, ref, s.id);
+                                return;
+                              } else if (action == 'specialties') {
+                                if (context.mounted) _editSpecialtiesDialog(context, ref, s);
+                                return;
+                              }
+                              ref.invalidate(staffProvider);
+                            } catch (e) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+                                );
+                              }
+                            }
+                          },
+                          itemBuilder: (_) => [
+                            const PopupMenuItem(value: 'schedule', child: Text('Edit Schedule')),
+                            const PopupMenuItem(value: 'portfolio', child: Text('Upload Portfolio')),
+                            const PopupMenuItem(value: 'specialties', child: Text('Edit Specialties')),
+                            if (isActive)
+                              const PopupMenuItem(value: 'deactivate', child: Text('Deactivate'))
+                            else
+                              const PopupMenuItem(value: 'activate', child: Text('Activate')),
+                          ],
+                        ),
+                      ]),
                     ),
-                    PopupMenuButton<String>(
-                      onSelected: (action) async {
-                        try {
-                          if (action == 'deactivate') {
-                            await ApiService().dio.delete('/provider/staff/${s.id}');
-                          } else if (action == 'activate') {
-                            await ApiService().updateStaff(s.id, {});
-                          } else if (action == 'schedule') {
-                            if (context.mounted) _showScheduleDialog(context, ref, s.id);
-                            return;
-                          }
-                          ref.invalidate(staffProvider);
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Row(children: [
+                          const Icon(Icons.photo_library_outlined, size: 14, color: Colors.grey),
+                          const SizedBox(width: 4),
+                          const Text('Portfolio', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey)),
+                          const Spacer(),
+                          TextButton.icon(
+                            onPressed: () => _pickAndUploadPortfolio(context, ref, s.id),
+                            icon: const Icon(Icons.add_a_photo, size: 14),
+                            label: const Text('Upload', style: TextStyle(fontSize: 12)),
+                          ),
+                        ]),
+                        portfolioAsync.when(
+                          data: (photos) {
+                            if (photos.isEmpty) return Text('Belum ada portfolio — POST /media/upload ownerType=staff', style: TextStyle(color: Colors.grey[500], fontSize: 11));
+                            return SizedBox(
+                              height: 70,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: photos.length,
+                                separatorBuilder: (_, __) => const SizedBox(width: 6),
+                                itemBuilder: (context, idx) {
+                                  final p = photos[idx];
+                                  final url = p['url'] as String? ?? '';
+                                  return Stack(children: [
+                                    ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: url.isNotEmpty
+                                          ? Image.network(url, width: 70, height: 70, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 20, color: Colors.grey)))
+                                          : Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
+                                    ),
+                                    Positioned(
+                                      top: 2,
+                                      right: 2,
+                                      child: GestureDetector(
+                                        onTap: () async {
+                                          try {
+                                            await ApiService().deleteMedia(p['id'] as String);
+                                            ref.invalidate(staffPortfolioProvider(s.id));
+                                          } catch (e) {
+                                            if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Delete failed: $e')));
+                                          }
+                                        },
+                                        child: Container(decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.all(2), child: const Icon(Icons.close, size: 12, color: Colors.white)),
+                                      ),
+                                    ),
+                                  ]);
+                                },
+                              ),
                             );
-                          }
-                        }
-                      },
-                      itemBuilder: (_) => [
-                        const PopupMenuItem(value: 'schedule', child: Text('Edit Schedule')),
-                        if (isActive)
-                          const PopupMenuItem(value: 'deactivate', child: Text('Deactivate'))
-                        else
-                          const PopupMenuItem(value: 'activate', child: Text('Activate')),
-                      ],
+                          },
+                          loading: () => const SizedBox(height: 30, child: Center(child: CircularProgressIndicator(strokeWidth: 1.5))),
+                          error: (e, _) => Text('Gagal load portfolio: $e', style: const TextStyle(fontSize: 11, color: Colors.red)),
+                        ),
+                      ]),
                     ),
-                  ]),
+                  ],
                 ),
               );
             },
@@ -204,6 +287,50 @@ class StaffListPage extends ConsumerWidget {
           ],
         );
       }),
+    );
+  }
+
+  Future<void> _pickAndUploadPortfolio(BuildContext context, WidgetRef ref, String staffId) async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    if (picked == null) return;
+    try {
+      await ApiService().uploadMedia(picked.path, 'staff', staffId);
+      ref.invalidate(staffPortfolioProvider(staffId));
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Portfolio uploaded'), backgroundColor: Colors.green));
+    } catch (e) {
+      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e'), backgroundColor: Colors.red));
+    }
+  }
+
+  void _editSpecialtiesDialog(BuildContext context, WidgetRef ref, PartnerStaffRow staff) {
+    final ctrl = TextEditingController(text: (staff.specialties ?? []).join(', '));
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Edit Specialties - ${staff.displayName}'),
+        content: TextField(
+          controller: ctrl,
+          decoration: const InputDecoration(labelText: 'Specialties (comma separated)', hintText: 'Fade, Undercut, Coloring'),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+          TextButton(
+            onPressed: () async {
+              final val = ctrl.text.trim();
+              try {
+                await ApiService().updateStaff(staff.id, {'specialties': val});
+                ref.invalidate(staffProvider);
+                if (ctx.mounted) Navigator.pop(ctx);
+                if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Specialties updated'), backgroundColor: Colors.green));
+              } catch (e) {
+                if (ctx.mounted) ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red));
+              }
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
     );
   }
 }

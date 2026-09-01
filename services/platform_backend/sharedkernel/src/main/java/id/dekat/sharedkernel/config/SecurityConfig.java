@@ -37,7 +37,8 @@ public class SecurityConfig {
     public BearerTokenResolver bearerTokenResolver() {
         DefaultBearerTokenResolver resolver = new DefaultBearerTokenResolver();
         resolver.setAllowFormEncodedBodyParameter(false);
-        resolver.setAllowUriQueryParameter(false);
+        resolver.setAllowUriQueryParameter(true);
+        // allow token via query param for WebSocket handshake (token, accessToken)
         return request -> {
             String uri = request.getRequestURI();
             // Skip JWT resolution for public/auth endpoints — allow anonymous access even if Authorization header present with invalid token
@@ -45,6 +46,13 @@ public class SecurityConfig {
                     || uri.startsWith("/api/v1/auth/") || uri.startsWith("/auth/")
                     || uri.startsWith("/api/v1/actuator/") || uri.startsWith("/actuator/")) {
                 return null;
+            }
+            // WebSocket/SSE handshake: allow JWT via query param ?token= or ?accessToken=
+            if (uri.startsWith("/ws-chat") || uri.startsWith("/ws/") || uri.contains("/ws-chat") || uri.contains("/events")) {
+                String token = request.getParameter("token");
+                if (token == null) token = request.getParameter("accessToken");
+                if (token == null) token = request.getParameter("access_token");
+                if (token != null && !token.isBlank()) return token;
             }
             // Also check servletPath as fallback
             String servletPath = request.getServletPath();
@@ -66,6 +74,7 @@ public class SecurityConfig {
                 .requestMatchers("/actuator/health", "/actuator/**", "/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 .requestMatchers("/auth/**").permitAll()
                 .requestMatchers("/public/**").permitAll()
+                .requestMatchers("/ws-chat/**", "/ws/**").permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer(oauth2 -> oauth2

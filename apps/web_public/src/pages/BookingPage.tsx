@@ -84,6 +84,36 @@ export default function BookingPage() {
     onError: (e) => setPinMsg(e instanceof Error ? e.message : 'PIN salah'),
   });
 
+  // Bundle B: reschedule + policy
+  const [rescheduleDate, setRescheduleDate] = useState('');
+  const [rescheduleTime, setRescheduleTime] = useState('09:00');
+  const [rescheduleMsg, setRescheduleMsg] = useState<string | null>(null);
+  const { data: policiesRes } = useQuery({
+    queryKey: ['policies-public-booking'],
+    queryFn: () => publicApi.policies.listPublic().then((r) => r.data),
+  });
+  const policyText = (policiesRes as unknown as { data?: { body?: string }[] })?.data?.[0]?.body || (policiesRes as unknown as { body?: string }[] | undefined)?.[0]?.body || 'Pembatalan sebelum 24 jam = refund penuh. Setelah itu no refund. Reschedule gratis 1x (409 jika melebihi).';
+  const rescheduleMut = useMutation({
+    mutationFn: () => {
+      const version = (createdBooking as unknown as { version?: number })?.version ?? 1;
+      const newStartsAt = new Date(`${rescheduleDate}T${rescheduleTime}:00+07:00`).toISOString();
+      const newEndsAt = new Date(new Date(newStartsAt).getTime() + (selectedService?.duration ?? 60) * 60000).toISOString();
+      return publicApi.bookings.reschedule(createdBooking!.id, { newStartsAt, newEndsAt, expectedVersion: version });
+    },
+    onSuccess: (res) => {
+      setCreatedBooking(res.data as unknown as BookingResponse);
+      setRescheduleMsg('Reschedule berhasil! Slot baru terkonfirmasi.');
+    },
+    onError: (e: unknown) => {
+      const msg = e instanceof Error ? e.message : 'Reschedule gagal';
+      // 409 is thrown as Error with message from ApiResponse
+      setRescheduleMsg(msg.includes('409') || msg.includes('limit') ? 'Gagal: Batas reschedule gratis tercapai (409).' : msg);
+    },
+  });
+  const calendarMut = useMutation({
+    mutationFn: () => publicApi.bookings.calendarLink(createdBooking!.id),
+  });
+
   const createBooking = useMutation({
     mutationFn: (data: z.infer<typeof contactSchema>) =>
       publicApi.bookings.create({
@@ -277,6 +307,63 @@ export default function BookingPage() {
                   <p className="text-xl font-bold tracking-widest text-yellow-900">{createdBooking.confirmationPin}</p>
                 </div>
               )}
+              {/* Bundle B: Deposit badge & policy */}
+              <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3 text-left">
+                <div className="flex items-center gap-2">
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${createdBooking.depositRequired || (createdBooking.depositAmount && createdBooking.depositAmount>0) ? 'bg-amber-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                    {createdBooking.depositRequired || (createdBooking.depositAmount && createdBooking.depositAmount>0) ? `Deposit ${formatPrice(createdBooking.depositAmount||0)} Wajib` : 'Tanpa Deposit'}
+                  </span>
+                  <span className="text-xs text-amber-700">{createdBooking.cancelPolicy || policyText}</span>
+                </div>
+                {createdBooking.cancelDeadline && <p className="mt-1 text-xs text-amber-600">Batas pembatalan: {new Date(createdBooking.cancelDeadline).toLocaleString('id-ID')}</p>}
+                <p className="mt-1 text-xs text-gray-500">Reschedule: {createdBooking.rescheduleCount ?? 0}/{createdBooking.maxReschedule ?? 1} gratis • Cancel setelah deadline = no refund</p>
+              </div>
+              {/* Bundle B: Reschedule */}
+              <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left">
+                <h3 className="text-sm font-semibold text-gray-900">Reschedule (gratis 1x)</h3>
+                <p className="mt-1 text-xs text-gray-500">Pilih tanggal & jam baru. Jika melebihi batas akan 409 Conflict.</p>
+                <div className="mt-3 grid grid-cols-2 gap-2">
+                  <input type="date" value={rescheduleDate} onChange={(e)=>setRescheduleDate(e.target.value)} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+                  <input type="time" value={rescheduleTime} onChange={(e)=>setRescheduleTime(e.target.value)} className="rounded-lg border border-gray-300 px-3 py-2 text-sm" />
+                </div>
+                <button onClick={()=>rescheduleMut.mutate()} disabled={!rescheduleDate || rescheduleMut.isPending} className="mt-3 w-full rounded-lg bg-white border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 disabled:opacity-50">{rescheduleMut.isPending ? 'Memproses...' : 'Reschedule Booking'}</button>
+                {rescheduleMsg && <p className={`mt-2 text-sm ${rescheduleMsg.includes('berhasil') ? 'text-green-600' : 'text-red-600'}`}>{rescheduleMsg}</p>}
+                {rescheduleMut.isError && <p className="mt-1 text-sm text-red-600">{(rescheduleMut.error as Error).message}</p>}
+              </div>
+              {/* Bundle B: Add to Calendar */}
+              <div className="mt-4 rounded-xl border border-blue-200 bg-blue-50 p-4 text-left">
+                <h3 className="text-sm font-semibold text-gray-900">Kalender Sync</h3>
+                <p className="mt-1 text-xs text-gray-500">Tambahkan ke Google Calendar atau download .ics</p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    onClick={async () => {
+                      try {
+                        const res = await publicApi.bookings.calendarLink(createdBooking.id);
+                        const url = (res.data as unknown as { data: { googleCalendarUrl: string } })?.data?.googleCalendarUrl || (res as unknown as { googleCalendarUrl: string })?.googleCalendarUrl;
+                        if (url) window.open(url, '_blank');
+                      } catch {}
+                      calendarMut.mutate();
+                    }}
+                    className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                  >
+                    Google Calendar
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const res = await publicApi.bookings.ics(createdBooking.id) as unknown as string;
+                      const text = typeof res === 'string' ? res : (res as unknown as { data: string }).data ?? '';
+                      const blob = new Blob([text as string], { type: 'text/calendar' });
+                      const url = URL.createObjectURL(blob);
+                      const a = document.createElement('a');
+                      a.href = url; a.download = `booking-${createdBooking.bookingCode}.ics`; a.click();
+                      URL.revokeObjectURL(url);
+                    }}
+                    className="flex-1 rounded-lg bg-white border border-blue-300 px-4 py-2 text-sm font-semibold text-blue-700 hover:bg-blue-50"
+                  >
+                    Download .ics
+                  </button>
+                </div>
+              </div>
               <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left">
                 <h3 className="text-sm font-semibold text-gray-900">Verifikasi PIN</h3>
                 <p className="mt-1 text-xs text-gray-500">POST /bookings/{'{id}'}/verify-pin — masukkan 6-digit PIN untuk check-in</p>
@@ -286,6 +373,33 @@ export default function BookingPage() {
                 </div>
                 {pinMsg && <p className="mt-2 text-sm text-green-600">{pinMsg}</p>}
                 {verifyPinMut.isError && <p className="mt-1 text-sm text-red-600">{(verifyPinMut.error as Error).message}</p>}
+              </div>
+              <div className="mt-4 rounded-xl border border-primary-200 bg-primary-50 p-4 text-left">
+                <h3 className="text-sm font-semibold text-gray-900">Chat Realtime</h3>
+                <p className="mt-1 text-xs text-gray-500">Hubungi provider via chat realtime — WebSocket /ws-chat (STOMP) + SSE /chats/{'{id}'}/events + Kafka.</p>
+                <div className="mt-3 flex gap-2">
+                  <Link to={`/chats`} className="flex-1 rounded-lg bg-white border border-primary-300 px-4 py-2 text-sm font-semibold text-primary-700 text-center hover:bg-primary-50">
+                    Buka Chat List
+                  </Link>
+                  <Link
+                    to={`/booking/${createdBooking.id}/chat`}
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      try {
+                        const { chatApi } = await import('../lib/api');
+                        const r = await chatApi.getBookingChat(createdBooking.id) as unknown as { data: { id: string } };
+                        const id = (r as unknown as { data: { id: string } }).data?.id ?? (r as unknown as { id: string }).id;
+                        window.location.href = `/chats/${id}`;
+                      } catch {
+                        window.location.href = `/chats`;
+                      }
+                    }}
+                    className="flex-1 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white text-center hover:bg-primary-700"
+                  >
+                    Chat Booking Ini
+                  </Link>
+                </div>
+                <p className="mt-2 text-[11px] text-gray-400">POST /chats • GET /chats • POST /chats/{'{id}'}/messages • GET /bookings/{'{bookingId}'}/chat • SSE /chats/{'{id}'}/events</p>
               </div>
               <div className="mt-6 flex justify-center gap-3">
                 <Link
@@ -622,6 +736,17 @@ export default function BookingPage() {
                         Edit
                       </button>
                     </div>
+                  </div>
+                  {/* Bundle B: Deposit badge & policy preview */}
+                  <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                    <div className="flex items-center gap-2">
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${selectedService && selectedService.depositAmount>0 ? 'bg-amber-600 text-white' : 'bg-white text-gray-500 border'}`}>
+                        {selectedService && selectedService.depositAmount>0 ? `Deposit ${formatPrice(selectedService.depositAmount)}` : 'Tanpa Deposit'}
+                      </span>
+                      <span className="text-xs text-amber-800">Wajib via Midtrans/Xendit jika ada</span>
+                    </div>
+                    <p className="mt-2 text-xs text-amber-700">{policyText}</p>
+                    <p className="mt-1 text-xs text-gray-500">Cancel setelah deadline = no refund • Reschedule gratis 1x, lebih = 409</p>
                   </div>
                   <div className="mt-6 flex gap-3">
                     <button

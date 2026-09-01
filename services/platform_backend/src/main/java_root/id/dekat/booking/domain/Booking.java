@@ -81,6 +81,24 @@ public class Booking {
     @Column(name = "pin_verified", nullable = false)
     private Boolean pinVerified = false;
 
+    @Column(name = "deposit_amount", nullable = false)
+    private Integer depositAmount = 0;
+
+    @Column(name = "deposit_required", nullable = false)
+    private Boolean depositRequired = false;
+
+    @Column(name = "cancel_deadline")
+    private OffsetDateTime cancelDeadline;
+
+    @Column(name = "reschedule_count", nullable = false)
+    private Integer rescheduleCount = 0;
+
+    @Column(name = "max_reschedule", nullable = false)
+    private Integer maxReschedule = 1;
+
+    @Column(name = "cancel_policy")
+    private String cancelPolicy;
+
     @Column(name = "source")
     private String source;
 
@@ -238,4 +256,16 @@ public class Booking {
     public void setConfirmationPin(String confirmationPin) { this.confirmationPin = confirmationPin; }
     public Boolean getPinVerified() { return pinVerified; }
     public void setPinVerified(Boolean pinVerified) { this.pinVerified = pinVerified; }
+    public Integer getDepositAmount() { return depositAmount; }
+    public void setDepositAmount(Integer depositAmount) { this.depositAmount = depositAmount; }
+    public Boolean getDepositRequired() { return depositRequired; }
+    public void setDepositRequired(Boolean depositRequired) { this.depositRequired = depositRequired; }
+    public OffsetDateTime getCancelDeadline() { return cancelDeadline; }
+    public void setCancelDeadline(OffsetDateTime cancelDeadline) { this.cancelDeadline = cancelDeadline; }
+    public Integer getRescheduleCount() { return rescheduleCount; }
+    public void setRescheduleCount(Integer rescheduleCount) { this.rescheduleCount = rescheduleCount; }
+    public Integer getMaxReschedule() { return maxReschedule; }
+    public void setMaxReschedule(Integer maxReschedule) { this.maxReschedule = maxReschedule; }
+    public String getCancelPolicy() { return cancelPolicy; }
+    public void setCancelPolicy(String cancelPolicy) { this.cancelPolicy = cancelPolicy; }
 }

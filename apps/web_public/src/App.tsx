@@ -17,9 +17,12 @@ const ProviderStaffPage = lazy(() => import('./pages/provider/StaffPage'));
 const ProviderCustomersPage = lazy(() => import('./pages/provider/CustomersPage'));
 const ProviderReportsPage = lazy(() => import('./pages/provider/ReportsPage'));
 const ProviderSettingsPage = lazy(() => import('./pages/provider/SettingsPage'));
+const ProviderMediaPage = lazy(() => import('./pages/provider/MediaPage'));
+const ProviderFaqPage = lazy(() => import('./pages/provider/FaqPage'));
 const ProfileCompletePage = lazy(() => import('./pages/ProfileCompletePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ProviderRegisterPage = lazy(() => import('./pages/ProviderRegisterPage'));
+const ChatPage = lazy(() => import('./pages/ChatPage'));
 
 function LoadingFallback() {
   return (
@@ -80,7 +83,13 @@ export function App() {
         <Route path="/provider/staff" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderStaffPage /></ProtectedRoute>} />
         <Route path="/provider/customers" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCustomersPage /></ProtectedRoute>} />
         <Route path="/provider/reports" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderReportsPage /></ProtectedRoute>} />
+        <Route path="/provider/media" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderMediaPage /></ProtectedRoute>} />
+        <Route path="/provider/faq" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderFaqPage /></ProtectedRoute>} />
         <Route path="/provider/settings" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderSettingsPage /></ProtectedRoute>} />
+
+        <Route path="/chats" element={<ChatPage />} />
+        <Route path="/chats/:id" element={<ChatPage />} />
+        <Route path="/booking/:bookingId/chat" element={<ChatPage />} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

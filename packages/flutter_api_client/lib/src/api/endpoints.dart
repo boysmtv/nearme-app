@@ -47,4 +47,26 @@ class Endpoints {
   // Notifications (device tokens)
   static const String notifications = '/notifications';
   static const String fcmToken = '/devices/token';
+
+  // Media & gallery
+  static const String mediaUpload = '/media/upload';
+  static const String providerMedia = '/provider/media';
+  static const String publicProviderMedia = '/public/providers'; // + /{id}/media
+  static const String publicStaffMedia = '/public/staff'; // + /{id}/media
+
+  // Favorites
+  static const String customerFavorites = '/customer/favorites';
+
+  // Bundle B - FAQ & Policies
+  static const String publicFaqs = '/public/faqs';
+  static const String publicPolicies = '/public/policies';
+  static const String providerFaqs = '/provider/faqs';
+  static const String providerPolicies = '/provider/policies';
+  static const String adminFaqs = '/admin/faqs';
+  static const String adminPolicies = '/admin/policies';
+
+  // Bundle C - Chat & Analytics
+  static const String chats = '/chats';
+  static const String providerAnalytics = '/provider/reports/analytics';
+  static const String providerReportsExport = '/provider/reports/export';
 }

@@ -181,12 +181,16 @@ module/
 
 ## Database
 
-- 80+ tables, migrations V0-V20 (Flyway)
+- 90+ tables, migrations V0-V26 (Flyway)
 - V14 includes seed data (roles, permissions, plans, users, tenant, services, bookings)
 - V14 adds `password_hash` column to users table
 - V18 adds `device_info` and `token_family` columns to sessions table
 - V19 fixes `ip_address` type from `inet` to `text` in sessions table (entity uses String)
 - V20 adds `confirmation_pin` and `pin_verified` columns to bookings table
+- V23 adds `media_assets` + `customer_favorites` + `review_photos` + `staff.specialties`
+- V24 adds `deposit_amount/cancelDeadline/rescheduleCount/maxReschedule/cancelPolicy` to bookings
+- V25 adds `faqs/policies` tables + seed 5 FAQ/3 policies
+- V26 adds `conversations/messages` for chat
 - Seed password: `admin123` (BCrypt hashed)
 - Credentials stored in both `users.password_hash` and `credentials` table
 
@@ -270,13 +274,13 @@ pnpm install && pnpm dev
 - Profile completion route: `/profile/complete` (required before booking)
 
 ### Testing
-- **Total: 489 tests** across 6 platforms, all passing (164 backend + 101 web_public + 58 web_provider + 49 web_admin + 86 mobile + 19 e2e + 12 weird)
-- Backend: 164 tests (BookingService 18+16 weird, Booking 17+26 weird, Coupon 19, Payment 21, Jwt 19) — JUnit 5 + Mockito
-- web_public: 101 tests (9 files, +21 weird.test.ts) — Vitest + @testing-library/react
+- **Total: ~650 tests** across 6 platforms, all passing (236 backend + 134 web_public + 58 web_provider + 49 web_admin + 124 mobile_customer + 43 mobile_partner + e2e 19)
+- Backend: 236 tests (BookingService + Media 14 + Deposit 6 + FAQ 7 + Chat 10 + Reporting 4 + Coupon/Payment/Jwt) — JUnit 5 + Mockito
+- web_public: 134 tests (15 files, +Gallery/Chat/Analytics/BundleB) — Vitest + @testing-library/react
 - web_provider: 58 tests (5 files) — Vitest + @testing-library/react
 - web_admin: 49 tests (5 files) — Vitest + @testing-library/react
-- mobile_customer: 86 tests (weird_test 30 + rows 27 + utils) — flutter_test (dart analyze pass, device Mi A1)
-- mobile_partner: 31 tests (models, utils) — flutter_test
+- mobile_customer: 124 tests (weird_test 30 + media 8 + bundleB 10 + chat 8 + rows + utils) — flutter_test
+- mobile_partner: 43 tests (portfolio 6 + chat 8 + models) — flutter_test
 - E2E Playwright: 19 tests (12 web-public + 7 booking-weird) — `booking-weird.spec.ts` XSS/race/PIN/coupon
 - Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
 
@@ -314,6 +318,7 @@ pnpm install && pnpm dev
  - **Comprehensive weird tests 2026-08-31** — `docs/TEST_CASES_COMPREHENSIVE.md` 330 scenario P/N/E/A, `BookingWeirdCasesTest 26` + `BookingServiceWeirdTest 16` + `CouponServiceWeirdTest 19` + `PaymentServiceWeirdTest 21` + `web_public weird 21` + `flutter weird 30` + `e2e booking-weird 7`, backend 164 total, `playwright.config.ts` 3000→4100, `app_config.dart` default 192.168.100.55
  - **Availability popup 2026-08-31** — `availability_page.dart:82` inline month 320px → popup button `Tanggal Sen, 31 Aug 2026` + `showModalBottomSheet` month full, service picker `PILIH LAYANAN` card gradient + bottom sheet, separator `Atur Jadwal` divider, week→popup via hot-restart
  - **Provider detail & booking form 2026-08-31** — `provider_detail_page.dart:78` gradient header + white card overlay + Layanan `Pilih →` card, `booking_form_page.dart:16` Map key infinite loop fix `String key providerId|serviceId`, design `Ringkasan Booking` + `_InfoChip` + `_PaymentCard`, `auth_interceptor.dart:54` refresh parse `data['data']['accessToken']`, `app_router.dart:9` `GoRouterRefresh` + `redirect?redirect=` flow pilih jam→login→konfirmasi, `discovery_page.dart:110` `value.clamp(0,1)` fix red opacity, `availability_page.dart:42` date persist `SecureStorage selected_date` + focused sync
+ - **Bundles 2026-09-01 — Media+Portfolio+Review + Deposit+Kalender+FAQ + Chat+Analytics** — `V23 media_assets` + `customer_favorites` + `review_photos` + `staff.specialties`, `MediaService` upload `./uploads` signed-url, `MediaController` `POST /media/upload` `GET /public/providers/{id}/media` `PUT /provider/media/reorder`, `FavoriteController` `POST/DELETE/GET /customer/favorites`, `ReviewService` photos cap 8 + `verified_booking`, `web_public/MediaPage.tsx` + `ProviderPage.tsx` gallery 3-col + `ChatPage.tsx` + `ChatWidget` + `useChatWebSocket` polling 3s+SSE, `ReportsPage.tsx` Recharts Area/Bar/Pie + `analyticsApi`, `V24 bookings` deposit `deposit_amount/cancelDeadline/rescheduleCount` `BookingService` DP+409, `BookingCalendarService` `.ics` + Google `BookingCalendarController` `GET /bookings/{id}/ics`, `BookingReminderScheduler` H-24/H-2, `V25 faqs/policies` `PublicFaqController` `GET /public/faqs` + `ProviderFaqController`, `V26 conversations/messages` `ChatService` `SimpMessagingTemplate /topic/chats/{id}` `ChatWebSocketConfig /ws-chat` JWT query `token`, `ReportingService` `revenueByDay/bookingsByStatus/retention/funnel/topServices/staffUtilization` `ReportingController /provider/reports/analytics`, `flutter` `chat_list/detail` + `reports_page` fl_chart, `SecurityConfig:36` `allowUriQueryParameter` + `WebConfig:14` `/uploads/**` resource, `api/build.gradle:44` `websocket`, tests +~160 (total ~650: backend 236+ web 134+ mobile 167+ e2e 19)
 
 ## Deployment
 

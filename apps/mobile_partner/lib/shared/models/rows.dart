@@ -36,6 +36,7 @@ class PartnerStaffRow {
   final String? bio;
   final String? avatarUrl;
   final bool isActive;
+  final List<String>? specialties;
 
   const PartnerStaffRow({
     required this.id,
@@ -45,17 +46,28 @@ class PartnerStaffRow {
     this.bio,
     this.avatarUrl,
     required this.isActive,
+    this.specialties,
   });
 
-  factory PartnerStaffRow.fromJson(Map<String, dynamic> json) => PartnerStaffRow(
-        id: json['id'] as String,
-        userId: json['userId'] as String?,
-        displayName: (json['displayName'] ?? '') as String,
-        title: json['title'] as String?,
-        bio: json['bio'] as String?,
-        avatarUrl: json['avatarUrl'] as String?,
-        isActive: json['isActive'] == true,
-      );
+  factory PartnerStaffRow.fromJson(Map<String, dynamic> json) {
+    List<String>? specs;
+    final raw = json['specialties'];
+    if (raw is String && raw.isNotEmpty) {
+      specs = raw.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    } else if (raw is List) {
+      specs = raw.cast<String>();
+    }
+    return PartnerStaffRow(
+      id: json['id'] as String,
+      userId: json['userId'] as String?,
+      displayName: (json['displayName'] ?? '') as String,
+      title: json['title'] as String?,
+      bio: json['bio'] as String?,
+      avatarUrl: json['avatarUrl'] as String?,
+      isActive: json['isActive'] == true,
+      specialties: specs,
+    );
+  }
 }
 
 class PartnerReportRow {
@@ -82,6 +94,108 @@ class PartnerReportRow {
         totalRevenue: (json['totalRevenue'] as num?)?.toInt() ?? 0,
         avgRating: (json['avgRating'] as num?)?.toDouble() ?? 0,
         currency: (json['currency'] ?? 'IDR') as String,
+      );
+}
+
+class ConversationRow {
+  final String id;
+  final String? bookingId;
+  final String tenantId;
+  final String customerId;
+  final String providerId;
+  final String? subject;
+  final String status;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final String? lastMessageBody;
+  final int messageCount;
+
+  const ConversationRow({
+    required this.id,
+    this.bookingId,
+    required this.tenantId,
+    required this.customerId,
+    required this.providerId,
+    this.subject,
+    required this.status,
+    this.createdAt,
+    this.updatedAt,
+    this.lastMessageBody,
+    this.messageCount = 0,
+  });
+
+  factory ConversationRow.fromJson(Map<String, dynamic> json) => ConversationRow(
+        id: json['id'] as String,
+        bookingId: json['bookingId'] as String?,
+        tenantId: (json['tenantId'] ?? '') as String,
+        customerId: (json['customerId'] ?? '') as String,
+        providerId: (json['providerId'] ?? '') as String,
+        subject: json['subject'] as String?,
+        status: (json['status'] ?? 'OPEN') as String,
+        createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
+        updatedAt: json['updatedAt'] != null ? DateTime.tryParse(json['updatedAt'].toString()) : null,
+        lastMessageBody: json['lastMessage'] is Map ? (json['lastMessage']['body'] as String?) : null,
+        messageCount: (json['messageCount'] as num?)?.toInt() ?? 0,
+      );
+}
+
+class ChatMessageRow {
+  final String id;
+  final String conversationId;
+  final String senderId;
+  final String senderRole;
+  final String body;
+  final String messageType;
+  final String? attachmentUrl;
+  final DateTime? createdAt;
+
+  const ChatMessageRow({
+    required this.id,
+    required this.conversationId,
+    required this.senderId,
+    required this.senderRole,
+    required this.body,
+    required this.messageType,
+    this.attachmentUrl,
+    this.createdAt,
+  });
+
+  factory ChatMessageRow.fromJson(Map<String, dynamic> json) => ChatMessageRow(
+        id: json['id'] as String,
+        conversationId: (json['conversationId'] ?? '') as String,
+        senderId: (json['senderId'] ?? '') as String,
+        senderRole: (json['senderRole'] ?? 'CUSTOMER') as String,
+        body: (json['body'] ?? '') as String,
+        messageType: (json['messageType'] ?? 'TEXT') as String,
+        attachmentUrl: json['attachmentUrl'] as String?,
+        createdAt: json['createdAt'] != null ? DateTime.tryParse(json['createdAt'].toString()) : null,
+      );
+}
+
+class AnalyticsRow {
+  final List<Map<String, dynamic>> revenueByDay;
+  final Map<String, dynamic> bookingsByStatus;
+  final Map<String, dynamic> retention;
+  final Map<String, dynamic> funnel;
+  final List<Map<String, dynamic>> topServices;
+  final List<Map<String, dynamic>> staffUtilization;
+
+  const AnalyticsRow({
+    required this.revenueByDay,
+    required this.bookingsByStatus,
+    required this.retention,
+    required this.funnel,
+    required this.topServices,
+    required this.staffUtilization,
+  });
+
+  factory AnalyticsRow.fromJson(Map<String, dynamic> json) => AnalyticsRow(
+        revenueByDay: (json['revenueByDay'] as List?)?.cast<Map<String, dynamic>>() ?? [],
+        bookingsByStatus: (json['bookingsByStatus'] as Map?)?.cast<String, dynamic>() ?? {},
+        retention: (json['retention'] as Map?)?.cast<String, dynamic>() ?? {},
+        funnel: (json['funnel'] as Map?)?.cast<String, dynamic>() ?? {},
+        topServices: (json['topServices'] as List?)?.cast<Map<String, dynamic>>() ?? [],
+        staffUtilization: (json['staffUtilization'] as List?)?.cast<Map<String, dynamic>>() ?? [],
       );
 }
 

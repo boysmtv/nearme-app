@@ -122,6 +122,33 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
                           const SizedBox(width: 8),
                           Expanded(child: _InfoChip(icon: Icons.access_time_rounded, label: widget.time!, color: Colors.orange[700]!)),
                         ]),
+                        const SizedBox(height: 12),
+                        // Bundle B: Deposit badge & policy
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(color: Colors.amber[50], borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.amber[100]!)),
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Row(children: [
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(color: summary.service.depositAmount > 0 ? Colors.amber[700] : Colors.grey[300], borderRadius: BorderRadius.circular(20)),
+                                child: Text(summary.service.depositAmount > 0 ? 'Deposit ${formatRupiah(summary.service.depositAmount)} Wajib' : 'Tanpa Deposit', style: TextStyle(color: summary.service.depositAmount > 0 ? Colors.white : Colors.grey[700], fontWeight: FontWeight.w800, fontSize: 11)),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.verified_user_rounded, size: 14, color: Colors.amber),
+                              const SizedBox(width: 4),
+                              Expanded(child: Text('Via Midtrans/Xendit', style: TextStyle(color: Colors.amber[800], fontSize: 11, fontWeight: FontWeight.w600))),
+                            ]),
+                            const SizedBox(height: 6),
+                            Text('Kebijakan: Pembatalan sebelum 24 jam = refund penuh. Setelah itu no refund. Reschedule gratis 1x, lebih = 409.', style: TextStyle(color: Colors.amber[900], fontSize: 11)),
+                            const SizedBox(height: 4),
+                            Row(children: [
+                              const Icon(Icons.info_outline_rounded, size: 12, color: Colors.amber),
+                              const SizedBox(width: 4),
+                              Text('Batas cancel: H-24 • Reschedule: 0/1', style: TextStyle(color: Colors.grey[700], fontSize: 11)),
+                            ]),
+                          ]),
+                        ),
                       ]),
                     ),
                   ]),

@@ -18,15 +18,16 @@ class ApiClient {
 
     const isPublic = endpoint.startsWith('/public/') || endpoint.startsWith('/auth/');
     const token = localStorage.getItem('auth_token');
+    const isFormData = typeof FormData !== 'undefined' && body instanceof FormData;
 
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        ...(!isFormData && { 'Content-Type': 'application/json' }),
         ...(!isPublic && token && { Authorization: `Bearer ${token}` }),
         ...headers,
       },
-      body: body ? JSON.stringify(body) : undefined,
+      body: body ? (isFormData ? (body as unknown as BodyInit) : JSON.stringify(body)) : undefined,
     });
 
     if (!response.ok) {
@@ -39,23 +40,29 @@ class ApiClient {
       throw new Error(msg);
     }
 
+    // Bundle B: ics returns text/calendar
+    if (endpoint.endsWith('/ics')) {
+      const text = await response.text();
+      return text as unknown as T;
+    }
+
     return response.json();
   }
 
-  async get<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint);
+  async get<T>(endpoint: string, headers?: Record<string, string>): Promise<T> {
+    return this.request<T>(endpoint, { headers });
   }
 
-  async post<T>(endpoint: string, body: unknown): Promise<T> {
-    return this.request<T>(endpoint, { method: 'POST', body });
+  async post<T>(endpoint: string, body: unknown, headers?: Record<string, string>): Promise<T> {
+    return this.request<T>(endpoint, { method: 'POST', body, headers });
   }
 
-  async put<T>(endpoint: string, body: unknown): Promise<T> {
-    return this.request<T>(endpoint, { method: 'PUT', body });
+  async put<T>(endpoint: string, body: unknown, headers?: Record<string, string>): Promise<T> {
+    return this.request<T>(endpoint, { method: 'PUT', body, headers });
   }
 
-  async delete<T>(endpoint: string): Promise<T> {
-    return this.request<T>(endpoint, { method: 'DELETE' });
+  async delete<T>(endpoint: string, headers?: Record<string, string>): Promise<T> {
+    return this.request<T>(endpoint, { method: 'DELETE', headers });
   }
 }
 

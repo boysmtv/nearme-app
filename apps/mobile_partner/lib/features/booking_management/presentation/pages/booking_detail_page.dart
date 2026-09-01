@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
 
@@ -61,6 +62,40 @@ class BookingDetailPage extends ConsumerWidget {
                 const SizedBox(height: 12),
                 _InfoRow(icon: Icons.payments, label: 'Amount', value: formatRupiah(booking.amount)),
               ]))),
+              const SizedBox(height: 12),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    const Text('Chat Realtime', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 8),
+                    const Text('Chat pelanggan realtime via WebSocket /ws-chat + SSE', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        icon: const Icon(Icons.chat_bubble, size: 16),
+                        label: const Text('Buka Chat Booking'),
+                        onPressed: () async {
+                          try {
+                            final res = await ApiService().getBookingChat(booking.id);
+                            final chatId = (res.data['data']['id'] ?? res.data['id']) as String;
+                            if (context.mounted) context.push('/partner/chat/$chatId');
+                          } catch (_) {
+                            try {
+                              final res = await ApiService().createChat({'bookingId': booking.id, 'subject': 'Booking ${booking.bookingCode}'});
+                              final chatId = (res.data['data']['id'] ?? res.data['id']) as String;
+                              if (context.mounted) context.push('/partner/chat/$chatId');
+                            } catch (e) {
+                              if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Chat gagal: $e')));
+                            }
+                          }
+                        },
+                      ),
+                    ),
+                  ]),
+                ),
+              ),
             ]),
           );
         },

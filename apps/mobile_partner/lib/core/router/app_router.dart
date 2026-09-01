@@ -10,6 +10,8 @@ import '../../features/booking_management/presentation/pages/booking_detail_page
 import '../../features/payment/presentation/pages/earnings_page.dart';
 import '../../features/staff_management/presentation/pages/staff_list_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
+import '../../features/chat/presentation/pages/chat_list_page.dart';
+import '../../features/chat/presentation/pages/chat_detail_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
 final partnerAuthProvider = StateNotifierProvider<PartnerAuthNotifier, PartnerAuthState>((ref) {
@@ -79,8 +81,11 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: '/payments', name: 'payments', pageBuilder: (_, __) => const NoTransitionPage(child: EarningsPage())),
         GoRoute(path: '/staff', name: 'staff', pageBuilder: (_, __) => const NoTransitionPage(child: StaffListPage())),
         GoRoute(path: '/reports', name: 'reports', pageBuilder: (_, __) => const NoTransitionPage(child: ReportsPage())),
+        GoRoute(path: '/chats', name: 'partnerChats', pageBuilder: (_, __) => const NoTransitionPage(child: PartnerChatListPage())),
       ]),
       GoRoute(path: '/booking/:id', name: 'bookingDetail', builder: (_, state) => BookingDetailPage(bookingId: state.pathParameters['id']!)),
+      GoRoute(path: '/partner/chat/:id', name: 'partnerChatDetail', builder: (_, state) => PartnerChatDetailPage(chatId: state.pathParameters['id']!)),
+      GoRoute(path: '/chat/:id', name: 'chatDetailAlias', builder: (_, state) => PartnerChatDetailPage(chatId: state.pathParameters['id']!)),
     ],
     redirect: (context, state) {
       final auth = ref.read(partnerAuthProvider);

@@ -11,8 +11,10 @@ import id.dekat.customer.domain.CustomerProfile;
 import id.dekat.customer.domain.CustomerProfileRepository;
 import id.dekat.identity.domain.User;
 import id.dekat.identity.domain.UserRepository;
+import id.dekat.media.domain.MediaRepository;
 import id.dekat.review.domain.PublicReview;
 import id.dekat.review.domain.PublicReviewRepository;
+import id.dekat.review.domain.ReviewPhotoRepository;
 import id.dekat.sharedkernel.web.ApiResponse;
 import id.dekat.staff.application.StaffService;
 import id.dekat.tenant.domain.*;
@@ -53,6 +55,8 @@ public class PublicController {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final BlockedDateRepository blockedDateRepository;
+    private final MediaRepository mediaRepository;
+    private final ReviewPhotoRepository reviewPhotoRepository;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -67,7 +71,9 @@ public class PublicController {
                             CustomerProfileRepository customerProfileRepository,
                             UserRepository userRepository,
                             BookingRepository bookingRepository,
-                            BlockedDateRepository blockedDateRepository) {
+                            BlockedDateRepository blockedDateRepository,
+                            MediaRepository mediaRepository,
+                            ReviewPhotoRepository reviewPhotoRepository) {
         this.categoryRepository = categoryRepository;
         this.serviceOfferingRepository = serviceOfferingRepository;
         this.providerListingRepository = providerListingRepository;
@@ -79,6 +85,8 @@ public class PublicController {
         this.userRepository = userRepository;
         this.bookingRepository = bookingRepository;
         this.blockedDateRepository = blockedDateRepository;
+        this.mediaRepository = mediaRepository;
+        this.reviewPhotoRepository = reviewPhotoRepository;
     }
 
     @GetMapping("/categories")
@@ -196,6 +204,39 @@ public class PublicController {
                     row.put("title", s.getTitle());
                     row.put("bio", s.getBio());
                     row.put("avatar", s.getAvatarUrl());
+                    row.put("avatarUrl", s.getAvatarUrl());
+                    // specialties: split specialties TEXT comma-separated into array
+                    if (s.getSpecialties() != null && !s.getSpecialties().isBlank()) {
+                        String raw = s.getSpecialties().trim();
+                        List<String> specs;
+                        if (raw.startsWith("[")) {
+                            // try JSON-like array
+                            specs = Arrays.stream(raw.replaceAll("[\\[\\]\"]", "").split(","))
+                                    .map(String::trim).filter(v -> !v.isEmpty()).toList();
+                        } else {
+                            specs = Arrays.stream(raw.split(",")).map(String::trim).filter(v -> !v.isEmpty()).toList();
+                        }
+                        row.put("specialties", specs);
+                    } else {
+                        row.put("specialties", List.of());
+                    }
+                    // portfolio photos via media_assets
+                    try {
+                        var portfolio = mediaRepository.findByOwnerTypeAndOwnerIdOrderBySortOrderAsc("staff", s.getId());
+                        List<Map<String, Object>> photos = portfolio.stream().map(m -> {
+                            Map<String, Object> pr = new LinkedHashMap<>();
+                            pr.put("id", m.getId().toString());
+                            pr.put("url", m.getUrl());
+                            pr.put("fileName", m.getFileName());
+                            pr.put("sortOrder", m.getSortOrder());
+                            return pr;
+                        }).toList();
+                        row.put("portfolio", photos);
+                        row.put("portfolioCount", photos.size());
+                    } catch (Exception e) {
+                        row.put("portfolio", List.of());
+                        row.put("portfolioCount", 0);
+                    }
                     return row;
                 })
                 .collect(Collectors.toList());
@@ -258,6 +299,54 @@ public class PublicController {
                     row.put("comment", r.getBody());
                     row.put("createdAt", r.getCreatedAt());
                     row.put("customerName", resolveCustomerName(r.getCustomerId(), null));
+                    // verified_booking badge: check if booking exists with same customer and provider and status COMPLETED
+                    boolean verified = false;
+                    try {
+                        if (r.getBookingId() != null) {
+                            var bookingOpt = bookingRepository.findById(r.getBookingId());
+                            if (bookingOpt.isPresent()) {
+                                var b = bookingOpt.get();
+                                verified = b.getCustomerId().equals(r.getCustomerId())
+                                        && b.getTenantId().equals(providerId)
+                                        && b.getStatus() == BookingStatus.COMPLETED;
+                            }
+                        }
+                        // fallback: any completed booking for same customer+tenant
+                        if (!verified) {
+                            verified = bookingRepository.findByCustomerId(r.getCustomerId(), PageRequest.of(0, 5)).getContent().stream()
+                                    .anyMatch(b -> b.getTenantId().equals(providerId) && b.getStatus() == BookingStatus.COMPLETED);
+                        }
+                    } catch (Exception ignored) {}
+                    row.put("verifiedBooking", verified);
+                    // photos: via media_assets owner_type=review or review_photos junction
+                    try {
+                        List<Map<String, Object>> photos = new ArrayList<>();
+                        var linked = reviewPhotoRepository.findByReviewId(r.getId());
+                        if (!linked.isEmpty()) {
+                            List<UUID> mediaIds = linked.stream().map(id -> id.getMediaAssetId()).toList();
+                            var assets = mediaRepository.findAllById(mediaIds);
+                            for (var a : assets) {
+                                Map<String, Object> pr = new LinkedHashMap<>();
+                                pr.put("id", a.getId().toString());
+                                pr.put("url", a.getUrl());
+                                pr.put("fileName", a.getFileName());
+                                photos.add(pr);
+                            }
+                        } else {
+                            var assets = mediaRepository.findByOwnerTypeAndOwnerIdOrderBySortOrderAsc("review", r.getId());
+                            for (var a : assets) {
+                                Map<String, Object> pr = new LinkedHashMap<>();
+                                pr.put("id", a.getId().toString());
+                                pr.put("url", a.getUrl());
+                                pr.put("fileName", a.getFileName());
+                                photos.add(pr);
+                            }
+                        }
+                        if (photos.size() > 8) photos = photos.subList(0, 8);
+                        row.put("photos", photos);
+                    } catch (Exception e) {
+                        row.put("photos", List.of());
+                    }
                     return row;
                 })
                 .collect(Collectors.toList());

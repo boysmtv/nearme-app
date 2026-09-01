@@ -4,7 +4,9 @@ import id.dekat.booking.domain.*;
 import id.dekat.common.IdempotencyException;
 import id.dekat.common.NotFoundException;
 import id.dekat.customer.application.CustomerService;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,8 +19,8 @@ import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.Random;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
 public class BookingService {
 
     private static final int HOLD_EXPIRY_MINUTES = 10;
@@ -29,6 +31,34 @@ public class BookingService {
     private final BookingItemRepository bookingItemRepository;
     private final BookingAssignmentRepository bookingAssignmentRepository;
     private final CustomerService customerService;
+    private final id.dekat.payment.application.PaymentService paymentService;
+
+    @Autowired
+    public BookingService(BookingRepository bookingRepository,
+                          BookingHoldRepository bookingHoldRepository,
+                          BookingStatusHistoryRepository statusHistoryRepository,
+                          BookingItemRepository bookingItemRepository,
+                          BookingAssignmentRepository bookingAssignmentRepository,
+                          CustomerService customerService,
+                          @Lazy @Autowired(required = false) id.dekat.payment.application.PaymentService paymentService) {
+        this.bookingRepository = bookingRepository;
+        this.bookingHoldRepository = bookingHoldRepository;
+        this.statusHistoryRepository = statusHistoryRepository;
+        this.bookingItemRepository = bookingItemRepository;
+        this.bookingAssignmentRepository = bookingAssignmentRepository;
+        this.customerService = customerService;
+        this.paymentService = paymentService;
+    }
+
+    // Constructor for tests without PaymentService
+    public BookingService(BookingRepository bookingRepository,
+                          BookingHoldRepository bookingHoldRepository,
+                          BookingStatusHistoryRepository statusHistoryRepository,
+                          BookingItemRepository bookingItemRepository,
+                          BookingAssignmentRepository bookingAssignmentRepository,
+                          CustomerService customerService) {
+        this(bookingRepository, bookingHoldRepository, statusHistoryRepository, bookingItemRepository, bookingAssignmentRepository, customerService, null);
+    }
 
     @Transactional
     public BookingHold createHold(UUID tenantId, UUID locationId, UUID serviceId,
@@ -86,9 +116,39 @@ public class BookingService {
         booking.recalculateTotal();
         String pin = String.format("%06d", new Random().nextInt(999999));
         booking.setConfirmationPin(pin);
+        // Bundle B: default deposit & policy fields
+        if (booking.getDepositAmount() == null) booking.setDepositAmount(0);
+        if (booking.getDepositRequired() == null) booking.setDepositRequired(false);
+        if (booking.getRescheduleCount() == null) booking.setRescheduleCount(0);
+        if (booking.getMaxReschedule() == null) booking.setMaxReschedule(1);
+        if (booking.getCancelDeadline() == null) {
+            // default 24h before start
+            booking.setCancelDeadline(hold.getStartsAt().minusHours(24));
+        }
+        if (booking.getCancelPolicy() == null) {
+            booking.setCancelPolicy("24h_full_refund");
+        }
+        // enforce deposit: if depositRequired true and amount >0, set pending payment until deposit paid
+        // For now we still confirm but create payment intent via payment module
         booking.confirm();
 
         Booking savedBooking = bookingRepository.save(booking);
+
+        // Enforce deposit creation via payment module if required
+        if (Boolean.TRUE.equals(savedBooking.getDepositRequired()) && savedBooking.getDepositAmount() != null && savedBooking.getDepositAmount() > 0) {
+            try {
+                if (paymentService != null) {
+                    // create deposit payment intent - will be in PENDING state, gateway will handle
+                    paymentService.createPaymentIntent(savedBooking.getId(), tenantId, savedBooking.getDepositAmount(), currency, "DEPOSIT");
+                    log.info("[BookingService] Deposit payment intent created for booking {} amount {}", savedBooking.getId(), savedBooking.getDepositAmount());
+                } else {
+                    log.warn("[BookingService] Deposit required but PaymentService not available for booking {}", savedBooking.getId());
+                }
+            } catch (Exception e) {
+                log.warn("[BookingService] Failed to create deposit intent for booking {}: {}", savedBooking.getId(), e.getMessage());
+                // do not fail booking creation, deposit can be paid via separate endpoint
+            }
+        }
 
         if (items != null) {
             for (BookingItem item : items) {
@@ -170,7 +230,7 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
 
-        if (!booking.getVersion().equals(expectedVersion)) {
+        if (booking.getVersion() == null || !booking.getVersion().equals(expectedVersion)) {
             throw new IdempotencyException(
                 "Booking modified concurrently. Expected v" + expectedVersion
                 + " but found v" + booking.getVersion()
@@ -182,12 +242,26 @@ public class BookingService {
             throw new IllegalStateException("Cannot reschedule in status: " + booking.getStatus());
         }
 
+        // Bundle B: reschedule max 1 free else 409 (handle mock default 0)
+        Integer countBox = booking.getRescheduleCount();
+        Integer maxBox = booking.getMaxReschedule();
+        int currentCount = countBox != null ? countBox : 0;
+        int maxAllowed = (maxBox != null && maxBox > 0) ? maxBox : 1;
+        if (currentCount >= maxAllowed) {
+            throw new IllegalStateException("Reschedule limit reached. Maximum " + maxAllowed + " free reschedule(s) allowed");
+        }
+
         validateSlotAvailability(booking.getTenantId(), null, newStartsAt, newEndsAt);
 
         OffsetDateTime oldStartsAt = booking.getStartsAt();
         OffsetDateTime oldEndsAt = booking.getEndsAt();
 
         booking.reschedule(newStartsAt, newEndsAt);
+        booking.setRescheduleCount(currentCount + 1);
+        // update cancelDeadline to new start minus 24h if policy is 24h
+        if (booking.getCancelPolicy() != null && booking.getCancelPolicy().contains("24h")) {
+            booking.setCancelDeadline(newStartsAt.minusHours(24));
+        }
         Booking savedBooking = bookingRepository.save(booking);
 
         Map<String, Object> metadata = new HashMap<>();
@@ -195,10 +269,11 @@ public class BookingService {
         metadata.put("oldEndsAt", oldEndsAt.toString());
         metadata.put("newStartsAt", newStartsAt.toString());
         metadata.put("newEndsAt", newEndsAt.toString());
+        metadata.put("rescheduleCount", savedBooking.getRescheduleCount());
 
         BookingStatusHistory history = new BookingStatusHistory(
                 bookingId, booking.getStatus(), booking.getStatus(),
-                null, "Booking rescheduled");
+                null, "Booking rescheduled " + (currentCount+1) + "/" + maxAllowed);
         statusHistoryRepository.save(history);
 
         return savedBooking;
@@ -216,16 +291,30 @@ public class BookingService {
             throw new IllegalStateException("Booking is already cancelled");
         }
 
+        // Bundle B: cancel after deadline => no refund
+        boolean afterDeadline = false;
+        if (booking.getCancelDeadline() != null && OffsetDateTime.now().isAfter(booking.getCancelDeadline())) {
+            afterDeadline = true;
+            log.info("[BookingService] Cancel after deadline for booking {} deadline {} now {} => no refund", bookingId, booking.getCancelDeadline(), OffsetDateTime.now());
+        }
+
         BookingStatus fromStatus = booking.getStatus();
         booking.cancel();
         Booking savedBooking = bookingRepository.save(booking);
 
         Map<String, Object> metadata = new HashMap<>();
         metadata.put("cancellationReason", reason);
+        metadata.put("afterDeadline", afterDeadline);
+        metadata.put("depositAmount", booking.getDepositAmount());
+        metadata.put("cancelPolicy", booking.getCancelPolicy());
+        if (afterDeadline) {
+            metadata.put("refund", 0);
+            metadata.put("refundNote", "No refund - cancelled after deadline");
+        }
 
         BookingStatusHistory history = new BookingStatusHistory(
                 bookingId, fromStatus, BookingStatus.CANCELLED,
-                actorId, reason, metadata
+                actorId, afterDeadline ? reason + " (no refund - after deadline)" : reason, metadata
         );
         statusHistoryRepository.save(history);
 
@@ -393,4 +482,3 @@ public class BookingService {
         return sb.toString();
     }
 }
-

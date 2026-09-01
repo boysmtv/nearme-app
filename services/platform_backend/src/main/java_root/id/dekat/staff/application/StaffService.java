@@ -71,6 +71,7 @@ public class StaffService {
         if (update.getAvatarUrl() != null) staff.setAvatarUrl(update.getAvatarUrl());
         if (update.getSortOrder() != null) staff.setSortOrder(update.getSortOrder());
         if (update.getIsActive() != null) staff.setIsActive(update.getIsActive());
+        if (update.getSpecialties() != null) staff.setSpecialties(update.getSpecialties());
 
         return staffRepository.save(staff);
     }

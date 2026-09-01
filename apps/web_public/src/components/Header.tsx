@@ -58,6 +58,11 @@ export default function Header() {
           >
             Cari Layanan
           </Link>
+          {isAuthenticated && (
+            <Link to="/chats" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block">
+              Chat
+            </Link>
+          )}
           <div className="h-6 w-px bg-gray-200" />
           {isAuthenticated && user ? (
             <>
