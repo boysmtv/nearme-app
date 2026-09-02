@@ -178,6 +178,19 @@ module/
 - `GET /admin/tenants` - List tenants
 - `PUT /admin/tenants/{id}/approve` - Approve tenant
 - `GET /admin/config/flags` - Feature flags
+- `GET /admin/feature-flags` - List feature flags (full CRUD)
+- `POST /admin/feature-flags` - Create feature flag
+- `PUT /admin/feature-flags/{id}` - Update feature flag
+- `PUT /admin/feature-flags/{id}/toggle` - Toggle feature flag
+- `DELETE /admin/feature-flags/{id}` - Delete feature flag
+- `GET /admin/subscriptions/plans` - List subscription plans
+- `POST /admin/subscriptions/plans` - Create plan
+- `PUT /admin/subscriptions/plans/{id}` - Update plan
+- `GET /admin/subscriptions` - List subscriptions
+- `PUT /admin/subscriptions/{id}/cancel` - Cancel subscription
+- `GET /admin/audit-logs` - List audit logs (with filters)
+- `GET /admin/export/users` - Export users as CSV
+- `GET /admin/export/bookings` - Export bookings as CSV
 
 ## Database
 
@@ -274,14 +287,13 @@ pnpm install && pnpm dev
 - Profile completion route: `/profile/complete` (required before booking)
 
 ### Testing
-- **Total: ~650 tests** across 6 platforms, all passing (236 backend + 134 web_public + 58 web_provider + 49 web_admin + 124 mobile_customer + 43 mobile_partner + e2e 19)
+- **Total: ~670 tests** across 6 platforms, all passing (236 backend + 134 web_public + 49 web_admin + 124 mobile_customer + 43 mobile_partner + e2e 41)
 - Backend: 236 tests (BookingService + Media 14 + Deposit 6 + FAQ 7 + Chat 10 + Reporting 4 + Coupon/Payment/Jwt) — JUnit 5 + Mockito
-- web_public: 134 tests (15 files, +Gallery/Chat/Analytics/BundleB) — Vitest + @testing-library/react
-- web_provider: 58 tests (5 files) — Vitest + @testing-library/react
+- web_public: 134 tests (15 files) — Vitest + @testing-library/react
 - web_admin: 49 tests (5 files) — Vitest + @testing-library/react
 - mobile_customer: 124 tests (weird_test 30 + media 8 + bundleB 10 + chat 8 + rows + utils) — flutter_test
 - mobile_partner: 43 tests (portfolio 6 + chat 8 + models) — flutter_test
-- E2E Playwright: 19 tests (12 web-public + 7 booking-weird) — `booking-weird.spec.ts` XSS/race/PIN/coupon
+- E2E Playwright: 41 tests (12 web-public + 7 booking-weird + 18 UI audit + 4 web-provider) — screenshots + functional
 - Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
 
 ### Backend Runtime (verified 2026-08-27)
@@ -319,6 +331,7 @@ pnpm install && pnpm dev
  - **Availability popup 2026-08-31** — `availability_page.dart:82` inline month 320px → popup button `Tanggal Sen, 31 Aug 2026` + `showModalBottomSheet` month full, service picker `PILIH LAYANAN` card gradient + bottom sheet, separator `Atur Jadwal` divider, week→popup via hot-restart
  - **Provider detail & booking form 2026-08-31** — `provider_detail_page.dart:78` gradient header + white card overlay + Layanan `Pilih →` card, `booking_form_page.dart:16` Map key infinite loop fix `String key providerId|serviceId`, design `Ringkasan Booking` + `_InfoChip` + `_PaymentCard`, `auth_interceptor.dart:54` refresh parse `data['data']['accessToken']`, `app_router.dart:9` `GoRouterRefresh` + `redirect?redirect=` flow pilih jam→login→konfirmasi, `discovery_page.dart:110` `value.clamp(0,1)` fix red opacity, `availability_page.dart:42` date persist `SecureStorage selected_date` + focused sync
  - **Bundles 2026-09-01 — Media+Portfolio+Review + Deposit+Kalender+FAQ + Chat+Analytics** — `V23 media_assets` + `customer_favorites` + `review_photos` + `staff.specialties`, `MediaService` upload `./uploads` signed-url, `MediaController` `POST /media/upload` `GET /public/providers/{id}/media` `PUT /provider/media/reorder`, `FavoriteController` `POST/DELETE/GET /customer/favorites`, `ReviewService` photos cap 8 + `verified_booking`, `web_public/MediaPage.tsx` + `ProviderPage.tsx` gallery 3-col + `ChatPage.tsx` + `ChatWidget` + `useChatWebSocket` polling 3s+SSE, `ReportsPage.tsx` Recharts Area/Bar/Pie + `analyticsApi`, `V24 bookings` deposit `deposit_amount/cancelDeadline/rescheduleCount` `BookingService` DP+409, `BookingCalendarService` `.ics` + Google `BookingCalendarController` `GET /bookings/{id}/ics`, `BookingReminderScheduler` H-24/H-2, `V25 faqs/policies` `PublicFaqController` `GET /public/faqs` + `ProviderFaqController`, `V26 conversations/messages` `ChatService` `SimpMessagingTemplate /topic/chats/{id}` `ChatWebSocketConfig /ws-chat` JWT query `token`, `ReportingService` `revenueByDay/bookingsByStatus/retention/funnel/topServices/staffUtilization` `ReportingController /provider/reports/analytics`, `flutter` `chat_list/detail` + `reports_page` fl_chart, `SecurityConfig:36` `allowUriQueryParameter` + `WebConfig:14` `/uploads/**` resource, `api/build.gradle:44` `websocket`, tests +~160 (total ~650: backend 236+ web 134+ mobile 167+ e2e 19)
+ - **Feature completion 2026-09-02** — 50+ new files across 6 platforms: FeatureFlag CRUD, NotificationPreference, AdminAuditController, AdminSubscriptionController, AdminExportController (CSV), EmailService + 6 HTML templates, ScheduledTasks, Nearby providers (Haversine), Public FAQs/Policies, Refund estimate/list, Booking history/code, BookingNote entity, web_admin (Analytics/Audit/Subscriptions/FeatureFlags pages), web_public customer (Bookings/Notifications/Favorites/Account/Support), web_public provider (Reviews/Promotions/Notifications), mobile_customer (favorites/reviews/loyalty pages), mobile_partner (services/reviews/promotions/notifications pages), ApiService wired with 7 new methods, V25 UUID hex fixed, FeatureFlag entity fixed (no key_name), Haversine query fixed (subquery instead of GROUP BY), E2E updated (+18 UI audit +4 web-provider), UI audit clean (exposed API paths removed, Indonesian localization), ~670 tests all pass
 
 ## Deployment
 
