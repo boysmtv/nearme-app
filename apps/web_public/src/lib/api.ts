@@ -25,6 +25,13 @@ import type {
   Policy,
 } from './types';
 
+export const api = {
+  get: <T = unknown>(url: string) => apiClient.get<T>(url),
+  post: <T = unknown>(url: string, data?: unknown) => apiClient.post<T>(url, data),
+  put: <T = unknown>(url: string, data?: unknown) => apiClient.put<T>(url, data),
+  delete: <T = unknown>(url: string) => apiClient.delete<T>(url),
+};
+
 export const publicApi = {
   auth: {
     login: (email: string, password: string) =>
@@ -343,6 +350,32 @@ export const providerApi = {
       apiClient.post<ApiResponse<{ date: string }>>('/provider/blocked-dates', data),
     remove: (date: string) =>
       apiClient.delete<ApiResponse<void>>(`/provider/blocked-dates/${date}`),
+  },
+
+  reviews: {
+    list: () => apiClient.get<ApiResponse<any[]>>('/provider/reviews'),
+    respond: (reviewId: string, body: string) =>
+      apiClient.post<ApiResponse<any>>(`/provider/reviews/${reviewId}/respond`, { body }),
+  },
+
+  coupons: {
+    list: () => apiClient.get<ApiResponse<any[]>>('/provider/coupons'),
+    create: (data: any) => apiClient.post<ApiResponse<any>>('/provider/coupons', data),
+    update: (id: string, data: any) => apiClient.put<ApiResponse<any>>(`/provider/coupons/${id}`, data),
+    delete: (id: string) => apiClient.delete(`/provider/coupons/${id}`),
+  },
+
+  campaigns: {
+    list: () => apiClient.get<ApiResponse<any[]>>('/provider/campaigns'),
+    create: (data: any) => apiClient.post<ApiResponse<any>>('/provider/campaigns', data),
+    activate: (id: string) => apiClient.put<ApiResponse<any>>(`/provider/campaigns/${id}/activate`, {}),
+    pause: (id: string) => apiClient.put<ApiResponse<any>>(`/provider/campaigns/${id}/pause`, {}),
+  },
+
+  notifications: {
+    list: () => apiClient.get<ApiResponse<any[]>>('/notifications'),
+    markRead: (id: string) => apiClient.put(`/notifications/${id}/read`, {}),
+    markAllRead: () => apiClient.put('/notifications/read-all', {}),
   },
 
   bookingsProvider: {

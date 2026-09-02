@@ -12,6 +12,10 @@ import '../../features/staff_management/presentation/pages/staff_list_page.dart'
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/chat/presentation/pages/chat_detail_page.dart';
+import '../../features/service_management/presentation/pages/services_page.dart';
+import '../../features/review_management/presentation/pages/reviews_page.dart';
+import '../../features/promotion/presentation/pages/promotions_page.dart';
+import '../../features/notification/presentation/pages/notification_inbox_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
 final partnerAuthProvider = StateNotifierProvider<PartnerAuthNotifier, PartnerAuthState>((ref) {
@@ -82,6 +86,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: '/staff', name: 'staff', pageBuilder: (_, __) => const NoTransitionPage(child: StaffListPage())),
         GoRoute(path: '/reports', name: 'reports', pageBuilder: (_, __) => const NoTransitionPage(child: ReportsPage())),
         GoRoute(path: '/chats', name: 'partnerChats', pageBuilder: (_, __) => const NoTransitionPage(child: PartnerChatListPage())),
+        GoRoute(path: '/services', name: 'services', pageBuilder: (_, __) => const NoTransitionPage(child: ServicesPage())),
+        GoRoute(path: '/reviews', name: 'reviews', pageBuilder: (_, __) => const NoTransitionPage(child: ReviewsPage())),
+        GoRoute(path: '/promotions', name: 'promotions', pageBuilder: (_, __) => const NoTransitionPage(child: PromotionsPage())),
+        GoRoute(path: '/notifications', name: 'notifications', pageBuilder: (_, __) => const NoTransitionPage(child: NotificationInboxPage())),
       ]),
       GoRoute(path: '/booking/:id', name: 'bookingDetail', builder: (_, state) => BookingDetailPage(bookingId: state.pathParameters['id']!)),
       GoRoute(path: '/partner/chat/:id', name: 'partnerChatDetail', builder: (_, state) => PartnerChatDetailPage(chatId: state.pathParameters['id']!)),

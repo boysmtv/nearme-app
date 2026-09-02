@@ -39,6 +39,9 @@ class AccountPage extends ConsumerWidget {
           ),
           const SizedBox(height: 8),
           _MenuItem(icon: Icons.calendar_today, title: 'My Bookings', onTap: () => context.go('/bookings')),
+          _MenuItem(icon: Icons.favorite, title: 'Favorites', onTap: () => context.push('/favorites')),
+          _MenuItem(icon: Icons.stars, title: 'Loyalty Points', onTap: () => context.push('/loyalty')),
+          _MenuItem(icon: Icons.notifications, title: 'Notifications', onTap: () => context.go('/notifications')),
           _MenuItem(icon: Icons.help_outline, title: 'Help & Support', onTap: () => context.push('/support')),
           const Divider(),
           _MenuItem(icon: Icons.logout, title: 'Logout', textColor: Colors.red, onTap: () {

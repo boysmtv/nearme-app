@@ -10,6 +10,10 @@ const BookingsPage = lazy(() => import('./pages/BookingsPage'));
 const PaymentsPage = lazy(() => import('./pages/PaymentsPage'));
 const CasesPage = lazy(() => import('./pages/CasesPage'));
 const ConfigPage = lazy(() => import('./pages/ConfigPage'));
+const AnalyticsPage = lazy(() => import('./pages/AnalyticsPage'));
+const AuditLogPage = lazy(() => import('./pages/AuditLogPage'));
+const SubscriptionsPage = lazy(() => import('./pages/SubscriptionsPage'));
+const FeatureFlagsPage = lazy(() => import('./pages/FeatureFlagsPage'));
 
 function LoadingFallback() {
   return (
@@ -40,6 +44,10 @@ export function App() {
           <Route path="/payments" element={<ProtectedRoute><PaymentsPage /></ProtectedRoute>} />
           <Route path="/cases" element={<ProtectedRoute><CasesPage /></ProtectedRoute>} />
           <Route path="/config" element={<ProtectedRoute><ConfigPage /></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
+          <Route path="/audit-logs" element={<ProtectedRoute><AuditLogPage /></ProtectedRoute>} />
+          <Route path="/subscriptions" element={<ProtectedRoute><SubscriptionsPage /></ProtectedRoute>} />
+          <Route path="/feature-flags" element={<ProtectedRoute><FeatureFlagsPage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Suspense>

@@ -24,8 +24,10 @@ import '../../features/support/presentation/pages/support_page.dart';
 import '../../features/account/presentation/pages/account_page.dart';
 import '../../features/account/presentation/pages/profile_edit_page.dart';
 import '../../features/account/presentation/pages/profile_complete_page.dart';
+import '../../features/account/presentation/pages/loyalty_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/chat/presentation/pages/chat_detail_page.dart';
+import '../../features/favorites/presentation/pages/favorites_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
 class GoRouterRefresh extends ChangeNotifier {
@@ -441,6 +443,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/chat/:id',
         name: 'chatDetail',
         builder: (context, state) => ChatDetailPage(chatId: state.pathParameters['id']!),
+      ),
+      GoRoute(
+        path: '/favorites',
+        name: 'favorites',
+        builder: (context, state) => const FavoritesPage(),
+      ),
+      GoRoute(
+        path: '/loyalty',
+        name: 'loyalty',
+        builder: (context, state) => const LoyaltyPage(),
       ),
     ],
     redirect: (context, state) {

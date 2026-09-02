@@ -5,6 +5,7 @@ import id.dekat.booking.domain.Booking;
 import id.dekat.booking.domain.BookingHold;
 import id.dekat.booking.domain.BookingRepository;
 import id.dekat.booking.domain.BookingStatus;
+import id.dekat.booking.domain.BookingStatusHistory;
 import id.dekat.booking.web.dto.*;
 import id.dekat.sharedkernel.web.ApiResponse;
 import org.springframework.data.domain.Page;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -171,6 +173,18 @@ public class BookingController {
     public ResponseEntity<ApiResponse<Booking>> noShow(@PathVariable UUID id,
                                           @RequestHeader("X-Actor-Id") UUID actorId) {
         return ResponseEntity.ok(ApiResponse.ok(bookingService.recordNoShow(id, actorId)));
+    }
+
+    @GetMapping("/{id}/history")
+    public ResponseEntity<ApiResponse<List<BookingStatusHistory>>> getBookingHistory(@PathVariable UUID id) {
+        List<BookingStatusHistory> history = bookingService.getBookingHistory(id);
+        return ResponseEntity.ok(ApiResponse.ok(history));
+    }
+
+    @GetMapping("/code/{code}")
+    public ResponseEntity<ApiResponse<Booking>> getBookingByCode(@PathVariable String code) {
+        Booking booking = bookingService.getBookingByCode(code);
+        return ResponseEntity.ok(ApiResponse.ok(booking));
     }
 
     private Map<String, Object> toRow(Booking booking) {

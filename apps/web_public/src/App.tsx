@@ -19,10 +19,18 @@ const ProviderReportsPage = lazy(() => import('./pages/provider/ReportsPage'));
 const ProviderSettingsPage = lazy(() => import('./pages/provider/SettingsPage'));
 const ProviderMediaPage = lazy(() => import('./pages/provider/MediaPage'));
 const ProviderFaqPage = lazy(() => import('./pages/provider/FaqPage'));
+const ProviderReviewsPage = lazy(() => import('./pages/provider/ReviewsPage'));
+const ProviderPromotionsPage = lazy(() => import('./pages/provider/PromotionsPage'));
+const ProviderNotificationsPage = lazy(() => import('./pages/provider/NotificationsPage'));
 const ProfileCompletePage = lazy(() => import('./pages/ProfileCompletePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ProviderRegisterPage = lazy(() => import('./pages/ProviderRegisterPage'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
+const CustomerBookingsPage = lazy(() => import('./pages/customer/CustomerBookingsPage'));
+const CustomerNotificationsPage = lazy(() => import('./pages/customer/CustomerNotificationsPage'));
+const CustomerFavoritesPage = lazy(() => import('./pages/customer/CustomerFavoritesPage'));
+const CustomerAccountPage = lazy(() => import('./pages/customer/CustomerAccountPage'));
+const SupportPage = lazy(() => import('./pages/customer/SupportPage'));
 
 function LoadingFallback() {
   return (
@@ -77,6 +85,12 @@ export function App() {
         <Route path="/provider/register" element={<ProviderRegisterPage />} />
         <Route path="/profile/complete" element={<ProfileCompleteGuard><ProfileCompletePage /></ProfileCompleteGuard>} />
 
+        <Route path="/bookings" element={<CustomerBookingsPage />} />
+        <Route path="/notifications" element={<CustomerNotificationsPage />} />
+        <Route path="/favorites" element={<CustomerFavoritesPage />} />
+        <Route path="/account" element={<CustomerAccountPage />} />
+        <Route path="/support" element={<SupportPage />} />
+
         <Route path="/provider/dashboard" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderDashboardPage /></ProtectedRoute>} />
         <Route path="/provider/calendar" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCalendarPage /></ProtectedRoute>} />
         <Route path="/provider/services" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderServicesPage /></ProtectedRoute>} />
@@ -85,6 +99,9 @@ export function App() {
         <Route path="/provider/reports" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderReportsPage /></ProtectedRoute>} />
         <Route path="/provider/media" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderMediaPage /></ProtectedRoute>} />
         <Route path="/provider/faq" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderFaqPage /></ProtectedRoute>} />
+        <Route path="/provider/reviews" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderReviewsPage /></ProtectedRoute>} />
+        <Route path="/provider/promotions" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderPromotionsPage /></ProtectedRoute>} />
+        <Route path="/provider/notifications" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderNotificationsPage /></ProtectedRoute>} />
         <Route path="/provider/settings" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderSettingsPage /></ProtectedRoute>} />
 
         <Route path="/chats" element={<ChatPage />} />

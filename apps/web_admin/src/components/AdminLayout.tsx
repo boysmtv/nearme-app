@@ -10,6 +10,10 @@ const sidebarItems = [
   { label: 'Payments', href: '/payments' },
   { label: 'Cases', href: '/cases' },
   { label: 'Config', href: '/config' },
+  { label: 'Analytics', href: '/analytics' },
+  { label: 'Audit Logs', href: '/audit-logs' },
+  { label: 'Subscriptions', href: '/subscriptions' },
+  { label: 'Feature Flags', href: '/feature-flags' },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

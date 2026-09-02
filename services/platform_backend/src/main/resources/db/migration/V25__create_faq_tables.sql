@@ -35,16 +35,16 @@ CREATE INDEX IF NOT EXISTS idx_policies_active ON policies(is_active);
 
 -- seed platform-global FAQs
 INSERT INTO faqs (id, tenant_id, question, answer, category, sort_order, is_active) VALUES
-  ('f1000000-0000-0000-0000-000000000001', NULL, 'Bagaimana cara booking layanan?', 'Pilih provider, layanan, staf, dan slot waktu tersedia, lalu isi data kontak dan konfirmasi. Anda akan menerima kode booking DKT-* dan PIN 6-digit.', 'booking', 1, true),
-  ('f1000000-0000-0000-0000-000000000002', NULL, 'Apakah bisa reschedule booking?', 'Ya, setiap booking dapat di-reschedule gratis 1 kali. Reschedule berikutnya akan dikenakan biaya atau ditolak tergantung kebijakan provider.', 'booking', 2, true),
-  ('f1000000-0000-0000-0000-000000000003', NULL, 'Bagaimana kebijakan pembatalan & deposit?', 'Pembatalan sebelum batas waktu (H-24) mendapat refund penuh. Setelah deadline deposit hangus (no refund). Deposit diperlukan untuk layanan tertentu dan dibayar saat booking.', 'pembayaran', 3, true),
-  ('f1000000-0000-0000-0000-000000000004', NULL, 'Bagaimana cara menambahkan ke kalender?', 'Setelah booking, klik "Add to Calendar" untuk download file .ics atau buka link Google Calendar di halaman detail booking.', 'kalender', 4, true),
-  ('f1000000-0000-0000-0000-000000000005', NULL, 'Apakah data saya aman?', 'DEKAT menggunakan JWT, OTP/MFA, dan enkripsi BCrypt. Data tidak dibagikan tanpa persetujuan.', 'keamanan', 5, true)
+  ('a1000000-0000-0000-0000-000000000001', NULL, 'Bagaimana cara booking layanan?', 'Pilih provider, layanan, staf, dan slot waktu tersedia, lalu isi data kontak dan konfirmasi. Anda akan menerima kode booking DKT-* dan PIN 6-digit.', 'booking', 1, true),
+  ('a1000000-0000-0000-0000-000000000002', NULL, 'Apakah bisa reschedule booking?', 'Ya, setiap booking dapat di-reschedule gratis 1 kali. Reschedule berikutnya akan dikenakan biaya atau ditolak tergantung kebijakan provider.', 'booking', 2, true),
+  ('a1000000-0000-0000-0000-000000000003', NULL, 'Bagaimana kebijakan pembatalan & deposit?', 'Pembatalan sebelum batas waktu (H-24) mendapat refund penuh. Setelah deadline deposit hangus (no refund). Deposit diperlukan untuk layanan tertentu dan dibayar saat booking.', 'pembayaran', 3, true),
+  ('a1000000-0000-0000-0000-000000000004', NULL, 'Bagaimana cara menambahkan ke kalender?', 'Setelah booking, klik "Add to Calendar" untuk download file .ics atau buka link Google Calendar di halaman detail booking.', 'kalender', 4, true),
+  ('a1000000-0000-0000-0000-000000000005', NULL, 'Apakah data saya aman?', 'DEKAT menggunakan JWT, OTP/MFA, dan enkripsi BCrypt. Data tidak dibagikan tanpa persetujuan.', 'keamanan', 5, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- seed platform policies
 INSERT INTO policies (id, tenant_id, title, body, type, version, is_active) VALUES
-  ('p1000000-0000-0000-0000-000000000001', NULL, 'Kebijakan Pembatalan', 'Pembatalan sebelum 24 jam sebelum jadwal mendapat refund 100%. Setelah itu no refund. Reschedule gratis 1x.', 'cancellation', 1, true),
-  ('p1000000-0000-0000-0000-000000000002', NULL, 'Kebijakan Privasi', 'Kami menjaga privasi data pelanggan dan provider sesuai UU PDP. Data hanya digunakan untuk layanan booking.', 'privacy', 1, true),
-  ('p1000000-0000-0000-0000-000000000003', NULL, 'Syarat & Ketentuan', 'Dengan menggunakan DEKAT Anda menyetujui syarat penggunaan platform, tanggung jawab provider, dan proses sengketa.', 'terms', 1, true)
+  ('b1000000-0000-0000-0000-000000000001', NULL, 'Kebijakan Pembatalan', 'Pembatalan sebelum 24 jam sebelum jadwal mendapat refund 100%. Setelah itu no refund. Reschedule gratis 1x.', 'cancellation', 1, true),
+  ('b1000000-0000-0000-0000-000000000002', NULL, 'Kebijakan Privasi', 'Kami menjaga privasi data pelanggan dan provider sesuai UU PDP. Data hanya digunakan untuk layanan booking.', 'privacy', 1, true),
+  ('b1000000-0000-0000-0000-000000000003', NULL, 'Syarat & Ketentuan', 'Dengan menggunakan DEKAT Anda menyetujui syarat penggunaan platform, tanggung jawab provider, dan proses sengketa.', 'terms', 1, true)
 ON CONFLICT (id) DO NOTHING;
