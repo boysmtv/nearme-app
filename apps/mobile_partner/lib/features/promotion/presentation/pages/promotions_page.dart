@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/dekat_colors.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 
 class PromotionsPage extends ConsumerStatefulWidget {
   const PromotionsPage({super.key});

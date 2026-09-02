@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/dekat_colors.dart';
+import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 
 class NotificationInboxPage extends ConsumerStatefulWidget {
   const NotificationInboxPage({super.key});
@@ -22,10 +23,10 @@ class _NotificationInboxPageState extends ConsumerState<NotificationInboxPage> {
   Future<void> _loadNotifications() async {
     setState(() => _loading = true);
     try {
-      // TODO: Call API GET /notifications
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await ApiService().getNotifications();
+      final data = response.data['data'];
       setState(() {
-        _notifications = [];
+        _notifications = data is List ? data : [];
         _loading = false;
       });
     } catch (e) {
@@ -43,12 +44,16 @@ class _NotificationInboxPageState extends ConsumerState<NotificationInboxPage> {
         actions: [
           TextButton(
             onPressed: () async {
-              // TODO: Call API PUT /notifications/read-all
-              setState(() {
-                for (var n in _notifications) {
-                  n['read'] = true;
-                }
-              });
+              try {
+                await ApiService().markAllNotificationsRead();
+                setState(() {
+                  for (var n in _notifications) {
+                    n['read'] = true;
+                  }
+                });
+              } catch (e) {
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+              }
             },
             child: const Text('Mark all read', style: TextStyle(color: Colors.white)),
           ),
@@ -91,10 +96,12 @@ class _NotificationInboxPageState extends ConsumerState<NotificationInboxPage> {
                             _formatTime(n['createdAt']),
                             style: const TextStyle(fontSize: 11, color: Colors.grey),
                           ),
-                          onTap: () {
+                          onTap: () async {
                             if (!isRead) {
-                              // TODO: Call API PUT /notifications/${n['id']}/read
-                              setState(() => n['read'] = true);
+                              try {
+                                await ApiService().markNotificationRead(n['id']);
+                                setState(() => n['read'] = true);
+                              } catch (e) {}
                             }
                           },
                         ),

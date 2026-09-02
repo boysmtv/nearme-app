@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/dekat_colors.dart';
-import '../../../../shared/widgets/main_scaffold.dart';
+import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
   const FavoritesPage({super.key});
@@ -24,10 +24,10 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   Future<void> _loadFavorites() async {
     setState(() => _loading = true);
     try {
-      // TODO: Call API GET /customer/favorites
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await ApiService().getFavorites();
+      final data = response.data['data'];
       setState(() {
-        _favorites = [];
+        _favorites = data is List ? data : [];
         _loading = false;
       });
     } catch (e) {
@@ -37,8 +37,12 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MainScaffold(
-      title: 'Favorite Staff',
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Favorite Staff'),
+        backgroundColor: DEKATColors.primary,
+        foregroundColor: Colors.white,
+      ),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : _favorites.isEmpty
@@ -89,7 +93,11 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   }
 
   Future<void> _removeFavorite(String staffId) async {
-    // TODO: Call API DELETE /customer/favorites/$staffId
-    setState(() => _favorites.removeWhere((f) => f['staffId'] == staffId));
+    try {
+      await ApiService().removeFavorite(staffId);
+      setState(() => _favorites.removeWhere((f) => f['staffId'] == staffId));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+    }
   }
 }

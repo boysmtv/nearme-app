@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/dekat_colors.dart';
+import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 
 class ServicesPage extends ConsumerStatefulWidget {
   const ServicesPage({super.key});
@@ -22,10 +23,10 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
   Future<void> _loadServices() async {
     setState(() => _loading = true);
     try {
-      // TODO: Call API GET /provider/services
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await ApiService().getProviderServicesList();
+      final data = response.data['data'];
       setState(() {
-        _services = [];
+        _services = data is List ? data : [];
         _loading = false;
       });
     } catch (e) {
@@ -103,7 +104,9 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
   }
 
   void _showCreateServiceDialog() {
-    // TODO: Show create service dialog
+    final nameCtrl = TextEditingController();
+    final priceCtrl = TextEditingController();
+    final durationCtrl = TextEditingController();
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -111,14 +114,29 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const TextField(decoration: InputDecoration(labelText: 'Name')),
-            const TextField(decoration: InputDecoration(labelText: 'Price'), keyboardType: TextInputType.number),
-            const TextField(decoration: InputDecoration(labelText: 'Duration (min)'), keyboardType: TextInputType.number),
+            TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Name')),
+            TextField(controller: priceCtrl, decoration: const InputDecoration(labelText: 'Price'), keyboardType: TextInputType.number),
+            TextField(controller: durationCtrl, decoration: const InputDecoration(labelText: 'Duration (min)'), keyboardType: TextInputType.number),
           ],
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-          ElevatedButton(onPressed: () => Navigator.pop(context), child: const Text('Save')),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                await ApiService().createService({
+                  'name': nameCtrl.text,
+                  'price': int.tryParse(priceCtrl.text) ?? 0,
+                  'durationMinutes': int.tryParse(durationCtrl.text) ?? 30,
+                });
+                Navigator.pop(context);
+                _loadServices();
+              } catch (e) {
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+              }
+            },
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
@@ -128,7 +146,12 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
     // TODO: Show edit service dialog
   }
 
-  void _toggleService(String id, bool active) {
-    // TODO: Call API PUT /provider/services/$id
+  void _toggleService(String id, bool active) async {
+    try {
+      await ApiService().updateService(id, {'isActive': active});
+      _loadServices();
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+    }
   }
 }

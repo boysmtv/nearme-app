@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/dekat_colors.dart';
+import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 
 class LoyaltyPage extends ConsumerStatefulWidget {
   const LoyaltyPage({super.key});
@@ -23,11 +24,11 @@ class _LoyaltyPageState extends ConsumerState<LoyaltyPage> {
   Future<void> _loadLoyalty() async {
     setState(() => _loading = true);
     try {
-      // TODO: Call API GET /customer/profile (for points) and loyalty history
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await ApiService().getCustomerProfile();
+      final data = response.data['data'];
       setState(() {
-        _points = 0;
-        _history = [];
+        _points = data['loyaltyPoints'] ?? 0;
+        _history = data['loyaltyHistory'] is List ? data['loyaltyHistory'] : [];
         _loading = false;
       });
     } catch (e) {

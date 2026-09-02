@@ -325,4 +325,35 @@ class ApiService {
   Future<Response> exportAnalytics({Map<String, dynamic>? params}) {
     return _dio.get(Endpoints.providerReportsExport, queryParameters: params);
   }
+
+  // Provider reviews
+  Future<Response> getProviderReviews(String providerId) {
+    return _dio.get('${Endpoints.providers}/$providerId/reviews');
+  }
+
+  Future<Response> getPartnerReviews({Map<String, dynamic>? params}) {
+    return _dio.get('/provider/reviews', queryParameters: params);
+  }
+
+  Future<Response> respondToReview(String reviewId, Map<String, dynamic> data) {
+    return _dio.post('/provider/reviews/$reviewId/respond', data: data);
+  }
+
+  // Provider services management
+  Future<Response> createService(Map<String, dynamic> data) {
+    return _dio.post(Endpoints.providerServices, data: data);
+  }
+
+  Future<Response> updateService(String id, Map<String, dynamic> data) {
+    return _dio.put('${Endpoints.providerServices}/$id', data: data);
+  }
+
+  Future<Response> deleteService(String id) {
+    return _dio.delete('${Endpoints.providerServices}/$id');
+  }
+
+  // Customer loyalty
+  Future<Response> getCustomerLoyalty() {
+    return _dio.get('/customer/loyalty');
+  }
 }

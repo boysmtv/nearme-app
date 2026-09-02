@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/dekat_colors.dart';
+import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 
 class ProviderReviewsPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -23,10 +24,10 @@ class _ProviderReviewsPageState extends ConsumerState<ProviderReviewsPage> {
   Future<void> _loadReviews() async {
     setState(() => _loading = true);
     try {
-      // TODO: Call API GET /public/providers/${widget.providerId}/reviews
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await ApiService().getProviderReviews(widget.providerId);
+      final data = response.data['data'];
       setState(() {
-        _reviews = [];
+        _reviews = data is List ? data : [];
         _loading = false;
       });
     } catch (e) {

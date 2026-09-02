@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/theme/dekat_colors.dart';
+import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 
 class ReviewsPage extends ConsumerStatefulWidget {
   const ReviewsPage({super.key});
@@ -22,10 +23,10 @@ class _ReviewsPageState extends ConsumerState<ReviewsPage> {
   Future<void> _loadReviews() async {
     setState(() => _loading = true);
     try {
-      // TODO: Call API GET /provider/reviews
-      await Future.delayed(const Duration(seconds: 1));
+      final response = await ApiService().getPartnerReviews();
+      final data = response.data['data'];
       setState(() {
-        _reviews = [];
+        _reviews = data is List ? data : [];
         _loading = false;
       });
     } catch (e) {
@@ -135,9 +136,15 @@ class _ReviewsPageState extends ConsumerState<ReviewsPage> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           ElevatedButton(
-            onPressed: () {
-              // TODO: Call API POST /provider/reviews/$reviewId/respond
-              Navigator.pop(context);
+            onPressed: () async {
+              if (controller.text.trim().isEmpty) return;
+              try {
+                await ApiService().respondToReview(reviewId, {'response': controller.text.trim()});
+                Navigator.pop(context);
+                _loadReviews();
+              } catch (e) {
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
+              }
             },
             child: const Text('Send'),
           ),
