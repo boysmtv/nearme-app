@@ -51,7 +51,7 @@ export default function ProviderRegisterPage() {
               <p className="mt-1 text-xs text-gray-400">Akan menjadi /provider/{slug}</p>
             </div>
             <button type="submit" disabled={loading} className="w-full rounded-lg bg-primary-600 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{loading ? 'Mengirim...' : 'Daftar Provider'}</button>
-            <p className="text-center text-xs text-gray-400">POST /provider/tenant — butuh JWT ROLE_PROVIDER_OWNER. Hubungi admin@dekat.id (admin123) untuk aktivasi.</p>
+            <p className="text-center text-xs text-gray-400">Hubungi admin@dekat.id untuk aktivasi akun provider Anda.</p>
             <div className="text-center">
               <Link to="/about" className="text-sm text-primary-600 hover:underline">Pelajari tentang DEKAT</Link>
             </div>

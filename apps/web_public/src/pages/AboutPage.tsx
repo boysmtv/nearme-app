@@ -46,7 +46,7 @@ export default function AboutPage() {
           {/* FAQ Section Bundle B */}
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900">FAQ</h2>
-            <p className="mt-1 text-sm text-gray-500">GET /public/faqs - Pertanyaan umum tentang booking, deposit, reschedule & kalender</p>
+            <p className="mt-1 text-sm text-gray-500">Pertanyaan umum tentang booking, deposit, reschedule & kalender</p>
             <div className="mt-6 space-y-3">
               {Array.isArray(faqs) && faqs.length > 0 ? faqs.map((f) => (
                 <div key={f.id} className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
@@ -64,7 +64,7 @@ export default function AboutPage() {
           {/* Policies Section */}
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900">Kebijakan</h2>
-            <p className="mt-1 text-sm text-gray-500">GET /public/policies - Deposit & pembatalan, privasi, S&K</p>
+            <p className="mt-1 text-sm text-gray-500">Deposit & pembatalan, privasi, S&K</p>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {Array.isArray(policies) && policies.length > 0 ? policies.map((p) => (
                 <div key={p.id} className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">

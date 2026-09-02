@@ -24,12 +24,12 @@ export default function SupportPage() {
 
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-8">
-      <h1 className="text-2xl font-bold">Help & Support</h1>
+      <h1 className="text-2xl font-bold">Bantuan & Dukungan</h1>
 
-      {loading ? <p>Loading...</p> : (
+      {loading ? <p>Memuat...</p> : (
         <>
           <section>
-            <h2 className="text-xl font-semibold mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-xl font-semibold mb-4">Pertanyaan Umum</h2>
             <div className="space-y-2">
               {faqs.map(faq => (
                 <div key={faq.id} className="bg-white rounded-lg shadow">
@@ -43,12 +43,12 @@ export default function SupportPage() {
                   )}
                 </div>
               ))}
-              {faqs.length === 0 && <p className="text-gray-500">No FAQs available</p>}
+              {faqs.length === 0 && <p className="text-gray-500">Belum ada FAQ</p>}
             </div>
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold mb-4">Policies</h2>
+            <h2 className="text-xl font-semibold mb-4">Kebijakan</h2>
             <div className="space-y-2">
               {policies.map(p => (
                 <div key={p.id} className="bg-white p-4 rounded-lg shadow">
