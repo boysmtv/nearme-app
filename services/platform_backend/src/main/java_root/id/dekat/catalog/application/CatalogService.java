@@ -4,6 +4,8 @@ import id.dekat.catalog.domain.*;
 import id.dekat.catalog.web.dto.ServiceRequest;
 import id.dekat.catalog.web.dto.ServiceResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +26,7 @@ public class CatalogService {
     private final ServiceAddonRepository addonRepository;
 
     @Transactional
+    @CacheEvict(value = "provider-services", key = "#tenantId")
     public ServiceItem createService(UUID tenantId, ServiceRequest request) {
         String slug = generateUniqueSlug(request.getSlug(), tenantId);
 
@@ -49,6 +52,7 @@ public class CatalogService {
     }
 
     @Transactional
+    @CacheEvict(value = "provider-services", key = "#tenantId")
     public ServiceItem updateService(UUID id, ServiceRequest request) {
         ServiceItem service = serviceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Service not found: " + id));
@@ -153,6 +157,7 @@ public class CatalogService {
     }
 
     @Transactional(readOnly = true)
+    @Cacheable(value = "provider-services", key = "#tenantId")
     public List<ServiceResponse> getPublicServicesByTenant(UUID tenantId) {
         return serviceRepository.findByTenantIdAndVisibility(tenantId, "PUBLIC").stream()
                 .map(this::mapToResponse)
@@ -160,6 +165,7 @@ public class CatalogService {
     }
 
     @Transactional
+    @CacheEvict(value = "provider-services", key = "#result.tenantId")
     public ServiceItem publishService(UUID id) {
         ServiceItem service = serviceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Service not found: " + id));
@@ -179,6 +185,7 @@ public class CatalogService {
     }
 
     @Transactional
+    @CacheEvict(value = "provider-services", key = "#result.tenantId")
     public ServiceItem unpublishService(UUID id) {
         ServiceItem service = serviceRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Service not found: " + id));

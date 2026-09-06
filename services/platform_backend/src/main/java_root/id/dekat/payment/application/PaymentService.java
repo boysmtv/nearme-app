@@ -3,6 +3,7 @@ package id.dekat.payment.application;
 import id.dekat.common.NotFoundException;
 import id.dekat.payment.domain.*;
 import id.dekat.payment.infrastructure.gateway.PaymentGatewayPort;
+import id.dekat.payment.infrastructure.gateway.PaymentGatewayProperties;
 import id.dekat.payment.infrastructure.gateway.CreateTransactionRequest;
 import id.dekat.payment.infrastructure.gateway.PaymentResult;
 import id.dekat.payment.infrastructure.gateway.RefundRequest;
@@ -22,7 +23,6 @@ import java.util.UUID;
 public class PaymentService {
 
     private static final int PAYMENT_EXPIRY_MINUTES = 30;
-    private static final String GATEWAY_PROVIDER = "midtrans";
 
     private final PaymentRepository paymentRepository;
     private final RefundRepository refundRepository;
@@ -30,6 +30,7 @@ public class PaymentService {
     private final LedgerEntryRepository ledgerEntryRepository;
     private final PaymentGatewayPort gateway;
     private final PaymentWebhookEventRepository webhookEventRepository;
+    private final PaymentGatewayProperties gatewayProperties;
 
     @Transactional
     public PaymentIntent createPaymentIntent(UUID bookingId, UUID tenantId,
@@ -65,7 +66,7 @@ public class PaymentService {
                 .orderId(saved.getId().toString())
                 .amount(saved.getAmount())
                 .currency(saved.getCurrency())
-                .callbackUrl("/webhooks/payments/" + GATEWAY_PROVIDER)
+                .callbackUrl("/webhooks/payments/" + gatewayProperties.provider())
                 .expiry(saved.getExpiresAt())
                 .build();
 
@@ -78,7 +79,7 @@ public class PaymentService {
         }
 
         PaymentTransaction initTransaction = new PaymentTransaction(
-                saved.getId(), GATEWAY_PROVIDER, amount,
+                saved.getId(), gatewayProperties.provider(), amount,
                 PaymentTransaction.TransactionStatus.INITIATED, null
         );
 

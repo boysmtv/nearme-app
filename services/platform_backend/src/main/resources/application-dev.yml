@@ -76,6 +76,15 @@ dekat:
       host: localhost
       port: 1025
       from: no-reply@dekat.id
+    fcm:
+      project-id: dekat-dev
+      service-account-path: ./fcm/service-account.json
+  payment:
+    gateway:
+      provider: midtrans
+      server-key: SB-Mid-server-XXXXXXXXXXXXXXXXXXXX
+      webhook-secret: SB-Mid-signature-key-XXXXXXXXXXXXXXXXXXXX
+      api-url: https://api.sandbox.midtrans.com
 
 # ===== Actuator (dev) =====
 management:

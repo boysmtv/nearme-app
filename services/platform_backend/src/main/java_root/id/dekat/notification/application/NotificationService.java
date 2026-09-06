@@ -1,8 +1,9 @@
 package id.dekat.notification.application;
 
 import id.dekat.notification.domain.*;
-import id.dekat.notification.infrastructure.email.EmailPort;
 import id.dekat.notification.infrastructure.push.PushNotificationPort;
+import id.dekat.identity.domain.User;
+import id.dekat.identity.domain.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,9 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final NotificationTemplateRepository templateRepository;
     private final DeviceTokenRepository deviceTokenRepository;
-    private final EmailPort emailPort;
+    private final EmailService emailService;
     private final PushNotificationPort pushPort;
+    private final UserRepository userRepository;
 
     @Transactional
     public NotificationDelivery sendBookingConfirmation(UUID tenantId, UUID recipientId,
@@ -224,8 +226,18 @@ public class NotificationService {
 
     private void sendEmailNotification(UUID userId, String subject, String body) {
         try {
-            emailPort.sendEmail(userId.toString(), subject, body);
-            log.info("Email notification sent to user {}", userId);
+            User user = userRepository.findById(userId).orElse(null);
+            if (user == null || user.getEmail() == null) {
+                log.warn("No email found for user {}", userId);
+                return;
+            }
+            Map<String, String> vars = Map.of(
+                "userName", user.getName() != null ? user.getName() : "User",
+                "subject", subject,
+                "body", body
+            );
+            emailService.sendTemplateEmail(user.getEmail(), "welcome", subject, vars);
+            log.info("Email notification sent to user {} ({})", userId, user.getEmail());
         } catch (Exception e) {
             log.warn("Failed to send email to user {}: {}", userId, e.getMessage());
         }

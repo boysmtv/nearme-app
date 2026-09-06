@@ -18,6 +18,8 @@ import id.dekat.review.domain.ReviewPhotoRepository;
 import id.dekat.sharedkernel.web.ApiResponse;
 import id.dekat.staff.application.StaffService;
 import id.dekat.tenant.domain.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/public")
+@Tag(name = "Public", description = "Endpoint publik - tidak perlu autentikasi")
 public class PublicController {
 
     private static final ZoneId WIB = ZoneId.of("Asia/Jakarta");
@@ -90,6 +93,7 @@ public class PublicController {
     }
 
     @GetMapping("/categories")
+    @Operation(summary = "Daftar kategori layanan", description = "Mendapatkan semua kategori yang aktif")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getCategories() {
         List<Map<String, Object>> categories = categoryRepository.findAllByIsActiveTrueOrderBySortOrderAsc()
                 .stream()
@@ -106,6 +110,7 @@ public class PublicController {
     }
 
     @GetMapping("/providers")
+    @Operation(summary = "Cari provider", description = "Mencari provider berdasarkan kata kunci, kategori, lokasi, harga, rating")
     public ResponseEntity<ApiResponse<List<Map<String, Object>>>> searchProviders(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String category,
@@ -374,6 +379,7 @@ public class PublicController {
     }
 
     @PostMapping("/bookings")
+    @Operation(summary = "Buat booking (guest)", description = "Membuat booking baru tanpa login. Customer email akan auto-create user jika belum ada.")
     @Transactional
     public ResponseEntity<ApiResponse<Map<String, Object>>> createBooking(
             @RequestHeader(value = "X-Tenant-Id", required = false) UUID headerTenantId,
@@ -610,5 +616,46 @@ public class PublicController {
                 .setParameter("name", name)
                 .executeUpdate();
         return newId;
+    }
+
+    @GetMapping("/providers/nearby")
+    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> findNearbyProviders(
+            @RequestParam double lat,
+            @RequestParam double lng,
+            @RequestParam(defaultValue = "10") double radiusKm,
+            @RequestParam(defaultValue = "20") int limit) {
+
+        // Haversine formula for distance calculation
+        String haversine = "(6371 * acos(cos(radians(:lat)) * cos(radians(l.latitude)) * cos(radians(l.longitude) - radians(:lng)) + sin(radians(:lat)) * sin(radians(l.latitude))))";
+        
+        List<Object[]> results = entityManager.createNativeQuery(
+            "SELECT sub.id, sub.name, sub.slug, sub.verification_status, sub.distance FROM (" +
+            "SELECT t.id, t.name, t.slug, t.verification_status, " +
+            haversine + " AS distance " +
+            "FROM tenants t " +
+            "JOIN locations l ON l.tenant_id = t.id " +
+            "WHERE t.verification_status = 'VERIFIED'" +
+            ") sub " +
+            "WHERE sub.distance <= :radius " +
+            "ORDER BY sub.distance " +
+            "LIMIT :limit")
+            .setParameter("lat", lat)
+            .setParameter("lng", lng)
+            .setParameter("radius", radiusKm)
+            .setParameter("limit", limit)
+            .getResultList();
+
+        List<Map<String, Object>> providers = results.stream().map(row -> {
+            Object[] arr = (Object[]) row;
+            Map<String, Object> map = new LinkedHashMap<>();
+            map.put("id", arr[0].toString());
+            map.put("name", arr[1]);
+            map.put("slug", arr[2]);
+            map.put("verificationStatus", arr[3]);
+            map.put("distanceKm", arr[4]);
+            return map;
+        }).toList();
+
+        return ResponseEntity.ok(ApiResponse.ok(providers));
     }
 }

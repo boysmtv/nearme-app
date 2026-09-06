@@ -6,7 +6,17 @@ Future<void> initCore() async {
   );
 
   try {
-    await NotificationService.initialize();
+    await NotificationService.initialize(
+      onForegroundMessage: (message) {
+        // Show local notification or in-app banner
+      },
+      onNotificationOpened: (message) {
+        // Navigate to relevant screen based on payload
+      },
+      onTokenRegistered: (token) {
+        // Token will be registered after login
+      },
+    );
   } catch (_) {}
   try {
     await LocalizationService.initialize();

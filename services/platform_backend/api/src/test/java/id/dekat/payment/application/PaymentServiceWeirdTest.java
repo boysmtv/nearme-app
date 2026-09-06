@@ -3,6 +3,7 @@ package id.dekat.payment.application;
 import id.dekat.common.NotFoundException;
 import id.dekat.payment.domain.*;
 import id.dekat.payment.infrastructure.gateway.PaymentGatewayPort;
+import id.dekat.payment.infrastructure.gateway.PaymentGatewayProperties;
 import id.dekat.payment.infrastructure.gateway.PaymentResult;
 import id.dekat.payment.infrastructure.gateway.RefundResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,7 @@ class PaymentServiceWeirdTest {
     @Mock private LedgerEntryRepository ledgerEntryRepository;
     @Mock private PaymentGatewayPort gateway;
     @Mock private PaymentWebhookEventRepository webhookEventRepository;
+    @Mock private PaymentGatewayProperties gatewayProperties;
 
     @InjectMocks private PaymentService paymentService;
 
@@ -39,6 +41,7 @@ class PaymentServiceWeirdTest {
     void setUp() {
         bookingId = UUID.randomUUID();
         tenantId = UUID.randomUUID();
+        lenient().when(gatewayProperties.provider()).thenReturn("midtrans");
     }
 
     // P

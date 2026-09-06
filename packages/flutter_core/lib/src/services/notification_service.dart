@@ -1,6 +1,11 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint('Background message: ${message.notification?.title}');
+}
+
 class NotificationService {
   NotificationService._();
 
@@ -8,15 +13,21 @@ class NotificationService {
   static Function(RemoteMessage)? _onMessageHandler;
   static Function(RemoteMessage)? _onMessageOpenedAppHandler;
   static String? _fcmToken;
+  static Function(String token)? _onTokenRegistered;
 
   static String? get fcmToken => _fcmToken;
 
   static Future<void> initialize({
     Function(RemoteMessage)? onForegroundMessage,
     Function(RemoteMessage)? onNotificationOpened,
+    Function(String token)? onTokenRegistered,
   }) async {
     _onMessageHandler = onForegroundMessage;
     _onMessageOpenedAppHandler = onNotificationOpened;
+    _onTokenRegistered = onTokenRegistered;
+
+    // Register background handler
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     final settings = await _messaging.requestPermission(
       alert: true,
@@ -31,9 +42,14 @@ class NotificationService {
       _fcmToken = await _messaging.getToken();
       debugPrint('FCM Token: $_fcmToken');
 
+      if (_fcmToken != null) {
+        _onTokenRegistered?.call(_fcmToken!);
+      }
+
       _messaging.onTokenRefresh.listen((token) {
         _fcmToken = token;
         debugPrint('FCM Token refreshed: $token');
+        _onTokenRegistered?.call(token);
       });
     }
 

@@ -46,6 +46,7 @@ spring:
 
   cache:
     type: redis
+    cache-names: categories,providers,provider-services,provider-reviews,provider-staff
     redis:
       time-to-live: 600000
       cache-null-values: false
@@ -88,6 +89,15 @@ springdoc:
     path: /swagger-ui.html
     operations-sorter: alpha
     tags-sorter: alpha
+
+# ===== Payment Gateway =====
+dekat:
+  payment:
+    gateway:
+      provider: midtrans
+      server-key: ${MIDTRANS_SERVER_KEY:SB-Mid-server-XXXXXXXXXXXXXXXXXXXX}
+      webhook-secret: ${MIDTRANS_WEBHOOK_SECRET:SB-Mid-signature-key-XXXXXXXXXXXXXXXXXXXX}
+      api-url: ${MIDTRANS_API_URL:https://api.sandbox.midtrans.com}
 
 # Modulith Slices visualisation
 spring.modulith:
