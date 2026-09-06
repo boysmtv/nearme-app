@@ -1,0 +1,227 @@
+{
+  "flows": [
+    {
+      "name": "add",
+      "entrypoints": [
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart"
+      ],
+      "domain_functions": [
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/login_page.dart:Padding",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart:Padding",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart:Padding",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart:Padding",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart:Padding",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart:Padding",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart:Padding",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_detail_page.dart:Padding"
+      ],
+      "tests": [
+        "services/platform_backend/api/src/test/java/id/dekat/customer/web/FavoriteControllerTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/review/application/ReviewServicePhotoTest.java"
+      ],
+      "docs": [
+        ".github/workflows/cd.yml",
+        ".github/workflows/ci.yml",
+        ".opencode/memory/2026-08-27-progress.md",
+        ".opencode/package-lock.json",
+        ".opencode/package.json",
+        ".playwright-mcp/page-2026-08-25T14-26-53-727Z.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "deposit",
+      "entrypoints": [
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingDepositAndPolicyTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingDepositAndPolicyTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingDepositAndPolicyTest.java",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java"
+      ],
+      "domain_functions": [
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingDepositAndPolicyTest.java:deposit_enforced_via_payment",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java:getDeposit",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java:setDeposit",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java:getDepositAmount",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java:setDepositAmount",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java:getDepositRequired",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/domain/Booking.java:setDepositRequired",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/web/dto/BookingResponse.java:getDeposit"
+      ],
+      "tests": [
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingDepositAndPolicyTest.java"
+      ],
+      "docs": [
+        ".github/workflows/cd.yml",
+        ".github/workflows/ci.yml",
+        ".opencode/memory/2026-08-27-progress.md",
+        ".opencode/package-lock.json",
+        ".opencode/package.json",
+        ".playwright-mcp/page-2026-08-25T14-26-53-727Z.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "list",
+      "entrypoints": [
+        "apps/mobile_customer/lib/features/chat/presentation/pages/chat_list_page.dart",
+        "apps/mobile_customer/lib/features/chat/presentation/pages/chat_list_page.dart",
+        "apps/mobile_customer/lib/features/provider_profile/presentation/pages/provider_list_page.dart",
+        "apps/mobile_customer/lib/features/provider_profile/presentation/pages/provider_list_page.dart",
+        "apps/mobile_partner/lib/features/booking_management/presentation/pages/booking_list_page.dart",
+        "apps/mobile_partner/lib/features/booking_management/presentation/pages/booking_list_page.dart"
+      ],
+      "domain_functions": [
+        "apps/mobile_partner/lib/features/promotion/presentation/pages/promotions_page.dart:_buildCouponsList",
+        "apps/mobile_partner/lib/features/promotion/presentation/pages/promotions_page.dart:_buildCampaignsList",
+        "apps/mobile_partner/lib/features/staff_management/presentation/pages/staff_list_page.dart:ListTile",
+        "packages/flutter_api_client/lib/src/api/api_service.dart:getProviderServicesList",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/web/BookingControllerTest.java:listBookings_withTenantId_returnsPaginatedResponse",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/web/BookingControllerTest.java:listBookings_withCustomerId_returnsCustomerBookings",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/web/BookingControllerTest.java:listBookings_withStatusFilter_appliesFilter",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/web/BookingControllerTest.java:listBookings_withInvalidStatus_returnsUnfiltered"
+      ],
+      "tests": [
+        "services/platform_backend/api/src/test/java/id/dekat/booking/web/BookingControllerTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/chat/application/ChatServiceTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/customer/web/FavoriteControllerTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/faq/application/FaqServiceTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/media/web/MediaControllerTest.java"
+      ],
+      "docs": [
+        ".github/workflows/cd.yml",
+        ".github/workflows/ci.yml",
+        ".opencode/memory/2026-08-27-progress.md",
+        ".opencode/package-lock.json",
+        ".opencode/package.json",
+        ".playwright-mcp/page-2026-08-25T14-26-53-727Z.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "login",
+      "entrypoints": [
+        "apps/mobile_customer/lib/core/router/app_router.dart",
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+        "apps/mobile_partner/lib/core/router/app_router.dart"
+      ],
+      "domain_functions": [
+        "apps/mobile_customer/lib/core/router/app_router.dart:login",
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/login_page.dart:_handleLogin",
+        "apps/mobile_partner/lib/core/router/app_router.dart:login",
+        "apps/mobile_partner/lib/features/authentication/presentation/pages/login_page.dart:_handleLogin",
+        "packages/flutter_api_client/lib/src/api/api_service.dart:login",
+        "packages/flutter_core/lib/src/network/api_client.dart:login",
+        "services/platform_backend/src/main/java_root/id/dekat/identity/application/AuthService.java:login",
+        "services/platform_backend/src/main/java_root/id/dekat/identity/web/AuthController.java:login"
+      ],
+      "tests": [],
+      "docs": [
+        ".github/workflows/cd.yml",
+        ".github/workflows/ci.yml",
+        ".opencode/memory/2026-08-27-progress.md",
+        ".opencode/package-lock.json",
+        ".opencode/package.json",
+        ".playwright-mcp/page-2026-08-25T14-26-53-727Z.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "run",
+      "entrypoints": [
+        "apps/mobile_customer/lib/main.dart",
+        "apps/mobile_partner/ios/Runner/AppDelegate.swift",
+        "apps/mobile_partner/ios/Runner/SceneDelegate.swift",
+        "apps/mobile_partner/ios/RunnerTests/RunnerTests.swift",
+        "apps/mobile_partner/ios/RunnerTests/RunnerTests.swift",
+        "apps/mobile_partner/lib/main.dart"
+      ],
+      "domain_functions": [
+        "apps/mobile_customer/lib/main.dart:runApp",
+        "apps/mobile_partner/lib/main.dart:runApp",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingCalendarServiceTest.java:RuntimeException",
+        "services/platform_backend/api/src/test/java/id/dekat/reporting/application/ReportingServiceTest.java:RuntimeException",
+        "services/platform_backend/sharedkernel/src/main/java/id/dekat/sharedkernel/outbox/OutboxPublisher.java:RuntimeException",
+        "services/platform_backend/src/main/java_root/id/dekat/booking/application/BookingService.java:RuntimeException",
+        "services/platform_backend/src/main/java_root/id/dekat/common/JsonbMapConverter.java:RuntimeException",
+        "services/platform_backend/src/main/java_root/id/dekat/common/JsonbMapConverter.java:RuntimeException"
+      ],
+      "tests": [
+        "services/platform_backend/api/src/test/java/id/dekat/booking/application/BookingCalendarServiceTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/reporting/application/ReportingServiceTest.java"
+      ],
+      "docs": [
+        ".github/workflows/cd.yml",
+        ".github/workflows/ci.yml",
+        ".opencode/memory/2026-08-27-progress.md",
+        ".opencode/package-lock.json",
+        ".opencode/package.json",
+        ".playwright-mcp/page-2026-08-25T14-26-53-727Z.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "status",
+      "entrypoints": [
+        "apps/mobile_customer/lib/core/router/app_router.dart",
+        "apps/mobile_customer/lib/core/router/app_router.dart",
+        "apps/mobile_customer/lib/core/router/app_router.dart",
+        "apps/mobile_customer/lib/core/router/app_router.dart",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_history_page.dart",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_history_page.dart"
+      ],
+      "domain_functions": [
+        "apps/mobile_customer/lib/core/router/app_router.dart:_checkAuthStatus",
+        "apps/mobile_customer/lib/core/router/app_router.dart:_checkAuthStatus",
+        "apps/mobile_customer/lib/core/router/app_router.dart:_fetchProfileStatus",
+        "apps/mobile_customer/lib/core/router/app_router.dart:_fetchProfileStatus",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_history_page.dart:_StatusChip",
+        "apps/mobile_partner/lib/features/booking_management/presentation/pages/booking_detail_page.dart:_updateStatus",
+        "packages/flutter_api_client/lib/src/api/api_service.dart:updateBookingStatus",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingAssignmentTest.java:constructor_createsAssignmentWithAssignedStatus"
+      ],
+      "tests": [
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingAssignmentTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingHoldTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingStatusHistoryTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/domain/BookingTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/booking/web/BookingControllerTest.java",
+        "services/platform_backend/api/src/test/java/id/dekat/payment/application/PaymentServiceWeirdTest.java"
+      ],
+      "docs": [
+        ".github/workflows/cd.yml",
+        ".github/workflows/ci.yml",
+        ".opencode/memory/2026-08-27-progress.md",
+        ".opencode/package-lock.json",
+        ".opencode/package.json",
+        ".playwright-mcp/page-2026-08-25T14-26-53-727Z.yml"
+      ],
+      "notes": []
+    },
+    {
+      "name": "waitlist",
+      "entrypoints": [],
+      "domain_functions": [],
+      "tests": [],
+      "docs": [
+        ".github/workflows/cd.yml",
+        ".github/workflows/ci.yml",
+        ".opencode/memory/2026-08-27-progress.md",
+        ".opencode/package-lock.json",
+        ".opencode/package.json",
+        ".playwright-mcp/page-2026-08-25T14-26-53-727Z.yml"
+      ],
+      "notes": []
+    }
+  ],
+  "updated_at": "2026-09-06T12:09:22.488862+00:00"
+}

@@ -51,6 +51,9 @@ export default function BookingPage() {
     return `${year}-${month}-${day}`;
   });
   const [createdBooking, setCreatedBooking] = useState<BookingResponse | null>(null);
+  const [couponCode, setCouponCode] = useState('');
+  const [couponResult, setCouponResult] = useState<{ valid: boolean; discountType: string; discountValue: number; discountAmount: number; finalPrice: number; message?: string } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   const { data: servicesRes } = useQuery({
     queryKey: ['services', providerId],
@@ -224,6 +227,19 @@ export default function BookingPage() {
         setCreatedBooking(res.data);
       },
     });
+  };
+
+  const handleValidateCoupon = async () => {
+    if (!couponCode || !providerId || !selectedService) return;
+    setCouponLoading(true);
+    try {
+      const res = await publicApi.bookings.validateCoupon(couponCode, providerId, selectedService.id);
+      setCouponResult(res.data as any);
+    } catch (e: any) {
+      setCouponResult({ valid: false, discountType: '', discountValue: 0, discountAmount: 0, finalPrice: 0, message: e.response?.data?.message || 'Kupon tidak valid' });
+    } finally {
+      setCouponLoading(false);
+    }
   };
 
   return (
@@ -736,6 +752,42 @@ export default function BookingPage() {
                         Edit
                       </button>
                     </div>
+                  </div>
+                  {/* Coupon Input */}
+                  <div className="mt-4 rounded-xl border border-gray-200 bg-white p-4">
+                    <h3 className="text-sm font-semibold text-gray-900">Kode Kupon</h3>
+                    <p className="mt-1 text-xs text-gray-500">Masukkan kode kupon untuk mendapatkan diskon</p>
+                    <div className="mt-3 flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => { setCouponCode(e.target.value.toUpperCase()); setCouponResult(null); }}
+                        placeholder="Contoh: DISKON10"
+                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none uppercase"
+                      />
+                      <button
+                        onClick={handleValidateCoupon}
+                        disabled={!couponCode || couponLoading}
+                        className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50"
+                      >
+                        {couponLoading ? '...' : 'Gunakan'}
+                      </button>
+                    </div>
+                    {couponResult && (
+                      <div className={`mt-2 rounded-lg p-2 text-sm ${couponResult.valid ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-600'}`}>
+                        {couponResult.valid ? (
+                          <div>
+                            <p className="font-medium">Kupon berhasil diterapkan!</p>
+                            <p className="text-xs mt-1">
+                              Diskon {couponResult.discountType === 'PERCENTAGE' ? `${couponResult.discountValue}%` : `Rp ${couponResult.discountAmount.toLocaleString('id-ID')}`}
+                              {couponResult.finalPrice > 0 && ` • Harga akhir: Rp ${couponResult.finalPrice.toLocaleString('id-ID')}`}
+                            </p>
+                          </div>
+                        ) : (
+                          <p>{couponResult.message || 'Kupon tidak valid'}</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                   {/* Bundle B: Deposit badge & policy preview */}
                   <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">

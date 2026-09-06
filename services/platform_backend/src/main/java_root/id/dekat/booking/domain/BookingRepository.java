@@ -77,4 +77,12 @@ public interface BookingRepository extends JpaRepository<Booking, UUID> {
         @Param("endsAt") OffsetDateTime endsAt,
         @Param("excludedStatuses") List<BookingStatus> excludedStatuses
     );
+
+    long countByCreatedAtAfter(OffsetDateTime date);
+
+    long countByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end);
+
+    List<Booking> findByStatusAndCreatedAtAfter(BookingStatus status, OffsetDateTime date);
+
+    List<Booking> findByStatusAndCreatedAtBetween(BookingStatus status, OffsetDateTime start, OffsetDateTime end);
 }

@@ -46,6 +46,10 @@ export const publicApi = {
         phone,
         password,
       }),
+    requestOtp: (email: string, purpose: string = 'LOGIN') =>
+      apiClient.post<ApiResponse<void>>('/auth/otp/request', { email, purpose }),
+    verifyOtp: (email: string, code: string, purpose: string = 'LOGIN') =>
+      apiClient.post<ApiResponse<{ accessToken: string; refreshToken: string }>>('/auth/otp/verify', { email, code, purpose }),
   },
 
   categories: {
@@ -163,6 +167,10 @@ export const publicApi = {
       apiClient.post<ApiResponse<{ holdId: string; expiresAt: string }>>(
         `/public/providers/${providerId}/slots/${slotId}/hold`,
         { serviceId },
+      ),
+    validateCoupon: (code: string, providerId: string, serviceId: string) =>
+      apiClient.get<ApiResponse<{ valid: boolean; discountType: string; discountValue: number; discountAmount: number; finalPrice: number; message?: string }>>(
+        `/public/bookings/validate-coupon?code=${encodeURIComponent(code)}&providerId=${providerId}&serviceId=${serviceId}`,
       ),
   },
 
@@ -363,6 +371,13 @@ export const providerApi = {
     create: (data: any) => apiClient.post<ApiResponse<any>>('/provider/coupons', data),
     update: (id: string, data: any) => apiClient.put<ApiResponse<any>>(`/provider/coupons/${id}`, data),
     delete: (id: string) => apiClient.delete(`/provider/coupons/${id}`),
+  },
+
+  loyalty: {
+    getCustomerHistory: (customerId: string) =>
+      apiClient.get<ApiResponse<any>>(`/provider/loyalty/${customerId}`),
+    earn: (data: { customerId: string; points: number; description: string }) =>
+      apiClient.post<ApiResponse<any>>('/provider/loyalty/earn', data),
   },
 
   campaigns: {

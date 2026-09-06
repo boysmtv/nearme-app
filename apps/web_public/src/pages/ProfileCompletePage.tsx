@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -16,6 +16,13 @@ export default function ProfileCompletePage() {
   const { user, completeProfile } = useAuth();
   const navigate = useNavigate();
   const [serverError, setServerError] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    if (saved && user?.hasProfile) {
+      navigate('/', { replace: true });
+    }
+  }, [saved, user?.hasProfile, navigate]);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({
     resolver: zodResolver(schema),
@@ -26,7 +33,7 @@ export default function ProfileCompletePage() {
     setServerError(null);
     try {
       await completeProfile({ nickname: data.name, name: data.name, phone: data.phone });
-      navigate('/', { replace: true });
+      setSaved(true);
     } catch (e) {
       setServerError(e instanceof Error ? e.message : 'Gagal menyimpan profil');
     }
@@ -38,6 +45,11 @@ export default function ProfileCompletePage() {
         <Link to="/login" className="text-primary-600 hover:underline">Silakan login terlebih dahulu</Link>
       </div>
     );
+  }
+
+  if (user.hasProfile) {
+    navigate('/', { replace: true });
+    return null;
   }
 
   return (
@@ -80,7 +92,6 @@ export default function ProfileCompletePage() {
           >
             {isSubmitting ? 'Menyimpan...' : 'Simpan & Lanjutkan'}
           </button>
-          <p className="text-center text-xs text-gray-400">Profil disimpan ke server via PUT /customer/profile</p>
         </form>
       </div>
     </div>

@@ -1,0 +1,264 @@
+{
+  "updated_at": "2026-09-06T12:09:22.553425+00:00",
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter",
+  "final_project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter",
+  "dominant_language": "java",
+  "dominant_platform": "",
+  "languages": [
+    {
+      "language": "dart",
+      "file_count": 126,
+      "modeling_guidance": "Prefer enums, sealed classes, value objects, and Flutter or Dart architectural patterns over raw strings.",
+      "localization_guidance": "Keep user-facing copy behind a resource, catalog, or message boundary suitable for the platform.",
+      "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
+      "documentation_topics": [
+        "Dart language tour",
+        "Flutter internationalization and app architecture",
+        "Flutter testing and state management patterns",
+        "Node.js runtime and package management guidance",
+        "Gradle project structure and task guidance",
+        "Flutter widget tree, state, and internationalization guidance",
+        "Compose service, volume, and environment guidance",
+        "Docker image and runtime configuration guidance",
+        "OpenAPI schema, compatibility, and versioning guidance"
+      ],
+      "next_checks": [
+        "Confirm new dart changes follow idiomatic modeling and naming conventions.",
+        "Review dart test layout and update the closest existing test surface first.",
+        "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+        "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern."
+      ]
+    },
+    {
+      "language": "java",
+      "file_count": 304,
+      "modeling_guidance": "Prefer enums, records, dedicated service types, and explicit interfaces instead of string switches spread across the codebase.",
+      "localization_guidance": "Keep user-facing copy behind a resource, catalog, or message boundary suitable for the platform.",
+      "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
+      "documentation_topics": [
+        "Java language guide",
+        "Java enums, records, and interface design",
+        "JUnit and build-tool testing patterns",
+        "Node.js runtime and package management guidance",
+        "Gradle project structure and task guidance",
+        "Flutter widget tree, state, and internationalization guidance",
+        "Compose service, volume, and environment guidance",
+        "Docker image and runtime configuration guidance",
+        "OpenAPI schema, compatibility, and versioning guidance"
+      ],
+      "next_checks": [
+        "Confirm new java changes follow idiomatic modeling and naming conventions.",
+        "Review java test layout and update the closest existing test surface first.",
+        "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+        "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern."
+      ]
+    },
+    {
+      "language": "javascript",
+      "file_count": 3,
+      "modeling_guidance": "Prefer structured modules, explicit object maps, and framework conventions instead of free-form string branching.",
+      "localization_guidance": "Keep user-facing copy behind a resource, catalog, or message boundary suitable for the platform.",
+      "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
+      "documentation_topics": [
+        "Modern JavaScript modules guide",
+        "Framework routing and state management conventions",
+        "Testing patterns for frontend and Node surfaces",
+        "Node.js runtime and package management guidance",
+        "Gradle project structure and task guidance",
+        "Flutter widget tree, state, and internationalization guidance",
+        "Compose service, volume, and environment guidance",
+        "Docker image and runtime configuration guidance",
+        "OpenAPI schema, compatibility, and versioning guidance"
+      ],
+      "next_checks": [
+        "Confirm new javascript changes follow idiomatic modeling and naming conventions.",
+        "Review javascript test layout and update the closest existing test surface first.",
+        "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+        "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern."
+      ]
+    },
+    {
+      "language": "kotlin",
+      "file_count": 2,
+      "modeling_guidance": "Prefer enum class, sealed hierarchies, data classes, and explicit domain types over raw command strings.",
+      "localization_guidance": "Separate CLI copy or UI strings from control flow so localization can evolve without rewriting logic.",
+      "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
+      "documentation_topics": [
+        "Kotlin language guide",
+        "Kotlin enum and sealed class patterns",
+        "Kotlin testing and Gradle or Maven integration",
+        "Node.js runtime and package management guidance",
+        "Gradle project structure and task guidance",
+        "Flutter widget tree, state, and internationalization guidance",
+        "Compose service, volume, and environment guidance",
+        "Docker image and runtime configuration guidance",
+        "OpenAPI schema, compatibility, and versioning guidance"
+      ],
+      "next_checks": [
+        "Confirm new kotlin changes follow idiomatic modeling and naming conventions.",
+        "Review kotlin test layout and update the closest existing test surface first.",
+        "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+        "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern."
+      ]
+    },
+    {
+      "language": "python",
+      "file_count": 1,
+      "modeling_guidance": "Prefer dataclasses, typed models, modules, and explicit registries over implicit dict or string protocols.",
+      "localization_guidance": "Centralize UI or CLI copy in message helpers or translation catalogs rather than scattering literals.",
+      "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
+      "documentation_topics": [
+        "Python language reference",
+        "Python typing and dataclass patterns",
+        "Pytest and packaging practices",
+        "Node.js runtime and package management guidance",
+        "Gradle project structure and task guidance",
+        "Flutter widget tree, state, and internationalization guidance",
+        "Compose service, volume, and environment guidance",
+        "Docker image and runtime configuration guidance",
+        "OpenAPI schema, compatibility, and versioning guidance"
+      ],
+      "next_checks": [
+        "Confirm new python changes follow idiomatic modeling and naming conventions.",
+        "Review python test layout and update the closest existing test surface first.",
+        "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+        "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern."
+      ]
+    },
+    {
+      "language": "swift",
+      "file_count": 11,
+      "modeling_guidance": "Prefer enum, struct, protocol, and result types aligned with Swift platform conventions.",
+      "localization_guidance": "Keep user-facing copy behind a resource, catalog, or message boundary suitable for the platform.",
+      "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
+      "documentation_topics": [
+        "Swift language guide",
+        "Swift enums, protocols, and structured concurrency",
+        "XCTest and Apple platform localization",
+        "Node.js runtime and package management guidance",
+        "Gradle project structure and task guidance",
+        "Flutter widget tree, state, and internationalization guidance",
+        "Compose service, volume, and environment guidance",
+        "Docker image and runtime configuration guidance",
+        "OpenAPI schema, compatibility, and versioning guidance"
+      ],
+      "next_checks": [
+        "Confirm new swift changes follow idiomatic modeling and naming conventions.",
+        "Review swift test layout and update the closest existing test surface first.",
+        "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+        "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern."
+      ]
+    },
+    {
+      "language": "typescript",
+      "file_count": 149,
+      "modeling_guidance": "Prefer discriminated unions, typed DTOs, schema validation, and framework-native routing conventions.",
+      "localization_guidance": "Keep user-facing copy behind a resource, catalog, or message boundary suitable for the platform.",
+      "configuration_guidance": "Use the platform's standard configuration and environment layering instead of ad-hoc constants.",
+      "documentation_topics": [
+        "TypeScript handbook",
+        "TypeScript unions, enums, and type narrowing",
+        "Framework routing and server/client component conventions",
+        "Node.js runtime and package management guidance",
+        "Gradle project structure and task guidance",
+        "Flutter widget tree, state, and internationalization guidance",
+        "Compose service, volume, and environment guidance",
+        "Docker image and runtime configuration guidance",
+        "OpenAPI schema, compatibility, and versioning guidance"
+      ],
+      "next_checks": [
+        "Confirm new typescript changes follow idiomatic modeling and naming conventions.",
+        "Review typescript test layout and update the closest existing test surface first.",
+        "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+        "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern."
+      ]
+    }
+  ],
+  "platforms": [],
+  "framework_hints": [
+    "node",
+    "gradle",
+    "flutter",
+    "docker-compose",
+    "docker",
+    "openapi"
+  ],
+  "documentation_topics": [
+    "Dart language tour",
+    "Flutter internationalization and app architecture",
+    "Flutter testing and state management patterns",
+    "Node.js runtime and package management guidance",
+    "Gradle project structure and task guidance",
+    "Flutter widget tree, state, and internationalization guidance",
+    "Compose service, volume, and environment guidance",
+    "Docker image and runtime configuration guidance",
+    "OpenAPI schema, compatibility, and versioning guidance",
+    "Java language guide",
+    "Java enums, records, and interface design",
+    "JUnit and build-tool testing patterns",
+    "Modern JavaScript modules guide",
+    "Framework routing and state management conventions",
+    "Testing patterns for frontend and Node surfaces",
+    "Kotlin language guide",
+    "Kotlin enum and sealed class patterns",
+    "Kotlin testing and Gradle or Maven integration",
+    "Python language reference",
+    "Python typing and dataclass patterns"
+  ],
+  "next_checks": [
+    "Confirm new dart changes follow idiomatic modeling and naming conventions.",
+    "Review dart test layout and update the closest existing test surface first.",
+    "Check whether the platform has a first-class localization or resource mechanism before adding new user-facing copy.",
+    "Check whether the framework has a canonical way to model commands, routes, requests, or screens before inventing a custom pattern.",
+    "Confirm new java changes follow idiomatic modeling and naming conventions.",
+    "Review java test layout and update the closest existing test surface first.",
+    "Confirm new javascript changes follow idiomatic modeling and naming conventions.",
+    "Review javascript test layout and update the closest existing test surface first.",
+    "Confirm new kotlin changes follow idiomatic modeling and naming conventions.",
+    "Review kotlin test layout and update the closest existing test surface first.",
+    "Confirm new python changes follow idiomatic modeling and naming conventions.",
+    "Review python test layout and update the closest existing test surface first.",
+    "Confirm new swift changes follow idiomatic modeling and naming conventions.",
+    "Review swift test layout and update the closest existing test surface first.",
+    "Confirm new typescript changes follow idiomatic modeling and naming conventions.",
+    "Review typescript test layout and update the closest existing test surface first."
+  ],
+  "active_goals": [
+    "add",
+    "approve",
+    "create",
+    "delete",
+    "deposit",
+    "list",
+    "login",
+    "logout",
+    "reject",
+    "return",
+    "run",
+    "status",
+    "waitlist"
+  ],
+  "current_focus": {
+    "problem_statement": "",
+    "entrypoints": [
+      "services/platform_backend/promotion/src/main/java/id/dekat/promotion/web/CampaignController.java",
+      "services/platform_backend/promotion/src/main/java/id/dekat/promotion/web/CouponController.java",
+      "services/platform_backend/promotion/src/main/java/id/dekat/promotion/web/LoyaltyController.java",
+      "services/platform_backend/promotion/src/main/java/id/dekat/promotion/web/PublicCouponController.java",
+      "services/platform_backend/src/main/java_root/id/dekat/access/web/RoleController.java",
+      "services/platform_backend/src/main/java_root/id/dekat/api/web/AdminController.java",
+      "services/platform_backend/src/main/java_root/id/dekat/api/web/AdminExportController.java",
+      "services/platform_backend/src/main/java_root/id/dekat/api/web/ProviderDashboardController.java"
+    ],
+    "contracts": [
+      "run",
+      "list",
+      "status",
+      "deposit",
+      "login",
+      "waitlist",
+      "add"
+    ],
+    "feature_count": 14
+  }
+}

@@ -1,6 +1,8 @@
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { providerApi } from '../../lib/api';
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { providerApi, analyticsApi } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import ProviderLayout from '../../components/ProviderLayout';
 import StatsCard from '../../components/StatsCard';
@@ -28,15 +30,30 @@ export default function DashboardPage() {
     queryFn: () => providerApi.dashboard.getRecentBookings(),
   });
 
+  const today = new Date();
+  const thirtyDaysAgo = new Date(today);
+  thirtyDaysAgo.setDate(today.getDate() - 30);
+  const startDate = thirtyDaysAgo.toISOString().split('T')[0];
+  const endDate = today.toISOString().split('T')[0];
+
+  const { data: analyticsRes } = useQuery({
+    queryKey: ['dashboard', 'analytics'],
+    queryFn: () => analyticsApi.getAnalytics({ startDate, endDate, granularity: 'day' }),
+  });
+
   const stats = statsRes?.data;
   const recentBookings = bookingsRes?.data ?? [];
+  const revenueChart = (analyticsRes?.data?.revenueByDay ?? []).map((d: any) => ({
+    date: d.date?.substring(5) || d.date,
+    revenue: d.revenue || 0,
+  }));
 
   return (
     <ProviderLayout>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-500">Ringkasan aktivitas bisnis hari ini</p>
+          <p className="mt-1 text-sm text-gray-500">Ringkasan aktivitas bisnis</p>
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -50,11 +67,44 @@ export default function DashboardPage() {
               ))
             : [
                 <StatsCard key="today" label="Booking Hari Ini" value={stats?.todayBookings ?? 0} icon="calendar" color="blue" />,
-                <StatsCard key="revenue" label="Pendapatan Minggu Ini" value={formatPrice(stats?.weekRevenue ?? 0)} icon="currency" color="green" />,
-                <StatsCard key="customers" label="Total Pelanggan" value={stats?.totalCustomers ?? 0} icon="users" color="purple" />,
-                <StatsCard key="rating" label="Rating Rata-rata" value={(stats?.avgRating)?.toFixed(1) ?? '-'} icon="star" color="amber" />,
+                <StatsCard key="today-revenue" label="Pendapatan Hari Ini" value={formatPrice(stats?.todayRevenue ?? 0)} icon="currency" color="green" />,
+                <StatsCard key="week-bookings" label="Booking Minggu Ini" value={stats?.weekBookings ?? 0} icon="calendar" color="purple" />,
+                <StatsCard key="week-revenue" label="Pendapatan Minggu" value={formatPrice(stats?.weekRevenue ?? 0)} icon="currency" color="amber" />,
               ]}
         </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {statsLoading ? null : (
+            <>
+              <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                <p className="text-sm text-gray-500">Total Pelanggan</p>
+                <p className="text-2xl font-bold text-gray-900">{stats?.totalCustomers ?? 0}</p>
+              </div>
+              <div className="rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
+                <p className="text-sm text-gray-500">Rating Rata-rata</p>
+                <p className="text-2xl font-bold text-gray-900">{(stats?.avgRating)?.toFixed(1) ?? '-'}</p>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Revenue Chart */}
+        {revenueChart.length > 0 && (
+          <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+            <h3 className="font-semibold text-gray-900">Pendapatan 30 Hari</h3>
+            <div className="mt-4">
+              <ResponsiveContainer width="100%" height={200}>
+                <AreaChart data={revenueChart}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} />
+                  <Tooltip formatter={(v: number) => formatPrice(v)} />
+                  <Area type="monotone" dataKey="revenue" stroke="#6C63FF" fill="#6C63FF" fillOpacity={0.2} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-6 lg:grid-cols-3">
           <div className="lg:col-span-2">
@@ -80,11 +130,11 @@ export default function DashboardPage() {
                 </div>
               ) : recentBookings.length > 0 ? (
                 <div className="space-y-3">
-                  {recentBookings.slice(0, 5).map((booking) => (
+                  {recentBookings.slice(0, 5).map((booking: any) => (
                     <div key={booking.id} className="flex items-center justify-between rounded-lg border border-gray-100 p-4 hover:bg-gray-50">
                       <div className="flex items-center gap-3">
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100 text-sm font-bold text-primary-600">
-                          {booking.customerName[0]}
+                          {booking.customerName?.[0] || '?'}
                         </div>
                         <div>
                           <p className="text-sm font-medium text-gray-900">{booking.customerName}</p>

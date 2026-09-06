@@ -1,0 +1,73 @@
+{
+  "schema_version": 1,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter",
+  "updated_at": "2026-09-06T12:09:23.430468+00:00",
+  "node_count": 5000,
+  "edge_count": 10000,
+  "node_types": {
+    "ApiRoute": 7,
+    "Class": 338,
+    "Dto": 25,
+    "Entity": 2,
+    "Enum": 28,
+    "Field": 2836,
+    "File": 500,
+    "Flow": 7,
+    "Function": 726,
+    "Interface": 38,
+    "Method": 4320,
+    "Module": 411,
+    "Object": 1,
+    "Package": 73,
+    "Project": 1
+  },
+  "edge_types": {
+    "ACCEPTS": 42,
+    "COVERS": 155,
+    "DEFINED_IN": 9029,
+    "EXPOSES": 7,
+    "HANDLES": 25,
+    "IMPLEMENTS": 7,
+    "IMPORTS": 1908,
+    "PART_OF_FLOW": 82,
+    "READS": 70,
+    "RETURNS": 42,
+    "USES": 10142,
+    "WRITES": 70
+  },
+  "top_flows": [
+    "add",
+    "deposit",
+    "list",
+    "login",
+    "run",
+    "status",
+    "waitlist"
+  ],
+  "top_api_routes": [
+    "run",
+    "list",
+    "status",
+    "deposit",
+    "login",
+    "waitlist",
+    "add"
+  ],
+  "metrics": {
+    "schema_version": 1,
+    "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter",
+    "updated_at": "2026-09-06T12:09:23.246515+00:00",
+    "memory_completeness_score": 0.474,
+    "graph_coverage_score": 1.0,
+    "symbol_extraction_confidence": 1.0,
+    "api_contract_coverage": 1.0,
+    "flow_completeness_score": 0.714,
+    "test_mapping_score": 0.643,
+    "runtime_proof_score": 0.0,
+    "security_readiness_score": 0.6,
+    "hotspot_risk": "medium",
+    "blast_radius_risk": "high",
+    "release_readiness_score": 0.708,
+    "release_readiness": "blocked"
+  }
+}

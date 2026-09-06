@@ -12,6 +12,7 @@ const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 
 const ProviderDashboardPage = lazy(() => import('./pages/provider/DashboardPage'));
 const ProviderCalendarPage = lazy(() => import('./pages/provider/CalendarPage'));
+const ProviderBookingsPage = lazy(() => import('./pages/provider/BookingsPage'));
 const ProviderServicesPage = lazy(() => import('./pages/provider/ServicesPage'));
 const ProviderStaffPage = lazy(() => import('./pages/provider/StaffPage'));
 const ProviderCustomersPage = lazy(() => import('./pages/provider/CustomersPage'));
@@ -27,6 +28,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ProviderRegisterPage = lazy(() => import('./pages/ProviderRegisterPage'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
 const CustomerBookingsPage = lazy(() => import('./pages/customer/CustomerBookingsPage'));
+const CustomerBookingDetailPage = lazy(() => import('./pages/customer/CustomerBookingDetailPage'));
 const CustomerNotificationsPage = lazy(() => import('./pages/customer/CustomerNotificationsPage'));
 const CustomerFavoritesPage = lazy(() => import('./pages/customer/CustomerFavoritesPage'));
 const CustomerAccountPage = lazy(() => import('./pages/customer/CustomerAccountPage'));
@@ -85,14 +87,16 @@ export function App() {
         <Route path="/provider/register" element={<ProviderRegisterPage />} />
         <Route path="/profile/complete" element={<ProfileCompleteGuard><ProfileCompletePage /></ProfileCompleteGuard>} />
 
-        <Route path="/bookings" element={<CustomerBookingsPage />} />
-        <Route path="/notifications" element={<CustomerNotificationsPage />} />
-        <Route path="/favorites" element={<CustomerFavoritesPage />} />
-        <Route path="/account" element={<CustomerAccountPage />} />
-        <Route path="/support" element={<SupportPage />} />
+        <Route path="/bookings" element={<ProtectedRoute><CustomerBookingsPage /></ProtectedRoute>} />
+        <Route path="/bookings/:id" element={<ProtectedRoute><CustomerBookingDetailPage /></ProtectedRoute>} />
+        <Route path="/notifications" element={<ProtectedRoute><CustomerNotificationsPage /></ProtectedRoute>} />
+        <Route path="/favorites" element={<ProtectedRoute><CustomerFavoritesPage /></ProtectedRoute>} />
+        <Route path="/account" element={<ProtectedRoute><CustomerAccountPage /></ProtectedRoute>} />
+        <Route path="/support" element={<ProtectedRoute><SupportPage /></ProtectedRoute>} />
 
         <Route path="/provider/dashboard" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderDashboardPage /></ProtectedRoute>} />
         <Route path="/provider/calendar" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCalendarPage /></ProtectedRoute>} />
+        <Route path="/provider/bookings" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderBookingsPage /></ProtectedRoute>} />
         <Route path="/provider/services" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderServicesPage /></ProtectedRoute>} />
         <Route path="/provider/staff" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderStaffPage /></ProtectedRoute>} />
         <Route path="/provider/customers" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCustomersPage /></ProtectedRoute>} />
@@ -104,9 +108,9 @@ export function App() {
         <Route path="/provider/notifications" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderNotificationsPage /></ProtectedRoute>} />
         <Route path="/provider/settings" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderSettingsPage /></ProtectedRoute>} />
 
-        <Route path="/chats" element={<ChatPage />} />
-        <Route path="/chats/:id" element={<ChatPage />} />
-        <Route path="/booking/:bookingId/chat" element={<ChatPage />} />
+        <Route path="/chats" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+        <Route path="/chats/:id" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+        <Route path="/booking/:bookingId/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

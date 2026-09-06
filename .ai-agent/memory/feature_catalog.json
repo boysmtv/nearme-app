@@ -1,0 +1,28 @@
+{
+  "features": [
+    "add",
+    "approve",
+    "create",
+    "delete",
+    "deposit",
+    "list",
+    "login",
+    "logout",
+    "reject",
+    "return",
+    "run",
+    "status",
+    "update",
+    "waitlist"
+  ],
+  "commands": [
+    "add",
+    "deposit",
+    "list",
+    "login",
+    "run",
+    "status",
+    "waitlist"
+  ],
+  "updated_at": "2026-09-06T12:09:19.446875+00:00"
+}

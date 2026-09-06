@@ -3,6 +3,144 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { providerApi } from '../../lib/api';
 import ProviderLayout from '../../components/ProviderLayout';
 
+function LoyaltyTab() {
+  const queryClient = useQueryClient();
+  const [search, setSearch] = useState('');
+  const [showEarn, setShowEarn] = useState(false);
+  const [earnForm, setEarnForm] = useState({ customerId: '', points: 10, description: '' });
+
+  const { data: customersRes, isLoading } = useQuery({
+    queryKey: ['provider-customers', search],
+    queryFn: () => providerApi.customers.list({ page: 1, limit: 50, search: search || undefined }),
+  });
+
+  const earnMutation = useMutation({
+    mutationFn: (data: { customerId: string; points: number; description: string }) =>
+      providerApi.loyalty.earn(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['provider-customers'] });
+      setShowEarn(false);
+      setEarnForm({ customerId: '', points: 10, description: '' });
+    },
+  });
+
+  const customers = customersRes?.data?.data ?? [];
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500">Poin loyalitas pelanggan</p>
+        <button
+          onClick={() => setShowEarn(true)}
+          className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
+        >
+          + Beri Poin
+        </button>
+      </div>
+
+      {showEarn && (
+        <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+          <h3 className="font-semibold text-gray-900">Beri Poin Loyalitas</h3>
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Pelanggan</label>
+              <select
+                value={earnForm.customerId}
+                onChange={(e) => setEarnForm({ ...earnForm, customerId: e.target.value })}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+              >
+                <option value="">Pilih pelanggan</option>
+                {customers.map((c: any) => (
+                  <option key={c.id} value={c.id}>{c.name || c.email}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Poin</label>
+              <input
+                type="number"
+                value={earnForm.points}
+                onChange={(e) => setEarnForm({ ...earnForm, points: +e.target.value })}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Deskripsi</label>
+              <input
+                value={earnForm.description}
+                onChange={(e) => setEarnForm({ ...earnForm, description: e.target.value })}
+                placeholder="Booking selesai"
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none"
+              />
+            </div>
+          </div>
+          <div className="mt-4 flex gap-3">
+            <button
+              onClick={() => earnMutation.mutate(earnForm)}
+              disabled={!earnForm.customerId || earnMutation.isPending}
+              className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50"
+            >
+              {earnMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+            </button>
+            <button
+              onClick={() => setShowEarn(false)}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+            >
+              Batal
+            </button>
+          </div>
+        </div>
+      )}
+
+      {isLoading ? (
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="animate-pulse rounded-xl bg-white p-4 shadow-sm">
+              <div className="h-4 w-1/3 rounded bg-gray-200" />
+            </div>
+          ))}
+        </div>
+      ) : customers.length === 0 ? (
+        <div className="rounded-xl bg-white p-12 text-center shadow-sm ring-1 ring-gray-100">
+          <p className="text-gray-500">Belum ada pelanggan</p>
+        </div>
+      ) : (
+        <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-100">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Pelanggan</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Total Booking</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Total Belanja</th>
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Poin Loyalitas</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100">
+              {customers.map((c: any) => (
+                <tr key={c.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{c.name || '-'}</p>
+                      <p className="text-xs text-gray-500">{c.email || c.phone || '-'}</p>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-700">{c.totalBookings || 0}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">Rp {(c.totalSpent || 0).toLocaleString('id-ID')}</td>
+                  <td className="px-6 py-4">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-1 text-xs font-semibold text-primary-700">
+                      ⭐ {c.loyaltyPoints || 0}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function PromotionsPage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<'coupons' | 'campaigns' | 'loyalty'>('coupons');
@@ -27,6 +165,11 @@ export default function PromotionsPage() {
   const createCouponMutation = useMutation({
     mutationFn: (data: any) => providerApi.coupons.create(data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['coupons'] }); setShowCreateCoupon(false); },
+  });
+
+  const deleteCouponMutation = useMutation({
+    mutationFn: (id: string) => providerApi.coupons.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
   });
 
   const createCampaignMutation = useMutation({
@@ -153,13 +296,14 @@ export default function PromotionsPage() {
               <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-100">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Kode</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Tipe</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Nilai</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Penggunaan</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Status</th>
-                    </tr>
+                      <tr>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Kode</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Tipe</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Nilai</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Penggunaan</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium uppercase text-gray-500">Status</th>
+                        <th className="px-6 py-3" />
+                      </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {coupons.map((c: any) => (
@@ -174,6 +318,18 @@ export default function PromotionsPage() {
                           <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${c.active !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
                             {c.active !== false ? 'Aktif' : 'Nonaktif'}
                           </span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <button
+                            onClick={() => {
+                              if (confirm(`Hapus kupon "${c.code}"?`)) {
+                                deleteCouponMutation.mutate(c.id);
+                              }
+                            }}
+                            className="text-sm font-medium text-red-600 hover:text-red-700"
+                          >
+                            Hapus
+                          </button>
                         </td>
                       </tr>
                     ))}
@@ -308,10 +464,7 @@ export default function PromotionsPage() {
         )}
 
         {tab === 'loyalty' && (
-          <div className="rounded-xl bg-white p-8 text-center shadow-sm ring-1 ring-gray-100">
-            <p className="text-gray-500">Poin loyalitas dilacak secara otomatis untuk setiap pemesanan pelanggan.</p>
-            <p className="mt-2 text-sm text-gray-400">Lihat loyalitas pelanggan individu dari halaman Pelanggan.</p>
-          </div>
+          <LoyaltyTab />
         )}
       </div>
     </ProviderLayout>

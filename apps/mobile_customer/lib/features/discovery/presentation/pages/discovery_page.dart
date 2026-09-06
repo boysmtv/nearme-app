@@ -97,6 +97,9 @@ class DiscoveryPage extends ConsumerWidget {
                 ),
               ),
               SliverToBoxAdapter(
+                child: _DashboardSummary(),
+              ),
+              SliverToBoxAdapter(
                 child: SizedBox(
                   height: 96,
                   child: categoriesAsync.when(
@@ -506,6 +509,85 @@ class _ShimmerCardState extends State<_ShimmerCard> with SingleTickerProviderSta
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DashboardSummary extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _DashboardItem(
+            icon: Icons.calendar_today_rounded,
+            label: 'Booking Aktif',
+            value: '2',
+          ),
+          _DashboardItem(
+            icon: Icons.star_rounded,
+            label: 'Poin Loyalitas',
+            value: '150',
+          ),
+          _DashboardItem(
+            icon: Icons.favorite_rounded,
+            label: 'Favorit',
+            value: '5',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DashboardItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _DashboardItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: Colors.white, size: 24),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.9),
+            fontSize: 11,
+          ),
+        ),
+      ],
     );
   }
 }

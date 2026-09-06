@@ -1,0 +1,52 @@
+{
+  "changes": [
+    {
+      "run_id": "bootstrap::near-flutter",
+      "final_status": "registered",
+      "summary": "Bootstrapped AI_AGENT_CORE memory from existing project registration (project_registration).",
+      "changed_artifacts": [
+        "apps/mobile_customer/.dart_tool/flutter_build/dart_plugin_registrant.dart",
+        "apps/mobile_customer/android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java",
+        "apps/mobile_customer/android/app/src/main/kotlin/com/example/mobile_customer/MainActivity.kt",
+        "apps/mobile_customer/lib/app.dart",
+        "apps/mobile_customer/lib/core/bootstrap/bootstrap.dart",
+        "apps/mobile_customer/lib/core/router/app_router.dart",
+        "apps/mobile_customer/lib/features/account/presentation/pages/account_page.dart",
+        "apps/mobile_customer/lib/features/account/presentation/pages/loyalty_page.dart",
+        "apps/mobile_customer/lib/features/account/presentation/pages/profile_complete_page.dart",
+        "apps/mobile_customer/lib/features/account/presentation/pages/profile_edit_page.dart",
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/forgot_password_page.dart",
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/login_page.dart",
+        "apps/mobile_customer/lib/features/authentication/presentation/pages/register_page.dart",
+        "apps/mobile_customer/lib/features/availability/presentation/pages/availability_page.dart",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_confirmation_page.dart",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_detail_page.dart",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_form_page.dart",
+        "apps/mobile_customer/lib/features/booking/presentation/pages/booking_history_page.dart",
+        "apps/mobile_customer/lib/features/chat/presentation/pages/chat_detail_page.dart",
+        "apps/mobile_customer/lib/features/chat/presentation/pages/chat_list_page.dart",
+        "apps/mobile_customer/lib/features/discovery/presentation/pages/discovery_page.dart",
+        "apps/mobile_customer/lib/features/discovery/presentation/pages/search_page.dart",
+        "apps/mobile_customer/lib/features/favorites/presentation/pages/favorites_page.dart",
+        "apps/mobile_customer/lib/features/notification/presentation/pages/notification_page.dart"
+      ],
+      "features": [
+        "add",
+        "approve",
+        "create",
+        "delete",
+        "deposit",
+        "list",
+        "login",
+        "logout",
+        "reject",
+        "return",
+        "run",
+        "status",
+        "update",
+        "waitlist"
+      ],
+      "recorded_at": "2026-09-06T12:09:22.732803+00:00"
+    }
+  ]
+}

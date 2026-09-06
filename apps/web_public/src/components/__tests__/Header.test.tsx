@@ -1,5 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import Header from '../Header';
 
 const mockNavigate = vi.fn();
@@ -16,10 +17,18 @@ vi.mock('../../lib/auth', () => ({
   useAuth: () => ({ user: null, isAuthenticated: false, logout: vi.fn() }),
 }));
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: { retry: false },
+  },
+});
+
 function renderHeader() {
   return render(
     <MemoryRouter>
-      <Header />
+      <QueryClientProvider client={queryClient}>
+        <Header />
+      </QueryClientProvider>
     </MemoryRouter>
   );
 }

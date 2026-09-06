@@ -59,11 +59,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const syncHasProfile = useCallback(async (token: string) => {
     try {
-      const res = await publicApi.customer.getProfile() as unknown as { success: boolean; data: { exists: boolean; nickname?: string; name?: string } };
+      const res = await publicApi.customer.getProfile() as unknown as { success: boolean; data: { exists: boolean; nickname?: string; name?: string; phone?: string } };
       const exists = res?.data?.exists === true;
-      // treat hasProfile true only if exists and nickname/name present
+      // treat hasProfile true if:
+      // 1. customer profile exists with nickname, OR
+      // 2. user has name AND phone in the User table (already completed before)
       const nickname = res?.data?.nickname ?? res?.data?.name ?? '';
-      const hasProfile = exists && String(nickname).trim().length > 0;
+      const hasName = String(nickname).trim().length > 0;
+      const hasPhone = String(res?.data?.phone ?? '').trim().length > 0;
+      const hasProfile = exists ? hasName : hasName && hasPhone;
       // persist
       localStorage.setItem('has_profile', String(hasProfile));
       const updated = buildUser(token, hasProfile);
@@ -71,7 +75,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(updated);
       return hasProfile;
     } catch {
-      return null;
+      // If API fails, keep existing hasProfile from localStorage (don't reset to false)
+      const stored = localStorage.getItem('has_profile');
+      return stored === 'true' ? true : null;
     }
   }, [buildUser]);
 

@@ -36,9 +36,15 @@ import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
+
+    @PersistenceContext
+    private EntityManager em;
 
     private final UserRepository userRepository;
     private final RoleAssignmentRepository roleAssignmentRepository;
@@ -85,15 +91,122 @@ public class AdminController {
         long activeProviders = tenantRepository.count();
         long pendingVerifications = userRepository.countByStatus(UserStatus.PENDING_VERIFICATION);
 
+        // Calculate growth: compare this month vs last month
+        java.time.OffsetDateTime now = java.time.OffsetDateTime.now();
+        java.time.OffsetDateTime thisMonthStart = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
+        java.time.OffsetDateTime lastMonthStart = thisMonthStart.minusMonths(1);
+        java.time.OffsetDateTime lastMonthEnd = thisMonthStart.minusNanos(1);
+
+        long usersThisMonth = userRepository.countByCreatedAtAfter(thisMonthStart);
+        long usersLastMonth = userRepository.countByCreatedAtBetween(lastMonthStart, lastMonthEnd);
+        long tenantsThisMonth = tenantRepository.countByCreatedAtAfter(thisMonthStart);
+        long tenantsLastMonth = tenantRepository.countByCreatedAtBetween(lastMonthStart, lastMonthEnd);
+        long bookingsThisMonth = bookingRepository.countByCreatedAtAfter(thisMonthStart);
+        long bookingsLastMonth = bookingRepository.countByCreatedAtBetween(lastMonthStart, lastMonthEnd);
+
+        BigDecimal revenueThisMonth = bookingRepository.findByStatusAndCreatedAtAfter(BookingStatus.COMPLETED, thisMonthStart).stream()
+                .map(Booking::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal revenueLastMonth = bookingRepository.findByStatusAndCreatedAtBetween(BookingStatus.COMPLETED, lastMonthStart, lastMonthEnd).stream()
+                .map(Booking::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        double userGrowth = usersLastMonth > 0 ? ((double)(usersThisMonth - usersLastMonth) / usersLastMonth * 100) : (usersThisMonth > 0 ? 100.0 : 0.0);
+        double tenantGrowth = tenantsLastMonth > 0 ? ((double)(tenantsThisMonth - tenantsLastMonth) / tenantsLastMonth * 100) : (tenantsThisMonth > 0 ? 100.0 : 0.0);
+        double bookingGrowth = bookingsLastMonth > 0 ? ((double)(bookingsThisMonth - bookingsLastMonth) / bookingsLastMonth * 100) : (bookingsThisMonth > 0 ? 100.0 : 0.0);
+        double revenueGrowth = revenueLastMonth.compareTo(BigDecimal.ZERO) > 0
+                ? revenueThisMonth.subtract(revenueLastMonth).divide(revenueLastMonth, 4, java.math.RoundingMode.HALF_UP).doubleValue() * 100
+                : (revenueThisMonth.compareTo(BigDecimal.ZERO) > 0 ? 100.0 : 0.0);
+
         Map<String, Object> stats = Map.of(
             "totalUsers", totalUsers,
             "totalTenants", totalTenants,
             "totalBookings", totalBookings,
             "totalRevenue", totalRevenue.longValue(),
             "activeProviders", activeProviders,
-            "pendingVerifications", pendingVerifications
+            "pendingVerifications", pendingVerifications,
+            "userGrowth", Math.round(userGrowth * 10.0) / 10.0,
+            "tenantGrowth", Math.round(tenantGrowth * 10.0) / 10.0,
+            "bookingGrowth", Math.round(bookingGrowth * 10.0) / 10.0,
+            "revenueGrowth", Math.round(revenueGrowth * 10.0) / 10.0
         );
         return ResponseEntity.ok(ApiResponse.ok(stats));
+    }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getAnalytics(
+            @RequestParam(required = false, defaultValue = "30") int days) {
+        java.time.OffsetDateTime now = java.time.OffsetDateTime.now();
+        java.time.OffsetDateTime start = now.minusDays(days);
+        
+        // Revenue by day (platform-wide)
+        List<Object[]> revenueRows;
+        try {
+            String sql = "SELECT DATE(b.starts_at AT TIME ZONE 'Asia/Jakarta') as d, SUM(b.total) as rev, COUNT(*) as cnt " +
+                    "FROM bookings b WHERE b.starts_at >= :start AND b.status NOT IN ('CANCELLED','EXPIRED') " +
+                    "GROUP BY d ORDER BY d";
+            revenueRows = em.createNativeQuery(sql).setParameter("start", start).getResultList();
+        } catch (Exception e) {
+            revenueRows = List.of();
+        }
+        
+        java.time.LocalDate cur = start.atZoneSameInstant(java.time.ZoneId.of("Asia/Jakarta")).toLocalDate();
+        java.time.LocalDate endDate = now.atZoneSameInstant(java.time.ZoneId.of("Asia/Jakarta")).toLocalDate();
+        Map<String, Map<String, Object>> revenueMap = new LinkedHashMap<>();
+        while (!cur.isAfter(endDate)) {
+            Map<String, Object> entry = new LinkedHashMap<>();
+            entry.put("date", cur.toString());
+            entry.put("revenue", 0L);
+            entry.put("count", 0L);
+            revenueMap.put(cur.toString(), entry);
+            cur = cur.plusDays(1);
+        }
+        for (Object[] r : revenueRows) {
+            try {
+                java.sql.Date sqlDate = (java.sql.Date) r[0];
+                String d = sqlDate.toLocalDate().toString();
+                Map<String, Object> entry = revenueMap.getOrDefault(d, new LinkedHashMap<>());
+                entry.put("date", d);
+                entry.put("revenue", r[1] != null ? ((Number) r[1]).longValue() : 0L);
+                entry.put("count", r[2] != null ? ((Number) r[2]).longValue() : 0L);
+                revenueMap.put(d, entry);
+            } catch (Exception ignore) {}
+        }
+        List<Map<String, Object>> revenueByDay = new ArrayList<>(revenueMap.values());
+
+        // Bookings by status (platform-wide)
+        Map<String, Long> bookingsByStatus = new LinkedHashMap<>();
+        for (BookingStatus s : BookingStatus.values()) bookingsByStatus.put(s.name(), 0L);
+        try {
+            List<Object[]> statusRows = em.createNativeQuery("SELECT status, COUNT(*) FROM bookings WHERE starts_at >= :start GROUP BY status")
+                    .setParameter("start", start).getResultList();
+            for (Object[] r : statusRows) {
+                bookingsByStatus.put((String) r[0], ((Number) r[1]).longValue());
+            }
+        } catch (Exception ignore) {}
+
+        // Top services (platform-wide)
+        List<Map<String, Object>> topServices = new ArrayList<>();
+        try {
+            String sql = "SELECT s.name, COUNT(bi.id) as cnt, SUM(bi.price) as rev " +
+                    "FROM booking_items bi JOIN bookings b ON b.id = bi.booking_id JOIN services s ON s.id = bi.service_id " +
+                    "WHERE b.starts_at >= :start AND b.status NOT IN ('CANCELLED','EXPIRED') " +
+                    "GROUP BY s.name ORDER BY cnt DESC LIMIT 10";
+            List<Object[]> serviceRows = em.createNativeQuery(sql).setParameter("start", start).getResultList();
+            for (Object[] r : serviceRows) {
+                Map<String, Object> m = new LinkedHashMap<>();
+                m.put("serviceName", r[0]);
+                m.put("bookingCount", ((Number) r[1]).longValue());
+                m.put("revenue", r[2] != null ? ((Number) r[2]).longValue() : 0L);
+                topServices.add(m);
+            }
+        } catch (Exception ignore) {}
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("revenueByDay", revenueByDay);
+        result.put("bookingsByStatus", bookingsByStatus);
+        result.put("topServices", topServices);
+        result.put("currency", "IDR");
+        result.put("days", days);
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     @GetMapping("/users")

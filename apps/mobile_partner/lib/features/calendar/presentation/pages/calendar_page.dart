@@ -12,6 +12,11 @@ final calendarBookingsProvider =
   return parsePaginated(response.data['data'], PartnerBookingRow.fromJson).items;
 });
 
+final partnerStatsProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+  final response = await ApiService().getPartnerDashboardStats();
+  return response.data['data'] as Map<String, dynamic>? ?? {};
+});
+
 class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({super.key});
   @override
@@ -27,6 +32,7 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
   Widget build(BuildContext context) {
     final selectedDay = _selectedDay ?? DateTime.now();
     final bookingsAsync = ref.watch(calendarBookingsProvider(selectedDay));
+    final statsAsync = ref.watch(partnerStatsProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -36,6 +42,38 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
         ],
       ),
       body: Column(children: [
+        // Dashboard Stats
+        statsAsync.when(
+          data: (stats) => Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: Row(
+              children: [
+                _StatCard(
+                  icon: Icons.calendar_today,
+                  label: 'Hari Ini',
+                  value: '${stats['todayBookings'] ?? 0}',
+                  color: Colors.blue,
+                ),
+                const SizedBox(width: 8),
+                _StatCard(
+                  icon: Icons.attach_money,
+                  label: 'Minggu Ini',
+                  value: _formatPrice(stats['weekRevenue'] ?? 0),
+                  color: Colors.green,
+                ),
+                const SizedBox(width: 8),
+                _StatCard(
+                  icon: Icons.people,
+                  label: 'Pelanggan',
+                  value: '${stats['totalCustomers'] ?? 0}',
+                  color: Colors.purple,
+                ),
+              ],
+            ),
+          ),
+          loading: () => const SizedBox(height: 80),
+          error: (_, __) => const SizedBox(height: 80),
+        ),
         TableCalendar(
           firstDay: DateTime.now().subtract(const Duration(days: 30)),
           lastDay: DateTime.now().add(const Duration(days: 90)),
@@ -114,6 +152,65 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
           ),
         )),
       ]),
+    );
+  }
+}
+
+String _formatPrice(dynamic amount) {
+  final value = (amount is num) ? amount.toInt() : 0;
+  if (value >= 1000000) {
+    return '${(value / 1000000).toStringAsFixed(1)}jt';
+  } else if (value >= 1000) {
+    return '${(value / 1000).toStringAsFixed(0)}rb';
+  }
+  return '$value';
+}
+
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color color;
+
+  const _StatCard({
+    required this.icon,
+    required this.label,
+    required this.value,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon, color: color, size: 20),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: color,
+              ),
+            ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color: color.withValues(alpha: 0.8),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
