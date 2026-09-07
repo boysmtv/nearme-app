@@ -213,8 +213,6 @@ class ProviderDetailPage extends ConsumerWidget {
                                 Icon(Icons.photo_library_outlined, color: Colors.grey[400]),
                                 const SizedBox(width: 8),
                                 Text('Belum ada foto galeri', style: TextStyle(color: Colors.grey[600], fontSize: 13)),
-                                const Spacer(),
-                                Text('GET /public/providers/${provider.id}/media', style: TextStyle(color: Colors.grey[400], fontSize: 10)),
                               ]),
                             );
                           }

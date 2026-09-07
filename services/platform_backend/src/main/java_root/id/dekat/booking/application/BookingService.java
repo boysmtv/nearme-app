@@ -110,10 +110,15 @@ public class BookingService {
                 currency
         );
 
+        // Temporarily set items for total calculation, then clear before save
+        // (items don't have bookingId yet, so cascade persist would insert NULL booking_id)
         if (items != null) {
-            booking.setItems(items);
+            booking.setItems(new ArrayList<>(items));
         }
         booking.recalculateTotal();
+        if (items != null) {
+            booking.setItems(new ArrayList<>());
+        }
         String pin = String.format("%06d", new Random().nextInt(999999));
         booking.setConfirmationPin(pin);
         // Bundle B: default deposit & policy fields
@@ -151,14 +156,24 @@ public class BookingService {
         }
 
         if (items != null) {
+            List<BookingItem> savedItems = new ArrayList<>();
             for (BookingItem item : items) {
+                // Safety: derive from hold if missing
+                java.time.Instant itemStarts = item.getStartsAt() != null
+                        ? item.getStartsAt()
+                        : hold.getStartsAt().toInstant();
+                java.time.Instant itemEnds = item.getEndsAt() != null
+                        ? item.getEndsAt()
+                        : hold.getEndsAt().toInstant();
+
                 BookingItem newItem = new BookingItem(
                         savedBooking.getId(), item.getServiceId(), item.getStaffId(),
-                        item.getResourceId(), item.getStartsAt(), item.getEndsAt(),
+                        item.getResourceId(), itemStarts, itemEnds,
                         item.getPrice(), item.getDiscount(), item.getTax(), item.getNotes()
                 );
-                bookingItemRepository.save(newItem);
+                savedItems.add(bookingItemRepository.save(newItem));
             }
+            savedBooking.setItems(savedItems);
         }
 
         if (hold.getStaffId() != null) {

@@ -95,9 +95,35 @@ public class BookingController {
         UUID customerId = request.getCustomerId() != null
                 ? request.getCustomerId()
                 : UUID.fromString(jwt.getSubject());
+
+        // Convert BookingItemRequest DTOs to BookingItem domain entities
+        List<id.dekat.booking.domain.BookingItem> domainItems = null;
+        if (request.getItems() != null) {
+            domainItems = new java.util.ArrayList<>();
+            for (BookingItemRequest req : request.getItems()) {
+                java.time.Instant starts = req.getStartsAt() != null
+                        ? java.time.Instant.parse(req.getStartsAt()) : null;
+                java.time.Instant ends = req.getEndsAt() != null
+                        ? java.time.Instant.parse(req.getEndsAt()) : null;
+                int price = req.getPrice() != null ? req.getPrice()
+                        : (req.getPriceSnapshot() != null ? req.getPriceSnapshot() : 0);
+                domainItems.add(new id.dekat.booking.domain.BookingItem(
+                        null,
+                        req.getServiceId() != null ? UUID.fromString(req.getServiceId()) : null,
+                        req.getStaffId() != null ? UUID.fromString(req.getStaffId()) : null,
+                        req.getResourceId() != null ? UUID.fromString(req.getResourceId()) : null,
+                        starts, ends,
+                        price,
+                        req.getDiscount() != null ? req.getDiscount() : 0,
+                        req.getTax() != null ? req.getTax() : 0,
+                        req.getNotes()
+                ));
+            }
+        }
+
         Booking booking = bookingService.confirmBooking(
                 request.getHoldId(), request.getTenantId(), request.getLocationId(),
-                customerId, request.getCurrency(), request.getItems()
+                customerId, request.getCurrency(), domainItems
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(booking));
     }

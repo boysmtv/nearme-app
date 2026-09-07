@@ -1,6 +1,5 @@
 package id.dekat.booking.web.dto;
 
-import id.dekat.booking.domain.BookingItem;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.UUID;
@@ -22,7 +21,6 @@ public class CreateBookingRequest {
     @NotNull
     private String currency;
 
-    @NotNull
     private String idempotencyKey;
 
     private String contactInfo;
@@ -31,7 +29,7 @@ public class CreateBookingRequest {
 
     private String notes;
 
-    private List<BookingItem> items;
+    private List<BookingItemRequest> items;
 
     public UUID getHoldId() { return holdId; }
     public void setHoldId(UUID holdId) { this.holdId = holdId; }
@@ -51,6 +49,6 @@ public class CreateBookingRequest {
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
-    public List<BookingItem> getItems() { return items; }
-    public void setItems(List<BookingItem> items) { this.items = items; }
+    public List<BookingItemRequest> getItems() { return items; }
+    public void setItems(List<BookingItemRequest> items) { this.items = items; }
 }
