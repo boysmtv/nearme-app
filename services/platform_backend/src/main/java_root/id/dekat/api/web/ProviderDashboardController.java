@@ -18,6 +18,8 @@ import id.dekat.review.domain.PublicReview;
 import id.dekat.review.domain.PublicReviewRepository;
 import id.dekat.review.domain.ReviewResponse;
 import id.dekat.sharedkernel.web.ApiResponse;
+import id.dekat.staff.application.StaffService;
+import id.dekat.staff.domain.Staff;
 import id.dekat.tenant.domain.BlockedDate;
 import id.dekat.tenant.domain.BlockedDateRepository;
 import id.dekat.tenant.domain.ProviderListing;
@@ -55,6 +57,7 @@ public class ProviderDashboardController {
     private final ConfigVersionRepository configVersionRepository;
     private final ReviewService reviewService;
     private final BlockedDateRepository blockedDateRepository;
+    private final StaffService staffService;
 
     public ProviderDashboardController(BookingRepository bookingRepository,
                                        BookingService bookingService,
@@ -65,7 +68,8 @@ public class ProviderDashboardController {
                                        PublicReviewRepository publicReviewRepository,
                                        ConfigVersionRepository configVersionRepository,
                                        ReviewService reviewService,
-                                       BlockedDateRepository blockedDateRepository) {
+                                       BlockedDateRepository blockedDateRepository,
+                                       StaffService staffService) {
         this.bookingRepository = bookingRepository;
         this.bookingService = bookingService;
         this.serviceOfferingRepository = serviceOfferingRepository;
@@ -76,6 +80,7 @@ public class ProviderDashboardController {
         this.configVersionRepository = configVersionRepository;
         this.reviewService = reviewService;
         this.blockedDateRepository = blockedDateRepository;
+        this.staffService = staffService;
     }
 
     @GetMapping("/dashboard/stats")
@@ -275,15 +280,14 @@ public class ProviderDashboardController {
     }
 
     @PostMapping("/staff/invite")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> inviteStaff(@RequestBody Map<String, Object> request) {
-        Map<String, Object> staff = Map.of(
-                "id", UUID.randomUUID().toString(),
-                "name", request.getOrDefault("name", ""),
-                "email", request.getOrDefault("email", ""),
-                "role", request.getOrDefault("role", "STAFF"),
-                "active", true
-        );
-        return ResponseEntity.ok(ApiResponse.ok(staff, "Staff invitation sent"));
+    public ResponseEntity<ApiResponse<Staff>> inviteStaff(
+            @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantIdHeader,
+            @RequestBody Map<String, Object> request) {
+        UUID tenantId = resolveTenant(tenantIdHeader);
+        String name = (String) request.getOrDefault("name", "");
+        String email = (String) request.getOrDefault("email", "");
+        Staff staff = staffService.inviteStaff(tenantId, name, email, null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(staff));
     }
 
     @GetMapping("/customers")

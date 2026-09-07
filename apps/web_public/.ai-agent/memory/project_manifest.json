@@ -1,0 +1,376 @@
+{
+  "project_name": "web_public",
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps\\web_public",
+  "final_project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps\\web_public",
+  "problem_file": "",
+  "problem_statement": "",
+  "stack": [],
+  "stack_id": "",
+  "template_id": "",
+  "platform": "",
+  "domain": "",
+  "project_type": "",
+  "build_commands": [],
+  "run_commands": [],
+  "features": [],
+  "packages": [],
+  "languages": [
+    "typescript"
+  ],
+  "entrypoints": [],
+  "final_status": "registered",
+  "mode": "factory_managed",
+  "updated_at": "2026-09-07T05:58:23.246434+00:00",
+  "source_fingerprint": {
+    "updated_at": "2026-09-07T05:58:23.261796+00:00",
+    "file_count": 68,
+    "digest": "7d4c67505d4886c57a2d50e09bc8cf98954cf3b2192fbfa799aee692cf6a90cb",
+    "files": [
+      {
+        "path": "package.json",
+        "hash": "c3c44e793eb7438e82236f1043da3d9048ccab439261386746290ec74df24aa1",
+        "size_bytes": 1078
+      },
+      {
+        "path": "src/App.tsx",
+        "hash": "5f80ae1cb4691a6678682203b6902cfae4553222680bc22922b7be09cd77a085",
+        "size_bytes": 7887
+      },
+      {
+        "path": "src/components/BookingSummary.tsx",
+        "hash": "b69463ed7e6cf475b3c3fd513dd4b7ac21d6f662e22fe1446232ed54f22fbe66",
+        "size_bytes": 4856
+      },
+      {
+        "path": "src/components/ChatWidget.tsx",
+        "hash": "189ac69a438e503fdfa9e89e302ad7c97b0157da0c332cb8620541769a8b81e8",
+        "size_bytes": 3534
+      },
+      {
+        "path": "src/components/Footer.tsx",
+        "hash": "109f447bb4305896b3229abc85340eaaaa86d307e90d4b5c97066caf4dc169e3",
+        "size_bytes": 2515
+      },
+      {
+        "path": "src/components/Header.tsx",
+        "hash": "bee4ee49789ee68a66bdcf583262614353e98aefd8303e53f42c6d2a6dbc7f83",
+        "size_bytes": 6622
+      },
+      {
+        "path": "src/components/ProviderCard.tsx",
+        "hash": "fd7ca686e82d47694e5c7fba85657f7a54c05115d1481cc3eb7530e8dd7ef38f",
+        "size_bytes": 4039
+      },
+      {
+        "path": "src/components/ProviderLayout.tsx",
+        "hash": "3f75203320984ac8584d0343e4724b11dae137b3af852d881be4d81e9989e484",
+        "size_bytes": 6726
+      },
+      {
+        "path": "src/components/ServiceCard.tsx",
+        "hash": "33b9c2c596ed09d0d6bafc69e3e030dea8270ee5b1b795440efce4989be45cae",
+        "size_bytes": 2785
+      },
+      {
+        "path": "src/components/SlotPicker.tsx",
+        "hash": "8b706eb688658c885a86e6a84d12501e56b87408e6c93690fe96253d0417af2e",
+        "size_bytes": 3158
+      },
+      {
+        "path": "src/components/StatsCard.tsx",
+        "hash": "6036f879b7a42aae82cca9cdef2fb28f86dd66038bc8e7be85847065c394638e",
+        "size_bytes": 2118
+      },
+      {
+        "path": "src/components/__tests__/BookingSummary.test.tsx",
+        "hash": "d2560a179abbd236db0625c474907ae5a70d1b21285cda458708a4f29994842a",
+        "size_bytes": 3888
+      },
+      {
+        "path": "src/components/__tests__/ChatWidget.test.tsx",
+        "hash": "6add067817df54257b761066469806d7608509bc3e249e3e4280789aaf85d02c",
+        "size_bytes": 1161
+      },
+      {
+        "path": "src/components/__tests__/Footer.test.tsx",
+        "hash": "e7fb57300f2da3f949a75a8572288d41e03538a8a405aa67d348bf867df2e1fd",
+        "size_bytes": 1816
+      },
+      {
+        "path": "src/components/__tests__/Gallery.test.tsx",
+        "hash": "bdb89204f2a2c4a6306385a43891a28f5d4dc5d994f51b93006be7af7b2de4da",
+        "size_bytes": 2389
+      },
+      {
+        "path": "src/components/__tests__/Header.test.tsx",
+        "hash": "7ce351f5e0c87c08e133ccf4d57143bb19948b0eeb844ee90fd3abfe7982adc7",
+        "size_bytes": 2530
+      },
+      {
+        "path": "src/components/__tests__/ProviderCard.test.tsx",
+        "hash": "c4dd39d12b9911f5fe7cd76315e186cb4e75295782b70b9eb1741eff145c7ac6",
+        "size_bytes": 2768
+      },
+      {
+        "path": "src/components/__tests__/ReportsAnalytics.test.tsx",
+        "hash": "0c56b582e2bf69eb4a8bc7ef4210589734a9bb28093aaec3bbf71890da75f5ef",
+        "size_bytes": 2283
+      },
+      {
+        "path": "src/components/__tests__/ServiceCard.test.tsx",
+        "hash": "58d5c799cba2436e09fe6708d64b7ecb05e124d6c8be5d258bd3f0b8915a0644",
+        "size_bytes": 3474
+      },
+      {
+        "path": "src/components/__tests__/SlotPicker.test.tsx",
+        "hash": "3a243f3b4dc468f84a43ef4233a22eb70d5eb3173ea6da3836a3c4025e38f7cb",
+        "size_bytes": 3154
+      },
+      {
+        "path": "src/hooks/useChatWebSocket.ts",
+        "hash": "3979335414f1069de5db5d78c344e31a0e26f6ed3610696b851fc85d736e89e5",
+        "size_bytes": 4259
+      },
+      {
+        "path": "src/lib/ProtectedRoute.tsx",
+        "hash": "2dd692d73bf832a3bdc1ee96df30028faa094c15de37232f5706bcd17da2024e",
+        "size_bytes": 1048
+      },
+      {
+        "path": "src/lib/__tests__/analytics.test.ts",
+        "hash": "5657a468a658bf346a48819aa1860571d66c84b1eb78427dd23c1cb206b76a9f",
+        "size_bytes": 2589
+      },
+      {
+        "path": "src/lib/__tests__/api.test.ts",
+        "hash": "9154091ed8bdc05a1de9b02a9d778dbe9c2995f3d58f1d2384e7c2bd3137c44d",
+        "size_bytes": 5997
+      },
+      {
+        "path": "src/lib/__tests__/bundleB.test.ts",
+        "hash": "287830d4eb0ecf5855847ccc4a34e615e1a5370a880537d7bddbdb30364778b7",
+        "size_bytes": 5884
+      },
+      {
+        "path": "src/lib/__tests__/chat.test.ts",
+        "hash": "a9bc9e403425389e3b5a65eccc4c70b60bc182c09d8efa931156d7b28a5ce985",
+        "size_bytes": 2868
+      },
+      {
+        "path": "src/lib/__tests__/types.test.ts",
+        "hash": "3893548ace4674daa7868ef22be91e5e469c51b61901fd6618a3de7a00a0986a",
+        "size_bytes": 4801
+      },
+      {
+        "path": "src/lib/__tests__/weird.test.ts",
+        "hash": "83f6f92e3ecdcf390c8ede53bf07f8c841ad6aa976b7c82d0a35ff7172101495",
+        "size_bytes": 9973
+      },
+      {
+        "path": "src/lib/api.ts",
+        "hash": "b110046bb2c5edf5dacad2b453ffba27c2645c61fdf7803fd6d60b399c320fed",
+        "size_bytes": 19550
+      },
+      {
+        "path": "src/lib/auth.tsx",
+        "hash": "1cb8e48bc6f3198f1a1f438d85e2c65fdd5832e7c4d32117eab269a9d6c587a3",
+        "size_bytes": 6749
+      },
+      {
+        "path": "src/lib/types.ts",
+        "hash": "9b913f872091b4917c0c53c49d1ed7bbc8fff949adb220775f7838acb7691f3a",
+        "size_bytes": 6879
+      },
+      {
+        "path": "src/main.tsx",
+        "hash": "7c26adb1887430e9b01896a1dd410fcf2df1d6eca58a1ae0745d16154ee57593",
+        "size_bytes": 712
+      },
+      {
+        "path": "src/pages/AboutPage.tsx",
+        "hash": "d83d4c5146e3691fd8dd67e03b72f5d9bdd5284860c6e55cba8b8169e5b05c12",
+        "size_bytes": 5421
+      },
+      {
+        "path": "src/pages/BookingPage.tsx",
+        "hash": "f141b2baa2c2efe9dc044f5ce4c4451137f7e853796a6099870b2038ebd921d9",
+        "size_bytes": 47392
+      },
+      {
+        "path": "src/pages/ChatPage.tsx",
+        "hash": "0891fe47e5037ae718e2ab718c8325ef4b6cbde897dafa7e735c057f68af0bfb",
+        "size_bytes": 6886
+      },
+      {
+        "path": "src/pages/HomePage.tsx",
+        "hash": "dc9183fd9f64f7589fdb91155e19b622a681fdb697112bf7643d5b61072380ce",
+        "size_bytes": 14406
+      },
+      {
+        "path": "src/pages/LoginPage.tsx",
+        "hash": "0dca8caff3ec597eec3c4606c35b30729c460a9bd87f2e73d318f9fafb9dd35f",
+        "size_bytes": 10813
+      },
+      {
+        "path": "src/pages/PaymentPage.tsx",
+        "hash": "2b044bd28b6bd7b0001109563961eeec30ee0ddcfe3661374ea14144b29b866c",
+        "size_bytes": 8175
+      },
+      {
+        "path": "src/pages/ProfileCompletePage.tsx",
+        "hash": "bcac5b17bad9cf278eedfc3c5d4527138ca1f3837f13a81d55b703742993f3c9",
+        "size_bytes": 4011
+      },
+      {
+        "path": "src/pages/ProviderPage.tsx",
+        "hash": "7b4b4751176ec30d7e5c82b50d66aa07d1e1d4ebe12dfb884fbce24d0fac3024",
+        "size_bytes": 28323
+      },
+      {
+        "path": "src/pages/ProviderRegisterPage.tsx",
+        "hash": "a61d10d6784756d862766813cdf091d50136d2ac015920b328c27dccb00ddf96",
+        "size_bytes": 3521
+      },
+      {
+        "path": "src/pages/RegisterPage.tsx",
+        "hash": "228fff35d4f47fe25f9fb9fcf513ddc12162e28e181fb46c49b597314928cc35",
+        "size_bytes": 6862
+      },
+      {
+        "path": "src/pages/SearchPage.tsx",
+        "hash": "1bc64ed97660c798d626edb09380e2f82bb5b3e9ee3a6fe63c72132b03473104",
+        "size_bytes": 13072
+      },
+      {
+        "path": "src/pages/customer/CustomerAccountPage.tsx",
+        "hash": "5cc7a4c1f85f690e93c9b5d30687b4bf8206499c43c16a8c250bf92d6cdc1143",
+        "size_bytes": 4146
+      },
+      {
+        "path": "src/pages/customer/CustomerBookingDetailPage.tsx",
+        "hash": "010f6a24e9a0b755057b27ffc73377715a0b00a1fbcfb7bfe16a99575d2160ea",
+        "size_bytes": 12334
+      },
+      {
+        "path": "src/pages/customer/CustomerBookingsPage.tsx",
+        "hash": "af4c9016b69e7960def00b95e70d97f83b4c666a3da3129c3ec1d21e4740ee13",
+        "size_bytes": 3657
+      },
+      {
+        "path": "src/pages/customer/CustomerFavoritesPage.tsx",
+        "hash": "58cbc1cc025b11e15583b72078449453f317d28896a584f9a2cf127cdb45c239",
+        "size_bytes": 2459
+      },
+      {
+        "path": "src/pages/customer/CustomerNotificationsPage.tsx",
+        "hash": "6d5765a707a4e8341f72714f19452cc607709e8e33e1801b4c2485a1dc3bf969",
+        "size_bytes": 2984
+      },
+      {
+        "path": "src/pages/customer/SupportPage.tsx",
+        "hash": "c853e3d77dfd11fe40aab07dbad02c7e5fdb4dbd29f237a8b1fed49eff9bbc6a",
+        "size_bytes": 3386
+      },
+      {
+        "path": "src/pages/provider/BookingsPage.tsx",
+        "hash": "0dfc2a9c47bce89b37c77f3e9c1315f40c88ddd3386c55a7fb2e50c54f711fc9",
+        "size_bytes": 10755
+      },
+      {
+        "path": "src/pages/provider/CalendarPage.tsx",
+        "hash": "4820792bd00795d52e083ba3ceb4a6e8019ec3da829396078e2c1827cfa75f38",
+        "size_bytes": 9687
+      },
+      {
+        "path": "src/pages/provider/CustomersPage.tsx",
+        "hash": "4fef0e421f3d6ca673e6acc6d0ea143ac6e025a72584c169f75a5cafef924fdf",
+        "size_bytes": 3993
+      },
+      {
+        "path": "src/pages/provider/DashboardPage.tsx",
+        "hash": "cddbe2f34a92d97eaa901440705c6cd49390e3dcf57bf7386a1b8a837f5a01a2",
+        "size_bytes": 10068
+      },
+      {
+        "path": "src/pages/provider/FaqPage.tsx",
+        "hash": "eb7deec630018f51acfa9f3cd1e43e5d5be3041c9c1f5a86c7dc0a3d452d631f",
+        "size_bytes": 13409
+      },
+      {
+        "path": "src/pages/provider/MediaPage.tsx",
+        "hash": "eacd9b7c3513c2bd4540bc2fa1739f0094d6a24a9e6f5ed74dea1641a063a04d",
+        "size_bytes": 5884
+      },
+      {
+        "path": "src/pages/provider/NotificationsPage.tsx",
+        "hash": "bfe8f7ef547d51425606211608fbd20bf5853ae4efe925427ab4fd2654dbec98",
+        "size_bytes": 3144
+      },
+      {
+        "path": "src/pages/provider/PromotionsPage.tsx",
+        "hash": "5faf7c923275debf964e21ea5364e28144c108d965ee306592462e5e9e628dd8",
+        "size_bytes": 23323
+      },
+      {
+        "path": "src/pages/provider/ReportsPage.tsx",
+        "hash": "39410a4cf3064b974daf540c5b29f4fe797d879b33f997bb47ccde26ce97c215",
+        "size_bytes": 11598
+      },
+      {
+        "path": "src/pages/provider/ReviewsPage.tsx",
+        "hash": "3bfc8c97436fe64142a89dbd8c0e39124d3da2b9482620d8095e4617d790a807",
+        "size_bytes": 5473
+      },
+      {
+        "path": "src/pages/provider/ServicesPage.tsx",
+        "hash": "6e0b90e84ae0a98c732b89cf9bfe7c94b5dd90e3465f155de3e08f6a77ffcc15",
+        "size_bytes": 10868
+      },
+      {
+        "path": "src/pages/provider/SettingsPage.tsx",
+        "hash": "eb21d2cadb235bd8bad8068b84cc2e301884a8eb9e5517e02ecefb1d6ab788ac",
+        "size_bytes": 10455
+      },
+      {
+        "path": "src/pages/provider/StaffPage.tsx",
+        "hash": "2a211e112a69536e88ceab11c9b91f3e2a5da0304e6364a41758edac99cad4bf",
+        "size_bytes": 9836
+      },
+      {
+        "path": "src/test/setup.ts",
+        "hash": "4c245fac909e94f0d995dd093c429044fa413aa6244cbbb2faeb3f8567dcbb57",
+        "size_bytes": 1030
+      },
+      {
+        "path": "tailwind.config.ts",
+        "hash": "29eeb6fbf35ed5250d4173cd9a4bace3989f93d0cd2297195fe86e16acb976f5",
+        "size_bytes": 984
+      },
+      {
+        "path": "tsconfig.json",
+        "hash": "a75185215163f72d9d3a304d952cad8fa859b545854f308d42869464553494a5",
+        "size_bytes": 1071
+      },
+      {
+        "path": "vite-env.d.ts",
+        "hash": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+        "size_bytes": 38
+      },
+      {
+        "path": "vite.config.ts",
+        "hash": "c52726c620d1aadf275da63cf4c1a3ca52d9405da3b6a24300cf71c81209658b",
+        "size_bytes": 524
+      },
+      {
+        "path": "vitest.config.ts",
+        "hash": "7081614755609fa01507da51cf4cd392ca7028e45dd298c330482cee21e63204",
+        "size_bytes": 673
+      }
+    ]
+  },
+  "registration": {
+    "source": "project_registration",
+    "actor": "",
+    "recorded_at": "2026-09-07T05:58:23.261796+00:00"
+  }
+}

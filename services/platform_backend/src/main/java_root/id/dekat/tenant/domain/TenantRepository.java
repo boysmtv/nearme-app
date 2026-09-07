@@ -2,7 +2,7 @@ package id.dekat.tenant.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,7 +15,7 @@ public interface TenantRepository extends JpaRepository<Tenant, UUID> {
 
     Optional<Tenant> findBySlugAndVerificationStatus(String slug, String verificationStatus);
 
-    long countByCreatedAtAfter(OffsetDateTime date);
+    long countByCreatedAtAfter(LocalDateTime date);
 
-    long countByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end);
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

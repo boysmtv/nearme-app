@@ -28,6 +28,7 @@ import '../../features/account/presentation/pages/loyalty_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/chat/presentation/pages/chat_detail_page.dart';
 import '../../features/favorites/presentation/pages/favorites_page.dart';
+import '../../features/provider_profile/presentation/pages/provider_reviews_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
 class GoRouterRefresh extends ChangeNotifier {
@@ -362,6 +363,13 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'providerDetail',
         builder: (context, state) => ProviderDetailPage(
           providerSlug: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/provider/:id/reviews',
+        name: 'providerReviews',
+        builder: (context, state) => ProviderReviewsPage(
+          providerId: state.pathParameters['id']!,
         ),
       ),
       GoRoute(

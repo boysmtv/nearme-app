@@ -130,6 +130,10 @@ export default function BookingPage() {
       }),
   });
 
+  const createPaymentIntent = useMutation({
+    mutationFn: (bookingId: string) => publicApi.bookings.createPaymentIntent(bookingId, 'midtrans'),
+  });
+
   const services = servicesRes?.data ?? [];
 
   useEffect(() => {
@@ -224,7 +228,18 @@ export default function BookingPage() {
     const values = contactForm.getValues();
     createBooking.mutate(values, {
       onSuccess: (res) => {
-        setCreatedBooking(res.data);
+        const booking = res.data;
+        setCreatedBooking(booking);
+        if (selectedService && selectedService.depositAmount > 0 && booking.depositRequired) {
+          createPaymentIntent.mutate(booking.id, {
+            onSuccess: (paymentRes) => {
+              const paymentData = paymentRes.data as unknown as { paymentUrl?: string; redirectUrl?: string };
+              if (paymentData.redirectUrl) {
+                window.open(paymentData.redirectUrl, '_blank');
+              }
+            },
+          });
+        }
       },
     });
   };
@@ -333,6 +348,27 @@ export default function BookingPage() {
                 </div>
                 {createdBooking.cancelDeadline && <p className="mt-1 text-xs text-amber-600">Batas pembatalan: {new Date(createdBooking.cancelDeadline).toLocaleString('id-ID')}</p>}
                 <p className="mt-1 text-xs text-gray-500">Reschedule: {createdBooking.rescheduleCount ?? 0}/{createdBooking.maxReschedule ?? 1} gratis • Cancel setelah deadline = no refund</p>
+                {selectedService && selectedService.depositAmount > 0 && (
+                  <div className="mt-3">
+                    <button
+                      onClick={() => createPaymentIntent.mutate(createdBooking.id, {
+                        onSuccess: (paymentRes) => {
+                          const paymentData = paymentRes.data as unknown as { paymentUrl?: string; redirectUrl?: string };
+                          if (paymentData.redirectUrl) {
+                            window.open(paymentData.redirectUrl, '_blank');
+                          }
+                        },
+                      })}
+                      disabled={createPaymentIntent.isPending}
+                      className="w-full rounded-lg bg-amber-600 px-4 py-2 text-sm font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
+                    >
+                      {createPaymentIntent.isPending ? 'Memproses...' : `Bayar Deposit ${formatPrice(selectedService.depositAmount)}`}
+                    </button>
+                    {createPaymentIntent.isError && (
+                      <p className="mt-1 text-xs text-red-600">{(createPaymentIntent.error as Error).message}</p>
+                    )}
+                  </div>
+                )}
               </div>
               {/* Bundle B: Reschedule */}
               <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left">
@@ -795,7 +831,9 @@ export default function BookingPage() {
                       <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${selectedService && selectedService.depositAmount>0 ? 'bg-amber-600 text-white' : 'bg-white text-gray-500 border'}`}>
                         {selectedService && selectedService.depositAmount>0 ? `Deposit ${formatPrice(selectedService.depositAmount)}` : 'Tanpa Deposit'}
                       </span>
-                      <span className="text-xs text-amber-800">Wajib via Midtrans/Xendit jika ada</span>
+                      <span className="text-xs text-amber-800">
+                        {selectedService && selectedService.depositAmount>0 ? 'Wajib dibayar via Midtrans' : 'Tanpa deposit required'}
+                      </span>
                     </div>
                     <p className="mt-2 text-xs text-amber-700">{policyText}</p>
                     <p className="mt-1 text-xs text-gray-500">Cancel setelah deadline = no refund • Reschedule gratis 1x, lebih = 409</p>

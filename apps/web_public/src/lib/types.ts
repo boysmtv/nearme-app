@@ -341,3 +341,92 @@ export interface AnalyticsData {
   endDate: string;
   granularity: string;
 }
+
+// ── Admin Types ──────────────────────────────────────
+export interface AdminStats {
+  totalUsers: number;
+  totalTenants: number;
+  totalBookings: number;
+  totalRevenue: number;
+  userGrowth?: { value: number; isPositive: boolean };
+  tenantGrowth?: { value: number; isPositive: boolean };
+  bookingGrowth?: { value: number; isPositive: boolean };
+  revenueGrowth?: { value: number; isPositive: boolean };
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  status: string;
+  lastLoginAt?: string;
+}
+
+export interface Tenant {
+  id: string;
+  name: string;
+  category: string;
+  ownerName: string;
+  status: string;
+  totalBookings: number;
+  totalRevenue: number;
+}
+
+export interface AdminBooking {
+  id: string;
+  code: string;
+  customerName: string;
+  providerName: string;
+  serviceName: string;
+  startTime: string;
+  status: string;
+  totalAmount: number;
+}
+
+export interface Payment {
+  id: string;
+  bookingCode: string;
+  customerName: string;
+  providerName: string;
+  amount: number;
+  method: string;
+  status: string;
+  createdAt: string;
+}
+
+export interface SupportCase {
+  id: string;
+  caseNumber: string;
+  subject: string;
+  customerName: string;
+  severity: string;
+  status: string;
+  assignee?: string;
+  createdAt: string;
+}
+
+export interface FeatureFlag {
+  id: string;
+  name: string;
+  key?: string;
+  description: string;
+  enabled: boolean;
+  environment?: string;
+  targetEnvironment?: string;
+  percentage?: number;
+  ownerId?: string;
+  expiresAt?: string;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  data: { pagination: Pagination; data: T[] };
+}

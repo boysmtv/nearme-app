@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/main_scaffold.dart';
 
 final staffProvider = FutureProvider.autoDispose<List<PartnerStaffRow>>((ref) async {
   final response = await ApiService().getStaff();
@@ -26,7 +27,13 @@ class StaffListPage extends ConsumerWidget {
     final staffAsync = ref.watch(staffProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Staff')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => partnerScaffoldKey.currentState?.openDrawer(),
+        ),
+        title: const Text('Staff'),
+      ),
       body: staffAsync.when(
         data: (staffList) {
           if (staffList.isEmpty) {
@@ -74,7 +81,7 @@ class StaffListPage extends ConsumerWidget {
                           onSelected: (action) async {
                             try {
                               if (action == 'deactivate') {
-                                await ApiService().dio.delete('/provider/staff/${s.id}');
+                                await ApiService().deleteStaff(s.id);
                               } else if (action == 'activate') {
                                 await ApiService().updateStaff(s.id, {});
                               } else if (action == 'schedule') {
@@ -277,7 +284,7 @@ class StaffListPage extends ConsumerWidget {
             TextButton(onPressed: saving ? null : () async {
               setState(()=> saving=true);
               try {
-                await ApiService().dio.post('/provider/staff/$staffId/schedule', data: schedule);
+                await ApiService().saveStaffSchedule(staffId, schedule);
                 if (ctx.mounted) Navigator.pop(ctx);
                 if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Jadwal tersimpan'), backgroundColor: Colors.green));
               } catch (e) {

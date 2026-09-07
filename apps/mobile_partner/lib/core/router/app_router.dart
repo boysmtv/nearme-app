@@ -16,6 +16,10 @@ import '../../features/service_management/presentation/pages/services_page.dart'
 import '../../features/review_management/presentation/pages/reviews_page.dart';
 import '../../features/promotion/presentation/pages/promotions_page.dart';
 import '../../features/notification/presentation/pages/notification_inbox_page.dart';
+import '../../features/faq_management/presentation/pages/faq_page.dart';
+import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/settings/presentation/pages/blocked_dates_page.dart';
+import '../../features/customer_management/presentation/pages/customers_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
 final partnerAuthProvider = StateNotifierProvider<PartnerAuthNotifier, PartnerAuthState>((ref) {
@@ -63,7 +67,7 @@ class PartnerAuthNotifier extends StateNotifier<PartnerAuthState> {
   Future<void> logout() async {
     final refreshToken = await SecureStorageService.read(StorageKeys.refreshToken);
     try {
-      await _apiService.dio.post('/auth/logout', queryParameters: {'refreshToken': refreshToken});
+      await _apiService.logout(refreshToken: refreshToken);
     } catch (_) {}
     await SecureStorageService.deleteAll();
     state = const PartnerAuthState();
@@ -90,6 +94,10 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: '/reviews', name: 'reviews', pageBuilder: (_, __) => const NoTransitionPage(child: ReviewsPage())),
         GoRoute(path: '/promotions', name: 'promotions', pageBuilder: (_, __) => const NoTransitionPage(child: PromotionsPage())),
         GoRoute(path: '/notifications', name: 'notifications', pageBuilder: (_, __) => const NoTransitionPage(child: NotificationInboxPage())),
+        GoRoute(path: '/faq', name: 'faq', pageBuilder: (_, __) => const NoTransitionPage(child: ProviderFaqPage())),
+        GoRoute(path: '/settings', name: 'settings', pageBuilder: (_, __) => const NoTransitionPage(child: SettingsPage())),
+        GoRoute(path: '/blocked-dates', name: 'blockedDates', pageBuilder: (_, __) => const NoTransitionPage(child: BlockedDatesPage())),
+        GoRoute(path: '/customers', name: 'customers', pageBuilder: (_, __) => const NoTransitionPage(child: CustomersPage())),
       ]),
       GoRoute(path: '/booking/:id', name: 'bookingDetail', builder: (_, state) => BookingDetailPage(bookingId: state.pathParameters['id']!)),
       GoRoute(path: '/partner/chat/:id', name: 'partnerChatDetail', builder: (_, state) => PartnerChatDetailPage(chatId: state.pathParameters['id']!)),

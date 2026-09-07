@@ -195,7 +195,7 @@ describe('adminApi', () => {
 
       const result = await adminApi.config.getFlags();
 
-      expect(mockedGet).toHaveBeenCalledWith('/admin/config/flags');
+      expect(mockedGet).toHaveBeenCalledWith('/admin/feature-flags');
       expect(result.data).toHaveLength(1);
     });
 
@@ -204,7 +204,7 @@ describe('adminApi', () => {
 
       await adminApi.config.toggleFlag('f1', false);
 
-      expect(mockedPut).toHaveBeenCalledWith('/admin/config/flags/f1', { enabled: false });
+      expect(mockedPut).toHaveBeenCalledWith('/admin/feature-flags/f1/toggle', { enabled: false });
     });
   });
 });

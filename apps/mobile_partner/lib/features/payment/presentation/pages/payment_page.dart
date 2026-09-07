@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import 'package:flutter_core/flutter_core.dart';
 
 final paymentDetailProvider = FutureProvider.autoDispose.family<Map<String, dynamic>, String>((ref, id) async {
-  try {
-    final res = await ApiService().getPayment(id);
-    return res.data['data'] as Map<String, dynamic>;
-  } catch (_) {
-    // fallback to earnings summary if direct fetch fails
-    try {
-      final res2 = await ApiService().getBookings(params: {'limit': '1'});
-      final list = (res2.data['data']?['data'] as List?) ?? [];
-      if (list.isNotEmpty) return list.first as Map<String, dynamic>;
-    } catch (_) {}
-    return {'id': id, 'amount': 75000, 'status': 'COMPLETED', 'customerName': 'John Doe', 'serviceName': 'Haircut'};
-  }
+  final res = await ApiService().getPayment(id);
+  final data = res.data['data'];
+  if (data is Map<String, dynamic>) return data;
+  throw Exception('Payment not found');
 });
 
 class PaymentPage extends ConsumerWidget {
@@ -27,15 +18,16 @@ class PaymentPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final detailAsync = ref.watch(paymentDetailProvider(paymentId));
     return Scaffold(
-      appBar: AppBar(title: const Text('Payment Details')),
+      appBar: AppBar(title: const Text('Detail Pembayaran')),
       body: detailAsync.when(
         data: (data) {
-          final amount = (data['total'] ?? data['amount'] ?? 75000) as num;
-          final status = (data['status'] ?? 'COMPLETED').toString();
-          final customer = (data['customerName'] ?? data['customer_name'] ?? 'John Doe').toString();
-          final service = (data['serviceName'] ?? data['service_name'] ?? 'Haircut').toString();
+          final amount = (data['amount'] ?? data['totalAmount'] ?? 0) as num;
+          final status = (data['status'] ?? 'UNKNOWN').toString();
+          final paymentMethod = (data['paymentMethod'] ?? data['gatewayProvider'] ?? '-').toString();
           final txnId = (data['id'] ?? paymentId).toString();
-          final isCompleted = status.toUpperCase() == 'COMPLETED' || status.toUpperCase() == 'PAID';
+          final createdAt = (data['createdAt'] ?? '-').toString();
+          final isCompleted = status.toUpperCase() == 'CAPTURED' || status.toUpperCase() == 'SETTLEMENT' || status.toUpperCase() == 'SUCCESS';
+
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -46,10 +38,8 @@ class PaymentPage extends ConsumerWidget {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        Text('Payment #$txnId',
-                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                )),
+                        Text('Pembayaran #$txnId',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
                         Text(formatRupiah(amount),
                             style: TextStyle(
@@ -77,17 +67,13 @@ class PaymentPage extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Transaction Details',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                )),
+                        Text('Detail Transaksi',
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
-                        _DetailRow(label: 'Customer', value: customer),
-                        _DetailRow(label: 'Service', value: service),
+                        _DetailRow(label: 'Metode Pembayaran', value: paymentMethod),
                         _DetailRow(label: 'Status', value: status),
-                        _DetailRow(label: 'Payment Method', value: (data['paymentMethod'] ?? 'Midtrans').toString()),
                         _DetailRow(label: 'Transaction ID', value: txnId),
-                        _DetailRow(label: 'Updated', value: (data['updatedAt'] ?? data['createdAt'] ?? '-').toString()),
+                        _DetailRow(label: 'Waktu', value: createdAt),
                       ],
                     ),
                   ),
@@ -97,7 +83,19 @@ class PaymentPage extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Column(mainAxisSize: MainAxisSize.min, children: [Text('Failed: $e'), TextButton(onPressed: () => ref.invalidate(paymentDetailProvider(paymentId)), child: const Text('Retry'))])),
+        error: (e, _) => Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('Gagal memuat: $e', style: const TextStyle(color: Colors.red)),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => ref.invalidate(paymentDetailProvider(paymentId)),
+                child: const Text('Coba Lagi'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

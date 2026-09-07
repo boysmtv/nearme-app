@@ -69,4 +69,8 @@ class Endpoints {
   static const String chats = '/chats';
   static const String providerAnalytics = '/provider/reports/analytics';
   static const String providerReportsExport = '/provider/reports/export';
+
+  // Promotions
+  static const String providerCoupons = '/provider/coupons';
+  static const String providerCampaigns = '/provider/campaigns';
 }

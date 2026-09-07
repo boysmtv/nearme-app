@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '../../lib/api';
+import { publicApi } from '../../lib/api';
 
 const STATUS_COLORS: Record<string, string> = {
   CONFIRMED: 'bg-green-100 text-green-700',
@@ -28,13 +28,13 @@ export default function CustomerBookingDetailPage() {
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['customer-booking', id],
-    queryFn: () => api.get(`/bookings/${id}`),
+    queryFn: () => publicApi.bookings.getById(id!),
     enabled: !!id,
   });
 
   const rescheduleMutation = useMutation({
     mutationFn: (vars: { newStartsAt: string; newEndsAt: string; expectedVersion: number }) =>
-      api.post(`/bookings/${id}/reschedule`, vars),
+      publicApi.bookings.reschedule(id!, vars),
     onSuccess: (res) => {
       queryClient.setQueryData(['customer-booking', id], res);
       setShowReschedule(false);
@@ -42,7 +42,7 @@ export default function CustomerBookingDetailPage() {
   });
 
   const cancelMutation = useMutation({
-    mutationFn: (reason: string) => api.post(`/bookings/${id}/cancel`, { reason }),
+    mutationFn: (reason: string) => publicApi.bookings.cancel(id!, reason),
     onSuccess: (res) => {
       queryClient.setQueryData(['customer-booking', id], res);
       setShowCancel(false);
@@ -50,7 +50,7 @@ export default function CustomerBookingDetailPage() {
   });
 
   const pinMutation = useMutation({
-    mutationFn: (pin: string) => api.post(`/bookings/${id}/verify-pin`, { pin }),
+    mutationFn: (pin: string) => publicApi.bookings.verifyPin(id!, pin),
     onSuccess: (res) => {
       queryClient.setQueryData(['customer-booking', id], res);
       setPinMsg('PIN terverifikasi!');

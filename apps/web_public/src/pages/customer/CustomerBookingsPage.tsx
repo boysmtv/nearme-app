@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../lib/api';
+import { publicApi } from '../../lib/api';
 
 const STATUS_FILTERS = [
   { value: 'ALL', label: 'Semua' },
@@ -25,7 +25,7 @@ export default function CustomerBookingsPage() {
 
   const { data, isLoading } = useQuery({
     queryKey: ['customer-bookings', filter],
-    queryFn: () => api.get(`/bookings${filter !== 'ALL' ? `?status=${filter}` : ''}`),
+    queryFn: () => publicApi.bookings.list({ status: filter !== 'ALL' ? filter : undefined }),
   });
 
   const bookings = data?.data ?? [];

@@ -53,7 +53,7 @@ class _ProviderFaqPageState extends ConsumerState<ProviderFaqPage> {
           const SizedBox(height: 8),
           TextField(controller: _a, decoration: const InputDecoration(labelText: 'Jawaban', border: OutlineInputBorder()), maxLines: 3),
           const SizedBox(height: 8),
-          DropdownButtonFormField<String>(initialValue: _cat, items: const [DropdownMenuItem(value: 'booking', child: Text('booking')), DropdownMenuItem(value: 'pembayaran', child: Text('pembayaran')), DropdownMenuItem(value: 'kalender', child: Text('kalender'))], onChanged: (v) => setState(() => _cat = v!), decoration: const InputDecoration(labelText: 'Kategori')),
+          DropdownButtonFormField<String>(value: _cat, items: const [DropdownMenuItem(value: 'booking', child: Text('booking')), DropdownMenuItem(value: 'pembayaran', child: Text('pembayaran')), DropdownMenuItem(value: 'kalender', child: Text('kalender'))], onChanged: (v) => setState(() => _cat = v!), decoration: const InputDecoration(labelText: 'Kategori')),
           const SizedBox(height: 12),
           ElevatedButton(onPressed: _create, child: const Text('Tambah FAQ')),
           const Divider(height: 32),

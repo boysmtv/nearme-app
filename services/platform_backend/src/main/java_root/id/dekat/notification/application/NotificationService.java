@@ -59,7 +59,12 @@ public class NotificationService {
         log.info("Booking confirmation notification sent for booking {} to user {}", bookingCode, recipientId);
 
         sendPushNotification(recipientId, subject, body);
-        sendEmailNotification(recipientId, subject, body);
+        sendEmailNotification(recipientId, subject, body, "booking-confirmation", Map.of(
+            "bookingCode", bookingCode,
+            "serviceName", serviceName != null ? serviceName : "",
+            "providerName", providerName != null ? providerName : "",
+            "bookingTime", bookingTime != null ? bookingTime.toString() : ""
+        ));
 
         return saved;
     }
@@ -132,7 +137,10 @@ public class NotificationService {
         log.info("Cancellation notification sent for booking {} to user {}", bookingCode, recipientId);
 
         sendPushNotification(recipientId, subject, body);
-        sendEmailNotification(recipientId, subject, body);
+        sendEmailNotification(recipientId, subject, body, "booking-cancellation", Map.of(
+            "bookingCode", bookingCode,
+            "reason", reason != null ? reason : ""
+        ));
 
         return saved;
     }
@@ -168,7 +176,11 @@ public class NotificationService {
         NotificationDelivery saved = notificationRepository.save(delivery);
         log.info("Payment receipt notification sent for booking {} to user {}", bookingCode, recipientId);
 
-        sendEmailNotification(recipientId, subject, body);
+        sendEmailNotification(recipientId, subject, body, "payment-receipt", Map.of(
+            "bookingCode", bookingCode,
+            "amount", amount != null ? amount : "",
+            "currency", currency != null ? currency : ""
+        ));
 
         return saved;
     }
@@ -224,20 +236,17 @@ public class NotificationService {
         }
     }
 
-    private void sendEmailNotification(UUID userId, String subject, String body) {
+    private void sendEmailNotification(UUID userId, String subject, String body, String templateId, Map<String, String> templateVars) {
         try {
             User user = userRepository.findById(userId).orElse(null);
             if (user == null || user.getEmail() == null) {
                 log.warn("No email found for user {}", userId);
                 return;
             }
-            Map<String, String> vars = Map.of(
-                "userName", user.getName() != null ? user.getName() : "User",
-                "subject", subject,
-                "body", body
-            );
-            emailService.sendTemplateEmail(user.getEmail(), "welcome", subject, vars);
-            log.info("Email notification sent to user {} ({})", userId, user.getEmail());
+            Map<String, String> vars = new java.util.HashMap<>(templateVars);
+            vars.putIfAbsent("userName", user.getName() != null ? user.getName() : "User");
+            emailService.sendTemplateEmail(user.getEmail(), templateId, subject, vars);
+            log.info("Email notification sent to user {} ({}) using template {}", userId, user.getEmail(), templateId);
         } catch (Exception e) {
             log.warn("Failed to send email to user {}: {}", userId, e.getMessage());
         }

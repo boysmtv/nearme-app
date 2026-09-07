@@ -6,7 +6,7 @@ import '../../../../shared/models/rows.dart';
 
 final partnerBookingDetailProvider =
     FutureProvider.autoDispose.family<PartnerBookingRow, String>((ref, id) async {
-  final response = await ApiService().dio.get('/provider/bookings/$id');
+  final response = await ApiService().getProviderBooking(id);
   return PartnerBookingRow.fromJson(response.data['data'] as Map<String, dynamic>);
 });
 

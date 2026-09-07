@@ -1,17 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '../../lib/api';
+import { publicApi } from '../../lib/api';
 
 export default function CustomerFavoritesPage() {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ['customer-favorites'],
-    queryFn: () => api.get('/customer/favorites'),
+    queryFn: () => publicApi.favorites.list(),
   });
 
   const removeMutation = useMutation({
-    mutationFn: (staffId: string) => api.delete(`/customer/favorites/${staffId}`),
+    mutationFn: (staffId: string) => publicApi.favorites.remove(staffId),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customer-favorites'] }),
   });
 

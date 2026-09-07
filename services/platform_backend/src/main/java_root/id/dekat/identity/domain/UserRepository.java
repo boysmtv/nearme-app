@@ -3,7 +3,7 @@ package id.dekat.identity.domain;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     long countByStatus(UserStatus status);
 
-    long countByCreatedAtAfter(OffsetDateTime date);
+    long countByCreatedAtAfter(LocalDateTime date);
 
-    long countByCreatedAtBetween(OffsetDateTime start, OffsetDateTime end);
+    long countByCreatedAtBetween(LocalDateTime start, LocalDateTime end);
 }

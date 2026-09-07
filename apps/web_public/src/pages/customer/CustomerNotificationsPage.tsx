@@ -1,21 +1,21 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '../../lib/api';
+import { publicApi } from '../../lib/api';
 
 export default function CustomerNotificationsPage() {
   const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ['customer-notifications'],
-    queryFn: () => api.get('/notifications'),
+    queryFn: () => publicApi.notifications.list(),
   });
 
   const markRead = useMutation({
-    mutationFn: (id: string) => api.put(`/notifications/${id}/read`),
+    mutationFn: (id: string) => publicApi.notifications.markRead(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customer-notifications'] }),
   });
 
   const markAllRead = useMutation({
-    mutationFn: () => api.put('/notifications/read-all'),
+    mutationFn: () => publicApi.notifications.markAllRead(),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customer-notifications'] }),
   });
 

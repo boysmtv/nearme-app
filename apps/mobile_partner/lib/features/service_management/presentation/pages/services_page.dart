@@ -143,7 +143,50 @@ class _ServicesPageState extends ConsumerState<ServicesPage> {
   }
 
   void _showEditServiceDialog(dynamic service) {
-    // TODO: Show edit service dialog
+    final nameCtrl = TextEditingController(text: service['name'] ?? '');
+    final priceCtrl = TextEditingController(text: (service['price'] ?? 0).toString());
+    final durationCtrl = TextEditingController(text: (service['duration'] ?? service['durationMinutes'] ?? 30).toString());
+    final descCtrl = TextEditingController(text: service['description'] ?? '');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Edit Layanan'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nama')),
+              const SizedBox(height: 8),
+              TextField(controller: priceCtrl, decoration: const InputDecoration(labelText: 'Harga'), keyboardType: TextInputType.number),
+              const SizedBox(height: 8),
+              TextField(controller: durationCtrl, decoration: const InputDecoration(labelText: 'Durasi (menit)'), keyboardType: TextInputType.number),
+              const SizedBox(height: 8),
+              TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Deskripsi'), maxLines: 2),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                await ApiService().updateService(service['id'], {
+                  'name': nameCtrl.text,
+                  'price': int.tryParse(priceCtrl.text) ?? 0,
+                  'durationMinutes': int.tryParse(durationCtrl.text) ?? 30,
+                  'description': descCtrl.text,
+                });
+                Navigator.pop(context);
+                _loadServices();
+              } catch (e) {
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
+              }
+            },
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _toggleService(String id, bool active) async {

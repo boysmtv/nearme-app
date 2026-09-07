@@ -1,0 +1,3854 @@
+{
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps\\web_public",
+  "file_count": 66,
+  "files": [
+    {
+      "path": "src/App.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "LoadingFallback",
+          "line": 37
+        },
+        {
+          "name": "NotFound",
+          "line": 45
+        },
+        {
+          "name": "ProfileCompleteGuard",
+          "line": 61
+        },
+        {
+          "name": "RequireProfileGuard",
+          "line": 68
+        },
+        {
+          "name": "App",
+          "line": 76
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "src/components/__tests__/BookingSummary.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "renderSummary",
+          "line": 45
+        }
+      ],
+      "data_members": [
+        {
+          "name": "id",
+          "line": 6
+        },
+        {
+          "name": "providerId",
+          "line": 7
+        },
+        {
+          "name": "name",
+          "line": 8
+        },
+        {
+          "name": "description",
+          "line": 9
+        },
+        {
+          "name": "duration",
+          "line": 10
+        },
+        {
+          "name": "price",
+          "line": 11
+        },
+        {
+          "name": "priceType",
+          "line": 12
+        },
+        {
+          "name": "depositAmount",
+          "line": 13
+        },
+        {
+          "name": "category",
+          "line": 14
+        },
+        {
+          "name": "addons",
+          "line": 15
+        },
+        {
+          "name": "imageUrl",
+          "line": 16
+        },
+        {
+          "name": "avatarUrl",
+          "line": 23
+        },
+        {
+          "name": "bio",
+          "line": 24
+        },
+        {
+          "name": "specialties",
+          "line": 25
+        },
+        {
+          "name": "rating",
+          "line": 26
+        },
+        {
+          "name": "reviewCount",
+          "line": 27
+        },
+        {
+          "name": "startTime",
+          "line": 32
+        },
+        {
+          "name": "endTime",
+          "line": 33
+        },
+        {
+          "name": "available",
+          "line": 34
+        },
+        {
+          "name": "service",
+          "line": 48
+        },
+        {
+          "name": "staff",
+          "line": 49
+        },
+        {
+          "name": "slot",
+          "line": 50
+        },
+        {
+          "name": "selectedAddons",
+          "line": 51
+        },
+        {
+          "name": "depositRequired",
+          "line": 52
+        },
+        {
+          "name": "isPending",
+          "line": 54
+        }
+      ]
+    },
+    {
+      "path": "src/components/__tests__/ChatWidget.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "default",
+          "line": 6
+        },
+        {
+          "name": "messages",
+          "line": 7
+        },
+        {
+          "name": "sendMessage",
+          "line": 11
+        },
+        {
+          "name": "connected",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "path": "src/components/__tests__/Footer.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "renderFooter",
+          "line": 9
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "src/components/__tests__/Gallery.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "GalleryGrid",
+          "line": 3
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "src/components/__tests__/Header.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "renderHeader",
+          "line": 25
+        }
+      ],
+      "data_members": [
+        {
+          "name": "useNavigate",
+          "line": 12
+        },
+        {
+          "name": "useAuth",
+          "line": 17
+        },
+        {
+          "name": "defaultOptions",
+          "line": 21
+        },
+        {
+          "name": "queries",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "path": "src/components/__tests__/ProviderCard.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "renderCard",
+          "line": 30
+        }
+      ],
+      "data_members": [
+        {
+          "name": "id",
+          "line": 12
+        },
+        {
+          "name": "name",
+          "line": 13
+        },
+        {
+          "name": "slug",
+          "line": 14
+        },
+        {
+          "name": "description",
+          "line": 15
+        },
+        {
+          "name": "logoUrl",
+          "line": 16
+        },
+        {
+          "name": "coverUrl",
+          "line": 17
+        },
+        {
+          "name": "category",
+          "line": 18
+        },
+        {
+          "name": "categorySlug",
+          "line": 19
+        },
+        {
+          "name": "rating",
+          "line": 20
+        },
+        {
+          "name": "reviewCount",
+          "line": 21
+        },
+        {
+          "name": "location",
+          "line": 22
+        },
+        {
+          "name": "address",
+          "line": 23
+        },
+        {
+          "name": "latitude",
+          "line": 24
+        },
+        {
+          "name": "longitude",
+          "line": 25
+        },
+        {
+          "name": "phone",
+          "line": 26
+        },
+        {
+          "name": "openingHours",
+          "line": 27
+        },
+        {
+          "name": "verificationStatus",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "path": "src/components/__tests__/ReportsAnalytics.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "providerApi",
+          "line": 7
+        },
+        {
+          "name": "reports",
+          "line": 8
+        },
+        {
+          "name": "analyticsApi",
+          "line": 10
+        },
+        {
+          "name": "getAnalytics",
+          "line": 11
+        },
+        {
+          "name": "success",
+          "line": 12
+        },
+        {
+          "name": "data",
+          "line": 13
+        },
+        {
+          "name": "revenueByDay",
+          "line": 14
+        },
+        {
+          "name": "bookingsByStatus",
+          "line": 15
+        },
+        {
+          "name": "retention",
+          "line": 16
+        },
+        {
+          "name": "funnel",
+          "line": 17
+        },
+        {
+          "name": "topServices",
+          "line": 18
+        },
+        {
+          "name": "staffUtilization",
+          "line": 19
+        },
+        {
+          "name": "currency",
+          "line": 20
+        },
+        {
+          "name": "exportCsv",
+          "line": 23
+        },
+        {
+          "name": "default",
+          "line": 28
+        },
+        {
+          "name": "useAuth",
+          "line": 32
+        }
+      ]
+    },
+    {
+      "path": "src/components/__tests__/ServiceCard.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "renderCard",
+          "line": 24
+        }
+      ],
+      "data_members": [
+        {
+          "name": "id",
+          "line": 12
+        },
+        {
+          "name": "providerId",
+          "line": 13
+        },
+        {
+          "name": "name",
+          "line": 14
+        },
+        {
+          "name": "description",
+          "line": 15
+        },
+        {
+          "name": "duration",
+          "line": 16
+        },
+        {
+          "name": "price",
+          "line": 17
+        },
+        {
+          "name": "priceType",
+          "line": 18
+        },
+        {
+          "name": "depositAmount",
+          "line": 19
+        },
+        {
+          "name": "category",
+          "line": 20
+        },
+        {
+          "name": "addons",
+          "line": 21
+        },
+        {
+          "name": "imageUrl",
+          "line": 22
+        }
+      ]
+    },
+    {
+      "path": "src/components/__tests__/SlotPicker.test.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "renderPicker",
+          "line": 34
+        }
+      ],
+      "data_members": [
+        {
+          "name": "id",
+          "line": 6
+        },
+        {
+          "name": "startTime",
+          "line": 7
+        },
+        {
+          "name": "endTime",
+          "line": 8
+        },
+        {
+          "name": "available",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "path": "src/components/BookingSummary.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 12
+        },
+        {
+          "name": "formatDateTime",
+          "line": 21
+        }
+      ],
+      "data_members": [
+        {
+          "name": "service",
+          "line": 4
+        },
+        {
+          "name": "staff",
+          "line": 5
+        },
+        {
+          "name": "slot",
+          "line": 6
+        },
+        {
+          "name": "selectedAddons",
+          "line": 7
+        },
+        {
+          "name": "depositRequired",
+          "line": 8
+        },
+        {
+          "name": "onConfirm",
+          "line": 9
+        },
+        {
+          "name": "isPending",
+          "line": 10
+        },
+        {
+          "name": "style",
+          "line": 15
+        },
+        {
+          "name": "currency",
+          "line": 16
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 17
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 18
+        },
+        {
+          "name": "weekday",
+          "line": 24
+        },
+        {
+          "name": "day",
+          "line": 25
+        },
+        {
+          "name": "month",
+          "line": 26
+        },
+        {
+          "name": "year",
+          "line": 27
+        },
+        {
+          "name": "hour",
+          "line": 28
+        },
+        {
+          "name": "minute",
+          "line": 29
+        },
+        {
+          "name": "hour12",
+          "line": 30
+        }
+      ]
+    },
+    {
+      "path": "src/components/ChatWidget.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "handleSend",
+          "line": 15
+        }
+      ],
+      "data_members": [
+        {
+          "name": "conversationId",
+          "line": 5
+        },
+        {
+          "name": "currentUserId",
+          "line": 6
+        },
+        {
+          "name": "title",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "path": "src/components/Footer.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "src/components/Header.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "unreadCount",
+          "line": 18
+        },
+        {
+          "name": "handleSearch",
+          "line": 20
+        },
+        {
+          "name": "handleLogout",
+          "line": 27
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 13
+        },
+        {
+          "name": "queryFn",
+          "line": 14
+        },
+        {
+          "name": "refetchInterval",
+          "line": 15
+        },
+        {
+          "name": "enabled",
+          "line": 16
+        }
+      ]
+    },
+    {
+      "path": "src/components/ProviderCard.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "getInitials",
+          "line": 9
+        }
+      ],
+      "data_members": [
+        {
+          "name": "provider",
+          "line": 5
+        }
+      ]
+    },
+    {
+      "path": "src/components/ProviderLayout.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "src/components/ServiceCard.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 9
+        },
+        {
+          "name": "formatDuration",
+          "line": 18
+        }
+      ],
+      "data_members": [
+        {
+          "name": "service",
+          "line": 5
+        },
+        {
+          "name": "providerSlug",
+          "line": 6
+        },
+        {
+          "name": "providerId",
+          "line": 7
+        },
+        {
+          "name": "style",
+          "line": 12
+        },
+        {
+          "name": "currency",
+          "line": 13
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 14
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "path": "src/components/SlotPicker.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatTime",
+          "line": 53
+        }
+      ],
+      "data_members": [
+        {
+          "name": "slots",
+          "line": 4
+        },
+        {
+          "name": "selectedSlotId",
+          "line": 5
+        },
+        {
+          "name": "onSelect",
+          "line": 6
+        },
+        {
+          "name": "isLoading",
+          "line": 7
+        }
+      ]
+    },
+    {
+      "path": "src/components/StatsCard.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "label",
+          "line": 2
+        },
+        {
+          "name": "value",
+          "line": 3
+        },
+        {
+          "name": "icon",
+          "line": 4
+        },
+        {
+          "name": "color",
+          "line": 5
+        },
+        {
+          "name": "change",
+          "line": 6
+        },
+        {
+          "name": "blue",
+          "line": 10
+        },
+        {
+          "name": "green",
+          "line": 11
+        },
+        {
+          "name": "purple",
+          "line": 12
+        },
+        {
+          "name": "amber",
+          "line": 13
+        },
+        {
+          "name": "red",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "src/hooks/useChatWebSocket.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "useChatWebSocket",
+          "line": 5
+        },
+        {
+          "name": "data",
+          "line": 18
+        },
+        {
+          "name": "trySSE",
+          "line": 40
+        },
+        {
+          "name": "base",
+          "line": 43
+        },
+        {
+          "name": "msg",
+          "line": 94
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "src/lib/__tests__/analytics.test.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "calledUrl",
+          "line": 18
+        }
+      ],
+      "data_members": [
+        {
+          "name": "apiClient",
+          "line": 4
+        },
+        {
+          "name": "get",
+          "line": 5
+        },
+        {
+          "name": "post",
+          "line": 6
+        },
+        {
+          "name": "put",
+          "line": 7
+        },
+        {
+          "name": "delete",
+          "line": 8
+        },
+        {
+          "name": "revenueByDay",
+          "line": 26
+        },
+        {
+          "name": "bookingsByStatus",
+          "line": 27
+        },
+        {
+          "name": "retention",
+          "line": 28
+        },
+        {
+          "name": "funnel",
+          "line": 29
+        },
+        {
+          "name": "topServices",
+          "line": 30
+        },
+        {
+          "name": "staffUtilization",
+          "line": 31
+        },
+        {
+          "name": "currency",
+          "line": 32
+        },
+        {
+          "name": "startDate",
+          "line": 33
+        },
+        {
+          "name": "endDate",
+          "line": 34
+        },
+        {
+          "name": "granularity",
+          "line": 35
+        }
+      ]
+    },
+    {
+      "path": "src/lib/__tests__/api.test.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "mockResponse",
+          "line": 5
+        }
+      ],
+      "data_members": [
+        {
+          "name": "json",
+          "line": 10
+        },
+        {
+          "name": "success",
+          "line": 23
+        },
+        {
+          "name": "data",
+          "line": 24
+        },
+        {
+          "name": "name",
+          "line": 51
+        },
+        {
+          "name": "email",
+          "line": 52
+        },
+        {
+          "name": "phone",
+          "line": 53
+        },
+        {
+          "name": "password",
+          "line": 54
+        },
+        {
+          "name": "query",
+          "line": 80
+        },
+        {
+          "name": "category",
+          "line": 81
+        },
+        {
+          "name": "location",
+          "line": 82
+        },
+        {
+          "name": "minPrice",
+          "line": 83
+        },
+        {
+          "name": "maxPrice",
+          "line": 84
+        },
+        {
+          "name": "minRating",
+          "line": 85
+        },
+        {
+          "name": "date",
+          "line": 86
+        },
+        {
+          "name": "sort",
+          "line": 87
+        },
+        {
+          "name": "page",
+          "line": 88
+        },
+        {
+          "name": "limit",
+          "line": 89
+        },
+        {
+          "name": "providerId",
+          "line": 154
+        },
+        {
+          "name": "serviceId",
+          "line": 155
+        },
+        {
+          "name": "startsAt",
+          "line": 156
+        },
+        {
+          "name": "endsAt",
+          "line": 157
+        },
+        {
+          "name": "customerName",
+          "line": 158
+        },
+        {
+          "name": "customerEmail",
+          "line": 159
+        },
+        {
+          "name": "customerPhone",
+          "line": 160
+        },
+        {
+          "name": "notes",
+          "line": 161
+        },
+        {
+          "name": "idempotencyKey",
+          "line": 162
+        }
+      ]
+    },
+    {
+      "path": "src/lib/__tests__/bundleB.test.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "mockResponse",
+          "line": 5
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "src/lib/__tests__/chat.test.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "isParticipant",
+          "line": 65
+        }
+      ],
+      "data_members": [
+        {
+          "name": "apiClient",
+          "line": 5
+        },
+        {
+          "name": "get",
+          "line": 6
+        },
+        {
+          "name": "post",
+          "line": 7
+        },
+        {
+          "name": "put",
+          "line": 8
+        },
+        {
+          "name": "delete",
+          "line": 9
+        },
+        {
+          "name": "config",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "src/lib/__tests__/types.test.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "success",
+          "line": 34
+        },
+        {
+          "name": "data",
+          "line": 35
+        },
+        {
+          "name": "id",
+          "line": 47
+        },
+        {
+          "name": "name",
+          "line": 48
+        },
+        {
+          "name": "slug",
+          "line": 49
+        },
+        {
+          "name": "description",
+          "line": 50
+        },
+        {
+          "name": "logoUrl",
+          "line": 51
+        },
+        {
+          "name": "coverUrl",
+          "line": 52
+        },
+        {
+          "name": "category",
+          "line": 53
+        },
+        {
+          "name": "categorySlug",
+          "line": 54
+        },
+        {
+          "name": "rating",
+          "line": 55
+        },
+        {
+          "name": "reviewCount",
+          "line": 56
+        },
+        {
+          "name": "location",
+          "line": 57
+        },
+        {
+          "name": "address",
+          "line": 58
+        },
+        {
+          "name": "latitude",
+          "line": 59
+        },
+        {
+          "name": "longitude",
+          "line": 60
+        },
+        {
+          "name": "phone",
+          "line": 61
+        },
+        {
+          "name": "openingHours",
+          "line": 62
+        },
+        {
+          "name": "verificationStatus",
+          "line": 63
+        },
+        {
+          "name": "providerId",
+          "line": 77
+        },
+        {
+          "name": "duration",
+          "line": 80
+        },
+        {
+          "name": "price",
+          "line": 81
+        },
+        {
+          "name": "priceType",
+          "line": 82
+        },
+        {
+          "name": "depositAmount",
+          "line": 83
+        },
+        {
+          "name": "addons",
+          "line": 85
+        },
+        {
+          "name": "imageUrl",
+          "line": 86
+        },
+        {
+          "name": "avatarUrl",
+          "line": 101
+        },
+        {
+          "name": "bio",
+          "line": 102
+        },
+        {
+          "name": "specialties",
+          "line": 103
+        },
+        {
+          "name": "startTime",
+          "line": 113
+        },
+        {
+          "name": "endTime",
+          "line": 114
+        },
+        {
+          "name": "available",
+          "line": 115
+        },
+        {
+          "name": "customerName",
+          "line": 123
+        },
+        {
+          "name": "customerAvatar",
+          "line": 124
+        },
+        {
+          "name": "comment",
+          "line": 126
+        },
+        {
+          "name": "serviceName",
+          "line": 127
+        },
+        {
+          "name": "createdAt",
+          "line": 128
+        },
+        {
+          "name": "serviceId",
+          "line": 136
+        },
+        {
+          "name": "startsAt",
+          "line": 137
+        },
+        {
+          "name": "endsAt",
+          "line": 138
+        },
+        {
+          "name": "customerEmail",
+          "line": 140
+        },
+        {
+          "name": "customerPhone",
+          "line": 141
+        },
+        {
+          "name": "notes",
+          "line": 142
+        },
+        {
+          "name": "idempotencyKey",
+          "line": 143
+        },
+        {
+          "name": "bookingCode",
+          "line": 151
+        },
+        {
+          "name": "status",
+          "line": 152
+        },
+        {
+          "name": "query",
+          "line": 159
+        },
+        {
+          "name": "minPrice",
+          "line": 162
+        },
+        {
+          "name": "maxPrice",
+          "line": 163
+        },
+        {
+          "name": "minRating",
+          "line": 164
+        },
+        {
+          "name": "date",
+          "line": 165
+        },
+        {
+          "name": "sort",
+          "line": 166
+        },
+        {
+          "name": "page",
+          "line": 167
+        },
+        {
+          "name": "limit",
+          "line": 168
+        },
+        {
+          "name": "providers",
+          "line": 175
+        },
+        {
+          "name": "pagination",
+          "line": 176
+        }
+      ]
+    },
+    {
+      "path": "src/lib/__tests__/weird.test.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "mockResponse",
+          "line": 5
+        }
+      ],
+      "data_members": [
+        {
+          "name": "providerId",
+          "line": 20
+        },
+        {
+          "name": "customerName",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "path": "src/lib/api.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "base",
+          "line": 423
+        }
+      ],
+      "data_members": [
+        {
+          "name": "get",
+          "line": 29
+        },
+        {
+          "name": "post",
+          "line": 30
+        },
+        {
+          "name": "put",
+          "line": 31
+        },
+        {
+          "name": "delete",
+          "line": 32
+        },
+        {
+          "name": "auth",
+          "line": 36
+        },
+        {
+          "name": "login",
+          "line": 37
+        },
+        {
+          "name": "register",
+          "line": 42
+        },
+        {
+          "name": "requestOtp",
+          "line": 49
+        },
+        {
+          "name": "verifyOtp",
+          "line": 51
+        },
+        {
+          "name": "categories",
+          "line": 54
+        },
+        {
+          "name": "list",
+          "line": 56
+        },
+        {
+          "name": "providers",
+          "line": 59
+        },
+        {
+          "name": "search",
+          "line": 61
+        },
+        {
+          "name": "getBySlug",
+          "line": 73
+        },
+        {
+          "name": "getFeatured",
+          "line": 76
+        },
+        {
+          "name": "services",
+          "line": 80
+        },
+        {
+          "name": "listByProvider",
+          "line": 82
+        },
+        {
+          "name": "staff",
+          "line": 87
+        },
+        {
+          "name": "availability",
+          "line": 94
+        },
+        {
+          "name": "getSlots",
+          "line": 96
+        },
+        {
+          "name": "reviews",
+          "line": 103
+        },
+        {
+          "name": "create",
+          "line": 111
+        },
+        {
+          "name": "report",
+          "line": 113
+        },
+        {
+          "name": "getPhotos",
+          "line": 115
+        },
+        {
+          "name": "addPhoto",
+          "line": 117
+        },
+        {
+          "name": "blockedDates",
+          "line": 120
+        },
+        {
+          "name": "media",
+          "line": 125
+        },
+        {
+          "name": "publicProviderGallery",
+          "line": 127
+        },
+        {
+          "name": "publicStaffPortfolio",
+          "line": 129
+        },
+        {
+          "name": "publicReviewPhotos",
+          "line": 131
+        },
+        {
+          "name": "customer",
+          "line": 134
+        },
+        {
+          "name": "getProfile",
+          "line": 136
+        },
+        {
+          "name": "updateProfile",
+          "line": 137
+        },
+        {
+          "name": "favorites",
+          "line": 140
+        },
+        {
+          "name": "add",
+          "line": 143
+        },
+        {
+          "name": "remove",
+          "line": 144
+        },
+        {
+          "name": "bookings",
+          "line": 146
+        },
+        {
+          "name": "verifyPin",
+          "line": 150
+        },
+        {
+          "name": "getById",
+          "line": 152
+        },
+        {
+          "name": "reschedule",
+          "line": 154
+        },
+        {
+          "name": "cancel",
+          "line": 156
+        },
+        {
+          "name": "ics",
+          "line": 162
+        },
+        {
+          "name": "calendarLink",
+          "line": 163
+        },
+        {
+          "name": "hold",
+          "line": 165
+        },
+        {
+          "name": "validateCoupon",
+          "line": 171
+        },
+        {
+          "name": "createPaymentIntent",
+          "line": 175
+        },
+        {
+          "name": "getPaymentStatus",
+          "line": 180
+        },
+        {
+          "name": "faqs",
+          "line": 185
+        },
+        {
+          "name": "listPublic",
+          "line": 187
+        },
+        {
+          "name": "listProvider",
+          "line": 194
+        },
+        {
+          "name": "createProvider",
+          "line": 195
+        },
+        {
+          "name": "updateProvider",
+          "line": 197
+        },
+        {
+          "name": "deleteProvider",
+          "line": 199
+        },
+        {
+          "name": "listAdmin",
+          "line": 200
+        },
+        {
+          "name": "createAdmin",
+          "line": 204
+        },
+        {
+          "name": "updateAdmin",
+          "line": 206
+        },
+        {
+          "name": "deleteAdmin",
+          "line": 208
+        },
+        {
+          "name": "policies",
+          "line": 210
+        },
+        {
+          "name": "upload",
+          "line": 238
+        },
+        {
+          "name": "reorder",
+          "line": 254
+        },
+        {
+          "name": "getProviderGallery",
+          "line": 255
+        },
+        {
+          "name": "logout",
+          "line": 261
+        },
+        {
+          "name": "dashboard",
+          "line": 267
+        },
+        {
+          "name": "getStats",
+          "line": 269
+        },
+        {
+          "name": "getRecentBookings",
+          "line": 270
+        },
+        {
+          "name": "updateStatus",
+          "line": 286
+        },
+        {
+          "name": "calendar",
+          "line": 296
+        },
+        {
+          "name": "getBookings",
+          "line": 298
+        },
+        {
+          "name": "update",
+          "line": 310
+        },
+        {
+          "name": "invite",
+          "line": 318
+        },
+        {
+          "name": "updateSchedule",
+          "line": 322
+        },
+        {
+          "name": "deactivate",
+          "line": 324
+        },
+        {
+          "name": "customers",
+          "line": 327
+        },
+        {
+          "name": "reports",
+          "line": 339
+        },
+        {
+          "name": "getReport",
+          "line": 341
+        },
+        {
+          "name": "exportCsv",
+          "line": 350
+        },
+        {
+          "name": "settings",
+          "line": 357
+        },
+        {
+          "name": "respond",
+          "line": 374
+        },
+        {
+          "name": "coupons",
+          "line": 377
+        },
+        {
+          "name": "loyalty",
+          "line": 384
+        },
+        {
+          "name": "getCustomerHistory",
+          "line": 386
+        },
+        {
+          "name": "earn",
+          "line": 388
+        },
+        {
+          "name": "campaigns",
+          "line": 391
+        },
+        {
+          "name": "activate",
+          "line": 395
+        },
+        {
+          "name": "pause",
+          "line": 396
+        },
+        {
+          "name": "notifications",
+          "line": 398
+        },
+        {
+          "name": "markRead",
+          "line": 401
+        },
+        {
+          "name": "markAllRead",
+          "line": 402
+        },
+        {
+          "name": "bookingsProvider",
+          "line": 404
+        },
+        {
+          "name": "getMessages",
+          "line": 416
+        },
+        {
+          "name": "sendMessage",
+          "line": 418
+        },
+        {
+          "name": "getBookingChat",
+          "line": 420
+        },
+        {
+          "name": "streamUrl",
+          "line": 422
+        },
+        {
+          "name": "getAnalytics",
+          "line": 430
+        }
+      ]
+    },
+    {
+      "path": "src/lib/auth.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "decodeToken",
+          "line": 24
+        },
+        {
+          "name": "AuthProvider",
+          "line": 34
+        },
+        {
+          "name": "roles",
+          "line": 44
+        },
+        {
+          "name": "useAuth",
+          "line": 167
+        }
+      ],
+      "data_members": [
+        {
+          "name": "id",
+          "line": 6
+        },
+        {
+          "name": "email",
+          "line": 7
+        },
+        {
+          "name": "name",
+          "line": 8
+        },
+        {
+          "name": "role",
+          "line": 9
+        },
+        {
+          "name": "hasProfile",
+          "line": 10
+        },
+        {
+          "name": "user",
+          "line": 14
+        },
+        {
+          "name": "isAuthenticated",
+          "line": 15
+        },
+        {
+          "name": "login",
+          "line": 16
+        },
+        {
+          "name": "register",
+          "line": 17
+        },
+        {
+          "name": "logout",
+          "line": 18
+        },
+        {
+          "name": "refreshUser",
+          "line": 19
+        },
+        {
+          "name": "completeProfile",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "path": "src/lib/ProtectedRoute.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "children",
+          "line": 8
+        },
+        {
+          "name": "requiredRole",
+          "line": 9
+        }
+      ]
+    },
+    {
+      "path": "src/lib/types.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "success",
+          "line": 2
+        },
+        {
+          "name": "data",
+          "line": 3
+        },
+        {
+          "name": "message",
+          "line": 4
+        },
+        {
+          "name": "page",
+          "line": 13
+        },
+        {
+          "name": "limit",
+          "line": 14
+        },
+        {
+          "name": "total",
+          "line": 15
+        },
+        {
+          "name": "totalPages",
+          "line": 16
+        },
+        {
+          "name": "id",
+          "line": 20
+        },
+        {
+          "name": "name",
+          "line": 21
+        },
+        {
+          "name": "slug",
+          "line": 22
+        },
+        {
+          "name": "icon",
+          "line": 23
+        },
+        {
+          "name": "serviceCount",
+          "line": 24
+        },
+        {
+          "name": "description",
+          "line": 31
+        },
+        {
+          "name": "logoUrl",
+          "line": 32
+        },
+        {
+          "name": "coverUrl",
+          "line": 33
+        },
+        {
+          "name": "category",
+          "line": 34
+        },
+        {
+          "name": "categorySlug",
+          "line": 35
+        },
+        {
+          "name": "rating",
+          "line": 36
+        },
+        {
+          "name": "reviewCount",
+          "line": 37
+        },
+        {
+          "name": "location",
+          "line": 38
+        },
+        {
+          "name": "address",
+          "line": 39
+        },
+        {
+          "name": "latitude",
+          "line": 40
+        },
+        {
+          "name": "longitude",
+          "line": 41
+        },
+        {
+          "name": "phone",
+          "line": 42
+        },
+        {
+          "name": "openingHours",
+          "line": 43
+        },
+        {
+          "name": "verificationStatus",
+          "line": 44
+        },
+        {
+          "name": "dayOfWeek",
+          "line": 48
+        },
+        {
+          "name": "open",
+          "line": 49
+        },
+        {
+          "name": "close",
+          "line": 50
+        },
+        {
+          "name": "isClosed",
+          "line": 51
+        },
+        {
+          "name": "providerId",
+          "line": 56
+        },
+        {
+          "name": "duration",
+          "line": 59
+        },
+        {
+          "name": "price",
+          "line": 60
+        },
+        {
+          "name": "priceType",
+          "line": 61
+        },
+        {
+          "name": "depositAmount",
+          "line": 62
+        },
+        {
+          "name": "addons",
+          "line": 64
+        },
+        {
+          "name": "imageUrl",
+          "line": 65
+        },
+        {
+          "name": "avatarUrl",
+          "line": 79
+        },
+        {
+          "name": "avatar",
+          "line": 80
+        },
+        {
+          "name": "title",
+          "line": 81
+        },
+        {
+          "name": "bio",
+          "line": 82
+        },
+        {
+          "name": "specialties",
+          "line": 83
+        },
+        {
+          "name": "portfolio",
+          "line": 86
+        },
+        {
+          "name": "portfolioCount",
+          "line": 87
+        },
+        {
+          "name": "startTime",
+          "line": 92
+        },
+        {
+          "name": "endTime",
+          "line": 93
+        },
+        {
+          "name": "available",
+          "line": 94
+        },
+        {
+          "name": "customerName",
+          "line": 99
+        },
+        {
+          "name": "customerAvatar",
+          "line": 100
+        },
+        {
+          "name": "comment",
+          "line": 102
+        },
+        {
+          "name": "body",
+          "line": 104
+        },
+        {
+          "name": "serviceName",
+          "line": 105
+        },
+        {
+          "name": "createdAt",
+          "line": 106
+        },
+        {
+          "name": "verifiedBooking",
+          "line": 107
+        },
+        {
+          "name": "photos",
+          "line": 108
+        },
+        {
+          "name": "exists",
+          "line": 118
+        },
+        {
+          "name": "nickname",
+          "line": 120
+        },
+        {
+          "name": "email",
+          "line": 122
+        },
+        {
+          "name": "loyaltyPoints",
+          "line": 124
+        },
+        {
+          "name": "totalBookings",
+          "line": 125
+        },
+        {
+          "name": "totalSpent",
+          "line": 126
+        },
+        {
+          "name": "serviceId",
+          "line": 131
+        },
+        {
+          "name": "startsAt",
+          "line": 132
+        },
+        {
+          "name": "endsAt",
+          "line": 133
+        },
+        {
+          "name": "customerEmail",
+          "line": 135
+        },
+        {
+          "name": "customerPhone",
+          "line": 136
+        },
+        {
+          "name": "notes",
+          "line": 137
+        },
+        {
+          "name": "idempotencyKey",
+          "line": 138
+        },
+        {
+          "name": "bookingCode",
+          "line": 143
+        },
+        {
+          "name": "status",
+          "line": 144
+        },
+        {
+          "name": "totalAmount",
+          "line": 145
+        },
+        {
+          "name": "depositRequired",
+          "line": 147
+        },
+        {
+          "name": "cancelDeadline",
+          "line": 148
+        },
+        {
+          "name": "rescheduleCount",
+          "line": 149
+        },
+        {
+          "name": "maxReschedule",
+          "line": 150
+        },
+        {
+          "name": "cancelPolicy",
+          "line": 151
+        },
+        {
+          "name": "confirmationPin",
+          "line": 155
+        },
+        {
+          "name": "pinVerified",
+          "line": 156
+        },
+        {
+          "name": "tenantId",
+          "line": 161
+        },
+        {
+          "name": "question",
+          "line": 162
+        },
+        {
+          "name": "answer",
+          "line": 163
+        },
+        {
+          "name": "sortOrder",
+          "line": 165
+        },
+        {
+          "name": "isActive",
+          "line": 166
+        },
+        {
+          "name": "type",
+          "line": 175
+        },
+        {
+          "name": "version",
+          "line": 176
+        },
+        {
+          "name": "query",
+          "line": 182
+        },
+        {
+          "name": "minPrice",
+          "line": 185
+        },
+        {
+          "name": "maxPrice",
+          "line": 186
+        },
+        {
+          "name": "minRating",
+          "line": 187
+        },
+        {
+          "name": "date",
+          "line": 188
+        },
+        {
+          "name": "sort",
+          "line": 189
+        },
+        {
+          "name": "providers",
+          "line": 195
+        },
+        {
+          "name": "pagination",
+          "line": 196
+        },
+        {
+          "name": "todayBookings",
+          "line": 200
+        },
+        {
+          "name": "weekRevenue",
+          "line": 201
+        },
+        {
+          "name": "totalCustomers",
+          "line": 202
+        },
+        {
+          "name": "avgRating",
+          "line": 203
+        },
+        {
+          "name": "occupancyRate",
+          "line": 204
+        },
+        {
+          "name": "pendingBookings",
+          "line": 205
+        },
+        {
+          "name": "staffName",
+          "line": 215
+        },
+        {
+          "name": "time",
+          "line": 216
+        },
+        {
+          "name": "amount",
+          "line": 220
+        },
+        {
+          "name": "depositPaid",
+          "line": 221
+        },
+        {
+          "name": "currency",
+          "line": 245
+        },
+        {
+          "name": "active",
+          "line": 247
+        },
+        {
+          "name": "displayName",
+          "line": 252
+        },
+        {
+          "name": "isOff",
+          "line": 262
+        },
+        {
+          "name": "lastBookingAt",
+          "line": 271
+        },
+        {
+          "name": "completedBookings",
+          "line": 277
+        },
+        {
+          "name": "cancelledBookings",
+          "line": 278
+        },
+        {
+          "name": "totalRevenue",
+          "line": 279
+        },
+        {
+          "name": "businessName",
+          "line": 285
+        },
+        {
+          "name": "operatingHours",
+          "line": 291
+        },
+        {
+          "name": "bookingPolicy",
+          "line": 292
+        },
+        {
+          "name": "cancellationPolicy",
+          "line": 293
+        },
+        {
+          "name": "autoConfirm",
+          "line": 294
+        },
+        {
+          "name": "depositPercentage",
+          "line": 296
+        },
+        {
+          "name": "notifications",
+          "line": 297
+        },
+        {
+          "name": "emailBookingConfirmation",
+          "line": 301
+        },
+        {
+          "name": "emailBookingReminder",
+          "line": 302
+        }
+      ]
+    },
+    {
+      "path": "src/main.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "defaultOptions",
+          "line": 10
+        },
+        {
+          "name": "queries",
+          "line": 11
+        },
+        {
+          "name": "staleTime",
+          "line": 12
+        },
+        {
+          "name": "retry",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "src/pages/AboutPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "faqs",
+          "line": 17
+        },
+        {
+          "name": "policies",
+          "line": 18
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 10
+        },
+        {
+          "name": "queryFn",
+          "line": 11
+        }
+      ]
+    },
+    {
+      "path": "src/pages/BookingPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 25
+        },
+        {
+          "name": "policyText",
+          "line": 98
+        },
+        {
+          "name": "version",
+          "line": 101
+        },
+        {
+          "name": "data",
+          "line": 170
+        },
+        {
+          "name": "profile",
+          "line": 171
+        },
+        {
+          "name": "handleServiceSelect",
+          "line": 197
+        },
+        {
+          "name": "handleStaffSelect",
+          "line": 205
+        },
+        {
+          "name": "handleSlotSelect",
+          "line": 211
+        },
+        {
+          "name": "handleAddonToggle",
+          "line": 216
+        },
+        {
+          "name": "handleContactSubmit",
+          "line": 222
+        },
+        {
+          "name": "handleConfirm",
+          "line": 226
+        },
+        {
+          "name": "handleValidateCoupon",
+          "line": 246
+        },
+        {
+          "name": "url",
+          "line": 394
+        },
+        {
+          "name": "id",
+          "line": 443
+        }
+      ],
+      "data_members": [
+        {
+          "name": "customerName",
+          "line": 16
+        },
+        {
+          "name": "customerEmail",
+          "line": 17
+        },
+        {
+          "name": "customerPhone",
+          "line": 18
+        },
+        {
+          "name": "notes",
+          "line": 19
+        },
+        {
+          "name": "style",
+          "line": 28
+        },
+        {
+          "name": "currency",
+          "line": 29
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 30
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 31
+        },
+        {
+          "name": "queryKey",
+          "line": 59
+        },
+        {
+          "name": "queryFn",
+          "line": 60
+        },
+        {
+          "name": "enabled",
+          "line": 61
+        },
+        {
+          "name": "mutationFn",
+          "line": 85
+        },
+        {
+          "name": "onSuccess",
+          "line": 86
+        },
+        {
+          "name": "onError",
+          "line": 87
+        },
+        {
+          "name": "providerId",
+          "line": 123
+        },
+        {
+          "name": "serviceId",
+          "line": 124
+        },
+        {
+          "name": "startsAt",
+          "line": 125
+        },
+        {
+          "name": "endsAt",
+          "line": 126
+        },
+        {
+          "name": "idempotencyKey",
+          "line": 129
+        },
+        {
+          "name": "resolver",
+          "line": 158
+        },
+        {
+          "name": "service",
+          "line": 183
+        },
+        {
+          "name": "staff",
+          "line": 184
+        },
+        {
+          "name": "slot",
+          "line": 185
+        },
+        {
+          "name": "contact",
+          "line": 186
+        },
+        {
+          "name": "confirm",
+          "line": 187
+        },
+        {
+          "name": "Status",
+          "line": 333
+        },
+        {
+          "name": "weekday",
+          "line": 760
+        },
+        {
+          "name": "day",
+          "line": 761
+        },
+        {
+          "name": "month",
+          "line": 762
+        },
+        {
+          "name": "hour",
+          "line": 763
+        },
+        {
+          "name": "minute",
+          "line": 764
+        },
+        {
+          "name": "hour12",
+          "line": 765
+        }
+      ]
+    },
+    {
+      "path": "src/pages/ChatPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "conversations",
+          "line": 17
+        },
+        {
+          "name": "handleSend",
+          "line": 27
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 14
+        },
+        {
+          "name": "queryFn",
+          "line": 15
+        },
+        {
+          "name": "mutationFn",
+          "line": 24
+        },
+        {
+          "name": "onSuccess",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "path": "src/pages/customer/CustomerAccountPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "handleLogout",
+          "line": 16
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 11
+        },
+        {
+          "name": "queryFn",
+          "line": 12
+        }
+      ]
+    },
+    {
+      "path": "src/pages/customer/CustomerBookingDetailPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "handleReschedule",
+          "line": 73
+        }
+      ],
+      "data_members": [
+        {
+          "name": "CONFIRMED",
+          "line": 7
+        },
+        {
+          "name": "PENDING_PAYMENT",
+          "line": 8
+        },
+        {
+          "name": "IN_PROGRESS",
+          "line": 9
+        },
+        {
+          "name": "COMPLETED",
+          "line": 10
+        },
+        {
+          "name": "CANCELLED",
+          "line": 11
+        },
+        {
+          "name": "NO_SHOW",
+          "line": 12
+        },
+        {
+          "name": "PENDING_VERIFICATION",
+          "line": 13
+        },
+        {
+          "name": "queryKey",
+          "line": 30
+        },
+        {
+          "name": "queryFn",
+          "line": 31
+        },
+        {
+          "name": "enabled",
+          "line": 32
+        },
+        {
+          "name": "mutationFn",
+          "line": 36
+        },
+        {
+          "name": "onSuccess",
+          "line": 38
+        },
+        {
+          "name": "onError",
+          "line": 59
+        }
+      ]
+    },
+    {
+      "path": "src/pages/customer/CustomerBookingsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "CONFIRMED",
+          "line": 15
+        },
+        {
+          "name": "PENDING_PAYMENT",
+          "line": 16
+        },
+        {
+          "name": "IN_PROGRESS",
+          "line": 17
+        },
+        {
+          "name": "COMPLETED",
+          "line": 18
+        },
+        {
+          "name": "CANCELLED",
+          "line": 19
+        },
+        {
+          "name": "NO_SHOW",
+          "line": 20
+        },
+        {
+          "name": "queryKey",
+          "line": 27
+        },
+        {
+          "name": "queryFn",
+          "line": 28
+        }
+      ]
+    },
+    {
+      "path": "src/pages/customer/CustomerFavoritesPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 9
+        },
+        {
+          "name": "queryFn",
+          "line": 10
+        },
+        {
+          "name": "mutationFn",
+          "line": 14
+        },
+        {
+          "name": "onSuccess",
+          "line": 15
+        }
+      ]
+    },
+    {
+      "path": "src/pages/customer/CustomerNotificationsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 8
+        },
+        {
+          "name": "queryFn",
+          "line": 9
+        },
+        {
+          "name": "mutationFn",
+          "line": 13
+        },
+        {
+          "name": "onSuccess",
+          "line": 14
+        }
+      ]
+    },
+    {
+      "path": "src/pages/customer/SupportPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 9
+        },
+        {
+          "name": "queryFn",
+          "line": 10
+        }
+      ]
+    },
+    {
+      "path": "src/pages/HomePage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "data",
+          "line": 10
+        },
+        {
+          "name": "isLoading",
+          "line": 11
+        },
+        {
+          "name": "isError",
+          "line": 12
+        },
+        {
+          "name": "refetch",
+          "line": 13
+        },
+        {
+          "name": "queryKey",
+          "line": 15
+        },
+        {
+          "name": "queryFn",
+          "line": 16
+        },
+        {
+          "name": "staleTime",
+          "line": 17
+        },
+        {
+          "name": "step",
+          "line": 199
+        },
+        {
+          "name": "title",
+          "line": 200
+        },
+        {
+          "name": "desc",
+          "line": 201
+        },
+        {
+          "name": "icon",
+          "line": 202
+        }
+      ]
+    },
+    {
+      "path": "src/pages/LoginPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "onSubmitPassword",
+          "line": 47
+        },
+        {
+          "name": "handleRequestOtp",
+          "line": 56
+        },
+        {
+          "name": "onSubmitOtp",
+          "line": 68
+        }
+      ],
+      "data_members": [
+        {
+          "name": "email",
+          "line": 10
+        },
+        {
+          "name": "password",
+          "line": 11
+        },
+        {
+          "name": "code",
+          "line": 16
+        },
+        {
+          "name": "register",
+          "line": 32
+        },
+        {
+          "name": "handleSubmit",
+          "line": 33
+        },
+        {
+          "name": "formState",
+          "line": 34
+        },
+        {
+          "name": "resolver",
+          "line": 36
+        },
+        {
+          "name": "setValue",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "path": "src/pages/PaymentPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 6
+        }
+      ],
+      "data_members": [
+        {
+          "name": "style",
+          "line": 9
+        },
+        {
+          "name": "currency",
+          "line": 10
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 11
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 12
+        },
+        {
+          "name": "queryKey",
+          "line": 22
+        },
+        {
+          "name": "queryFn",
+          "line": 23
+        },
+        {
+          "name": "enabled",
+          "line": 34
+        }
+      ]
+    },
+    {
+      "path": "src/pages/ProfileCompletePage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "onSubmit",
+          "line": 31
+        }
+      ],
+      "data_members": [
+        {
+          "name": "name",
+          "line": 9
+        },
+        {
+          "name": "phone",
+          "line": 10
+        },
+        {
+          "name": "resolver",
+          "line": 28
+        },
+        {
+          "name": "defaultValues",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/BookingsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "CONFIRMED",
+          "line": 18
+        },
+        {
+          "name": "PENDING_PAYMENT",
+          "line": 19
+        },
+        {
+          "name": "IN_PROGRESS",
+          "line": 20
+        },
+        {
+          "name": "COMPLETED",
+          "line": 21
+        },
+        {
+          "name": "CANCELLED",
+          "line": 22
+        },
+        {
+          "name": "NO_SHOW",
+          "line": 23
+        },
+        {
+          "name": "PENDING_VERIFICATION",
+          "line": 24
+        },
+        {
+          "name": "queryKey",
+          "line": 42
+        },
+        {
+          "name": "queryFn",
+          "line": 43
+        },
+        {
+          "name": "enabled",
+          "line": 49
+        },
+        {
+          "name": "mutationFn",
+          "line": 53
+        },
+        {
+          "name": "onSuccess",
+          "line": 55
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/CalendarPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "getBookingsForDate",
+          "line": 46
+        },
+        {
+          "name": "navigateWeek",
+          "line": 51
+        },
+        {
+          "name": "navigateMonth",
+          "line": 57
+        },
+        {
+          "name": "getWeekDays",
+          "line": 63
+        }
+      ],
+      "data_members": [
+        {
+          "name": "CONFIRMED",
+          "line": 8
+        },
+        {
+          "name": "PENDING_APPROVAL",
+          "line": 9
+        },
+        {
+          "name": "PENDING_PAYMENT",
+          "line": 10
+        },
+        {
+          "name": "IN_SERVICE",
+          "line": 11
+        },
+        {
+          "name": "COMPLETED",
+          "line": 12
+        },
+        {
+          "name": "CANCELLED",
+          "line": 13
+        },
+        {
+          "name": "NO_SHOW",
+          "line": 14
+        },
+        {
+          "name": "HELD",
+          "line": 15
+        },
+        {
+          "name": "CHECKED_IN",
+          "line": 16
+        },
+        {
+          "name": "EN_ROUTE",
+          "line": 17
+        },
+        {
+          "name": "EXPIRED",
+          "line": 18
+        },
+        {
+          "name": "queryKey",
+          "line": 41
+        },
+        {
+          "name": "queryFn",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/CustomersPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 5
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 12
+        },
+        {
+          "name": "queryFn",
+          "line": 13
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/DashboardPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "formatPrice",
+          "line": 9
+        },
+        {
+          "name": "revenueChart",
+          "line": 46
+        }
+      ],
+      "data_members": [
+        {
+          "name": "style",
+          "line": 12
+        },
+        {
+          "name": "currency",
+          "line": 13
+        },
+        {
+          "name": "minimumFractionDigits",
+          "line": 14
+        },
+        {
+          "name": "maximumFractionDigits",
+          "line": 15
+        },
+        {
+          "name": "queryKey",
+          "line": 24
+        },
+        {
+          "name": "queryFn",
+          "line": 25
+        },
+        {
+          "name": "date",
+          "line": 47
+        },
+        {
+          "name": "revenue",
+          "line": 48
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/FaqPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "faqs",
+          "line": 34
+        },
+        {
+          "name": "policies",
+          "line": 36
+        }
+      ],
+      "data_members": [
+        {
+          "name": "question",
+          "line": 10
+        },
+        {
+          "name": "answer",
+          "line": 11
+        },
+        {
+          "name": "category",
+          "line": 12
+        },
+        {
+          "name": "sortOrder",
+          "line": 13
+        },
+        {
+          "name": "queryKey",
+          "line": 27
+        },
+        {
+          "name": "queryFn",
+          "line": 28
+        },
+        {
+          "name": "mutationFn",
+          "line": 43
+        },
+        {
+          "name": "onSuccess",
+          "line": 44
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/MediaPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "items",
+          "line": 12
+        },
+        {
+          "name": "handleFiles",
+          "line": 33
+        },
+        {
+          "name": "onDragStart",
+          "line": 48
+        },
+        {
+          "name": "onDragOver",
+          "line": 50
+        },
+        {
+          "name": "onDrop",
+          "line": 51
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 9
+        },
+        {
+          "name": "queryFn",
+          "line": 10
+        },
+        {
+          "name": "mutationFn",
+          "line": 17
+        },
+        {
+          "name": "onSuccess",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/NotificationsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 9
+        },
+        {
+          "name": "queryFn",
+          "line": 10
+        },
+        {
+          "name": "mutationFn",
+          "line": 16
+        },
+        {
+          "name": "onSuccess",
+          "line": 17
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/PromotionsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "LoyaltyTab",
+          "line": 5
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 13
+        },
+        {
+          "name": "queryFn",
+          "line": 14
+        },
+        {
+          "name": "mutationFn",
+          "line": 18
+        },
+        {
+          "name": "onSuccess",
+          "line": 20
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/ReportsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 6
+        },
+        {
+          "name": "handleExportCsv",
+          "line": 38
+        }
+      ],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 17
+        },
+        {
+          "name": "queryFn",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/ReviewsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "queryKey",
+          "line": 12
+        },
+        {
+          "name": "queryFn",
+          "line": 13
+        },
+        {
+          "name": "mutationFn",
+          "line": 19
+        },
+        {
+          "name": "onSuccess",
+          "line": 21
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/ServicesPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "fmt",
+          "line": 17
+        }
+      ],
+      "data_members": [
+        {
+          "name": "name",
+          "line": 11
+        },
+        {
+          "name": "description",
+          "line": 12
+        },
+        {
+          "name": "duration",
+          "line": 13
+        },
+        {
+          "name": "price",
+          "line": 14
+        },
+        {
+          "name": "mutationFn",
+          "line": 35
+        },
+        {
+          "name": "onSuccess",
+          "line": 36
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/SettingsPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "updateHour",
+          "line": 23
+        },
+        {
+          "name": "BlockedDatesSection",
+          "line": 98
+        },
+        {
+          "name": "blocked",
+          "line": 104
+        }
+      ],
+      "data_members": [
+        {
+          "name": "mutationFn",
+          "line": 28
+        },
+        {
+          "name": "onSuccess",
+          "line": 29
+        }
+      ]
+    },
+    {
+      "path": "src/pages/provider/StaffPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "mutationFn",
+          "line": 18
+        },
+        {
+          "name": "onSuccess",
+          "line": 19
+        }
+      ]
+    },
+    {
+      "path": "src/pages/ProviderPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "StarRating",
+          "line": 12
+        },
+        {
+          "name": "StarInput",
+          "line": 29
+        },
+        {
+          "name": "ReviewForm",
+          "line": 57
+        },
+        {
+          "name": "gallery",
+          "line": 253
+        },
+        {
+          "name": "reviews",
+          "line": 256
+        }
+      ],
+      "data_members": [
+        {
+          "name": "mutationFn",
+          "line": 68
+        },
+        {
+          "name": "onSuccess",
+          "line": 74
+        },
+        {
+          "name": "queryKey",
+          "line": 188
+        },
+        {
+          "name": "queryFn",
+          "line": 189
+        },
+        {
+          "name": "enabled",
+          "line": 190
+        },
+        {
+          "name": "onMutate",
+          "line": 226
+        },
+        {
+          "name": "onError",
+          "line": 232
+        },
+        {
+          "name": "onSettled",
+          "line": 233
+        }
+      ]
+    },
+    {
+      "path": "src/pages/ProviderRegisterPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "handleSubmit",
+          "line": 14
+        }
+      ],
+      "data_members": []
+    },
+    {
+      "path": "src/pages/RegisterPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "onSubmit",
+          "line": 46
+        }
+      ],
+      "data_members": [
+        {
+          "name": "name",
+          "line": 10
+        },
+        {
+          "name": "email",
+          "line": 11
+        },
+        {
+          "name": "phone",
+          "line": 12
+        },
+        {
+          "name": "password",
+          "line": 13
+        },
+        {
+          "name": "confirmPassword",
+          "line": 14
+        },
+        {
+          "name": "message",
+          "line": 16
+        },
+        {
+          "name": "path",
+          "line": 17
+        },
+        {
+          "name": "formState",
+          "line": 29
+        },
+        {
+          "name": "resolver",
+          "line": 31
+        },
+        {
+          "name": "mutationFn",
+          "line": 35
+        },
+        {
+          "name": "onSuccess",
+          "line": 37
+        },
+        {
+          "name": "onError",
+          "line": 42
+        }
+      ]
+    },
+    {
+      "path": "src/pages/SearchPage.tsx",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [
+        {
+          "name": "handleFilterChange",
+          "line": 54
+        },
+        {
+          "name": "handleSearch",
+          "line": 58
+        }
+      ],
+      "data_members": [
+        {
+          "name": "query",
+          "line": 32
+        },
+        {
+          "name": "category",
+          "line": 33
+        },
+        {
+          "name": "location",
+          "line": 34
+        },
+        {
+          "name": "minPrice",
+          "line": 35
+        },
+        {
+          "name": "maxPrice",
+          "line": 36
+        },
+        {
+          "name": "minRating",
+          "line": 37
+        },
+        {
+          "name": "date",
+          "line": 38
+        },
+        {
+          "name": "sort",
+          "line": 39
+        },
+        {
+          "name": "page",
+          "line": 40
+        },
+        {
+          "name": "limit",
+          "line": 41
+        },
+        {
+          "name": "queryKey",
+          "line": 47
+        },
+        {
+          "name": "queryFn",
+          "line": 48
+        },
+        {
+          "name": "staleTime",
+          "line": 49
+        }
+      ]
+    },
+    {
+      "path": "src/test/setup.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [
+        {
+          "name": "MockIntersectionObserver",
+          "kind": "class",
+          "line": 27
+        }
+      ],
+      "functions": [
+        {
+          "name": "localStorageMock",
+          "line": 13
+        }
+      ],
+      "data_members": [
+        {
+          "name": "getItem",
+          "line": 16
+        },
+        {
+          "name": "setItem",
+          "line": 17
+        },
+        {
+          "name": "removeItem",
+          "line": 18
+        },
+        {
+          "name": "clear",
+          "line": 19
+        },
+        {
+          "name": "key",
+          "line": 21
+        },
+        {
+          "name": "writable",
+          "line": 33
+        },
+        {
+          "name": "value",
+          "line": 34
+        }
+      ]
+    },
+    {
+      "path": "tailwind.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "content",
+          "line": 4
+        },
+        {
+          "name": "theme",
+          "line": 8
+        },
+        {
+          "name": "extend",
+          "line": 9
+        },
+        {
+          "name": "colors",
+          "line": 10
+        },
+        {
+          "name": "primary",
+          "line": 11
+        },
+        {
+          "name": "accent",
+          "line": 24
+        },
+        {
+          "name": "fontFamily",
+          "line": 38
+        },
+        {
+          "name": "sans",
+          "line": 39
+        },
+        {
+          "name": "plugins",
+          "line": 43
+        }
+      ]
+    },
+    {
+      "path": "vite-env.d.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": []
+    },
+    {
+      "path": "vite.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "plugins",
+          "line": 7
+        },
+        {
+          "name": "resolve",
+          "line": 8
+        },
+        {
+          "name": "alias",
+          "line": 9
+        },
+        {
+          "name": "server",
+          "line": 13
+        },
+        {
+          "name": "port",
+          "line": 14
+        },
+        {
+          "name": "host",
+          "line": 15
+        },
+        {
+          "name": "proxy",
+          "line": 16
+        },
+        {
+          "name": "target",
+          "line": 18
+        },
+        {
+          "name": "changeOrigin",
+          "line": 19
+        },
+        {
+          "name": "build",
+          "line": 23
+        },
+        {
+          "name": "outDir",
+          "line": 24
+        },
+        {
+          "name": "sourcemap",
+          "line": 25
+        }
+      ]
+    },
+    {
+      "path": "vitest.config.ts",
+      "language": "typescript",
+      "package": "",
+      "classes": [],
+      "functions": [],
+      "data_members": [
+        {
+          "name": "plugins",
+          "line": 7
+        },
+        {
+          "name": "resolve",
+          "line": 8
+        },
+        {
+          "name": "alias",
+          "line": 9
+        },
+        {
+          "name": "test",
+          "line": 13
+        },
+        {
+          "name": "environment",
+          "line": 14
+        },
+        {
+          "name": "globals",
+          "line": 15
+        },
+        {
+          "name": "setupFiles",
+          "line": 16
+        },
+        {
+          "name": "include",
+          "line": 17
+        },
+        {
+          "name": "coverage",
+          "line": 18
+        },
+        {
+          "name": "provider",
+          "line": 19
+        },
+        {
+          "name": "reporter",
+          "line": 20
+        },
+        {
+          "name": "exclude",
+          "line": 22
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-09-07T05:58:23.175105+00:00"
+}

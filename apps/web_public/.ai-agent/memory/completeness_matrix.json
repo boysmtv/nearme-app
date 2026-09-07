@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "project_root": "D:\\Work\\Pribadi\\FlutterProject\\near_flutter\\apps\\web_public",
+  "updated_at": "2026-09-07T05:58:23.292573+00:00",
+  "status": "ready",
+  "rows": [],
+  "blockers": [],
+  "release_readiness": {
+    "blocked": false,
+    "blocking_rules": []
+  },
+  "coverage": {
+    "requirement_count": 0,
+    "mapped_requirement_count": 0,
+    "test_mapped_requirement_count": 0
+  }
+}

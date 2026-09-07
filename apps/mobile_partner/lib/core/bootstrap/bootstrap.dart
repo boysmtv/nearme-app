@@ -1,4 +1,5 @@
 import 'package:flutter_core/flutter_core.dart';
+import 'package:flutter_api_client/flutter_api_client.dart';
 
 Future<void> initCore() async {
   await initFlutterCore(
@@ -16,8 +17,13 @@ Future<void> initCore() async {
       onNotificationOpened: (message) {
         // Navigate to relevant screen based on payload
       },
-      onTokenRegistered: (token) {
-        // Token will be registered after login
+      onTokenRegistered: (token) async {
+        try {
+          final tokenStored = await SecureStorageService.read(StorageKeys.accessToken);
+          if (tokenStored != null) {
+            await ApiService().updateFcmToken(token);
+          }
+        } catch (_) {}
       },
     );
   } catch (_) {}

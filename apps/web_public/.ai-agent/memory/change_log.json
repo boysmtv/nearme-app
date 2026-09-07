@@ -1,0 +1,37 @@
+{
+  "changes": [
+    {
+      "run_id": "bootstrap::web-public",
+      "final_status": "registered",
+      "summary": "Bootstrapped AI_AGENT_CORE memory from existing project registration (project_registration).",
+      "changed_artifacts": [
+        "src/App.tsx",
+        "src/components/__tests__/BookingSummary.test.tsx",
+        "src/components/__tests__/ChatWidget.test.tsx",
+        "src/components/__tests__/Footer.test.tsx",
+        "src/components/__tests__/Gallery.test.tsx",
+        "src/components/__tests__/Header.test.tsx",
+        "src/components/__tests__/ProviderCard.test.tsx",
+        "src/components/__tests__/ReportsAnalytics.test.tsx",
+        "src/components/__tests__/ServiceCard.test.tsx",
+        "src/components/__tests__/SlotPicker.test.tsx",
+        "src/components/BookingSummary.tsx",
+        "src/components/ChatWidget.tsx",
+        "src/components/Footer.tsx",
+        "src/components/Header.tsx",
+        "src/components/ProviderCard.tsx",
+        "src/components/ProviderLayout.tsx",
+        "src/components/ServiceCard.tsx",
+        "src/components/SlotPicker.tsx",
+        "src/components/StatsCard.tsx",
+        "src/hooks/useChatWebSocket.ts",
+        "src/lib/__tests__/analytics.test.ts",
+        "src/lib/__tests__/api.test.ts",
+        "src/lib/__tests__/bundleB.test.ts",
+        "src/lib/__tests__/chat.test.ts"
+      ],
+      "features": [],
+      "recorded_at": "2026-09-07T05:58:23.261796+00:00"
+    }
+  ]
+}

@@ -1,18 +1,18 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { api } from '../../lib/api';
+import { publicApi } from '../../lib/api';
 
 export default function SupportPage() {
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
 
   const { data: faqsData, isLoading: faqsLoading } = useQuery({
     queryKey: ['faqs'],
-    queryFn: () => api.get('/public/faqs'),
+    queryFn: () => publicApi.faqs.listPublic(),
   });
 
   const { data: policiesData, isLoading: policiesLoading } = useQuery({
     queryKey: ['policies'],
-    queryFn: () => api.get('/public/policies'),
+    queryFn: () => publicApi.policies.listPublic(),
   });
 
   const faqs = faqsData?.data ?? [];

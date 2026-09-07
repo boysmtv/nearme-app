@@ -97,6 +97,14 @@ export default function Header() {
                   Dashboard Provider
                 </Link>
               )}
+              {user.role === 'ROLE_CUSTOMER' && (
+                <Link
+                  to="/account"
+                  className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block"
+                >
+                  Akun Saya
+                </Link>
+              )}
               <span className="hidden text-sm text-gray-700 sm:inline">{user.email}</span>
               <button
                 onClick={handleLogout}

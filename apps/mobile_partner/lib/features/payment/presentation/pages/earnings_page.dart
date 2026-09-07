@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/widgets/main_scaffold.dart';
 
 class PartnerStats {
   final int todayBookings;
@@ -49,7 +50,13 @@ class EarningsPage extends ConsumerWidget {
     final statsAsync = ref.watch(earningsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Pendapatan')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => partnerScaffoldKey.currentState?.openDrawer(),
+        ),
+        title: const Text('Pendapatan'),
+      ),
       body: statsAsync.when(
         data: (stats) {
           return SingleChildScrollView(

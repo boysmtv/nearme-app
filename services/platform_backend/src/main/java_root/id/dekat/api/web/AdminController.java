@@ -92,21 +92,25 @@ public class AdminController {
         long pendingVerifications = userRepository.countByStatus(UserStatus.PENDING_VERIFICATION);
 
         // Calculate growth: compare this month vs last month
-        java.time.OffsetDateTime now = java.time.OffsetDateTime.now();
-        java.time.OffsetDateTime thisMonthStart = now.withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0).withNano(0);
-        java.time.OffsetDateTime lastMonthStart = thisMonthStart.minusMonths(1);
-        java.time.OffsetDateTime lastMonthEnd = thisMonthStart.minusNanos(1);
+        java.time.LocalDate today = java.time.LocalDate.now();
+        java.time.LocalDateTime thisMonthStart = today.withDayOfMonth(1).atStartOfDay();
+        java.time.LocalDateTime lastMonthStart = thisMonthStart.minusMonths(1);
+        java.time.LocalDateTime lastMonthEnd = thisMonthStart.minusNanos(1);
+
+        java.time.OffsetDateTime thisMonthStartOdt = thisMonthStart.atOffset(java.time.ZoneOffset.UTC);
+        java.time.OffsetDateTime lastMonthStartOdt = lastMonthStart.atOffset(java.time.ZoneOffset.UTC);
+        java.time.OffsetDateTime lastMonthEndOdt = lastMonthEnd.atOffset(java.time.ZoneOffset.UTC);
 
         long usersThisMonth = userRepository.countByCreatedAtAfter(thisMonthStart);
         long usersLastMonth = userRepository.countByCreatedAtBetween(lastMonthStart, lastMonthEnd);
         long tenantsThisMonth = tenantRepository.countByCreatedAtAfter(thisMonthStart);
         long tenantsLastMonth = tenantRepository.countByCreatedAtBetween(lastMonthStart, lastMonthEnd);
-        long bookingsThisMonth = bookingRepository.countByCreatedAtAfter(thisMonthStart);
-        long bookingsLastMonth = bookingRepository.countByCreatedAtBetween(lastMonthStart, lastMonthEnd);
+        long bookingsThisMonth = bookingRepository.countByCreatedAtAfter(thisMonthStartOdt);
+        long bookingsLastMonth = bookingRepository.countByCreatedAtBetween(lastMonthStartOdt, lastMonthEndOdt);
 
-        BigDecimal revenueThisMonth = bookingRepository.findByStatusAndCreatedAtAfter(BookingStatus.COMPLETED, thisMonthStart).stream()
+        BigDecimal revenueThisMonth = bookingRepository.findByStatusAndCreatedAtAfter(BookingStatus.COMPLETED, thisMonthStartOdt).stream()
                 .map(Booking::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal revenueLastMonth = bookingRepository.findByStatusAndCreatedAtBetween(BookingStatus.COMPLETED, lastMonthStart, lastMonthEnd).stream()
+        BigDecimal revenueLastMonth = bookingRepository.findByStatusAndCreatedAtBetween(BookingStatus.COMPLETED, lastMonthStartOdt, lastMonthEndOdt).stream()
                 .map(Booking::getTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         double userGrowth = usersLastMonth > 0 ? ((double)(usersThisMonth - usersLastMonth) / usersLastMonth * 100) : (usersThisMonth > 0 ? 100.0 : 0.0);

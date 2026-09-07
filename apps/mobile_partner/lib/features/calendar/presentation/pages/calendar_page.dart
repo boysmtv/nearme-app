@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/main_scaffold.dart';
 
 final calendarBookingsProvider =
     FutureProvider.autoDispose.family<List<PartnerBookingRow>, DateTime>((ref, date) async {
@@ -36,6 +37,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
 
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => partnerScaffoldKey.currentState?.openDrawer(),
+        ),
         title: const Text('Calendar'),
         actions: [
           IconButton(icon: const Icon(Icons.today), onPressed: () => setState(() { _focusedDay = DateTime.now(); _selectedDay = DateTime.now(); })),

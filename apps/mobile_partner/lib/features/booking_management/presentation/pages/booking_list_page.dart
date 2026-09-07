@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/main_scaffold.dart';
 
 enum BookingFilter { all, pending, confirmed, completed, cancelled }
 
@@ -25,7 +26,13 @@ class BookingListPage extends ConsumerWidget {
     final bookingsAsync = ref.watch(partnerBookingsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Bookings')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => partnerScaffoldKey.currentState?.openDrawer(),
+        ),
+        title: const Text('Bookings'),
+      ),
       body: Column(children: [
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,

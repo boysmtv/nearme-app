@@ -1,5 +1,5 @@
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, Component, type ReactNode } from 'react';
 import ProtectedRoute from './lib/ProtectedRoute';
 import { useAuth } from './lib/auth';
 
@@ -27,12 +27,43 @@ const ProfileCompletePage = lazy(() => import('./pages/ProfileCompletePage'));
 const AboutPage = lazy(() => import('./pages/AboutPage'));
 const ProviderRegisterPage = lazy(() => import('./pages/ProviderRegisterPage'));
 const ChatPage = lazy(() => import('./pages/ChatPage'));
+const PaymentPage = lazy(() => import('./pages/PaymentPage'));
 const CustomerBookingsPage = lazy(() => import('./pages/customer/CustomerBookingsPage'));
 const CustomerBookingDetailPage = lazy(() => import('./pages/customer/CustomerBookingDetailPage'));
 const CustomerNotificationsPage = lazy(() => import('./pages/customer/CustomerNotificationsPage'));
 const CustomerFavoritesPage = lazy(() => import('./pages/customer/CustomerFavoritesPage'));
 const CustomerAccountPage = lazy(() => import('./pages/customer/CustomerAccountPage'));
 const SupportPage = lazy(() => import('./pages/customer/SupportPage'));
+
+// Admin pages (lazy)
+const AdminDashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
+const AdminUsersPage = lazy(() => import('./pages/admin/UsersPage'));
+const AdminTenantsPage = lazy(() => import('./pages/admin/TenantsPage'));
+const AdminBookingsPage = lazy(() => import('./pages/admin/BookingsPage'));
+const AdminPaymentsPage = lazy(() => import('./pages/admin/PaymentsPage'));
+const AdminCasesPage = lazy(() => import('./pages/admin/CasesPage'));
+const AdminAnalyticsPage = lazy(() => import('./pages/admin/AnalyticsPage'));
+const AdminAuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'));
+const AdminSubscriptionsPage = lazy(() => import('./pages/admin/SubscriptionsPage'));
+const AdminFeatureFlagsPage = lazy(() => import('./pages/admin/FeatureFlagsPage'));
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+  state = { hasError: false, error: null };
+  static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
+          <p className="text-6xl font-bold text-red-600">!</p>
+          <h1 className="mt-4 text-2xl font-bold text-gray-900">Terjadi Kesalahan</h1>
+          <p className="mt-2 text-gray-500 max-w-md">{this.state.error?.message || 'Silakan muat ulang halaman.'}</p>
+          <button onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }} className="mt-6 rounded-lg bg-primary-600 px-6 py-3 text-sm font-semibold text-white hover:bg-primary-700">Muat Ulang</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function LoadingFallback() {
   return (
@@ -75,6 +106,7 @@ function RequireProfileGuard({ children }: { children: React.ReactNode }) {
 
 export function App() {
   return (
+    <ErrorBoundary>
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
         <Route path="/" element={<RequireProfileGuard><HomePage /></RequireProfileGuard>} />
@@ -92,7 +124,7 @@ export function App() {
         <Route path="/notifications" element={<ProtectedRoute><CustomerNotificationsPage /></ProtectedRoute>} />
         <Route path="/favorites" element={<ProtectedRoute><CustomerFavoritesPage /></ProtectedRoute>} />
         <Route path="/account" element={<ProtectedRoute><CustomerAccountPage /></ProtectedRoute>} />
-        <Route path="/support" element={<ProtectedRoute><SupportPage /></ProtectedRoute>} />
+        <Route path="/support" element={<SupportPage />} />
 
         <Route path="/provider/dashboard" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderDashboardPage /></ProtectedRoute>} />
         <Route path="/provider/calendar" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCalendarPage /></ProtectedRoute>} />
@@ -108,12 +140,27 @@ export function App() {
         <Route path="/provider/notifications" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderNotificationsPage /></ProtectedRoute>} />
         <Route path="/provider/settings" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderSettingsPage /></ProtectedRoute>} />
 
+        <Route path="/payment" element={<PaymentPage />} />
+        <Route path="/payment/success" element={<PaymentPage />} />
         <Route path="/chats" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
         <Route path="/chats/:id" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
         <Route path="/booking/:bookingId/chat" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
 
+        {/* Admin routes */}
+        <Route path="/admin/dashboard" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminDashboardPage /></ProtectedRoute>} />
+        <Route path="/admin/users" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminUsersPage /></ProtectedRoute>} />
+        <Route path="/admin/tenants" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminTenantsPage /></ProtectedRoute>} />
+        <Route path="/admin/bookings" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminBookingsPage /></ProtectedRoute>} />
+        <Route path="/admin/payments" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminPaymentsPage /></ProtectedRoute>} />
+        <Route path="/admin/cases" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminCasesPage /></ProtectedRoute>} />
+        <Route path="/admin/analytics" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminAnalyticsPage /></ProtectedRoute>} />
+        <Route path="/admin/audit-logs" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminAuditLogPage /></ProtectedRoute>} />
+        <Route path="/admin/subscriptions" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminSubscriptionsPage /></ProtectedRoute>} />
+        <Route path="/admin/feature-flags" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminFeatureFlagsPage /></ProtectedRoute>} />
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
+    </ErrorBoundary>
   );
 }

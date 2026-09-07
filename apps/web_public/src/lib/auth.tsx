@@ -89,20 +89,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const u = buildUser(token);
     localStorage.setItem('auth_user', JSON.stringify(u));
     setUser(u);
-    // Try to resolve real hasProfile from backend
-    const hp = await syncHasProfile(token);
-    const effectiveHasProfile = hp !== null ? hp : u.hasProfile;
-    if (effectiveHasProfile === false && u.role === 'ROLE_CUSTOMER') {
-      navigate('/profile/complete');
-      return;
+    // Only sync profile for customers; admin/provider skip this
+    if (u.role === 'ROLE_CUSTOMER') {
+      const hp = await syncHasProfile(token);
+      const effectiveHasProfile = hp !== null ? hp : u.hasProfile;
+      if (effectiveHasProfile === false) {
+        navigate('/profile/complete');
+        return;
+      }
+      navigate('/');
+    } else if (u.role.startsWith('ROLE_PROVIDER')) {
+      navigate('/provider/dashboard');
+    } else if (u.role === 'ROLE_PLATFORM_ADMIN') {
+      navigate('/admin/dashboard');
+    } else {
+      navigate('/');
     }
-    if (u.role === 'ROLE_CUSTOMER') navigate('/');
-    else if (u.role.startsWith('ROLE_PROVIDER')) navigate('/provider/dashboard');
-    else if (u.role === 'ROLE_PLATFORM_ADMIN') {
-      // Admin uses separate web_admin app (port 3002) — external redirect
-      window.location.href = 'http://localhost:3002';
-      return;
-    } else navigate('/');
   }, [navigate, buildUser, syncHasProfile]);
 
   const register = useCallback(async (name: string, email: string, phone: string, password: string) => {

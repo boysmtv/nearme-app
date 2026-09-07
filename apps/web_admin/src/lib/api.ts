@@ -79,10 +79,15 @@ export const adminApi = {
   },
 
   config: {
-    getFlags: () => apiClient.get<ApiResponse<FeatureFlag[]>>('/admin/config/flags'),
-    toggleFlag: (id: string, enabled: boolean) => apiClient.put(`/admin/config/flags/${id}`, { enabled }),
+    getFlags: () => apiClient.get<ApiResponse<FeatureFlag[]>>('/admin/feature-flags'),
+    toggleFlag: (id: string, enabled: boolean) => apiClient.put(`/admin/feature-flags/${id}/toggle`, { enabled }),
     createFlag: (data: { name: string; key: string; description: string; enabled: boolean; environment: string }) =>
-      apiClient.post('/admin/config/flags', data),
-    deleteFlag: (id: string) => apiClient.delete(`/admin/config/flags/${id}`),
+      apiClient.post('/admin/feature-flags', data),
+    deleteFlag: (id: string) => apiClient.delete(`/admin/feature-flags/${id}`),
+  },
+
+  export: {
+    users: (format: 'csv' | 'json' = 'csv') => apiClient.get<Blob>(`/admin/export/users?format=${format}`, { responseType: 'blob' }),
+    bookings: (format: 'csv' | 'json' = 'csv') => apiClient.get<Blob>(`/admin/export/bookings?format=${format}`, { responseType: 'blob' }),
   },
 };

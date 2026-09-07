@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/main_scaffold.dart';
 
 final reportProvider = FutureProvider.autoDispose<PartnerReportRow>((ref) async {
   final now = DateTime.now();
@@ -30,7 +31,13 @@ class ReportsPage extends ConsumerWidget {
     final analyticsAsync = ref.watch(analyticsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Reports • Analytics Lanjutan')),
+      appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(Icons.menu),
+          onPressed: () => partnerScaffoldKey.currentState?.openDrawer(),
+        ),
+        title: const Text('Reports • Analytics'),
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
           ref.invalidate(reportProvider);

@@ -37,8 +37,8 @@ class ApiService {
     return _dio.post(Endpoints.refreshToken, queryParameters: {'refreshToken': refreshToken});
   }
 
-  Future<Response> logout() {
-    return _dio.post(Endpoints.logout);
+  Future<Response> logout({String? refreshToken}) {
+    return _dio.post(Endpoints.logout, queryParameters: refreshToken != null ? {'refreshToken': refreshToken} : null);
   }
 
   Future<Response> search(String query, {Map<String, dynamic>? params}) {
@@ -355,5 +355,45 @@ class ApiService {
   // Customer loyalty
   Future<Response> getCustomerLoyalty() {
     return _dio.get('/customer/loyalty');
+  }
+
+  // Provider booking detail (provider-scoped)
+  Future<Response> getProviderBooking(String id) {
+    return _dio.get('${Endpoints.providerBookings}/$id');
+  }
+
+  // Promotions - Coupons
+  Future<Response> getCoupons() {
+    return _dio.get(Endpoints.providerCoupons);
+  }
+
+  Future<Response> createCoupon(Map<String, dynamic> data) {
+    return _dio.post(Endpoints.providerCoupons, data: data);
+  }
+
+  Future<Response> deleteCoupon(String id) {
+    return _dio.delete('${Endpoints.providerCoupons}/$id');
+  }
+
+  // Promotions - Campaigns
+  Future<Response> getCampaigns() {
+    return _dio.get(Endpoints.providerCampaigns);
+  }
+
+  Future<Response> createCampaign(Map<String, dynamic> data) {
+    return _dio.post(Endpoints.providerCampaigns, data: data);
+  }
+
+  Future<Response> activateCampaign(String id) {
+    return _dio.put('${Endpoints.providerCampaigns}/$id/activate');
+  }
+
+  Future<Response> pauseCampaign(String id) {
+    return _dio.put('${Endpoints.providerCampaigns}/$id/pause');
+  }
+
+  // Staff schedule
+  Future<Response> saveStaffSchedule(String staffId, List<Map<String, dynamic>> data) {
+    return _dio.post('${Endpoints.providerStaff}/$staffId/schedule', data: data);
   }
 }

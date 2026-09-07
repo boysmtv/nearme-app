@@ -145,6 +145,14 @@ export const publicApi = {
   },
 
   bookings: {
+    list: (params?: { status?: string; page?: number; limit?: number }) => {
+      const query = new URLSearchParams();
+      if (params?.status && params.status !== 'ALL') query.set('status', params.status);
+      if (params?.page) query.set('page', String(params.page));
+      if (params?.limit) query.set('limit', String(params.limit));
+      const qs = query.toString() ? `?${query.toString()}` : '';
+      return apiClient.get<ApiResponse<Booking[]>>(`/bookings${qs}`);
+    },
     create: (data: BookingRequest) =>
       apiClient.post<ApiResponse<BookingResponse>>('/public/bookings', data),
     verifyPin: (bookingId: string, pin: string) =>
@@ -171,6 +179,15 @@ export const publicApi = {
     validateCoupon: (code: string, providerId: string, serviceId: string) =>
       apiClient.get<ApiResponse<{ valid: boolean; discountType: string; discountValue: number; discountAmount: number; finalPrice: number; message?: string }>>(
         `/public/bookings/validate-coupon?code=${encodeURIComponent(code)}&providerId=${providerId}&serviceId=${serviceId}`,
+      ),
+    createPaymentIntent: (bookingId: string, method: string = 'midtrans') =>
+      apiClient.post<ApiResponse<{ paymentUrl: string; redirectUrl: string; orderId: string }>>(
+        `/bookings/${bookingId}/payment-intents`,
+        { paymentMethod: method },
+      ),
+    getPaymentStatus: (bookingId: string) =>
+      apiClient.get<ApiResponse<{ status: string; paymentMethod?: string; amount?: number }>>(
+        `/bookings/${bookingId}/payment-intents`,
       ),
   },
 
@@ -222,6 +239,18 @@ export const publicApi = {
     updateAdmin: (id: string, data: Partial<Policy>) =>
       apiClient.put<ApiResponse<Policy>>(`/admin/policies/${id}`, data),
     deleteAdmin: (id: string) => apiClient.delete(`/admin/policies/${id}`),
+  },
+
+  notifications: {
+    list: (params?: { page?: number; limit?: number }) => {
+      const query = new URLSearchParams();
+      if (params?.page) query.set('page', String(params.page));
+      if (params?.limit) query.set('limit', String(params.limit));
+      const qs = query.toString() ? `?${query.toString()}` : '';
+      return apiClient.get<ApiResponse<any[]>>(`/notifications${qs}`);
+    },
+    markRead: (id: string) => apiClient.put<ApiResponse<void>>(`/notifications/${id}/read`, {}),
+    markAllRead: () => apiClient.put<ApiResponse<void>>('/notifications/read-all', {}),
   },
 };
 
@@ -425,5 +454,82 @@ export const analyticsApi = {
   exportCsv: (params: { startDate: string; endDate: string }) => {
     const q = new URLSearchParams(params as Record<string, string>).toString();
     return apiClient.get<string>(`/provider/reports/export?${q}&format=csv`);
+  },
+};
+
+// ── Admin API ──────────────────────────────────────────
+export const adminApi = {
+  auth: {
+    login: (email: string, password: string, mfaCode?: string) =>
+      apiClient.post<ApiResponse<{ accessToken: string; refreshToken?: string; expiresIn?: number; tokenType?: string; requiresMfa?: boolean }>>('/auth/login', { email, password, mfaCode }),
+  },
+  dashboard: {
+    getStats: () => apiClient.get<ApiResponse<import('./types').AdminStats>>('/admin/dashboard/stats'),
+    getAnalytics: (days: number = 30) => apiClient.get<ApiResponse<any>>(`/admin/analytics?days=${days}`),
+  },
+  users: {
+    list: (params: { page?: number; limit?: number; search?: string; role?: string; status?: string }) => {
+      const q = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') q.set(k, String(v)); });
+      return apiClient.get<import('./types').PaginatedResponse<import('./types').User>>(`/admin/users?${q.toString()}`);
+    },
+    updateStatus: (id: string, status: string) =>
+      apiClient.put(`/admin/users/${id}/status`, { status }),
+  },
+  tenants: {
+    list: (params: { page?: number; limit?: number; search?: string; status?: string }) => {
+      const q = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') q.set(k, String(v)); });
+      return apiClient.get<import('./types').PaginatedResponse<import('./types').Tenant>>(`/admin/tenants?${q.toString()}`);
+    },
+    approve: (id: string) => apiClient.put(`/admin/tenants/${id}/approve`, {}),
+    reject: (id: string, reason: string) => apiClient.put(`/admin/tenants/${id}/reject`, { reason }),
+  },
+  bookings: {
+    list: (params: { page?: number; limit?: number; status?: string; date?: string }) => {
+      const q = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') q.set(k, String(v)); });
+      return apiClient.get<import('./types').PaginatedResponse<import('./types').AdminBooking>>(`/admin/bookings?${q.toString()}`);
+    },
+  },
+  payments: {
+    list: (params: { page?: number; limit?: number; status?: string }) => {
+      const q = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') q.set(k, String(v)); });
+      return apiClient.get<import('./types').PaginatedResponse<import('./types').Payment>>(`/admin/payments?${q.toString()}`);
+    },
+  },
+  cases: {
+    list: (params: { page?: number; limit?: number; severity?: string; status?: string }) => {
+      const q = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') q.set(k, String(v)); });
+      return apiClient.get<import('./types').PaginatedResponse<import('./types').SupportCase>>(`/admin/cases?${q.toString()}`);
+    },
+    updateStatus: (id: string, status: string) => apiClient.put(`/admin/cases/${id}/status`, { status }),
+  },
+  auditLogs: {
+    list: (params: { action?: string; resourceType?: string; since?: string }) => {
+      const q = new URLSearchParams();
+      Object.entries(params).forEach(([k, v]) => { if (v !== undefined && v !== '') q.set(k, String(v)); });
+      return apiClient.get<ApiResponse<any[]>>(`/admin/audit-logs?${q.toString()}`);
+    },
+  },
+  subscriptions: {
+    listPlans: () => apiClient.get<ApiResponse<any[]>>('/admin/subscriptions/plans'),
+    list: () => apiClient.get<ApiResponse<any[]>>('/admin/subscriptions'),
+    updatePlan: (id: string, data: { status: string }) => apiClient.put(`/admin/subscriptions/plans/${id}`, data),
+    cancel: (id: string) => apiClient.put(`/admin/subscriptions/${id}/cancel`, {}),
+    reactivate: (id: string) => apiClient.put(`/admin/subscriptions/${id}/reactivate`, {}),
+  },
+  config: {
+    getFlags: () => apiClient.get<ApiResponse<import('./types').FeatureFlag[]>>('/admin/feature-flags'),
+    toggleFlag: (id: string, enabled: boolean) => apiClient.put(`/admin/feature-flags/${id}/toggle`, { enabled }),
+    createFlag: (data: { name: string; key: string; description: string; enabled: boolean; environment: string }) =>
+      apiClient.post('/admin/feature-flags', data),
+    deleteFlag: (id: string) => apiClient.delete(`/admin/feature-flags/${id}`),
+  },
+  export: {
+    users: (format: 'csv' | 'json' = 'csv') => apiClient.get<Blob>(`/admin/export/users?format=${format}`, { responseType: 'blob' }),
+    bookings: (format: 'csv' | 'json' = 'csv') => apiClient.get<Blob>(`/admin/export/bookings?format=${format}`, { responseType: 'blob' }),
   },
 };

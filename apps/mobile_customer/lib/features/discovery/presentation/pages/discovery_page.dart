@@ -516,6 +516,7 @@ class _ShimmerCardState extends State<_ShimmerCard> with SingleTickerProviderSta
 class _DashboardSummary extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(_dashboardProfileProvider);
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       padding: const EdgeInsets.all(16),
@@ -530,29 +531,61 @@ class _DashboardSummary extends ConsumerWidget {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _DashboardItem(
-            icon: Icons.calendar_today_rounded,
-            label: 'Booking Aktif',
-            value: '2',
-          ),
-          _DashboardItem(
-            icon: Icons.star_rounded,
-            label: 'Poin Loyalitas',
-            value: '150',
-          ),
-          _DashboardItem(
-            icon: Icons.favorite_rounded,
-            label: 'Favorit',
-            value: '5',
-          ),
-        ],
+      child: profileAsync.when(
+        data: (profile) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _DashboardItem(
+              icon: Icons.calendar_today_rounded,
+              label: 'Booking Aktif',
+              value: '${profile['totalBookings'] ?? 0}',
+            ),
+            _DashboardItem(
+              icon: Icons.star_rounded,
+              label: 'Poin Loyalitas',
+              value: '${profile['loyaltyPoints'] ?? 0}',
+            ),
+            _DashboardItem(
+              icon: Icons.favorite_rounded,
+              label: 'Favorit',
+              value: '${profile['totalFavorites'] ?? 0}',
+            ),
+          ],
+        ),
+        loading: () => const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _DashboardItem(icon: Icons.calendar_today_rounded, label: 'Booking Aktif', value: '-'),
+            _DashboardItem(icon: Icons.star_rounded, label: 'Poin Loyalitas', value: '-'),
+            _DashboardItem(icon: Icons.favorite_rounded, label: 'Favorit', value: '-'),
+          ],
+        ),
+        error: (_, __) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _DashboardItem(icon: Icons.calendar_today_rounded, label: 'Booking Aktif', value: '0'),
+            _DashboardItem(icon: Icons.star_rounded, label: 'Poin Loyalitas', value: '0'),
+            _DashboardItem(icon: Icons.favorite_rounded, label: 'Favorit', value: '0'),
+          ],
+        ),
       ),
     );
   }
 }
+
+final _dashboardProfileProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+  try {
+    final res = await ApiService().getCustomerProfile();
+    final data = res.data;
+    if (data is Map<String, dynamic>) {
+      final profileData = data['data'];
+      if (profileData is Map<String, dynamic>) return profileData;
+    }
+    return {};
+  } catch (_) {
+    return {};
+  }
+});
 
 class _DashboardItem extends StatelessWidget {
   final IconData icon;

@@ -11,13 +11,14 @@ import id.dekat.sharedkernel.web.ApiResponse;
 import id.dekat.tenant.domain.Tenant;
 import id.dekat.tenant.domain.TenantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -28,6 +29,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminExportController {
 
+    private static final int MAX_EXPORT_ROWS = 10000;
+
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final BookingItemRepository bookingItemRepository;
@@ -36,15 +39,21 @@ public class AdminExportController {
     @GetMapping("/users")
     public ResponseEntity<byte[]> exportUsers(
             @RequestParam(required = false) String search,
-            @RequestParam(required = false) String status) {
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10000") int limit) {
 
-        List<User> users = userRepository.findAll();
+        int safeLimit = Math.min(limit, MAX_EXPORT_ROWS);
+        List<User> users;
         if (search != null && !search.isBlank()) {
             String q = search.toLowerCase();
-            users = users.stream().filter(u ->
+            users = userRepository.findAll(PageRequest.of(offset / safeLimit, safeLimit, Sort.by("createdAt").descending()))
+                    .getContent().stream().filter(u ->
                 (u.getName() != null && u.getName().toLowerCase().contains(q)) ||
                 (u.getEmail() != null && u.getEmail().toLowerCase().contains(q))
             ).collect(Collectors.toList());
+        } else {
+            users = userRepository.findAll(PageRequest.of(offset / safeLimit, safeLimit, Sort.by("createdAt").descending())).getContent();
         }
 
         StringWriter sw = new StringWriter();
@@ -68,9 +77,12 @@ public class AdminExportController {
     public ResponseEntity<byte[]> exportBookings(
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String dateFrom,
-            @RequestParam(required = false) String dateTo) {
+            @RequestParam(required = false) String dateTo,
+            @RequestParam(defaultValue = "0") int offset,
+            @RequestParam(defaultValue = "10000") int limit) {
 
-        List<Booking> bookings = bookingRepository.findAll();
+        int safeLimit = Math.min(limit, MAX_EXPORT_ROWS);
+        List<Booking> bookings = bookingRepository.findAll(PageRequest.of(offset / safeLimit, safeLimit, Sort.by("createdAt").descending())).getContent();
         if (status != null && !status.isBlank()) {
             try {
                 BookingStatus bs = BookingStatus.valueOf(status);

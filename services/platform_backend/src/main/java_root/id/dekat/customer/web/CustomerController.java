@@ -4,6 +4,7 @@ import id.dekat.customer.application.CustomerService;
 import id.dekat.customer.domain.CustomerProfile;
 import id.dekat.identity.domain.User;
 import id.dekat.identity.domain.UserRepository;
+import id.dekat.sharedkernel.web.ApiResponse;
 import id.dekat.tenant.domain.ProviderListingRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -26,13 +27,13 @@ public class CustomerController {
     private final ProviderListingRepository providerListingRepository;
 
     @GetMapping("/customer/profile")
-    public ResponseEntity<Map<String, Object>> getMyProfile(
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMyProfile(
             @RequestHeader(value = "X-User-Id", required = false) UUID headerUserId,
             @RequestHeader(value = "X-Tenant-Id", required = false) UUID headerTenantId,
             @AuthenticationPrincipal Jwt jwt) {
         UUID userId = resolveUserId(headerUserId, jwt);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("exists", false, "message", "Unauthorized"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Unauthorized"));
         }
         UUID tenantId = resolveTenantId(headerTenantId);
         if (tenantId == null) {
@@ -44,7 +45,7 @@ public class CustomerController {
                 result.put("name", u.getName());
                 result.put("phone", u.getPhone());
             });
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(ApiResponse.ok(result));
         }
         CustomerProfile profile = customerService.getProfile(userId, tenantId);
         Map<String, Object> result = new LinkedHashMap<>();
@@ -55,7 +56,7 @@ public class CustomerController {
                 result.put("name", u.getName());
                 result.put("phone", u.getPhone());
             });
-            return ResponseEntity.ok(result);
+            return ResponseEntity.ok(ApiResponse.ok(result));
         }
         result.put("exists", true);
         result.put("id", profile.getId());
@@ -68,27 +69,26 @@ public class CustomerController {
             result.put("name", u.getName());
             result.put("phone", u.getPhone());
         });
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     @PutMapping("/customer/profile")
-    public ResponseEntity<Map<String, Object>> updateMyProfile(
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateMyProfile(
             @RequestHeader(value = "X-User-Id", required = false) UUID headerUserId,
             @RequestHeader(value = "X-Tenant-Id", required = false) UUID headerTenantId,
             @AuthenticationPrincipal Jwt jwt,
             @RequestBody Map<String, String> body) {
         UUID userId = resolveUserId(headerUserId, jwt);
         if (userId == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("message", "Unauthorized"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Unauthorized"));
         }
         UUID tenantId = resolveTenantId(headerTenantId);
         if (tenantId == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "No tenant available"));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("No tenant available"));
         }
         String nicknameRaw = body.get("nickname");
         if (nicknameRaw == null) nicknameRaw = body.get("name");
         final String nickname = nicknameRaw;
-        // Update User entity if name/email/phone supplied
         try {
             userRepository.findById(userId).ifPresent(user -> {
                 boolean dirty = false;
@@ -104,7 +104,6 @@ public class CustomerController {
                 }
                 String phoneVal = body.get("phone");
                 if (phoneVal != null && !phoneVal.isBlank() && !phoneVal.equals(user.getPhone())) {
-                    // Normalize phone: keep as provided (allow 0-leading)
                     user.setPhone(phoneVal.trim());
                     dirty = true;
                 }
@@ -113,18 +112,18 @@ public class CustomerController {
         } catch (DataIntegrityViolationException ex) {
             String msg = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : ex.getMessage();
             if (msg != null && msg.toLowerCase().contains("uq_users_phone")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Nomor telepon sudah terdaftar, gunakan nomor lain"));
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error("Nomor telepon sudah terdaftar, gunakan nomor lain"));
             }
             if (msg != null && msg.toLowerCase().contains("uq_users_email")) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Email sudah terdaftar"));
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error("Email sudah terdaftar"));
             }
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Data sudah terdaftar: " + msg));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error("Data sudah terdaftar: " + msg));
         }
         CustomerProfile profile;
         try {
             profile = customerService.createOrUpdateProfile(userId, tenantId, nickname);
         } catch (DataIntegrityViolationException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of("message", "Gagal menyimpan profil, data mungkin duplikat"));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error("Gagal menyimpan profil, data mungkin duplikat"));
         }
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("id", profile.getId());
@@ -135,7 +134,7 @@ public class CustomerController {
             result.put("email", u.getEmail());
             result.put("phone", u.getPhone());
         });
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(ApiResponse.ok(result));
     }
 
     private UUID resolveUserId(UUID headerUserId, Jwt jwt) {
