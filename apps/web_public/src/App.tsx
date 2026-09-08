@@ -34,6 +34,11 @@ const CustomerNotificationsPage = lazy(() => import('./pages/customer/CustomerNo
 const CustomerFavoritesPage = lazy(() => import('./pages/customer/CustomerFavoritesPage'));
 const CustomerAccountPage = lazy(() => import('./pages/customer/CustomerAccountPage'));
 const SupportPage = lazy(() => import('./pages/customer/SupportPage'));
+const CustomerLoyaltyPage = lazy(() => import('./pages/customer/CustomerLoyaltyPage'));
+const CustomerNearbyPage = lazy(() => import('./pages/customer/CustomerNearbyPage'));
+const CustomerReviewsPage = lazy(() => import('./pages/customer/CustomerReviewsPage'));
+const CustomerReferralPage = lazy(() => import('./pages/customer/CustomerReferralPage'));
+const PricingPage = lazy(() => import('./pages/PricingPage'));
 
 // Admin pages (lazy)
 const AdminDashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
@@ -125,6 +130,11 @@ export function App() {
         <Route path="/notifications" element={<ProtectedRoute><CustomerNotificationsPage /></ProtectedRoute>} />
         <Route path="/favorites" element={<ProtectedRoute><CustomerFavoritesPage /></ProtectedRoute>} />
         <Route path="/account" element={<ProtectedRoute><CustomerAccountPage /></ProtectedRoute>} />
+        <Route path="/account/loyalty" element={<ProtectedRoute><CustomerLoyaltyPage /></ProtectedRoute>} />
+        <Route path="/account/referral" element={<ProtectedRoute><CustomerReferralPage /></ProtectedRoute>} />
+        <Route path="/account/reviews" element={<ProtectedRoute><CustomerReviewsPage /></ProtectedRoute>} />
+        <Route path="/nearby" element={<RequireProfileGuard><CustomerNearbyPage /></RequireProfileGuard>} />
+        <Route path="/pricing" element={<PricingPage />} />
         <Route path="/support" element={<SupportPage />} />
 
         <Route path="/provider/dashboard" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderDashboardPage /></ProtectedRoute>} />

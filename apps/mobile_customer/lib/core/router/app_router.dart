@@ -25,6 +25,9 @@ import '../../features/account/presentation/pages/account_page.dart';
 import '../../features/account/presentation/pages/profile_edit_page.dart';
 import '../../features/account/presentation/pages/profile_complete_page.dart';
 import '../../features/account/presentation/pages/loyalty_page.dart';
+import '../../features/account/presentation/pages/nearby_page.dart';
+import '../../features/account/presentation/pages/my_reviews_page.dart';
+import '../../features/account/presentation/pages/referral_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/chat/presentation/pages/chat_detail_page.dart';
 import '../../features/favorites/presentation/pages/favorites_page.dart';
@@ -461,6 +464,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/loyalty',
         name: 'loyalty',
         builder: (context, state) => const LoyaltyPage(),
+      ),
+      GoRoute(
+        path: '/nearby',
+        name: 'nearby',
+        builder: (context, state) => const NearbyPage(),
+      ),
+      GoRoute(
+        path: '/my-reviews',
+        name: 'myReviews',
+        builder: (context, state) => const MyReviewsPage(),
+      ),
+      GoRoute(
+        path: '/referral',
+        name: 'referral',
+        builder: (context, state) => const ReferralPage(),
       ),
     ],
     redirect: (context, state) {

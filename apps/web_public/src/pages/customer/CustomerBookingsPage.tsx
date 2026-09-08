@@ -83,6 +83,16 @@ export default function CustomerBookingsPage() {
                     {b.status?.replace('_', ' ')}
                   </span>
                   <p className="text-sm font-semibold mt-1 text-gray-900">Rp {(b.totalAmount || 0).toLocaleString('id-ID')}</p>
+                  {b.status === 'COMPLETED' && (
+                    <Link
+                      to={`/booking/${b.providerId || b.tenantId}?rebook=true&serviceId=${b.serviceId}&staffId=${b.staffId}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-green-600 hover:text-green-700"
+                    >
+                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                      Rebook
+                    </Link>
+                  )}
                 </div>
               </div>
             </Link>

@@ -73,6 +73,21 @@ export default function HomePage() {
           </div>
         </section>
 
+        {/* Seasonal Promo Banner */}
+        <section className="bg-gradient-to-r from-yellow-500 to-orange-500 py-4">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center gap-3 text-white">
+              <span className="text-2xl">🎉</span>
+              <p className="font-semibold text-sm sm:text-base">
+                Promo Spesial! Gunakan kode <span className="bg-white/20 px-2 py-0.5 rounded">DEKAT2024</span> untuk diskon 10% booking pertama Anda
+              </p>
+              <Link to="/search" className="ml-2 underline text-sm font-medium hover:text-yellow-100">
+                Booking Sekarang
+              </Link>
+            </div>
+          </div>
+        </section>
+
         {/* Categories */}
         <section className="bg-white py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -181,6 +196,50 @@ export default function HomePage() {
                 </svg>
                 <p className="mt-4 text-gray-500">Belum ada provider unggulan saat ini</p>
                 <p className="text-sm text-gray-400">Provider akan muncul di sini setelah terdaftar</p>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* Most Booked This Week */}
+        <section className="bg-white py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">Paling Laris Minggu Ini</h2>
+                <p className="mt-2 text-gray-500">Provider yang paling banyak dibooking minggu ini</p>
+              </div>
+              <Link
+                to="/search"
+                className="hidden rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-white sm:inline-block"
+              >
+                Lihat Semua
+              </Link>
+            </div>
+
+            {featuredLoading ? (
+              <div className="mt-8 flex gap-6 overflow-hidden">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="min-w-[300px] animate-pulse rounded-xl bg-white">
+                    <div className="h-40 bg-gray-200 rounded-t-xl" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-5 w-3/4 rounded bg-gray-200" />
+                      <div className="h-4 w-full rounded bg-gray-100" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : featured.length > 0 ? (
+              <div className="mt-8 flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+                {featured.slice(0, 3).map((provider) => (
+                  <div key={provider.id} className="min-w-[300px] flex-shrink-0">
+                    <ProviderCard provider={provider} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-8 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-12 text-center">
+                <p className="text-gray-500">Belum ada data booking minggu ini</p>
               </div>
             )}
           </div>

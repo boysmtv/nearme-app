@@ -19,6 +19,17 @@ export default function ChatPage() {
   const { messages, sendMessage, connected } = useChatWebSocket(selectedId);
   const [input, setInput] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const handleInputChange = (value: string) => {
+    setInput(value);
+    if (value.length > 0 && !isTyping) {
+      setIsTyping(true);
+    }
+    if (value.length === 0) {
+      setIsTyping(false);
+    }
+  };
 
   const createMut = useMutation({
     mutationFn: (data: { subject?: string; bookingId?: string }) => chatApi.create(data),
@@ -109,7 +120,7 @@ export default function ChatPage() {
                 <div className="flex gap-2">
                   <input
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={(e) => handleInputChange(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleSend()}
                     placeholder="Ketik pesan..."
                     className="flex-1 rounded-full border border-gray-300 px-4 py-2 text-sm focus:border-primary-500 focus:outline-none"
@@ -122,6 +133,16 @@ export default function ChatPage() {
                   </button>
                 </div>
                 {file && <p className="mt-2 text-xs text-gray-500">File: {file.name}</p>}
+                {isTyping && (
+                  <div className="mt-2 flex items-center gap-1 text-xs text-gray-400">
+                    <span className="flex gap-0.5">
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400" style={{ animationDelay: '0ms' }} />
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400" style={{ animationDelay: '150ms' }} />
+                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-gray-400" style={{ animationDelay: '300ms' }} />
+                    </span>
+                    <span>Mengetik...</span>
+                  </div>
+                )}
                 <p className="mt-2 text-[11px] text-gray-400">Upload lampiran foto atau file untuk dikirim ke provider</p>
               </div>
             </>

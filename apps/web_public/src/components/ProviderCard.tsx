@@ -42,9 +42,15 @@ export default function ProviderCard({ provider }: ProviderCardProps) {
 
       <div className="p-5">
         <div className="flex items-start justify-between">
-          <h3 className="font-semibold text-gray-900 group-hover:text-primary-600">
-            {provider.name}
-          </h3>
+          <div className="flex items-center gap-2">
+            <h3 className="font-semibold text-gray-900 group-hover:text-primary-600">
+              {provider.name}
+            </h3>
+            <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2 py-0.5 text-[11px] font-medium text-green-700">
+              <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              Respon Cepat
+            </span>
+          </div>
           {provider.rating > 0 && (
             <div className="flex items-center gap-1 rounded-full bg-primary-50 px-2.5 py-1">
               <svg className="h-4 w-4 text-primary-500" fill="currentColor" viewBox="0 0 20 20">

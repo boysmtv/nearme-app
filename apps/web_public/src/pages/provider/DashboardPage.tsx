@@ -19,6 +19,7 @@ function formatPrice(amount: number): string {
 export default function DashboardPage() {
   const { user } = useAuth();
   const bookingLink = user && user.id ? `${window.location.origin}/booking/${user.id}` : null;
+  const [copied, setCopied] = useState(false);
 
   const { data: statsRes, isLoading: statsLoading } = useQuery({
     queryKey: ['dashboard', 'stats'],
@@ -191,10 +192,14 @@ export default function DashboardPage() {
                       className="flex-1 rounded-lg bg-white/10 px-3 py-2.5 text-sm h-9 text-white placeholder-white/50 backdrop-blur"
                     />
                     <button
-                      onClick={() => { navigator.clipboard.writeText(bookingLink).catch(() => {}); }}
+                      onClick={() => {
+                        navigator.clipboard.writeText(bookingLink).catch(() => {});
+                        setCopied(true);
+                        setTimeout(() => setCopied(false), 2000);
+                      }}
                       className="rounded-lg bg-white px-3 py-2.5 text-sm h-9 font-medium text-primary-700 hover:bg-primary-50"
                     >
-                      Salin
+                      {copied ? 'Tersalin!' : 'Salin'}
                     </button>
                   </div>
                 </>
