@@ -49,6 +49,9 @@ const SmartSchedulingPage = lazy(() => import('./pages/provider/SmartSchedulingP
 const AnalyticsDeepPage = lazy(() => import('./pages/provider/AnalyticsDeepPage'));
 const NotificationPreferencesPage = lazy(() => import('./pages/customer/NotificationPreferencesPage'));
 const SocialFeedPage = lazy(() => import('./pages/customer/SocialFeedPage'));
+const WaitlistPage = lazy(() => import('./pages/provider/WaitlistPage'));
+const CommissionPage = lazy(() => import('./pages/provider/CommissionPage'));
+const SettlementPage = lazy(() => import('./pages/provider/SettlementPage'));
 
 // Admin pages (lazy)
 const AdminDashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
@@ -171,6 +174,9 @@ export function App() {
         <Route path="/provider/staff-suite" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><StaffManagementSuitePage /></ProtectedRoute>} />
         <Route path="/provider/smart-scheduling" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><SmartSchedulingPage /></ProtectedRoute>} />
         <Route path="/provider/analytics-deep" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><AnalyticsDeepPage /></ProtectedRoute>} />
+        <Route path="/provider/waitlist" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><WaitlistPage /></ProtectedRoute>} />
+        <Route path="/provider/commission" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><CommissionPage /></ProtectedRoute>} />
+        <Route path="/provider/settlement" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><SettlementPage /></ProtectedRoute>} />
 
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment/success" element={<PaymentPage />} />

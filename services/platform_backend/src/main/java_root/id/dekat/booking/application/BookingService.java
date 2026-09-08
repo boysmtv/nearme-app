@@ -4,6 +4,7 @@ import id.dekat.booking.domain.*;
 import id.dekat.common.IdempotencyException;
 import id.dekat.common.NotFoundException;
 import id.dekat.customer.application.CustomerService;
+import id.dekat.customer.application.LoyaltyService;
 import id.dekat.identity.domain.UserRepository;
 import id.dekat.notification.application.NotificationService;
 import id.dekat.notification.application.EmailService;
@@ -39,6 +40,7 @@ public class BookingService {
     private final NotificationService notificationService;
     private final EmailService emailService;
     private final UserRepository userRepository;
+    private final LoyaltyService loyaltyService;
 
     @Autowired
     public BookingService(BookingRepository bookingRepository,
@@ -50,7 +52,8 @@ public class BookingService {
                           @Lazy @Autowired(required = false) id.dekat.payment.application.PaymentService paymentService,
                           @Autowired(required = false) NotificationService notificationService,
                           @Autowired(required = false) EmailService emailService,
-                          @Autowired(required = false) UserRepository userRepository) {
+                          @Autowired(required = false) UserRepository userRepository,
+                          @Autowired(required = false) LoyaltyService loyaltyService) {
         this.bookingRepository = bookingRepository;
         this.bookingHoldRepository = bookingHoldRepository;
         this.statusHistoryRepository = statusHistoryRepository;
@@ -61,6 +64,7 @@ public class BookingService {
         this.notificationService = notificationService;
         this.emailService = emailService;
         this.userRepository = userRepository;
+        this.loyaltyService = loyaltyService;
     }
 
     // Constructor for tests without PaymentService
@@ -80,6 +84,7 @@ public class BookingService {
         this.notificationService = null;
         this.emailService = null;
         this.userRepository = null;
+        this.loyaltyService = null;
     }
 
     @Transactional
@@ -432,6 +437,20 @@ public class BookingService {
 
         Booking saved = bookingRepository.save(booking);
         sendBookingNotifications(saved, "COMPLETED");
+
+        // Earn loyalty points: 1 point per Rp 1000 spent
+        if (loyaltyService != null && saved.getCustomerId() != null && saved.getTotal() != null) {
+            try {
+                int points = saved.getTotal().intValue() / 1000;
+                if (points > 0) {
+                    loyaltyService.earnPoints(saved.getCustomerId(), saved.getTenantId(),
+                            saved.getId(), points, "Booking " + saved.getBookingCode() + " selesai");
+                }
+            } catch (Exception e) {
+                log.warn("[BookingService] Failed to earn loyalty points for {}: {}", saved.getId(), e.getMessage());
+            }
+        }
+
         return saved;
     }
 

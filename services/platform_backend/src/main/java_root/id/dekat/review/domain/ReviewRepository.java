@@ -19,4 +19,6 @@ public interface ReviewRepository extends JpaRepository<Review, UUID> {
     List<Review> findPublishedReviews(@Param("tenantId") UUID tenantId);
 
     boolean existsByBookingIdAndCustomerId(UUID bookingId, UUID customerId);
+
+    boolean existsByBookingId(UUID bookingId);
 }

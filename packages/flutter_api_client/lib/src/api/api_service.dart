@@ -401,4 +401,100 @@ class ApiService {
   Future<Response> saveStaffSchedule(String staffId, List<Map<String, dynamic>> data) {
     return _dio.post('${Endpoints.providerStaff}/$staffId/schedule', data: data);
   }
+
+  // Social Feed
+  Future<Response> getSocialFeed() {
+    return _dio.get('/social/feed');
+  }
+
+  Future<Response> getTrendingProviders() {
+    return _dio.get('/social/trending');
+  }
+
+  Future<Response> likePost(String postId) {
+    return _dio.post('/social/feed/$postId/like');
+  }
+
+  Future<Response> followProvider(String providerId) {
+    return _dio.post('/social/follow/$providerId');
+  }
+
+  // Recurring Bookings
+  Future<Response> getRecurringBookings() {
+    return _dio.get('/customer/recurring-bookings');
+  }
+
+  Future<Response> createRecurringBooking(Map<String, dynamic> data) {
+    return _dio.post('/customer/recurring-bookings', data: data);
+  }
+
+  Future<Response> updateRecurringBooking(String id, Map<String, dynamic> data) {
+    return _dio.put('/customer/recurring-bookings/$id', data: data);
+  }
+
+  Future<Response> deleteRecurringBooking(String id) {
+    return _dio.delete('/customer/recurring-bookings/$id');
+  }
+
+  // Walk-In Check-In
+  Future<Response> createWalkIn(Map<String, dynamic> data) {
+    return _dio.post('/provider/walk-in', data: data);
+  }
+
+  Future<Response> getWalkInQR(String bookingCode) {
+    return _dio.get('/provider/walk-in/qr/$bookingCode');
+  }
+
+  // Waitlist
+  Future<Response> getWaitlist({Map<String, dynamic>? params}) {
+    return _dio.get('/provider/waitlist', queryParameters: params);
+  }
+
+  Future<Response> joinWaitlist(Map<String, dynamic> data) {
+    return _dio.post('/provider/waitlist', data: data);
+  }
+
+  Future<Response> notifyWaitlist(String entryId) {
+    return _dio.post('/provider/waitlist/$entryId/notify');
+  }
+
+  Future<Response> removeWaitlist(String entryId) {
+    return _dio.delete('/provider/waitlist/$entryId');
+  }
+
+  // Commission
+  Future<Response> getCommissionStatement({int days = 30}) {
+    return _dio.get('/provider/commission/statement', queryParameters: {'days': days});
+  }
+
+  Future<Response> getCommissionConfig() {
+    return _dio.get('/provider/commission/config');
+  }
+
+  // Settlement
+  Future<Response> getSettlements({int limit = 10}) {
+    return _dio.get('/provider/settlement', queryParameters: {'limit': limit});
+  }
+
+  Future<Response> requestPayout(int amount) {
+    return _dio.post('/provider/settlement/request', data: {'amount': amount});
+  }
+
+  // Subscription
+  Future<Response> getProviderSubscription() {
+    return _dio.get('/provider/subscription');
+  }
+
+  Future<Response> upgradeSubscription(String planId) {
+    return _dio.post('/provider/subscription/upgrade', data: {'planId': planId});
+  }
+
+  Future<Response> cancelSubscription() {
+    return _dio.post('/provider/subscription/cancel');
+  }
+
+  // Staff Check-In (provider side)
+  Future<Response> getStaffCheckins() {
+    return _dio.get('/provider/staff');
+  }
 }

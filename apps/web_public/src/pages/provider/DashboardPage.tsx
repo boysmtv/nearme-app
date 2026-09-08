@@ -173,6 +173,9 @@ export default function DashboardPage() {
                   { label: 'Multi-Lokasi', href: '/provider/locations', color: 'text-pink-600 bg-pink-50 hover:bg-pink-100' },
                   { label: 'Analytics Mendalam', href: '/provider/analytics-deep', color: 'text-amber-600 bg-amber-50 hover:bg-amber-100' },
                   { label: 'Upgrade Plan', href: '/provider/upgrade', color: 'text-emerald-600 bg-emerald-50 hover:bg-emerald-100' },
+                  { label: 'Daftar Tunggu', href: '/provider/waitlist', color: 'text-cyan-600 bg-cyan-50 hover:bg-cyan-100' },
+                  { label: 'Komisi Platform', href: '/provider/commission', color: 'text-rose-600 bg-rose-50 hover:bg-rose-100' },
+                  { label: 'Settlement & Payout', href: '/provider/settlement', color: 'text-indigo-600 bg-indigo-50 hover:bg-indigo-100' },
                   { label: 'Lihat Laporan', href: '/provider/reports', color: 'text-gray-600 bg-gray-50 hover:bg-gray-100' },
                 ].map((action) => (
                   <Link

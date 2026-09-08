@@ -8,6 +8,7 @@ import '../../features/calendar/presentation/pages/calendar_page.dart';
 import '../../features/booking_management/presentation/pages/booking_list_page.dart';
 import '../../features/booking_management/presentation/pages/booking_detail_page.dart';
 import '../../features/payment/presentation/pages/earnings_page.dart';
+import '../../features/payment/presentation/pages/payment_page.dart';
 import '../../features/staff_management/presentation/pages/staff_list_page.dart';
 import '../../features/reports/presentation/pages/reports_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';
@@ -102,6 +103,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: '/staff-checkin', name: 'staffCheckin', pageBuilder: (_, __) => const NoTransitionPage(child: StaffCheckInPage())),
       ]),
       GoRoute(path: '/booking/:id', name: 'bookingDetail', builder: (_, state) => BookingDetailPage(bookingId: state.pathParameters['id']!)),
+      GoRoute(path: '/payment/:id', name: 'paymentDetail', builder: (_, state) => PaymentPage(paymentId: state.pathParameters['id']!)),
       GoRoute(path: '/partner/chat/:id', name: 'partnerChatDetail', builder: (_, state) => PartnerChatDetailPage(chatId: state.pathParameters['id']!)),
       GoRoute(path: '/chat/:id', name: 'chatDetailAlias', builder: (_, state) => PartnerChatDetailPage(chatId: state.pathParameters['id']!)),
     ],

@@ -43,7 +43,7 @@ class BookingDepositAndPolicyTest {
         startsAt = OffsetDateTime.now().plusDays(2);
         endsAt = startsAt.plusHours(1);
         // inject paymentService via constructor that accepts it (pass nulls for notification/email)
-        bookingService = new BookingService(bookingRepository, bookingHoldRepository, statusHistoryRepository, bookingItemRepository, bookingAssignmentRepository, customerService, paymentService, null, null, null);
+        bookingService = new BookingService(bookingRepository, bookingHoldRepository, statusHistoryRepository, bookingItemRepository, bookingAssignmentRepository, customerService, paymentService, null, null, null, null);
     }
 
     @Test
