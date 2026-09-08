@@ -146,10 +146,36 @@ module/
 - `PUT /provider/campaigns/{id}/pause` - Pause campaign
 - `GET /provider/loyalty/{customerId}` - Customer loyalty history
 - `POST /provider/loyalty/earn` - Earn loyalty points
+- `POST /provider/walk-in` - Create walk-in booking (QR check-in)
+- `GET /provider/walk-in/qr/{bookingCode}` - Get walk-in QR data
+- `GET /provider/waitlist` - List waitlist entries
+- `POST /provider/waitlist` - Join waitlist
+- `POST /provider/waitlist/{id}/notify` - Notify waitlist customer
+- `DELETE /provider/waitlist/{id}` - Remove waitlist entry
+- `GET /provider/commission/statement` - Commission statement (query: days)
+- `GET /provider/commission/config` - Commission config (rate, currency)
+- `GET /provider/settlement` - List settlements (query: limit)
+- `POST /provider/settlement/request` - Request payout
+- `GET /provider/subscription` - Get current subscription plan
+- `POST /provider/subscription/upgrade` - Upgrade plan
+- `POST /provider/subscription/cancel` - Cancel subscription
 
 ### Customer (JWT required)
 - `GET /customer/profile` - Get customer profile
 - `PUT /customer/profile` - Update customer profile
+- `GET /customer/loyalty` - Get loyalty points + history
+- `POST /customer/loyalty/redeem` - Redeem loyalty points
+- `POST /customer/loyalty/birthday-bonus` - Birthday bonus (500 pts)
+- `GET /customer/recurring-bookings` - List recurring bookings
+- `POST /customer/recurring-bookings` - Create recurring booking
+- `PUT /customer/recurring-bookings/{id}` - Update recurring booking
+- `DELETE /customer/recurring-bookings/{id}` - Delete recurring booking
+
+### Social (JWT required)
+- `GET /social/feed` - Get social feed posts
+- `POST /social/feed/{postId}/like` - Like/unlike post
+- `POST /social/follow/{providerId}` - Follow/unfollow provider
+- `GET /social/trending` - Get trending providers
 
 ### Core (JWT required)
 - `POST /bookings/holds` - Create booking hold
@@ -194,7 +220,7 @@ module/
 
 ## Database
 
-- 90+ tables, migrations V0-V26 (Flyway)
+- 95+ tables, migrations V0-V27 (Flyway)
 - V14 includes seed data (roles, permissions, plans, users, tenant, services, bookings)
 - V14 adds `password_hash` column to users table
 - V18 adds `device_info` and `token_family` columns to sessions table
@@ -204,6 +230,7 @@ module/
 - V24 adds `deposit_amount/cancelDeadline/rescheduleCount/maxReschedule/cancelPolicy` to bookings
 - V25 adds `faqs/policies` tables + seed 5 FAQ/3 policies
 - V26 adds `conversations/messages` for chat
+- V27 adds `loyalty_accounts` + `loyalty_transactions` + `recurring_bookings` + `waitlist_entries` + `settlement_batches`
 - Seed password: `admin123` (BCrypt hashed)
 - Credentials stored in both `users.password_hash` and `credentials` table
 
@@ -311,6 +338,14 @@ pnpm install && pnpm dev
 - **Customer module**: CustomerService + CustomerController with profile CRUD, booking integration
 - **Blocked dates**: BlockedDate entity + repository, provider CRUD endpoints, public endpoint for date picker
 - **Booking PIN**: confirmation_pin + pin_verified columns, verifyPin endpoint, auto-generated 6-digit PIN
+- **Loyalty system**: LoyaltyAccount + LoyaltyTransaction entities, LoyaltyService with earn/redeem/tier (BRONZE→PLATINUM), wired to BookingService (1pt per Rp1000 spent on completion)
+- **Auto review request**: ReviewRequestService cron (1hr) sends review request 2h after booking completes
+- **Walk-in check-in**: WalkInController creates instant booking + QR code for walk-in customers
+- **Waitlist**: WaitlistController with CRUD + notify flow
+- **Commission**: 5% platform commission statement + config
+- **Settlement**: Payout requests + history
+- **Subscription**: ProviderSubscriptionController for plan upgrade/cancel
+- **Recurring bookings**: RecurringBookingController with CRUD (in-memory, V27 migration created for DB backing)
 
 ### Docker Compose (verified 2026-08-27)
 - Always run backend via `docker compose -f infra/compose/compose.local.yaml up -d --build`
@@ -346,6 +381,7 @@ pnpm install && pnpm dev
  - **Booking confirm 500 FIXED 2026-09-07** — Two root causes: (1) `booking.setItems(items)` before `bookingRepository.save()` caused Hibernate to cascade-persist items with `booking_id=null` (parent UUID not yet generated). Fix: clear items before save, add to list after save. (2) `CreateBookingRequest` used `List<BookingItem>` (domain entity) as DTO, but Flutter sends `priceSnapshot`/`durationSnapshot` instead of `price`/`startsAt`/`endsAt` — Jackson couldn't map them → null `starts_at`/`ends_at`/`price`. Fix: created `BookingItemRequest` DTO, controller maps `priceSnapshot` → `price` and derives `startsAt`/`endsAt` from hold times. **RenderFlex overflow FIXED**: removed debug API path text from provider detail page Row. Verified: `POST /bookings` → 201, Total: 40000, Status: CONFIRMED. App running on Mi A1.
  - **Profile update + Payment + Mobile partner FIXED 2026-09-08** — (1) **Profile update bug FIXED**: `CustomerAccountPage.tsx` now calls `refreshUser()` from auth context after successful `PUT /customer/profile`, ensuring user state and localStorage are re-synced. (2) **Payment flow FIXED**: `api.ts createPaymentIntent` now accepts `{tenantId, amount, currency}` params; `BookingPage.tsx` passes `{bookingId, amount}` from `selectedService.depositAmount`; Flutter `ApiService.createPaymentIntent` and legacy `ApiClient.createPaymentIntent` both fixed to send `{tenantId, amount, currency, method}` to correct endpoint `POST /bookings/{id}/payment-intents` (was wrong `/payments/intent`). (3) **Mobile partner FIXED**: added `POST_NOTIFICATIONS` permission to both `mobile_partner` and `mobile_customer` AndroidManifest.xml for Android 13+; created dummy `google-services.json` for `mobile_partner` with correct package name `id.dekat.partner.mobile_partner`. (4) **Complete profile flow verified**: `syncHasProfile()` correctly evaluates `hasProfile` after profile update, `ProfileCompletePage` useEffect watches `saved && user?.hasProfile` before navigating. Tests: 134 web_public + 49 web_admin + 43 mobile_partner + 124 mobile_customer + 41 e2e = **391 all green**.
  - **Audit & improvements 2026-09-08** — Comprehensive audit across all platforms. **CRITICAL FIXES**: (1) `useChatWebSocket.ts:43` hardcoded `localhost:8080` fallback → `window.location.hostname` (chat production broken), (2) `BookingPage.tsx:102` + `CustomerBookingDetailPage.tsx:76` hardcoded timezone `+07:00` removed (reschedule wrong for non-WIB), (3) `BookingPage.tsx:250` added `onError` handler on `createBooking.mutate()` (user gets no feedback on failure), (4) `settings_page.dart` mobile_partner autoConfirm/depositRequired toggles now actually save (were silently discarded), (5) Backend `@Valid` added to 7 critical DTO endpoints (BookingController, ReviewController, SupportController, PaymentController), (6) `System.out.println` OTP → `log.warn` (security leak), (7) 16 exposed API paths in UI text replaced with user-friendly descriptions across 9 files. Tests: 134 web + 124 mobile_customer + 43 mobile_partner = **301 all green**.
+ - **Final feature completion 2026-09-08** — All stub pages replaced with real API integration + 10 new backend features. Backend: `ReviewRequestService` (auto review 2h post-booking), `WalkInController` (QR check-in), `LoyaltyService` + `LoyaltyAccount`/`LoyaltyTransaction` entities (DB-backed earn/redeem/tier), `LoyaltyController` (customer API), `ProviderSubscriptionController`, `WaitlistController` (CRUD+notify), `CommissionController` (5% platform), `SettlementController` (payout requests). `V27` migration: 5 new tables. Web: `WaitlistPage`, `CommissionPage`, `SettlementPage` + routes + sidebar + dashboard quick actions. Mobile customer: `social_feed_page.dart` + `recurring_bookings_page.dart` now use real API. Mobile partner: `staff_checkin_page.dart` uses real API, `payment_page.dart` route added. `ApiService` +18 methods. Tests: 124+43+134+49=**350 all green**, backend BUILD SUCCESSFUL. Commit `3bf2a85`.
 
 ## What's Next
 
