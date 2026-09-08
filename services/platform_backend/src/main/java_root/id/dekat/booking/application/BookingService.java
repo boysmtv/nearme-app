@@ -4,6 +4,9 @@ import id.dekat.booking.domain.*;
 import id.dekat.common.IdempotencyException;
 import id.dekat.common.NotFoundException;
 import id.dekat.customer.application.CustomerService;
+import id.dekat.identity.domain.UserRepository;
+import id.dekat.notification.application.NotificationService;
+import id.dekat.notification.application.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -13,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.Duration;
+import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.*;
@@ -32,6 +36,9 @@ public class BookingService {
     private final BookingAssignmentRepository bookingAssignmentRepository;
     private final CustomerService customerService;
     private final id.dekat.payment.application.PaymentService paymentService;
+    private final NotificationService notificationService;
+    private final EmailService emailService;
+    private final UserRepository userRepository;
 
     @Autowired
     public BookingService(BookingRepository bookingRepository,
@@ -40,7 +47,10 @@ public class BookingService {
                           BookingItemRepository bookingItemRepository,
                           BookingAssignmentRepository bookingAssignmentRepository,
                           CustomerService customerService,
-                          @Lazy @Autowired(required = false) id.dekat.payment.application.PaymentService paymentService) {
+                          @Lazy @Autowired(required = false) id.dekat.payment.application.PaymentService paymentService,
+                          @Autowired(required = false) NotificationService notificationService,
+                          @Autowired(required = false) EmailService emailService,
+                          @Autowired(required = false) UserRepository userRepository) {
         this.bookingRepository = bookingRepository;
         this.bookingHoldRepository = bookingHoldRepository;
         this.statusHistoryRepository = statusHistoryRepository;
@@ -48,6 +58,9 @@ public class BookingService {
         this.bookingAssignmentRepository = bookingAssignmentRepository;
         this.customerService = customerService;
         this.paymentService = paymentService;
+        this.notificationService = notificationService;
+        this.emailService = emailService;
+        this.userRepository = userRepository;
     }
 
     // Constructor for tests without PaymentService
@@ -57,7 +70,16 @@ public class BookingService {
                           BookingItemRepository bookingItemRepository,
                           BookingAssignmentRepository bookingAssignmentRepository,
                           CustomerService customerService) {
-        this(bookingRepository, bookingHoldRepository, statusHistoryRepository, bookingItemRepository, bookingAssignmentRepository, customerService, null);
+        this.bookingRepository = bookingRepository;
+        this.bookingHoldRepository = bookingHoldRepository;
+        this.statusHistoryRepository = statusHistoryRepository;
+        this.bookingItemRepository = bookingItemRepository;
+        this.bookingAssignmentRepository = bookingAssignmentRepository;
+        this.customerService = customerService;
+        this.paymentService = null;
+        this.notificationService = null;
+        this.emailService = null;
+        this.userRepository = null;
     }
 
     @Transactional
@@ -195,6 +217,9 @@ public class BookingService {
 
         hold.markConverted();
         bookingHoldRepository.save(hold);
+
+        // Wire push notification + email
+        sendBookingNotifications(savedBooking, "CONFIRMED");
 
         return savedBooking;
     }
@@ -341,6 +366,7 @@ public class BookingService {
             bookingAssignmentRepository.save(assignment);
         }
 
+        sendBookingNotifications(savedBooking, "CANCELLED");
         return savedBooking;
     }
 
@@ -404,7 +430,9 @@ public class BookingService {
             }
         }
 
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        sendBookingNotifications(saved, "COMPLETED");
+        return saved;
     }
 
     @Transactional
@@ -497,5 +525,44 @@ public class BookingService {
             sb.append(chars.charAt(ThreadLocalRandom.current().nextInt(chars.length())));
         }
         return sb.toString();
+    }
+
+    private void sendBookingNotifications(Booking booking, String eventType) {
+        try {
+            if (notificationService != null) {
+                Instant bookingTime = booking.getStartsAt() != null ? booking.getStartsAt().toInstant() : null;
+                notificationService.sendBookingConfirmation(
+                        booking.getTenantId(),
+                        booking.getCustomerId(),
+                        booking.getBookingCode(),
+                        booking.getItems() != null && !booking.getItems().isEmpty()
+                                ? "Layanan" : "Booking",
+                        "Provider",
+                        bookingTime
+                );
+                log.info("[BookingService] Push notification sent for booking {} event {}", booking.getId(), eventType);
+            }
+        } catch (Exception e) {
+            log.warn("[BookingService] Failed to send push notification for booking {}: {}", booking.getId(), e.getMessage());
+        }
+
+        try {
+            if (emailService != null && userRepository != null) {
+                userRepository.findById(booking.getCustomerId()).ifPresent(user -> {
+                    if (user.getEmail() != null && !user.getEmail().isBlank()) {
+                        Map<String, String> vars = Map.of(
+                                "bookingCode", booking.getBookingCode(),
+                                "status", eventType,
+                                "amount", booking.getTotal() != null ? booking.getTotal().toString() : "0"
+                        );
+                        emailService.sendTemplateEmail(user.getEmail(), "booking-confirmation",
+                                "Booking " + booking.getBookingCode() + " " + eventType, vars);
+                        log.info("[BookingService] Email sent to {} for booking {}", user.getEmail(), booking.getId());
+                    }
+                });
+            }
+        } catch (Exception e) {
+            log.warn("[BookingService] Failed to send email for booking {}: {}", booking.getId(), e.getMessage());
+        }
     }
 }

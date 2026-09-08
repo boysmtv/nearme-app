@@ -42,8 +42,8 @@ class BookingDepositAndPolicyTest {
         customerId = UUID.randomUUID();
         startsAt = OffsetDateTime.now().plusDays(2);
         endsAt = startsAt.plusHours(1);
-        // inject paymentService via constructor that accepts it
-        bookingService = new BookingService(bookingRepository, bookingHoldRepository, statusHistoryRepository, bookingItemRepository, bookingAssignmentRepository, customerService, paymentService);
+        // inject paymentService via constructor that accepts it (pass nulls for notification/email)
+        bookingService = new BookingService(bookingRepository, bookingHoldRepository, statusHistoryRepository, bookingItemRepository, bookingAssignmentRepository, customerService, paymentService, null, null, null);
     }
 
     @Test
