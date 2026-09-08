@@ -150,8 +150,13 @@ class ApiService {
     return _dio.delete('${Endpoints.providerPolicies}/$id');
   }
 
-  Future<Response> createPaymentIntent(String bookingId, String method) {
-    return _dio.post('$Endpoints.bookings/$bookingId/payment-intents', data: {'payment_method': method});
+  Future<Response> createPaymentIntent(String bookingId, String method, {String? tenantId, int? amount, String currency = 'IDR'}) {
+    return _dio.post('$Endpoints.bookings/$bookingId/payment-intents', data: {
+      if (tenantId != null) 'tenantId': tenantId,
+      'amount': amount ?? 0,
+      'currency': currency,
+      'method': method,
+    });
   }
 
   Future<Response> getPayment(String id) {

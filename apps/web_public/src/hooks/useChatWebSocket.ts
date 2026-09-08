@@ -40,7 +40,7 @@ export function useChatWebSocket(conversationId: string | null) {
     const trySSE = async () => {
       try {
         const token = localStorage.getItem('auth_token');
-        const base = (config as unknown as { apiUrl?: string })?.apiUrl || 'http://localhost:8080/api/v1';
+        const base = (config as unknown as { apiUrl?: string })?.apiUrl || `${window.location.protocol}//${window.location.hostname}:8080/api/v1`;
         const url = `${base}/chats/${conversationId}/events${token ? `?token=${encodeURIComponent(token)}` : ''}`;
         const es = new EventSource(url);
         esRef.current = es;

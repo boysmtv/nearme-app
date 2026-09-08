@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class ReviewController {
             @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantId,
             @RequestHeader(value = "X-User-Id", required = false) UUID headerUserId,
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody CreateReviewRequest request) {
+            @Valid @RequestBody CreateReviewRequest request) {
         UUID userId = resolveUserId(headerUserId, jwt);
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Unauthorized"));

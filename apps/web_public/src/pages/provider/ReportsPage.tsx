@@ -118,7 +118,7 @@ export default function ReportsPage() {
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
-              <p className="mt-2 text-xs text-gray-400">GET /provider/reports/analytics?startDate={start}&endDate={end}&granularity={granularity}</p>
+              <p className="mt-2 text-xs text-gray-400">Data analitik periode {start} — {end} ({granularity})</p>
             </div>
 
             <div className="grid gap-4 lg:grid-cols-2">

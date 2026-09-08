@@ -33,8 +33,8 @@ class DiscoveryPage extends ConsumerWidget {
             ref.invalidate(discoveryProvider);
             ref.invalidate(categoriesProvider);
             await Future.wait([
-              ref.read(discoveryProvider.future).catchError((_) {}),
-              ref.read(categoriesProvider.future).catchError((_) {}),
+              ref.read(discoveryProvider.future).catchError((_) => <ProviderRow>[]),
+              ref.read(categoriesProvider.future).catchError((_) => <Category>[]),
             ]);
           },
           child: CustomScrollView(

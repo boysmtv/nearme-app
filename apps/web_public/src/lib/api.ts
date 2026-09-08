@@ -180,10 +180,15 @@ export const publicApi = {
       apiClient.get<ApiResponse<{ valid: boolean; discountType: string; discountValue: number; discountAmount: number; finalPrice: number; message?: string }>>(
         `/public/bookings/validate-coupon?code=${encodeURIComponent(code)}&providerId=${providerId}&serviceId=${serviceId}`,
       ),
-    createPaymentIntent: (bookingId: string, method: string = 'midtrans') =>
+    createPaymentIntent: (bookingId: string, method: string = 'midtrans', data?: { tenantId?: string; amount?: number; currency?: string }) =>
       apiClient.post<ApiResponse<{ paymentUrl: string; redirectUrl: string; orderId: string }>>(
         `/bookings/${bookingId}/payment-intents`,
-        { paymentMethod: method },
+        {
+          tenantId: data?.tenantId,
+          amount: data?.amount ?? 0,
+          currency: data?.currency ?? 'IDR',
+          method,
+        },
       ),
     getPaymentStatus: (bookingId: string) =>
       apiClient.get<ApiResponse<{ status: string; paymentMethod?: string; amount?: number }>>(
@@ -387,6 +392,11 @@ export const providerApi = {
       apiClient.post<ApiResponse<{ date: string }>>('/provider/blocked-dates', data),
     remove: (date: string) =>
       apiClient.delete<ApiResponse<void>>(`/provider/blocked-dates/${date}`),
+  },
+
+  tenant: {
+    create: (data: { name: string; slug: string; legalName?: string; taxId?: string; phone?: string; email?: string }) =>
+      apiClient.post<any>('/provider/tenant', data),
   },
 
   reviews: {

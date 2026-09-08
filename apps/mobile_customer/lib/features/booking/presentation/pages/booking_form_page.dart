@@ -389,17 +389,3 @@ class _PaymentCard extends StatelessWidget {
     );
   }
 }
-
-class _PaymentOption extends StatelessWidget {
-  final String title, subtitle, value, groupValue;
-  final IconData icon;
-  final ValueChanged<String?> onChanged;
-  const _PaymentOption({required this.title, required this.subtitle, required this.icon, required this.value, required this.groupValue, required this.onChanged});
-  @override
-  Widget build(BuildContext context) {
-    return Card(margin: const EdgeInsets.only(bottom: 8), child: RadioListTile<String>(
-      title: Text(title), subtitle: Text(subtitle), secondary: Icon(icon),
-      value: value, groupValue: groupValue, onChanged: onChanged, activeColor: Theme.of(context).colorScheme.primary,
-    ));
-  }
-}

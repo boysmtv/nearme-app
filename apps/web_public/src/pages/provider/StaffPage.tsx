@@ -86,7 +86,7 @@ export default function StaffPage() {
               )}
               {scheduleFor === s.id && (
                 <div className="mt-4 rounded-lg border border-gray-200 p-3">
-                  <h4 className="text-sm font-semibold text-gray-900">Atur Jadwal — POST /provider/staff/{'{id}'}/schedule</h4>
+                  <h4 className="text-sm font-semibold text-gray-900">Atur Jadwal Staf</h4>
                   <div className="mt-2 space-y-2">
                     {schedule.map((sc, idx) => (
                       <div key={sc.dayOfWeek} className="flex items-center gap-2 text-[13px]">

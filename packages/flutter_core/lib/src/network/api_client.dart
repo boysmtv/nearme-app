@@ -134,10 +134,12 @@ class ApiClient {
   }
 
   // Payments
-  Future<Response> createPaymentIntent(String bookingId, String method) {
-    return _dio.post('/payments/intent', data: {
-      'booking_id': bookingId,
-      'payment_method': method,
+  Future<Response> createPaymentIntent(String bookingId, String method, {String? tenantId, int? amount, String currency = 'IDR'}) {
+    return _dio.post('/bookings/$bookingId/payment-intents', data: {
+      if (tenantId != null) 'tenantId': tenantId,
+      'amount': amount ?? 0,
+      'currency': currency,
+      'method': method,
     });
   }
 

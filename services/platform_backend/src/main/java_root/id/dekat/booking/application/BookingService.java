@@ -229,12 +229,14 @@ public class BookingService {
 
         BookingStatus fromStatus = booking.getStatus();
         booking.setPinVerified(true);
-        booking.confirm();
+        if (booking.getStatus() != BookingStatus.CONFIRMED) {
+            booking.confirm();
+        }
         Booking savedBooking = bookingRepository.save(booking);
 
         statusHistoryRepository.save(new BookingStatusHistory(
-                bookingId, fromStatus, BookingStatus.CONFIRMED,
-                null, "PIN verified, booking confirmed"));
+                bookingId, fromStatus, savedBooking.getStatus(),
+                null, "PIN verified"));
 
         return savedBooking;
     }
@@ -453,7 +455,7 @@ public class BookingService {
     public void releaseExpiredHolds() {
         int expired = bookingHoldRepository.expireHolds(OffsetDateTime.now());
         if (expired > 0) {
-            System.out.println("[BookingService] Released " + expired + " expired holds");
+            log.info("Released {} expired holds", expired);
         }
     }
 

@@ -74,7 +74,7 @@ export default function FaqPage() {
         {/* FAQ */}
         <div>
           <div className="flex items-center justify-between">
-            <div><h1 className="text-2xl font-bold text-gray-900">FAQ</h1><p className="mt-1 text-sm text-gray-500">Kelola FAQ - GET /public/faqs?tenantId untuk customer • CRUD di /provider/faqs</p></div>
+            <div><h1 className="text-2xl font-bold text-gray-900">FAQ</h1><p className="mt-1 text-sm text-gray-500">Kelola pertanyaan yang sering diajukan oleh pelanggan</p></div>
             <button onClick={() => { setEditFaq(null); resetFaq({ question: '', answer: '', category: '', sortOrder: 0 }); setShowFaq(true); }} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">+ Tambah FAQ</button>
           </div>
           <div className="mt-6">
@@ -103,7 +103,7 @@ export default function FaqPage() {
         {/* Policies */}
         <div>
           <div className="flex items-center justify-between">
-            <div><h1 className="text-2xl font-bold text-gray-900">Kebijakan</h1><p className="mt-1 text-sm text-gray-500">Kelola kebijakan - GET /public/policies • Deposit & pembatalan</p></div>
+            <div><h1 className="text-2xl font-bold text-gray-900">Kebijakan</h1><p className="mt-1 text-sm text-gray-500">Kelola kebijakan deposit, pembatalan, dan ketentuan lainnya</p></div>
             <button onClick={() => { setEditPolicy(null); resetPol({ title: '', body: '', type: 'cancellation', version: 1 }); setShowPolicy(true); }} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700">+ Tambah Kebijakan</button>
           </div>
           <div className="mt-6">

@@ -73,9 +73,9 @@ export default function CustomerBookingDetailPage() {
 
   const handleReschedule = () => {
     if (!rescheduleDate || !rescheduleTime) return;
-    const startsAt = `${rescheduleDate}T${rescheduleTime}:00+07:00`;
+    const startsAt = new Date(`${rescheduleDate}T${rescheduleTime}:00`).toISOString();
     const endDate = new Date(new Date(startsAt).getTime() + 60 * 60 * 1000);
-    const endsAt = endDate.toISOString().replace('Z', '+07:00');
+    const endsAt = endDate.toISOString();
     rescheduleMutation.mutate({ newStartsAt: startsAt, newEndsAt: endsAt, expectedVersion: booking.version ?? 1 });
   };
 

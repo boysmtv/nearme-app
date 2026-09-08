@@ -13,6 +13,7 @@ const sidebarItems = [
   { label: 'Audit Logs', href: '/admin/audit-logs' },
   { label: 'Subscriptions', href: '/admin/subscriptions' },
   { label: 'Feature Flags', href: '/admin/feature-flags' },
+  { label: 'FAQ & Kebijakan', href: '/admin/faqs' },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

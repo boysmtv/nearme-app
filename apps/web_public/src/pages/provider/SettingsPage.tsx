@@ -113,7 +113,7 @@ function BlockedDatesSection() {
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
       <h2 className="text-lg font-semibold text-gray-900">Tanggal Blokir</h2>
-      <p className="mt-1 text-sm text-gray-500">Tutup booking pada tanggal tertentu (libur, cuti, maintenance). GET/POST/DELETE /provider/blocked-dates</p>
+      <p className="mt-1 text-sm text-gray-500">Tutup booking pada tanggal tertentu (libur, cuti, maintenance)</p>
       <div className="mt-4 flex flex-wrap gap-3">
         <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
         <input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Alasan (opsional)" className="flex-1 min-w-[180px] rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />

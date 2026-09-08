@@ -82,7 +82,7 @@ export default function ChatPage() {
               >
                 Buat Percakapan
               </button>
-              <p className="mt-4 text-xs text-gray-400">Realtime via WebSocket /ws-chat + SSE /chats/{'{id}'}/events + polling fallback</p>
+              <p className="mt-4 text-xs text-gray-400">Percakapan tersinkronisasi secara realtime</p>
             </div>
           ) : (
             <>
@@ -122,7 +122,7 @@ export default function ChatPage() {
                   </button>
                 </div>
                 {file && <p className="mt-2 text-xs text-gray-500">File: {file.name}</p>}
-                <p className="mt-2 text-[11px] text-gray-400">Media upload reuse /media/upload (ownerType=provider) → attachment_url</p>
+                <p className="mt-2 text-[11px] text-gray-400">Upload lampiran foto atau file untuk dikirim ke provider</p>
               </div>
             </>
           )}

@@ -66,7 +66,7 @@ export default function MediaPage() {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Galeri</h1>
-          <p className="mt-1 text-sm text-gray-500">Kelola foto galeri provider (drag untuk reorder) — POST /media/upload, GET /provider/media, DELETE /provider/media/{'{id}'}, PUT /provider/media/reorder</p>
+          <p className="mt-1 text-sm text-gray-500">Kelola foto galeri provider — upload, hapus, dan atur urutan dengan drag & drop</p>
         </div>
 
         <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
@@ -122,7 +122,7 @@ export default function MediaPage() {
           </div>
         )}
         {reorderMut.isPending && <p className="text-sm text-primary-600">Reordering...</p>}
-        <p className="text-xs text-gray-400">Drag & drop untuk reorder — akan PUT /provider/media/reorder dengan orderedIds</p>
+        <p className="text-xs text-gray-400">Drag & drop untuk mengubah urutan foto galeri</p>
       </div>
     </ProviderLayout>
   );

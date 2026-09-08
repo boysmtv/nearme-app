@@ -60,7 +60,7 @@ export default function ServicesPage() {
               </div>
               {addonsFor === s.id && (
                 <div className="mt-4 rounded-lg border border-gray-200 p-3 bg-gray-50">
-                  <h4 className="text-sm font-semibold text-gray-900">Add-ons — PUT /provider/services/{'{id}'} dengan field addons</h4>
+                  <h4 className="text-sm font-semibold text-gray-900">Atur Add-on Layanan</h4>
                   <div className="mt-2 space-y-2">
                     {addons.length === 0 ? <p className="text-sm text-gray-500">Belum ada add-on</p> : addons.map((a, idx) => (
                       <div key={idx} className="flex items-center justify-between rounded border bg-white px-3 py-2 text-sm">

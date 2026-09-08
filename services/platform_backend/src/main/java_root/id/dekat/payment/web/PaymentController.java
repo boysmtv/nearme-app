@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class PaymentController {
     @Operation(summary = "Buat payment intent", description = "Membuat pembayaran untuk booking, menghasilkan redirect URL atau VA number")
     public ResponseEntity<PaymentResponse> createPaymentIntent(
             @PathVariable UUID id,
-            @RequestBody PaymentIntentRequest request) {
+            @Valid @RequestBody PaymentIntentRequest request) {
         PaymentIntent intent = paymentService.createPaymentIntent(
                 id, request.getTenantId(), request.getAmount(),
                 request.getCurrency(), request.getMethod()

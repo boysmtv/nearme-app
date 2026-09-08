@@ -8,6 +8,9 @@ function LoyaltyTab() {
   const [search, setSearch] = useState('');
   const [showEarn, setShowEarn] = useState(false);
   const [earnForm, setEarnForm] = useState({ customerId: '', points: 10, description: '' });
+  const [historyCustomerId, setHistoryCustomerId] = useState<string | null>(null);
+  const [historyEntries, setHistoryEntries] = useState<any[]>([]);
+  const [historyLoading, setHistoryLoading] = useState(false);
 
   const { data: customersRes, isLoading } = useQuery({
     queryKey: ['provider-customers', search],
@@ -25,6 +28,29 @@ function LoyaltyTab() {
   });
 
   const customers = customersRes?.data?.data ?? [];
+
+  const loadHistory = async (customerId: string) => {
+    setHistoryCustomerId(customerId);
+    setHistoryLoading(true);
+    try {
+      const res = await providerApi.loyalty.getCustomerHistory(customerId);
+      setHistoryEntries(res?.data ?? []);
+    } catch {
+      setHistoryEntries([]);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const entryTypeStyle = (type: string) => {
+    switch (type) {
+      case 'EARN': return 'text-green-600';
+      case 'REDEEM': return 'text-red-600';
+      case 'EXPIRE': return 'text-gray-500';
+      case 'ADJUST': return 'text-blue-600';
+      default: return 'text-gray-700';
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -127,14 +153,76 @@ function LoyaltyTab() {
                   <td className="px-6 py-4 text-sm text-gray-700">{c.totalBookings || 0}</td>
                   <td className="px-6 py-4 text-sm font-medium text-gray-900">Rp {(c.totalSpent || 0).toLocaleString('id-ID')}</td>
                   <td className="px-6 py-4">
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-1 text-xs font-semibold text-primary-700">
-                      ⭐ {c.loyaltyPoints || 0}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary-100 px-2.5 py-1 text-xs font-semibold text-primary-700">
+                        ⭐ {c.loyaltyPoints || 0}
+                      </span>
+                      <button
+                        onClick={() => loadHistory(c.id)}
+                        className="text-xs font-medium text-primary-600 hover:text-primary-700"
+                      >
+                        Lihat Riwayat
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {historyCustomerId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="mx-4 w-full max-w-lg rounded-xl bg-white p-6 shadow-xl">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-gray-900">Riwayat Loyalitas</h3>
+              <button
+                onClick={() => { setHistoryCustomerId(null); setHistoryEntries([]); }}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                ✕
+              </button>
+            </div>
+            {historyLoading ? (
+              <div className="mt-6 space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <div key={i} className="animate-pulse rounded-lg bg-gray-100 p-3">
+                    <div className="h-4 w-2/3 rounded bg-gray-200" />
+                  </div>
+                ))}
+              </div>
+            ) : historyEntries.length === 0 ? (
+              <p className="mt-6 text-center text-sm text-gray-500">Belum ada riwayat poin</p>
+            ) : (
+              <div className="mt-4 max-h-80 overflow-y-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Tanggal</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Tipe</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Poin</th>
+                      <th className="px-4 py-2 text-left text-xs font-medium uppercase text-gray-500">Deskripsi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {historyEntries.map((entry: any, i: number) => (
+                      <tr key={i} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-sm text-gray-700">
+                          {entry.createdAt ? new Date(entry.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }) : '-'}
+                        </td>
+                        <td className="px-4 py-3 text-sm font-medium text-gray-900">{entry.type || '-'}</td>
+                        <td className={`px-4 py-3 text-sm font-semibold ${entryTypeStyle(entry.type)}`}>
+                          {entry.type === 'EARN' ? `+${entry.points}` : entry.type === 'REDEEM' || entry.type === 'EXPIRE' ? `-${entry.points}` : entry.points > 0 ? `+${entry.points}` : entry.points}
+                        </td>
+                        <td className="px-4 py-3 text-sm text-gray-600">{entry.description || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
@@ -147,6 +235,8 @@ export default function PromotionsPage() {
   const [showCreateCoupon, setShowCreateCoupon] = useState(false);
   const [showCreateCampaign, setShowCreateCampaign] = useState(false);
   const [couponForm, setCouponForm] = useState({ code: '', discountType: 'PERCENTAGE', discountValue: 0, maxUses: 100, minOrder: 0 });
+  const [editingCoupon, setEditingCoupon] = useState<any | null>(null);
+  const [editCouponForm, setEditCouponForm] = useState({ code: '', discountType: 'PERCENTAGE', discountValue: 0, maxUses: 100, minOrder: 0 });
   const [campaignForm, setCampaignForm] = useState({ name: '', type: 'DISCOUNT', config: '{}', startDate: '', endDate: '' });
 
   const { data: couponsRes, isLoading: couponsLoading } = useQuery({
@@ -170,6 +260,14 @@ export default function PromotionsPage() {
   const deleteCouponMutation = useMutation({
     mutationFn: (id: string) => providerApi.coupons.delete(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['coupons'] }),
+  });
+
+  const updateCouponMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: any }) => providerApi.coupons.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['coupons'] });
+      setEditingCoupon(null);
+    },
   });
 
   const createCampaignMutation = useMutation({
@@ -280,6 +378,69 @@ export default function PromotionsPage() {
               </div>
             )}
 
+            {editingCoupon && (
+              <div className="rounded-xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+                <h3 className="font-semibold text-gray-900">Edit Kupon</h3>
+                <div className="mt-4 grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Kode</label>
+                    <input
+                      placeholder="DISKON20"
+                      value={editCouponForm.code}
+                      onChange={(e) => setEditCouponForm({ ...editCouponForm, code: e.target.value })}
+                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Tipe</label>
+                    <select
+                      value={editCouponForm.discountType}
+                      onChange={(e) => setEditCouponForm({ ...editCouponForm, discountType: e.target.value })}
+                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    >
+                      <option value="PERCENTAGE">Persentase</option>
+                      <option value="FIXED">Nominal Tetap</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Nilai</label>
+                    <input
+                      type="number"
+                      placeholder="20"
+                      value={editCouponForm.discountValue}
+                      onChange={(e) => setEditCouponForm({ ...editCouponForm, discountValue: +e.target.value })}
+                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Maks. Penggunaan</label>
+                    <input
+                      type="number"
+                      placeholder="100"
+                      value={editCouponForm.maxUses}
+                      onChange={(e) => setEditCouponForm({ ...editCouponForm, maxUses: +e.target.value })}
+                      className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
+                    />
+                  </div>
+                </div>
+                <div className="mt-4 flex gap-3">
+                  <button
+                    onClick={() => updateCouponMutation.mutate({ id: editingCoupon.id, data: editCouponForm })}
+                    disabled={updateCouponMutation.isPending}
+                    className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50"
+                  >
+                    {updateCouponMutation.isPending ? 'Menyimpan...' : 'Simpan'}
+                  </button>
+                  <button
+                    onClick={() => setEditingCoupon(null)}
+                    className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-50"
+                  >
+                    Batal
+                  </button>
+                </div>
+              </div>
+            )}
+
             {couponsLoading ? (
               <div className="space-y-3">
                 {Array.from({ length: 3 }).map((_, i) => (
@@ -320,16 +481,33 @@ export default function PromotionsPage() {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right">
-                          <button
-                            onClick={() => {
-                              if (confirm(`Hapus kupon "${c.code}"?`)) {
-                                deleteCouponMutation.mutate(c.id);
-                              }
-                            }}
-                            className="text-sm font-medium text-red-600 hover:text-red-700"
-                          >
-                            Hapus
-                          </button>
+                          <div className="flex items-center justify-end gap-3">
+                            <button
+                              onClick={() => {
+                                setEditingCoupon(c);
+                                setEditCouponForm({
+                                  code: c.code,
+                                  discountType: c.discountType,
+                                  discountValue: c.discountValue,
+                                  maxUses: c.maxUses,
+                                  minOrder: c.minOrder ?? 0,
+                                });
+                              }}
+                              className="text-sm font-medium text-primary-600 hover:text-primary-700"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (confirm(`Hapus kupon "${c.code}"?`)) {
+                                  deleteCouponMutation.mutate(c.id);
+                                }
+                              }}
+                              className="text-sm font-medium text-red-600 hover:text-red-700"
+                            >
+                              Hapus
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}

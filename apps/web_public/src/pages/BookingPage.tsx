@@ -99,7 +99,7 @@ export default function BookingPage() {
   const rescheduleMut = useMutation({
     mutationFn: () => {
       const version = (createdBooking as unknown as { version?: number })?.version ?? 1;
-      const newStartsAt = new Date(`${rescheduleDate}T${rescheduleTime}:00+07:00`).toISOString();
+      const newStartsAt = new Date(`${rescheduleDate}T${rescheduleTime}:00`).toISOString();
       const newEndsAt = new Date(new Date(newStartsAt).getTime() + (selectedService?.duration ?? 60) * 60000).toISOString();
       return publicApi.bookings.reschedule(createdBooking!.id, { newStartsAt, newEndsAt, expectedVersion: version });
     },
@@ -131,7 +131,8 @@ export default function BookingPage() {
   });
 
   const createPaymentIntent = useMutation({
-    mutationFn: (bookingId: string) => publicApi.bookings.createPaymentIntent(bookingId, 'midtrans'),
+    mutationFn: ({ bookingId, amount }: { bookingId: string; amount: number }) =>
+      publicApi.bookings.createPaymentIntent(bookingId, 'midtrans', { amount, currency: 'IDR' }),
   });
 
   const services = servicesRes?.data ?? [];
@@ -154,10 +155,6 @@ export default function BookingPage() {
     );
   }, [staffList, selectedService]);
 
-  const contactForm = useForm<ContactFormData>({
-    resolver: zodResolver(contactSchema),
-  });
-
   const { user, isAuthenticated } = useAuth();
   const { data: profileRes } = useQuery({
     queryKey: ['customerProfile'],
@@ -165,13 +162,39 @@ export default function BookingPage() {
     enabled: isAuthenticated,
   });
 
+  const defaultName = (() => {
+    if (!isAuthenticated) return '';
+    const p = (profileRes as unknown as { data?: Record<string, unknown> })?.data;
+    const n = (p?.nickname as string) || (p?.name as string) || user?.name || '';
+    return n;
+  })();
+  const defaultEmail = (() => {
+    if (!isAuthenticated) return '';
+    const p = (profileRes as unknown as { data?: Record<string, unknown> })?.data;
+    return (p?.email as string) || user?.email || '';
+  })();
+  const defaultPhone = (() => {
+    if (!isAuthenticated) return '';
+    const p = (profileRes as unknown as { data?: Record<string, unknown> })?.data;
+    return (p?.phone as string) || '';
+  })();
+
+  const contactForm = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      customerName: defaultName,
+      customerEmail: defaultEmail,
+      customerPhone: defaultPhone,
+      notes: '',
+    },
+  });
+
   useEffect(() => {
-    if (isAuthenticated) {
-      const data = (profileRes as unknown as { data?: { nickname?: string; name?: string; email?: string; phone?: string } })?.data ?? (profileRes as unknown as { nickname?: string; name?: string; email?: string; phone?: string });
-      const profile = (data as { nickname?: string; name?: string; email?: string; phone?: string }) ?? {};
-      const name = profile.nickname || profile.name || user?.name || '';
-      const email = profile.email || user?.email || '';
-      const phone = profile.phone || '';
+    if (isAuthenticated && profileRes) {
+      const p = (profileRes as unknown as { data?: Record<string, unknown> })?.data;
+      const name = (p?.nickname as string) || (p?.name as string) || user?.name || '';
+      const email = (p?.email as string) || user?.email || '';
+      const phone = (p?.phone as string) || '';
       if (name || email || phone) {
         const currentNotes = contactForm.getValues('notes') || '';
         contactForm.reset({ customerName: name, customerEmail: email, customerPhone: phone, notes: currentNotes });
@@ -224,14 +247,17 @@ export default function BookingPage() {
     setStep('confirm');
   };
 
+  const [bookingError, setBookingError] = useState<string | null>(null);
+
   const handleConfirm = () => {
+    setBookingError(null);
     const values = contactForm.getValues();
     createBooking.mutate(values, {
       onSuccess: (res) => {
         const booking = res.data;
         setCreatedBooking(booking);
         if (selectedService && selectedService.depositAmount > 0 && booking.depositRequired) {
-          createPaymentIntent.mutate(booking.id, {
+          createPaymentIntent.mutate({ bookingId: booking.id, amount: selectedService.depositAmount }, {
             onSuccess: (paymentRes) => {
               const paymentData = paymentRes.data as unknown as { paymentUrl?: string; redirectUrl?: string };
               if (paymentData.redirectUrl) {
@@ -240,6 +266,10 @@ export default function BookingPage() {
             },
           });
         }
+      },
+      onError: (e: unknown) => {
+        const msg = e instanceof Error ? e.message : 'Gagal membuat booking. Silakan coba lagi.';
+        setBookingError(msg);
       },
     });
   };
@@ -351,7 +381,7 @@ export default function BookingPage() {
                 {selectedService && selectedService.depositAmount > 0 && (
                   <div className="mt-3">
                     <button
-                      onClick={() => createPaymentIntent.mutate(createdBooking.id, {
+                      onClick={() => createPaymentIntent.mutate({ bookingId: createdBooking.id, amount: selectedService.depositAmount }, {
                         onSuccess: (paymentRes) => {
                           const paymentData = paymentRes.data as unknown as { paymentUrl?: string; redirectUrl?: string };
                           if (paymentData.redirectUrl) {
@@ -418,7 +448,7 @@ export default function BookingPage() {
               </div>
               <div className="mt-6 rounded-xl border border-gray-200 bg-gray-50 p-4 text-left">
                 <h3 className="text-sm font-semibold text-gray-900">Verifikasi PIN</h3>
-                <p className="mt-1 text-xs text-gray-500">POST /bookings/{'{id}'}/verify-pin — masukkan 6-digit PIN untuk check-in</p>
+                <p className="mt-1 text-xs text-gray-500">Masukkan 6-digit PIN yang diberikan provider untuk check-in</p>
                 <div className="mt-3 flex gap-2">
                   <input value={pin} onChange={(e) => setPin(e.target.value)} placeholder="6-digit PIN" maxLength={6} className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none" />
                   <button onClick={() => verifyPinMut.mutate()} disabled={verifyPinMut.isPending || pin.length !== 6} className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700 disabled:opacity-50">{verifyPinMut.isPending ? '...' : 'Verifikasi'}</button>
@@ -428,7 +458,7 @@ export default function BookingPage() {
               </div>
               <div className="mt-4 rounded-xl border border-primary-200 bg-primary-50 p-4 text-left">
                 <h3 className="text-sm font-semibold text-gray-900">Chat Realtime</h3>
-                <p className="mt-1 text-xs text-gray-500">Hubungi provider via chat realtime — WebSocket /ws-chat (STOMP) + SSE /chats/{'{id}'}/events + Kafka.</p>
+                <p className="mt-1 text-xs text-gray-500">Hubungi provider langsung melalui chat realtime</p>
                 <div className="mt-3 flex gap-2">
                   <Link to={`/chats`} className="flex-1 rounded-lg bg-white border border-primary-300 px-4 py-2 text-sm font-semibold text-primary-700 text-center hover:bg-primary-50">
                     Buka Chat List
@@ -451,7 +481,7 @@ export default function BookingPage() {
                     Chat Booking Ini
                   </Link>
                 </div>
-                <p className="mt-2 text-[11px] text-gray-400">POST /chats • GET /chats • POST /chats/{'{id}'}/messages • GET /bookings/{'{bookingId}'}/chat • SSE /chats/{'{id}'}/events</p>
+                <p className="mt-2 text-[11px] text-gray-400">Percakapan tersinkronisasi secara realtime — Kirim pesan, lampirkan file, dan lihat status koneksi</p>
               </div>
               <div className="mt-6 flex justify-center gap-3">
                 <Link
@@ -643,7 +673,7 @@ export default function BookingPage() {
                   <h2 className="text-xl font-semibold text-gray-900">Informasi Kontak</h2>
                   {isAuthenticated ? (
                     <p className="mt-1 text-sm text-green-600">
-                      Otomatis terisi dari profil — hanya catatan dapat diedit
+                      Data dari profil Anda — silakan edit jika perlu
                     </p>
                   ) : (
                     <p className="mt-1 text-sm text-gray-500">
@@ -658,9 +688,7 @@ export default function BookingPage() {
                       <label className="block text-sm font-medium text-gray-700">Nama Lengkap</label>
                       <input
                         {...contactForm.register('customerName')}
-                        readOnly={isAuthenticated}
-                        disabled={isAuthenticated}
-                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
+                        className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                         placeholder="Masukkan nama Anda"
                       />
                       {contactForm.formState.errors.customerName && (
@@ -674,9 +702,7 @@ export default function BookingPage() {
                       <input
                         {...contactForm.register('customerEmail')}
                         type="email"
-                        readOnly={isAuthenticated}
-                        disabled={isAuthenticated}
-                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
+                        className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                         placeholder="email@contoh.com"
                       />
                       {contactForm.formState.errors.customerEmail && (
@@ -690,9 +716,7 @@ export default function BookingPage() {
                       <input
                         {...contactForm.register('customerPhone')}
                         type="tel"
-                        readOnly={isAuthenticated}
-                        disabled={isAuthenticated}
-                        className={`mt-1 block w-full rounded-lg border px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 ${isAuthenticated ? 'border-gray-200 bg-gray-100 text-gray-600' : 'border-gray-300 bg-white'}`}
+                        className="mt-1 block w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
                         placeholder="08xxxxxxxxxx"
                       />
                       {contactForm.formState.errors.customerPhone && (
@@ -853,7 +877,12 @@ export default function BookingPage() {
                       {createBooking.isPending ? 'Memproses...' : 'Konfirmasi Booking'}
                     </button>
                   </div>
-                  {createBooking.isError && (
+                  {bookingError && (
+                    <div className="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                      {bookingError}
+                    </div>
+                  )}
+                  {createBooking.isError && !bookingError && (
                     <p className="mt-3 text-sm text-red-600">
                       {(createBooking.error as Error).message}
                     </p>

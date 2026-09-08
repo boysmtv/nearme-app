@@ -16,7 +16,7 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 
 export default function CustomerAccountPage() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, refreshUser } = useAuth();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [saveMsg, setSaveMsg] = useState<string | null>(null);
@@ -37,6 +37,7 @@ export default function CustomerAccountPage() {
     mutationFn: (data: ProfileFormData) => publicApi.customer.updateProfile({ name: data.name, phone: data.phone }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customer-profile'] });
+      refreshUser();
       setEditing(false);
       setSaveMsg('Profil berhasil diperbarui');
       setTimeout(() => setSaveMsg(null), 3000);

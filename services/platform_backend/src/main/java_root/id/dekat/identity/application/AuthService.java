@@ -6,6 +6,7 @@ import id.dekat.access.domain.RoleRepository;
 import id.dekat.identity.domain.*;
 import id.dekat.identity.web.dto.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthService {
 
     private static final int OTP_LENGTH = 6;
@@ -112,7 +114,7 @@ public class AuthService {
         redisTemplate.opsForValue().set(attemptsKey, String.valueOf(attempts + 1), OTP_TTL_MINUTES + 5, TimeUnit.MINUTES);
 
         // TODO: Send OTP via email/SMS provider
-        System.out.println("[OTP] Generated code for " + request.getEmail() + ": " + code);
+        log.warn("[OTP] Generated code for {} (purpose={}) — email/SMS provider not configured", request.getEmail(), request.getPurpose());
     }
 
     public TokenResponse verifyOtp(OtpRequest request) {

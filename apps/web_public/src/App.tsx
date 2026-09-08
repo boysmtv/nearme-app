@@ -46,6 +46,7 @@ const AdminAnalyticsPage = lazy(() => import('./pages/admin/AnalyticsPage'));
 const AdminAuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'));
 const AdminSubscriptionsPage = lazy(() => import('./pages/admin/SubscriptionsPage'));
 const AdminFeatureFlagsPage = lazy(() => import('./pages/admin/FeatureFlagsPage'));
+const AdminFaqsPage = lazy(() => import('./pages/admin/FaqsPage'));
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   state = { hasError: false, error: null };
@@ -157,6 +158,7 @@ export function App() {
         <Route path="/admin/audit-logs" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminAuditLogPage /></ProtectedRoute>} />
         <Route path="/admin/subscriptions" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminSubscriptionsPage /></ProtectedRoute>} />
         <Route path="/admin/feature-flags" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminFeatureFlagsPage /></ProtectedRoute>} />
+        <Route path="/admin/faqs" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminFaqsPage /></ProtectedRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

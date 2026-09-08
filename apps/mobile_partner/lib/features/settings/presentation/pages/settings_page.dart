@@ -26,6 +26,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   final _emailCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   bool _dirty = false;
+  bool _autoConfirm = false;
+  bool _depositRequired = false;
 
   @override
   void dispose() {
@@ -65,6 +67,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             _phoneCtrl.text = settings['phone'] ?? '';
             _emailCtrl.text = settings['email'] ?? '';
             _addressCtrl.text = settings['address'] ?? '';
+            _autoConfirm = settings['autoConfirm'] ?? false;
+            _depositRequired = settings['depositRequired'] ?? false;
           }
           return ListView(
             padding: const EdgeInsets.all(16),
@@ -119,10 +123,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 child: SwitchListTile(
                   title: const Text('Auto-confirm bookings'),
                   subtitle: const Text('Konfirmasi otomatis tanpa review'),
-                  value: settings['autoConfirm'] ?? false,
-                  onChanged: (v) async {
-                    setState(() => _dirty = true);
-                    // will be saved on save
+                  value: _autoConfirm,
+                  onChanged: (v) {
+                    setState(() {
+                      _autoConfirm = v;
+                      _dirty = true;
+                    });
                   },
                 ),
               ),
@@ -131,9 +137,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 child: SwitchListTile(
                   title: const Text('Deposit required'),
                   subtitle: const Text('Wajibkan deposit saat booking'),
-                  value: settings['depositRequired'] ?? false,
-                  onChanged: (v) async {
-                    setState(() => _dirty = true);
+                  value: _depositRequired,
+                  onChanged: (v) {
+                    setState(() {
+                      _depositRequired = v;
+                      _dirty = true;
+                    });
                   },
                 ),
               ),
@@ -154,6 +163,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         'phone': _phoneCtrl.text,
         'email': _emailCtrl.text,
         'address': _addressCtrl.text,
+        'autoConfirm': _autoConfirm,
+        'depositRequired': _depositRequired,
       });
       ref.invalidate(settingsProvider);
       setState(() => _dirty = false);

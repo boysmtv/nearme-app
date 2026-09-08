@@ -41,16 +41,12 @@ class AvailabilityPage extends ConsumerStatefulWidget {
 }
 
 class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
-  late DateTime _focusedDate;
   String? _selectedServiceId;
 
   @override
   void initState() {
     super.initState();
     _selectedServiceId = widget.initialServiceId;
-    // init focused from selectedDate agar tidak balik ke awal saat buka lagi
-    final initial = ref.read(selectedDateProvider);
-    _focusedDate = initial;
     // load persist tanggal jika pernah pilih sebelumnya
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final stored = await SecureStorageService.read('selected_date');
@@ -63,7 +59,6 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
           // jangan pakai tanggal lampau
           if (!p.isBefore(today)) {
             ref.read(selectedDateProvider.notifier).state = parsed;
-            if (mounted) setState(() => _focusedDate = parsed);
           }
         }
       }
@@ -109,7 +104,6 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                   ref.read(selectedDateProvider.notifier).state = selectedDay;
                   ref.read(selectedTimeSlotProvider.notifier).state = null;
                   await SecureStorageService.write('selected_date', selectedDay.toIso8601String());
-                  if (mounted) setState(() => _focusedDate = focusedDay);
                   if (ctx.mounted) Navigator.pop(ctx);
                 },
                 onPageChanged: (focusedDay) => tempFocused = focusedDay,
@@ -587,7 +581,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                       '?providerId=${widget.providerId}'
                       '&serviceId=$_selectedServiceId'
                       '&date=$dateStr'
-                      '&time=${Uri.encodeComponent(selectedTimeSlot!)}'
+                      '&time=${Uri.encodeComponent(selectedTimeSlot)}'
                       '${widget.locationId != null ? '&locationId=${widget.locationId}' : ''}')
                   : null,
               style: ElevatedButton.styleFrom(

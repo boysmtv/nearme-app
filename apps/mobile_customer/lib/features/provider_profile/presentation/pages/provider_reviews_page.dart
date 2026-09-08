@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import 'package:flutter_design_system/flutter_design_system.dart';
 
 class ProviderReviewsPage extends ConsumerStatefulWidget {
   final String providerId;

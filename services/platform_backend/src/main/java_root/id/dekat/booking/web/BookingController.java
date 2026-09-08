@@ -17,6 +17,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -76,7 +77,7 @@ public class BookingController {
     @PostMapping("/holds")
     public ResponseEntity<ApiResponse<BookingHold>> createHold(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody CreateHoldRequest request) {
+            @Valid @RequestBody CreateHoldRequest request) {
         UUID customerId = request.getCustomerId() != null
                 ? request.getCustomerId()
                 : UUID.fromString(jwt.getSubject());
@@ -91,7 +92,7 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<ApiResponse<Booking>> createBooking(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody CreateBookingRequest request) {
+            @Valid @RequestBody CreateBookingRequest request) {
         UUID customerId = request.getCustomerId() != null
                 ? request.getCustomerId()
                 : UUID.fromString(jwt.getSubject());
@@ -141,13 +142,13 @@ public class BookingController {
 
     @PostMapping("/{id}/verify-pin")
     public ResponseEntity<ApiResponse<Booking>> verifyPin(@PathVariable UUID id,
-                                              @RequestBody VerifyPinRequest request) {
+                                              @Valid @RequestBody VerifyPinRequest request) {
         return ResponseEntity.ok(ApiResponse.ok(bookingService.verifyPin(id, request.getPin())));
     }
 
     @PostMapping("/{id}/reschedule")
     public ResponseEntity<ApiResponse<Booking>> reschedule(@PathVariable UUID id,
-                                              @RequestBody RescheduleRequest request) {
+                                              @Valid @RequestBody RescheduleRequest request) {
         try {
             Booking booking = bookingService.rescheduleBooking(
                     id, request.getNewStartsAt(), request.getNewEndsAt(),

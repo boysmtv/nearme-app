@@ -174,7 +174,7 @@ function ReviewForm({ providerId }: { providerId: string }) {
         >
           {mutation.isPending ? 'Mengirim...' : 'Kirim Ulasan'}
         </button>
-        <p className="text-xs text-gray-400 text-center">POST /bookings/{'{id}'}/review dikirim dengan rating + comment — memerlukan JWT.</p>
+        <p className="text-xs text-gray-400 text-center">Ulasan akan dikirim bersama rating dan komentar Anda</p>
       </div>
     </div>
   );
@@ -374,7 +374,7 @@ export default function ProviderPage() {
             ) : (
               <p className="mt-3 text-sm text-gray-500">Belum ada foto galeri. Provider dapat upload via dashboard Media.</p>
             )}
-            <p className="mt-2 text-xs text-gray-400">GET /public/providers/{'{id}'}/media • {galleryItems.length} foto</p>
+            <p className="mt-2 text-xs text-gray-400">{galleryItems.length} foto dalam galeri</p>
           </div>
 
           {/* Operating Hours */}
@@ -567,7 +567,7 @@ export default function ProviderPage() {
                               >
                                 {reportingId === review.id ? 'Melaporkan...' : 'Laporkan'}
                               </button>
-                              <span className="text-xs text-gray-300">POST /reviews/{'{id}'}/report</span>
+                              
                             </div>
                           </div>
                         </div>
