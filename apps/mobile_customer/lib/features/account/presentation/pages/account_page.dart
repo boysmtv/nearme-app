@@ -43,7 +43,10 @@ class AccountPage extends ConsumerWidget {
           _MenuItem(icon: Icons.favorite, title: 'Favorites', onTap: () => context.push('/favorites')),
           _MenuItem(icon: Icons.stars, title: 'Loyalty Points', onTap: () => context.push('/loyalty')),
           _MenuItem(icon: Icons.person_add_outlined, title: 'Undang Teman', onTap: () => context.push('/referral')),
+          _MenuItem(icon: Icons.repeat, title: 'Booking Berulang', onTap: () => context.push('/recurring')),
           _MenuItem(icon: Icons.notifications, title: 'Notifications', onTap: () => context.go('/notifications')),
+          _MenuItem(icon: Icons.notifications_active, title: 'Preferensi Notifikasi', onTap: () => context.push('/notification-preferences')),
+          _MenuItem(icon: Icons.rss_feed, title: 'Social Feed', onTap: () => context.push('/feed')),
           _MenuItem(icon: Icons.help_outline, title: 'Help & Support', onTap: () => context.push('/support')),
           const Divider(),
           _MenuItem(icon: Icons.logout, title: 'Logout', textColor: Colors.red, onTap: () {

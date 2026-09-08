@@ -28,6 +28,9 @@ import '../../features/account/presentation/pages/loyalty_page.dart';
 import '../../features/account/presentation/pages/nearby_page.dart';
 import '../../features/account/presentation/pages/my_reviews_page.dart';
 import '../../features/account/presentation/pages/referral_page.dart';
+import '../../features/account/presentation/pages/notification_preferences_page.dart';
+import '../../features/account/presentation/pages/social_feed_page.dart';
+import '../../features/booking/presentation/pages/recurring_bookings_page.dart';
 import '../../features/chat/presentation/pages/chat_list_page.dart';
 import '../../features/chat/presentation/pages/chat_detail_page.dart';
 import '../../features/favorites/presentation/pages/favorites_page.dart';
@@ -479,6 +482,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/referral',
         name: 'referral',
         builder: (context, state) => const ReferralPage(),
+      ),
+      GoRoute(
+        path: '/recurring',
+        name: 'recurringBookings',
+        builder: (context, state) => const RecurringBookingsPage(),
+      ),
+      GoRoute(
+        path: '/notification-preferences',
+        name: 'notificationPreferences',
+        builder: (context, state) => const NotificationPreferencesPage(),
+      ),
+      GoRoute(
+        path: '/feed',
+        name: 'socialFeed',
+        builder: (context, state) => const SocialFeedPage(),
       ),
     ],
     redirect: (context, state) {

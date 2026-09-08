@@ -42,6 +42,13 @@ const RecurringBookingsPage = lazy(() => import('./pages/customer/RecurringBooki
 const PricingPage = lazy(() => import('./pages/PricingPage'));
 const ServiceBundlesPage = lazy(() => import('./pages/provider/ServiceBundlesPage'));
 const ServicesImportPage = lazy(() => import('./pages/provider/ServicesImportPage'));
+const SubscriptionUpgradePage = lazy(() => import('./pages/provider/SubscriptionUpgradePage'));
+const MultiLocationPage = lazy(() => import('./pages/provider/MultiLocationPage'));
+const StaffManagementSuitePage = lazy(() => import('./pages/provider/StaffManagementSuitePage'));
+const SmartSchedulingPage = lazy(() => import('./pages/provider/SmartSchedulingPage'));
+const AnalyticsDeepPage = lazy(() => import('./pages/provider/AnalyticsDeepPage'));
+const NotificationPreferencesPage = lazy(() => import('./pages/customer/NotificationPreferencesPage'));
+const SocialFeedPage = lazy(() => import('./pages/customer/SocialFeedPage'));
 
 // Admin pages (lazy)
 const AdminDashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
@@ -141,6 +148,8 @@ export function App() {
         <Route path="/nearby" element={<RequireProfileGuard><CustomerNearbyPage /></RequireProfileGuard>} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/support" element={<SupportPage />} />
+        <Route path="/feed" element={<ProtectedRoute><SocialFeedPage /></ProtectedRoute>} />
+        <Route path="/notification-preferences" element={<ProtectedRoute><NotificationPreferencesPage /></ProtectedRoute>} />
 
         <Route path="/provider/dashboard" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderDashboardPage /></ProtectedRoute>} />
         <Route path="/provider/calendar" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCalendarPage /></ProtectedRoute>} />
@@ -157,6 +166,11 @@ export function App() {
         <Route path="/provider/promotions" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderPromotionsPage /></ProtectedRoute>} />
         <Route path="/provider/notifications" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderNotificationsPage /></ProtectedRoute>} />
         <Route path="/provider/settings" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderSettingsPage /></ProtectedRoute>} />
+        <Route path="/provider/upgrade" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><SubscriptionUpgradePage /></ProtectedRoute>} />
+        <Route path="/provider/locations" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><MultiLocationPage /></ProtectedRoute>} />
+        <Route path="/provider/staff-suite" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><StaffManagementSuitePage /></ProtectedRoute>} />
+        <Route path="/provider/smart-scheduling" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><SmartSchedulingPage /></ProtectedRoute>} />
+        <Route path="/provider/analytics-deep" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><AnalyticsDeepPage /></ProtectedRoute>} />
 
         <Route path="/payment" element={<PaymentPage />} />
         <Route path="/payment/success" element={<PaymentPage />} />

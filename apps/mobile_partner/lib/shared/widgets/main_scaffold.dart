@@ -108,6 +108,12 @@ class MainScaffold extends StatelessWidget {
                 selected: location.startsWith('/staff'),
                 onTap: () { Navigator.pop(context); context.go('/staff'); },
               ),
+              _DrawerItem(
+                icon: Icons.fact_check_outlined,
+                title: 'Absensi Staf',
+                selected: location.startsWith('/staff-checkin'),
+                onTap: () { Navigator.pop(context); context.go('/staff-checkin'); },
+              ),
               const Divider(),
               _DrawerItem(
                 icon: Icons.chat_outlined,

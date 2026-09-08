@@ -20,6 +20,7 @@ import '../../features/faq_management/presentation/pages/faq_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/settings/presentation/pages/blocked_dates_page.dart';
 import '../../features/customer_management/presentation/pages/customers_page.dart';
+import '../../features/staff/presentation/pages/staff_checkin_page.dart';
 import '../../shared/widgets/main_scaffold.dart';
 
 final partnerAuthProvider = StateNotifierProvider<PartnerAuthNotifier, PartnerAuthState>((ref) {
@@ -98,6 +99,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         GoRoute(path: '/settings', name: 'settings', pageBuilder: (_, __) => const NoTransitionPage(child: SettingsPage())),
         GoRoute(path: '/blocked-dates', name: 'blockedDates', pageBuilder: (_, __) => const NoTransitionPage(child: BlockedDatesPage())),
         GoRoute(path: '/customers', name: 'customers', pageBuilder: (_, __) => const NoTransitionPage(child: CustomersPage())),
+        GoRoute(path: '/staff-checkin', name: 'staffCheckin', pageBuilder: (_, __) => const NoTransitionPage(child: StaffCheckInPage())),
       ]),
       GoRoute(path: '/booking/:id', name: 'bookingDetail', builder: (_, state) => BookingDetailPage(bookingId: state.pathParameters['id']!)),
       GoRoute(path: '/partner/chat/:id', name: 'partnerChatDetail', builder: (_, state) => PartnerChatDetailPage(chatId: state.pathParameters['id']!)),
