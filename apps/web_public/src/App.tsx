@@ -38,7 +38,10 @@ const CustomerLoyaltyPage = lazy(() => import('./pages/customer/CustomerLoyaltyP
 const CustomerNearbyPage = lazy(() => import('./pages/customer/CustomerNearbyPage'));
 const CustomerReviewsPage = lazy(() => import('./pages/customer/CustomerReviewsPage'));
 const CustomerReferralPage = lazy(() => import('./pages/customer/CustomerReferralPage'));
+const RecurringBookingsPage = lazy(() => import('./pages/customer/RecurringBookingsPage'));
 const PricingPage = lazy(() => import('./pages/PricingPage'));
+const ServiceBundlesPage = lazy(() => import('./pages/provider/ServiceBundlesPage'));
+const ServicesImportPage = lazy(() => import('./pages/provider/ServicesImportPage'));
 
 // Admin pages (lazy)
 const AdminDashboardPage = lazy(() => import('./pages/admin/DashboardPage'));
@@ -52,6 +55,7 @@ const AdminAuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'));
 const AdminSubscriptionsPage = lazy(() => import('./pages/admin/SubscriptionsPage'));
 const AdminFeatureFlagsPage = lazy(() => import('./pages/admin/FeatureFlagsPage'));
 const AdminFaqsPage = lazy(() => import('./pages/admin/FaqsPage'));
+const AdminRolesPage = lazy(() => import('./pages/admin/RolesPage'));
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   state = { hasError: false, error: null };
@@ -133,6 +137,7 @@ export function App() {
         <Route path="/account/loyalty" element={<ProtectedRoute><CustomerLoyaltyPage /></ProtectedRoute>} />
         <Route path="/account/referral" element={<ProtectedRoute><CustomerReferralPage /></ProtectedRoute>} />
         <Route path="/account/reviews" element={<ProtectedRoute><CustomerReviewsPage /></ProtectedRoute>} />
+        <Route path="/account/recurring" element={<ProtectedRoute><RecurringBookingsPage /></ProtectedRoute>} />
         <Route path="/nearby" element={<RequireProfileGuard><CustomerNearbyPage /></RequireProfileGuard>} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/support" element={<SupportPage />} />
@@ -145,6 +150,8 @@ export function App() {
         <Route path="/provider/customers" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderCustomersPage /></ProtectedRoute>} />
         <Route path="/provider/reports" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderReportsPage /></ProtectedRoute>} />
         <Route path="/provider/media" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderMediaPage /></ProtectedRoute>} />
+        <Route path="/provider/bundles" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ServiceBundlesPage /></ProtectedRoute>} />
+        <Route path="/provider/import" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ServicesImportPage /></ProtectedRoute>} />
         <Route path="/provider/faq" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderFaqPage /></ProtectedRoute>} />
         <Route path="/provider/reviews" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderReviewsPage /></ProtectedRoute>} />
         <Route path="/provider/promotions" element={<ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><ProviderPromotionsPage /></ProtectedRoute>} />
@@ -169,6 +176,7 @@ export function App() {
         <Route path="/admin/subscriptions" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminSubscriptionsPage /></ProtectedRoute>} />
         <Route path="/admin/feature-flags" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminFeatureFlagsPage /></ProtectedRoute>} />
         <Route path="/admin/faqs" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminFaqsPage /></ProtectedRoute>} />
+        <Route path="/admin/roles" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminRolesPage /></ProtectedRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

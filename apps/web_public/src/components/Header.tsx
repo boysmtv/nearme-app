@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '../lib/auth';
 import { api } from '../lib/api';
+import ThemeToggle from './ThemeToggle';
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -92,6 +93,7 @@ export default function Header() {
               )}
             </Link>
           )}
+          <ThemeToggle />
           <div className="h-6 w-px bg-gray-200" />
           {isAuthenticated && user ? (
             <>

@@ -166,6 +166,8 @@ export default function DashboardPage() {
                 {[
                   { label: 'Lihat Kalender', href: '/provider/calendar', color: 'text-blue-600 bg-blue-50 hover:bg-blue-100' },
                   { label: 'Kelola Layanan', href: '/provider/services', color: 'text-green-600 bg-green-50 hover:bg-green-100' },
+                  { label: 'Paket Layanan', href: '/provider/bundles', color: 'text-orange-600 bg-orange-50 hover:bg-orange-100' },
+                  { label: 'Import CSV', href: '/provider/import', color: 'text-teal-600 bg-teal-50 hover:bg-teal-100' },
                   { label: 'Kelola Staf', href: '/provider/staff', color: 'text-purple-600 bg-purple-50 hover:bg-purple-100' },
                   { label: 'Lihat Laporan', href: '/provider/reports', color: 'text-amber-600 bg-amber-50 hover:bg-amber-100' },
                 ].map((action) => (

@@ -13,6 +13,7 @@ const sidebarItems = [
   { label: 'Audit Logs', href: '/admin/audit-logs' },
   { label: 'Subscriptions', href: '/admin/subscriptions' },
   { label: 'Feature Flags', href: '/admin/feature-flags' },
+  { label: 'Roles & Permissions', href: '/admin/roles' },
   { label: 'FAQ & Kebijakan', href: '/admin/faqs' },
 ];
 
