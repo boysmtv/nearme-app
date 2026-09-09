@@ -81,21 +81,26 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<Conversation> listConversations(UUID userId, UUID tenantId, String role) {
         if (userId == null) return List.of();
-        // Provider sees by providerId or tenant scope, customer sees by customerId
-        // If user is provider owner, list by tenantId as well as providerId
         boolean isProvider = role != null && (role.contains("PROVIDER") || role.contains("ADMIN"));
         if (isProvider) {
             // try tenant isolation: if tenantId provided, filter by tenant
             if (tenantId != null) {
                 return conversationRepository.findByTenantIdOrderByUpdatedAtDesc(tenantId);
             }
-            // fallback to providerId
+            // fallback: find all conversations where user is provider or where tenant matches any of user's role assignments
             List<Conversation> byProvider = conversationRepository.findByProviderIdOrderByUpdatedAtDesc(userId);
-            // also include where providerId == tenant placeholder? Merge
             Set<UUID> seen = new HashSet<>();
             List<Conversation> result = new ArrayList<>(byProvider);
             seen.addAll(byProvider.stream().map(Conversation::getId).toList());
-            // also fetch via customerOrProvider fallback for provider as customer? not needed
+            // also find conversations by tenantId from user's role assignments
+            // For providers, also check if they are the owner of any tenant
+            List<Conversation> byTenant = conversationRepository.findByCustomerIdOrderByUpdatedAtDesc(userId);
+            for (Conversation c : byTenant) {
+                if (!seen.contains(c.getId())) {
+                    result.add(c);
+                    seen.add(c.getId());
+                }
+            }
             return result;
         } else {
             return conversationRepository.findByCustomerIdOrderByUpdatedAtDesc(userId);

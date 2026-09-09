@@ -78,7 +78,7 @@ export default function SubscriptionUpgradePage() {
   const currentPlan = currentSub?.data?.planId || 'FREE';
 
   return (
-    <div className="max-w-5xl mx-auto p-6 space-y-6">
+    <div className="max-w-screen-2xl mx-auto p-6 space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900">Upgrade Plan</h1>
         <p className="mt-2 text-gray-500">Pilih paket yang sesuai untuk bisnis Anda</p>

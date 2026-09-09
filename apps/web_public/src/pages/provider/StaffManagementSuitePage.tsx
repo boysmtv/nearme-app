@@ -51,7 +51,7 @@ export default function StaffManagementSuitePage() {
   const stats = statsRes?.data ?? {};
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-screen-2xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Manajemen Staf</h1>
 
       {/* Summary Stats */}

@@ -234,7 +234,22 @@ public class BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking not found: " + bookingId));
 
+        if (booking.getStatus() == BookingStatus.CONFIRMED) {
+            if (booking.getConfirmationPin() == null) {
+                String pin = String.format("%06d", new Random().nextInt(999999));
+                booking.setConfirmationPin(pin);
+                bookingRepository.save(booking);
+            }
+            org.hibernate.Hibernate.initialize(booking.getItems());
+            org.hibernate.Hibernate.initialize(booking.getAssignments());
+            return booking;
+        }
+
         BookingStatus fromStatus = booking.getStatus();
+        if (booking.getConfirmationPin() == null) {
+            String pin = String.format("%06d", new Random().nextInt(999999));
+            booking.setConfirmationPin(pin);
+        }
         booking.confirm();
         Booking savedBooking = bookingRepository.save(booking);
 
@@ -242,6 +257,8 @@ public class BookingService {
                 bookingId, fromStatus, BookingStatus.CONFIRMED,
                 actorId, "Booking confirmed"));
 
+        org.hibernate.Hibernate.initialize(savedBooking.getItems());
+        org.hibernate.Hibernate.initialize(savedBooking.getAssignments());
         return savedBooking;
     }
 
@@ -268,6 +285,8 @@ public class BookingService {
                 bookingId, fromStatus, savedBooking.getStatus(),
                 null, "PIN verified"));
 
+        org.hibernate.Hibernate.initialize(savedBooking.getItems());
+        org.hibernate.Hibernate.initialize(savedBooking.getAssignments());
         return savedBooking;
     }
 

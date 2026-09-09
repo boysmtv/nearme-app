@@ -136,14 +136,22 @@ public class BookingController {
 
     @PostMapping("/{id}/confirm")
     public ResponseEntity<ApiResponse<Booking>> confirmBooking(@PathVariable UUID id,
-                                                  @RequestHeader("X-Actor-Id") UUID actorId) {
-        return ResponseEntity.ok(ApiResponse.ok(bookingService.confirmExistingBooking(id, actorId)));
+                                                   @AuthenticationPrincipal Jwt jwt,
+                                                   @RequestHeader(value = "X-Actor-Id", required = false) UUID actorId) {
+        UUID effectiveActorId = actorId != null ? actorId : UUID.fromString(jwt.getSubject());
+        return ResponseEntity.ok(ApiResponse.ok(bookingService.confirmExistingBooking(id, effectiveActorId)));
     }
 
     @PostMapping("/{id}/verify-pin")
     public ResponseEntity<ApiResponse<Booking>> verifyPin(@PathVariable UUID id,
                                               @Valid @RequestBody VerifyPinRequest request) {
-        return ResponseEntity.ok(ApiResponse.ok(bookingService.verifyPin(id, request.getPin())));
+        try {
+            return ResponseEntity.ok(ApiResponse.ok(bookingService.verifyPin(id, request.getPin())));
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
     }
 
     @PostMapping("/{id}/reschedule")
@@ -170,9 +178,11 @@ public class BookingController {
     @PostMapping("/{id}/cancel")
     public ResponseEntity<ApiResponse<Booking>> cancel(@PathVariable UUID id,
                                           @RequestParam(required = false) String reason,
-                                          @RequestHeader("X-Actor-Id") UUID actorId) {
+                                          @AuthenticationPrincipal Jwt jwt,
+                                          @RequestHeader(value = "X-Actor-Id", required = false) UUID actorId) {
+        UUID effectiveActorId = actorId != null ? actorId : UUID.fromString(jwt.getSubject());
         try {
-            return ResponseEntity.ok(ApiResponse.ok(bookingService.cancelBooking(id, reason, actorId)));
+            return ResponseEntity.ok(ApiResponse.ok(bookingService.cancelBooking(id, reason, effectiveActorId)));
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(ApiResponse.error(e.getMessage()));
         }
@@ -180,26 +190,34 @@ public class BookingController {
 
     @PostMapping("/{id}/check-in")
     public ResponseEntity<ApiResponse<Booking>> checkIn(@PathVariable UUID id,
-                                           @RequestHeader("X-Actor-Id") UUID actorId) {
-        return ResponseEntity.ok(ApiResponse.ok(bookingService.checkIn(id, actorId)));
+                                           @AuthenticationPrincipal Jwt jwt,
+                                           @RequestHeader(value = "X-Actor-Id", required = false) UUID actorId) {
+        UUID effectiveActorId = actorId != null ? actorId : UUID.fromString(jwt.getSubject());
+        return ResponseEntity.ok(ApiResponse.ok(bookingService.checkIn(id, effectiveActorId)));
     }
 
     @PostMapping("/{id}/start")
     public ResponseEntity<ApiResponse<Booking>> startService(@PathVariable UUID id,
-                                                @RequestHeader("X-Actor-Id") UUID actorId) {
-        return ResponseEntity.ok(ApiResponse.ok(bookingService.startService(id, actorId)));
+                                                @AuthenticationPrincipal Jwt jwt,
+                                                @RequestHeader(value = "X-Actor-Id", required = false) UUID actorId) {
+        UUID effectiveActorId = actorId != null ? actorId : UUID.fromString(jwt.getSubject());
+        return ResponseEntity.ok(ApiResponse.ok(bookingService.startService(id, effectiveActorId)));
     }
 
     @PostMapping("/{id}/complete")
     public ResponseEntity<ApiResponse<Booking>> complete(@PathVariable UUID id,
-                                            @RequestHeader("X-Actor-Id") UUID actorId) {
-        return ResponseEntity.ok(ApiResponse.ok(bookingService.completeService(id, actorId)));
+                                            @AuthenticationPrincipal Jwt jwt,
+                                            @RequestHeader(value = "X-Actor-Id", required = false) UUID actorId) {
+        UUID effectiveActorId = actorId != null ? actorId : UUID.fromString(jwt.getSubject());
+        return ResponseEntity.ok(ApiResponse.ok(bookingService.completeService(id, effectiveActorId)));
     }
 
     @PostMapping("/{id}/no-show")
     public ResponseEntity<ApiResponse<Booking>> noShow(@PathVariable UUID id,
-                                          @RequestHeader("X-Actor-Id") UUID actorId) {
-        return ResponseEntity.ok(ApiResponse.ok(bookingService.recordNoShow(id, actorId)));
+                                          @AuthenticationPrincipal Jwt jwt,
+                                          @RequestHeader(value = "X-Actor-Id", required = false) UUID actorId) {
+        UUID effectiveActorId = actorId != null ? actorId : UUID.fromString(jwt.getSubject());
+        return ResponseEntity.ok(ApiResponse.ok(bookingService.recordNoShow(id, effectiveActorId)));
     }
 
     @GetMapping("/{id}/history")

@@ -64,13 +64,13 @@ export default function PricingPage() {
       <Header />
       <main className="flex-1">
         <section className="bg-gradient-to-b from-primary-50 to-white py-16">
-          <div className="mx-auto max-w-7xl px-4 text-center">
+          <div className="mx-auto max-w-screen-2xl px-4 text-center">
             <h1 className="text-4xl font-bold text-gray-900">Paket Harga</h1>
             <p className="mt-4 text-lg text-gray-500">Pilih paket yang sesuai untuk bisnis Anda</p>
           </div>
         </section>
 
-        <section className="mx-auto max-w-7xl px-4 py-16">
+        <section className="mx-auto max-w-screen-2xl px-4 py-16">
           <div className="grid gap-8 md:grid-cols-3">
             {PLANS.map((plan) => (
               <div

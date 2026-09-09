@@ -33,7 +33,7 @@ export default function SettingsPage() {
 
   return (
     <ProviderLayout>
-      <div className="space-y-6 max-w-3xl">
+      <div className="space-y-6 max-w-screen-2xl mx-auto">
         <div><h1 className="text-2xl font-bold text-gray-900">Pengaturan</h1><p className="mt-1 text-sm text-gray-500">Kelola profil bisnis dan preferensi</p></div>
 
         <form onSubmit={handleSubmit((d) => updateMut.mutate({ ...d, operatingHours: hours }))} className="space-y-6">

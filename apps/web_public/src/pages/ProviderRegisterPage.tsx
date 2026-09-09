@@ -77,7 +77,7 @@ export default function ProviderRegisterPage() {
       <div className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1 bg-gray-50">
-          <div className="mx-auto max-w-xl px-4 py-12 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 py-12 sm:px-6 lg:px-8">
             <div className="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-100 text-center space-y-4">
               <h1 className="text-2xl font-bold text-gray-900">Daftar sebagai Provider</h1>
               <p className="text-sm text-gray-500">Anda perlu login terlebih dahulu untuk mendaftar sebagai provider.</p>
@@ -99,7 +99,7 @@ export default function ProviderRegisterPage() {
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex-1 bg-gray-50">
-        <div className="mx-auto max-w-xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 py-12 sm:px-6 lg:px-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900">Daftar sebagai Provider</h1>
             <p className="mt-2 text-sm text-gray-500">

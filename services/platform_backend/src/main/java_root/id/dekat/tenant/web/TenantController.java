@@ -8,6 +8,8 @@ import id.dekat.tenant.web.dto.LocationRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
@@ -23,8 +25,14 @@ public class TenantController {
     }
 
     @PostMapping("/tenant")
-    public ResponseEntity<Tenant> createTenant(@Valid @RequestBody CreateTenantRequest request) {
-        Tenant tenant = tenantService.createTenant(request);
+    public ResponseEntity<Tenant> createTenant(
+            @AuthenticationPrincipal Jwt jwt,
+            @Valid @RequestBody CreateTenantRequest request) {
+        UUID userId = null;
+        if (jwt != null) {
+            try { userId = UUID.fromString(jwt.getSubject()); } catch (Exception ignored) {}
+        }
+        Tenant tenant = tenantService.createTenant(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(tenant);
     }
 
@@ -92,11 +100,5 @@ public class TenantController {
     public ResponseEntity<List<Location>> getLocations(@PathVariable UUID tenantId) {
         List<Location> locations = tenantService.getLocationsByTenantId(tenantId);
         return ResponseEntity.ok(locations);
-    }
-
-    @PutMapping("/locations/{id}")
-    public ResponseEntity<Location> updateLocation(@PathVariable UUID id, @Valid @RequestBody LocationRequest request) {
-        Location location = tenantService.updateLocation(id, request);
-        return ResponseEntity.ok(location);
     }
 }

@@ -14,6 +14,7 @@ const sidebarItems = [
   { label: 'Subscriptions', href: '/admin/subscriptions' },
   { label: 'Feature Flags', href: '/admin/feature-flags' },
   { label: 'Roles & Permissions', href: '/admin/roles' },
+  { label: 'Chat', href: '/admin/chats' },
   { label: 'FAQ & Kebijakan', href: '/admin/faqs' },
 ];
 

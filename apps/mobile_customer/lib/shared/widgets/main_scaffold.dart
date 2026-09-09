@@ -18,7 +18,7 @@ class MainScaffold extends ConsumerWidget {
   final Widget child;
   const MainScaffold({super.key, required this.child});
 
-  static const _tabs = ['/discovery', '/search', '/bookings', '/notifications', '/account'];
+  static const _tabs = ['/discovery', '/search', '/chat', '/bookings', '/notifications', '/account'];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -33,7 +33,7 @@ class MainScaffold extends ConsumerWidget {
         onDestinationSelected: (index) {
           ref.read(currentIndexProvider.notifier).state = index;
           final tab = _tabs[index];
-          final isProtected = tab == '/bookings' || tab == '/notifications' || tab == '/account';
+          final isProtected = tab == '/bookings' || tab == '/notifications' || tab == '/account' || tab == '/chat';
           if (isProtected && !isLoggedIn) {
             context.push('/login');
           } else {
@@ -43,6 +43,7 @@ class MainScaffold extends ConsumerWidget {
         destinations: [
           const NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: 'Discover'),
           const NavigationDestination(icon: Icon(Icons.search_outlined), selectedIcon: Icon(Icons.search), label: 'Search'),
+          const NavigationDestination(icon: Icon(Icons.chat_bubble_outline), selectedIcon: Icon(Icons.chat_bubble), label: 'Chat'),
           const NavigationDestination(icon: Icon(Icons.calendar_today_outlined), selectedIcon: Icon(Icons.calendar_today), label: 'Bookings'),
           NavigationDestination(
             icon: notificationCount > 0

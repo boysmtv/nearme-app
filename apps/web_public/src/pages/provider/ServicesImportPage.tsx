@@ -68,7 +68,7 @@ export default function ServicesImportPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-screen-2xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Import Layanan (CSV)</h1>
 
       <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-6">

@@ -16,7 +16,7 @@ export default function AdminRolesPage() {
     queryFn: () => api.get('/admin/users'),
   });
 
-  const users = usersRes?.data ?? [];
+  const users = usersRes?.data?.data ?? [];
 
   const roleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>
@@ -30,7 +30,7 @@ export default function AdminRolesPage() {
   }));
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
+    <div className="max-w-screen-2xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Manajemen Role</h1>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -260,7 +260,7 @@ export default function ProviderPage() {
       <div className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1 bg-gray-50">
-          <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
             <div className="animate-pulse space-y-6">
               <div className="h-64 rounded-xl bg-gray-200" />
               <div className="h-8 w-1/3 rounded bg-gray-200" />
@@ -278,7 +278,7 @@ export default function ProviderPage() {
       <div className="flex min-h-screen flex-col">
         <Header />
         <main className="flex-1 bg-gray-50">
-          <div className="mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 py-16 text-center sm:px-6 lg:px-8">
             <h2 className="text-xl font-semibold text-gray-900">Provider tidak ditemukan</h2>
             <Link to="/search" className="mt-4 inline-block text-primary-600 hover:underline">
               Kembali ke pencarian
@@ -306,7 +306,7 @@ export default function ProviderPage() {
           )}
         </div>
 
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
           {/* Profile Header */}
           <div className="relative -mt-16 flex flex-col gap-6 sm:flex-row sm:items-end">
             <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-2xl border-4 border-white bg-white shadow-lg sm:h-32 sm:w-32">

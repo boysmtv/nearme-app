@@ -292,7 +292,7 @@ export default function BookingPage() {
       <Header />
 
       <main className="flex-1 bg-gray-50">
-        <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 py-8 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <nav className="mb-6 text-sm text-gray-500">
             <Link to="/search" className="hover:text-primary-600">Cari Layanan</Link>

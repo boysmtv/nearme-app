@@ -49,6 +49,7 @@ const SmartSchedulingPage = lazy(() => import('./pages/provider/SmartSchedulingP
 const AnalyticsDeepPage = lazy(() => import('./pages/provider/AnalyticsDeepPage'));
 const NotificationPreferencesPage = lazy(() => import('./pages/customer/NotificationPreferencesPage'));
 const SocialFeedPage = lazy(() => import('./pages/customer/SocialFeedPage'));
+const CustomerDashboardPage = lazy(() => import('./pages/customer/CustomerDashboardPage'));
 const WaitlistPage = lazy(() => import('./pages/provider/WaitlistPage'));
 const CommissionPage = lazy(() => import('./pages/provider/CommissionPage'));
 const SettlementPage = lazy(() => import('./pages/provider/SettlementPage'));
@@ -66,6 +67,7 @@ const AdminSubscriptionsPage = lazy(() => import('./pages/admin/SubscriptionsPag
 const AdminFeatureFlagsPage = lazy(() => import('./pages/admin/FeatureFlagsPage'));
 const AdminFaqsPage = lazy(() => import('./pages/admin/FaqsPage'));
 const AdminRolesPage = lazy(() => import('./pages/admin/RolesPage'));
+const AdminChatPage = lazy(() => import('./pages/admin/ChatPage'));
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   state = { hasError: false, error: null };
@@ -116,6 +118,14 @@ function ProfileCompleteGuard({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function CustomerDashboardOrHome() {
+  const { isAuthenticated, user } = useAuth();
+  if (isAuthenticated && user?.role === 'ROLE_CUSTOMER') {
+    return <CustomerDashboardPage />;
+  }
+  return <HomePage />;
+}
+
 function RequireProfileGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth();
   if (isAuthenticated && user && !user.hasProfile && user.role === 'ROLE_CUSTOMER') {
@@ -129,7 +139,7 @@ export function App() {
     <ErrorBoundary>
     <Suspense fallback={<LoadingFallback />}>
       <Routes>
-        <Route path="/" element={<RequireProfileGuard><HomePage /></RequireProfileGuard>} />
+        <Route path="/" element={<RequireProfileGuard><CustomerDashboardOrHome /></RequireProfileGuard>} />
         <Route path="/search" element={<RequireProfileGuard><SearchPage /></RequireProfileGuard>} />
         <Route path="/provider/:slug" element={<RequireProfileGuard><ProviderPage /></RequireProfileGuard>} />
         <Route path="/booking/:providerId" element={<RequireProfileGuard><BookingPage /></RequireProfileGuard>} />
@@ -197,6 +207,7 @@ export function App() {
         <Route path="/admin/feature-flags" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminFeatureFlagsPage /></ProtectedRoute>} />
         <Route path="/admin/faqs" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminFaqsPage /></ProtectedRoute>} />
         <Route path="/admin/roles" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminRolesPage /></ProtectedRoute>} />
+        <Route path="/admin/chats" element={<ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><AdminChatPage /></ProtectedRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

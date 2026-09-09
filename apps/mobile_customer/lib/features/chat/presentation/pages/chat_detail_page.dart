@@ -66,8 +66,8 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
     if (file == null) return;
     setState(() => _sending = true);
     try {
-      // reuse media upload via ApiService: POST /media/upload ownerType provider
-      final uploadRes = await ApiService().uploadMedia(file.path, 'provider', widget.chatId);
+      // reuse media upload via ApiService: POST /media/upload ownerType customer
+      final uploadRes = await ApiService().uploadMedia(file.path, 'customer', widget.chatId);
       final url = (uploadRes.data['data']['url'] ?? uploadRes.data['url']) as String?;
       final body = _controller.text.trim().isEmpty ? '📎 Lampiran' : _controller.text.trim();
       await ApiService().sendChatMessage(widget.chatId, {'body': body, 'messageType': 'IMAGE', 'attachmentUrl': url});

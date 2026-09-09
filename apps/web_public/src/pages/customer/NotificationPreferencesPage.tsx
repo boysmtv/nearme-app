@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { publicApi } from '../../lib/api';
+import { api } from '../../lib/api';
 
 interface NotificationPreference {
   type: string;
@@ -26,14 +26,14 @@ export default function NotificationPreferencesPage() {
   const qc = useQueryClient();
   const [prefs, setPrefs] = useState<NotificationPreference[]>(DEFAULT_PREFS);
 
-  const { data, isLoading } = useQuery({
+  const { isLoading } = useQuery({
     queryKey: ['notification-preferences'],
-    queryFn: () => publicApi.get('/notifications/preferences'),
+    queryFn: () => api.get('/notifications/preferences'),
   });
 
   const saveMutation = useMutation({
     mutationFn: (preferences: NotificationPreference[]) =>
-      publicApi.put('/notifications/preferences', { preferences }),
+      api.put('/notifications/preferences', { preferences }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['notification-preferences'] }),
   });
 
@@ -46,7 +46,7 @@ export default function NotificationPreferencesPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-screen-2xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold text-gray-900">Preferensi Notifikasi</h1>
       <p className="text-gray-500">Atur notifikasi mana yang ingin Anda terima</p>
 

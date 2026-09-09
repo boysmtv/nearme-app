@@ -31,6 +31,9 @@ public class Tenant {
     @Column(name = "email")
     private String email;
 
+    @Column(name = "owner_id")
+    private UUID ownerId;
+
     @Column(name = "logo_url")
     private String logoUrl;
 
@@ -100,6 +103,9 @@ public class Tenant {
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
 
+    public UUID getOwnerId() { return ownerId; }
+    public void setOwnerId(UUID ownerId) { this.ownerId = ownerId; }
+
     public String getLogoUrl() { return logoUrl; }
     public void setLogoUrl(String logoUrl) { this.logoUrl = logoUrl; }
 
@@ -151,6 +157,7 @@ public class Tenant {
         public Builder taxId(String taxId) { tenant.taxId = taxId; return this; }
         public Builder phone(String phone) { tenant.phone = phone; return this; }
         public Builder email(String email) { tenant.email = email; return this; }
+        public Builder ownerId(UUID ownerId) { tenant.ownerId = ownerId; return this; }
         public Builder logoUrl(String logoUrl) { tenant.logoUrl = logoUrl; return this; }
         public Builder verificationStatus(String verificationStatus) { tenant.verificationStatus = verificationStatus; return this; }
         public Builder verifiedAt(LocalDateTime verifiedAt) { tenant.verifiedAt = verifiedAt; return this; }

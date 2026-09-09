@@ -179,16 +179,19 @@ export interface Policy {
 }
 
 export interface SearchFilters {
-  query: string;
-  category: string;
-  location: string;
-  minPrice: number;
-  maxPrice: number;
-  minRating: number;
-  date: string;
-  sort: string;
-  page: number;
-  limit: number;
+  query?: string;
+  category?: string;
+  location?: string;
+  lat?: number;
+  lng?: number;
+  radius?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  minRating?: number;
+  date?: string;
+  sort?: string;
+  page?: number;
+  limit?: number;
 }
 
 export interface SearchResult {

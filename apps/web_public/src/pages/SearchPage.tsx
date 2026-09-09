@@ -82,7 +82,7 @@ export default function SearchPage() {
       <main className="flex-1 bg-gray-50">
         {/* Search Bar */}
         <div className="border-b border-gray-200 bg-white">
-          <div className="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 py-4 sm:px-6 lg:px-8">
             <form onSubmit={handleSearch} className="flex gap-3">
               <div className="relative flex-1">
                 <svg
@@ -211,7 +211,7 @@ export default function SearchPage() {
         </div>
 
         {/* Results */}
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-500">

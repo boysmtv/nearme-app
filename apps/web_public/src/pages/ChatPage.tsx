@@ -1,12 +1,15 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { chatApi } from '../lib/api';
 import useChatWebSocket from '../hooks/useChatWebSocket';
 import Header from '../components/Header';
 
 export default function ChatPage() {
   const { id: routeId } = useParams<{ id: string }>();
+  const [searchParams] = useSearchParams();
+  const providerId = searchParams.get('providerId');
+  const tenantId = searchParams.get('tenantId');
   const [selectedId, setSelectedId] = useState<string | null>(routeId ?? null);
   const qc = useQueryClient();
 
@@ -32,8 +35,11 @@ export default function ChatPage() {
   };
 
   const createMut = useMutation({
-    mutationFn: (data: { subject?: string; bookingId?: string }) => chatApi.create(data),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['chats'] }),
+    mutationFn: (data: { subject?: string; bookingId?: string; providerId?: string; tenantId?: string }) => chatApi.create(data),
+    onSuccess: (res: any) => {
+      qc.invalidateQueries({ queryKey: ['chats'] });
+      if (res?.data?.id) setSelectedId(res.data.id);
+    },
   });
 
   const handleSend = async () => {
@@ -46,12 +52,12 @@ export default function ChatPage() {
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">
       <Header />
-      <div className="mx-auto flex w-full max-w-6xl flex-1 gap-4 p-4">
+      <div className="mx-auto flex w-full max-w-screen-2xl flex-1 gap-4 p-4">
         <div className="w-80 rounded-xl bg-white p-4 shadow-sm ring-1 ring-gray-100">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-semibold text-gray-900">Pesan</h2>
             <button
-              onClick={() => createMut.mutate({ subject: 'Pertanyaan umum' })}
+              onClick={() => createMut.mutate({ subject: 'Pertanyaan umum', providerId: providerId || undefined, tenantId: tenantId || undefined })}
               className="rounded-full bg-primary-600 px-3 py-1 text-xs font-semibold text-white hover:bg-primary-700"
             >
               + Baru
@@ -88,7 +94,7 @@ export default function ChatPage() {
             <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
               <p className="text-sm text-gray-500">Pilih percakapan atau buat baru</p>
               <button
-                onClick={() => createMut.mutate({ subject: 'Halo, ada yang bisa dibantu?' })}
+                onClick={() => createMut.mutate({ subject: 'Halo, ada yang bisa dibantu?', providerId: providerId || undefined, tenantId: tenantId || undefined })}
                 className="mt-3 rounded-lg bg-primary-600 px-4 py-2 text-sm font-semibold text-white hover:bg-primary-700"
               >
                 Buat Percakapan

@@ -34,8 +34,8 @@ export default function HomePage() {
         {/* Hero */}
         <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800">
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iLjA1Ij48cGF0aCBkPSJNMzYgMzRoLTJ2LTRoMnYtMmgtNnY2aDJ2Mmgydi0yaDJ2LTJoLTJ2LTJoMnYtMmgtMnYtMmgyVjhoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2MmgyVjhoLTJ2MmgydjJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2Mmg0VjhoLTIuMXYySDEzdjJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTJ2Mmg0djJoLTIuMXY0Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-30" />
-          <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
-            <div className="max-w-2xl">
+          <div className="relative mx-auto max-w-screen-2xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+            <div className="max-w-3xl">
               <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl lg:text-6xl">
                 Lihat harga. Pilih jadwal. Langsung booking.
               </h1>
@@ -75,7 +75,7 @@ export default function HomePage() {
 
         {/* Seasonal Promo Banner */}
         <section className="bg-gradient-to-r from-yellow-500 to-orange-500 py-4">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center gap-3 text-white">
               <span className="text-2xl">🎉</span>
               <p className="font-semibold text-sm sm:text-base">
@@ -90,7 +90,7 @@ export default function HomePage() {
 
         {/* Categories */}
         <section className="bg-white py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-gray-900">Kategori Populer</h2>
               <p className="mt-2 text-gray-500">Temukan layanan sesuai kebutuhan Anda</p>
@@ -146,7 +146,7 @@ export default function HomePage() {
 
         {/* Featured Providers */}
         <section className="bg-gray-50 py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-bold text-gray-900">Provider Unggulan</h2>
@@ -203,7 +203,7 @@ export default function HomePage() {
 
         {/* Most Booked This Week */}
         <section className="bg-white py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-3xl font-bold text-gray-900">Paling Laris Minggu Ini</h2>
@@ -247,7 +247,7 @@ export default function HomePage() {
 
         {/* How it Works */}
         <section className="bg-white py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-gray-900">Cara Kerja</h2>
               <p className="mt-2 text-gray-500">Booking dalam 4 langkah mudah</p>
@@ -334,7 +334,7 @@ export default function HomePage() {
 
         {/* CTA */}
         <section className="bg-primary-700 py-16">
-          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-screen-2xl px-4 text-center sm:px-6 lg:px-8">
             <h2 className="text-3xl font-bold text-white">Punya Usaha Jasa?</h2>
             <p className="mt-3 text-lg text-primary-100">
               Bergabung dengan DEKAT dan dapatkan booking 24/7. Kurangi no-show dengan deposit otomatis.

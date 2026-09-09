@@ -22,7 +22,7 @@ export default function AboutPage() {
     <div className="flex min-h-screen flex-col">
       <Header />
       <main className="flex-1 bg-gray-50">
-        <div className="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-2xl px-4 py-12 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold text-gray-900">Tentang DEKAT</h1>
           <p className="mt-4 text-gray-600 leading-relaxed">
             DEKAT adalah platform booking layanan lokal (barbershop, salon, kecantikan) dengan model provider-first hybrid (SaaS + marketplace).

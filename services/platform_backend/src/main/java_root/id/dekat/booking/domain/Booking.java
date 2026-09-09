@@ -124,10 +124,10 @@ public class Booking {
     @Column(name = "cancelled_at")
     private OffsetDateTime cancelledAt;
 
-    @OneToMany(mappedBy = "bookingId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bookingId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<BookingItem> items = new ArrayList<>();
 
-    @OneToMany(mappedBy = "bookingId", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "bookingId", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<BookingAssignment> assignments = new ArrayList<>();
 
     protected Booking() {}

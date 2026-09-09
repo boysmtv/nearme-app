@@ -17,7 +17,9 @@ export default function Header() {
     enabled: isAuthenticated,
   });
 
-  const unreadCount = (notifData?.data ?? []).filter((n: any) => !n.read).length;
+  const notifRaw = notifData?.data;
+  const notifList = Array.isArray(notifRaw) ? notifRaw : (notifRaw as any)?.data ?? [];
+  const unreadCount = notifList.filter((n: any) => !n.read).length;
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +34,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto flex h-16 max-w-screen-2xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link to="/" className="flex items-center gap-2">
           <span className="text-2xl font-bold text-primary-600">DEKAT</span>
           <span className="hidden text-xs text-gray-500 sm:inline">Booking Platform</span>
@@ -63,31 +65,32 @@ export default function Header() {
           </div>
         </form>
 
-        <nav className="flex items-center gap-3">
+        <nav className="flex items-center gap-1 sm:gap-3">
           <Link
             to="/search"
-            className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block"
+            className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 lg:inline-block"
           >
             Cari Layanan
           </Link>
           <Link
             to="/nearby"
-            className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block"
+            className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 lg:inline-block"
           >
             Terdekat
           </Link>
           {isAuthenticated && (
-            <Link to="/feed" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block">
+            <Link to="/feed" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 lg:inline-block">
               Feed
             </Link>
           )}
           {isAuthenticated && (
-            <Link to="/chats" className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block">
-              Chat
+            <Link to="/chats" className="rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600">
+              <svg className="h-5 w-5 sm:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+              <span className="hidden sm:inline">Chat</span>
             </Link>
           )}
           {isAuthenticated && (
-            <Link to="/notifications" className="relative hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block">
+            <Link to="/notifications" className="relative rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
               </svg>
@@ -105,7 +108,7 @@ export default function Header() {
               {user.role.startsWith('ROLE_PROVIDER') && (
                 <Link
                   to="/provider/dashboard"
-                  className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block"
+                  className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 xl:inline-block"
                 >
                   Dashboard Provider
                 </Link>
@@ -113,12 +116,12 @@ export default function Header() {
               {user.role === 'ROLE_CUSTOMER' && (
                 <Link
                   to="/account"
-                  className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 sm:inline-block"
+                  className="hidden rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-100 hover:text-primary-600 xl:inline-block"
                 >
                   Akun Saya
                 </Link>
               )}
-              <span className="hidden text-sm text-gray-700 sm:inline">{user.email}</span>
+              <span className="hidden text-sm text-gray-700 xl:inline">{user.email}</span>
               <button
                 onClick={handleLogout}
                 className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50"
@@ -145,7 +148,7 @@ export default function Header() {
         </nav>
       </div>
 
-      <div className="mx-auto block max-w-md px-4 pb-3 md:hidden">
+      <div className="block max-w-md px-4 pb-3 md:hidden">
         <form onSubmit={handleSearch}>
           <div className="relative">
             <svg

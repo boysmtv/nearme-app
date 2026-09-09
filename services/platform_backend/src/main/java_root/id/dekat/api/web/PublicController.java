@@ -437,6 +437,8 @@ public class PublicController {
         booking.setSource("WEB");
         booking.setSubtotal(price);
         booking.setTotal(price);
+        String pin = String.format("%06d", new java.util.Random().nextInt(999999));
+        booking.setConfirmationPin(pin);
         Booking saved = bookingRepository.save(booking);
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("id", saved.getId().toString());

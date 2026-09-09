@@ -3,6 +3,9 @@ package id.dekat.tenant.application;
 import id.dekat.tenant.domain.*;
 import id.dekat.tenant.web.dto.CreateTenantRequest;
 import id.dekat.tenant.web.dto.LocationRequest;
+import id.dekat.access.application.AuthorizationService;
+import id.dekat.access.domain.RoleRepository;
+import id.dekat.access.domain.RoleAssignmentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,10 +23,15 @@ public class TenantService {
 
     private final TenantRepository tenantRepository;
     private final LocationRepository locationRepository;
+    private final AuthorizationService authorizationService;
+    private final RoleRepository roleRepository;
+    private final RoleAssignmentRepository roleAssignmentRepository;
 
     @Transactional
-    public Tenant createTenant(CreateTenantRequest request) {
-        String slug = generateUniqueSlug(request.getName());
+    public Tenant createTenant(CreateTenantRequest request, UUID ownerId) {
+        String slug = (request.getSlug() != null && !request.getSlug().isBlank())
+                ? normalizeSlug(request.getSlug())
+                : generateUniqueSlug(request.getName());
 
         Tenant tenant = Tenant.builder()
                 .name(request.getName())
@@ -32,11 +40,27 @@ public class TenantService {
                 .taxId(request.getTaxId())
                 .phone(request.getPhone())
                 .email(request.getEmail())
+                .ownerId(ownerId)
                 .status(TenantStatus.ACTIVE)
                 .verificationStatus("UNVERIFIED")
                 .build();
 
-        return tenantRepository.save(tenant);
+        Tenant saved = tenantRepository.save(tenant);
+
+        // Assign ROLE_PROVIDER_OWNER to the creating user
+        if (ownerId != null) {
+            try {
+                roleRepository.findByName("ROLE_PROVIDER_OWNER").ifPresent(role -> {
+                    if (!roleAssignmentRepository.existsByUserIdAndRoleIdAndTenantId(ownerId, role.getId(), saved.getId())) {
+                        authorizationService.assignRole(ownerId, role.getId(), saved.getId(), null, ownerId);
+                    }
+                });
+            } catch (Exception e) {
+                // Log but don't fail tenant creation if role assignment fails
+            }
+        }
+
+        return saved;
     }
 
     @Transactional
@@ -236,6 +260,17 @@ public class TenantService {
         }
 
         return baseSlug;
+    }
+
+    private String normalizeSlug(String slug) {
+        String normalized = slug.toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9-]", "-")
+                .replaceAll("-+", "-")
+                .replaceAll("^-|-$", "");
+        if (tenantRepository.existsBySlug(normalized)) {
+            return generateUniqueSlug(normalized);
+        }
+        return normalized;
     }
 
     private void validateTenantForSubmission(Tenant tenant) {

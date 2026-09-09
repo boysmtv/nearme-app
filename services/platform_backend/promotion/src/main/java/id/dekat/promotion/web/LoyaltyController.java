@@ -5,6 +5,7 @@ import id.dekat.promotion.domain.LoyaltyEntry;
 import id.dekat.promotion.web.dto.LoyaltyEarnRequest;
 import id.dekat.sharedkernel.web.ApiResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +15,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@RestController
+@RestController("promotionLoyaltyController")
 @RequestMapping("/provider/loyalty")
 @RequiredArgsConstructor
 public class LoyaltyController {
 
+    @Qualifier("promotionLoyaltyService")
     private final LoyaltyService loyaltyService;
 
     @GetMapping("/{customerId}")
