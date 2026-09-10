@@ -1,31 +1,62 @@
 package id.dekat.subscription.web;
 
 import id.dekat.sharedkernel.web.ApiResponse;
+import id.dekat.subscription.application.SubscriptionService;
+import id.dekat.subscription.domain.Plan;
+import id.dekat.subscription.domain.PlanRepository;
+import id.dekat.subscription.domain.Subscription;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/provider/subscription")
+@RequiredArgsConstructor
 public class ProviderSubscriptionController {
 
-    // In-memory store (production would use DB)
-    private static final Map<UUID, Map<String, Object>> subscriptions = new HashMap<>();
+    private final SubscriptionService subscriptionService;
+    private final PlanRepository planRepository;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getCurrentPlan(
             @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantId) {
-        Map<String, Object> sub = subscriptions.getOrDefault(tenantId, Map.of(
-                "planId", "FREE",
-                "planName", "Free",
-                "status", "ACTIVE",
-                "startDate", OffsetDateTime.now().toString(),
-                "price", 0
-        ));
-        return ResponseEntity.ok(ApiResponse.ok(sub));
+        Subscription sub = subscriptionService.getActiveSubscription(tenantId);
+        if (sub == null) {
+            Plan freePlan = planRepository.findBySlug("free").orElse(null);
+            return ResponseEntity.ok(ApiResponse.ok(Map.of(
+                    "planId", "FREE",
+                    "planName", "Free",
+                    "status", "ACTIVE",
+                    "price", 0,
+                    "maxStaff", freePlan != null ? freePlan.getMaxStaff() : 1,
+                    "maxBookingsPerMonth", freePlan != null ? freePlan.getMaxBookingsPerMonth() : 100
+            )));
+        }
+        Plan plan = planRepository.findById(sub.getPlanId()).orElse(null);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of(
+                "id", sub.getId().toString(),
+                "planId", sub.getPlanId().toString(),
+                "planName", plan != null ? plan.getName() : "Unknown",
+                "status", sub.getStatus().name(),
+                "startDate", sub.getCurrentPeriodStart().toString(),
+                "endDate", sub.getCurrentPeriodEnd().toString(),
+                "price", plan != null ? plan.getPriceAmount() : 0,
+                "maxStaff", plan != null ? plan.getMaxStaff() : 1,
+                "maxBookingsPerMonth", plan != null ? plan.getMaxBookingsPerMonth() : 100
+        )));
+    }
+
+    @GetMapping("/plans")
+    public ResponseEntity<ApiResponse<List<Plan>>> listPlans() {
+        List<Plan> plans = planRepository.findAll().stream()
+                .filter(p -> p.getStatus() == Plan.PlanStatus.ACTIVE)
+                .toList();
+        return ResponseEntity.ok(ApiResponse.ok(plans));
     }
 
     @PostMapping("/upgrade")
@@ -33,34 +64,30 @@ public class ProviderSubscriptionController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> upgradePlan(
             @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantId,
             @RequestBody Map<String, Object> body) {
-        String planId = (String) body.getOrDefault("planId", "PRO");
-        int price = switch (planId) {
-            case "PRO" -> 199000;
-            case "ENTERPRISE" -> 499000;
-            default -> 0;
-        };
-
-        Map<String, Object> sub = new LinkedHashMap<>();
-        sub.put("planId", planId);
-        sub.put("planName", planId);
-        sub.put("status", "PENDING_PAYMENT");
-        sub.put("startDate", OffsetDateTime.now().toString());
-        sub.put("price", price);
-        sub.put("paymentUrl", "/payment/subscription/" + tenantId);
-
-        subscriptions.put(tenantId, sub);
-        return ResponseEntity.ok(ApiResponse.ok(sub));
+        UUID planId = UUID.fromString((String) body.get("planId"));
+        Subscription sub = subscriptionService.getActiveSubscription(tenantId);
+        if (sub != null) {
+            sub = subscriptionService.changePlan(tenantId, planId);
+        } else {
+            sub = subscriptionService.createSubscription(tenantId, planId);
+        }
+        Plan plan = planRepository.findById(planId).orElse(null);
+        return ResponseEntity.ok(ApiResponse.ok(Map.of(
+                "id", sub.getId().toString(),
+                "planId", sub.getPlanId().toString(),
+                "planName", plan != null ? plan.getName() : "Unknown",
+                "status", sub.getStatus().name(),
+                "startDate", sub.getCurrentPeriodStart().toString(),
+                "endDate", sub.getCurrentPeriodEnd().toString(),
+                "price", plan != null ? plan.getPriceAmount() : 0
+        )));
     }
 
     @PostMapping("/cancel")
     @Transactional
     public ResponseEntity<ApiResponse<Map<String, Object>>> cancelSubscription(
             @RequestHeader(value = "X-Tenant-Id", required = false) UUID tenantId) {
-        Map<String, Object> sub = subscriptions.get(tenantId);
-        if (sub != null) {
-            sub.put("status", "CANCELLED");
-            sub.put("cancelledAt", OffsetDateTime.now().toString());
-        }
+        subscriptionService.cancelSubscription(tenantId);
         return ResponseEntity.ok(ApiResponse.ok(Map.of("success", true)));
     }
 }

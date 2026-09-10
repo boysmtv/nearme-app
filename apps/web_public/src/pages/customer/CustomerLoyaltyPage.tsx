@@ -1,5 +1,5 @@
-import { useQuery } from '@tanstack/react-query';
-import { publicApi } from '../../lib/api';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { publicApi, api } from '../../lib/api';
 import CustomerLayout from '../../components/CustomerLayout';
 
 const TIERS = [
@@ -75,9 +75,15 @@ function getNextTier(points: number): typeof TIERS[number] | null {
 }
 
 export default function CustomerLoyaltyPage() {
+  const qc = useQueryClient();
   const { data: profileRes, isLoading } = useQuery({
     queryKey: ['customer-profile'],
     queryFn: () => publicApi.customer.getProfile(),
+  });
+
+  const { data: loyaltyRes } = useQuery({
+    queryKey: ['customer-loyalty'],
+    queryFn: () => api.get('/customer/loyalty'),
   });
 
   const profile = profileRes?.data;
@@ -88,19 +94,23 @@ export default function CustomerLoyaltyPage() {
   const pointsToNext = nextTier ? nextTier.min - points : 0;
   const progress = nextTier ? (points / nextTier.min) * 100 : 100;
 
-  const mockHistory = [
-    { date: '2026-09-08', desc: 'Booking Potong Rambut - Barbershop Central', pts: 35, type: 'earn' as const },
-    { date: '2026-09-05', desc: 'Ulasan layanan Color Treatment', pts: 5, type: 'earn' as const },
-    { date: '2026-09-01', desc: 'Referral - Andi bergabung', pts: 50, type: 'earn' as const },
-    { date: '2026-08-28', desc: 'Tukar poin: Diskon Rp25.000', pts: 250, type: 'redeem' as const },
-    { date: '2026-08-25', desc: 'Booking Hair Spa - Salon Cantik', pts: 80, type: 'earn' as const },
-    { date: '2026-08-20', desc: 'Booking Potong Rambut - Barbershop Central', pts: 30, type: 'earn' as const },
-  ];
+  const loyaltyData = (loyaltyRes as any)?.data;
+  const history = loyaltyData?.transactions ?? [];
+
+  const redeemMutation = useMutation({
+    mutationFn: (data: { points: number; description: string }) =>
+      api.post('/customer/loyalty/redeem', data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['customer-loyalty'] });
+      qc.invalidateQueries({ queryKey: ['customer-profile'] });
+    },
+  });
 
   let runningBalance = points;
-  const historyWithBalance = mockHistory.map((h) => {
-    runningBalance = h.type === 'earn' ? runningBalance + h.pts : runningBalance - h.pts;
-    return { ...h, balance: runningBalance };
+  const historyWithBalance = history.map((h: any) => {
+    const pts = h.points || 0;
+    runningBalance = h.type === 'EARN' ? runningBalance + pts : runningBalance - pts;
+    return { ...h, pts, balance: runningBalance };
   }).reverse();
 
   if (isLoading) {
@@ -228,13 +238,13 @@ export default function CustomerLoyaltyPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-50">
-                    {historyWithBalance.map((h, i) => (
+                    {historyWithBalance.map((h: any, i: number) => (
                       <tr key={i} className="hover:bg-gray-50/50 transition-colors">
                         <td className="px-4 py-3 text-gray-500 whitespace-nowrap">{new Date(h.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
-                        <td className="px-4 py-3 text-gray-700">{h.desc}</td>
+                        <td className="px-4 py-3 text-gray-700">{h.description || h.desc || '-'}</td>
                         <td className="px-4 py-3 text-right font-medium whitespace-nowrap">
-                          <span className={h.type === 'earn' ? 'text-green-600' : 'text-red-500'}>
-                            {h.type === 'earn' ? '+' : '-'}{h.pts.toLocaleString('id-ID')}
+                          <span className={h.type === 'EARN' || h.type === 'earn' ? 'text-green-600' : 'text-red-500'}>
+                            {h.type === 'EARN' || h.type === 'earn' ? '+' : '-'}{h.pts.toLocaleString('id-ID')}
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right text-gray-500 font-medium">{h.balance.toLocaleString('id-ID')}</td>
@@ -295,15 +305,16 @@ export default function CustomerLoyaltyPage() {
                       {opt.points.toLocaleString('id-ID')} poin
                     </span>
                   </div>
-                  <button
-                    disabled={!canRedeem}
+                   <button
+                    disabled={!canRedeem || redeemMutation.isPending}
+                    onClick={() => redeemMutation.mutate({ points: opt.points, description: `Tukar ${opt.name}` })}
                     className={`mt-3 w-full text-xs font-medium py-2 rounded-lg transition-colors ${
                       canRedeem
                         ? 'bg-primary-600 text-white hover:bg-primary-700'
                         : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                     }`}
                   >
-                    {canRedeem ? 'Tukarkan' : 'Poin Tidak Cukup'}
+                    {redeemMutation.isPending ? 'Menukar...' : canRedeem ? 'Tukarkan' : 'Poin Tidak Cukup'}
                   </button>
                 </div>
               );

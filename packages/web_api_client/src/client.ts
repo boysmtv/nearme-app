@@ -56,7 +56,7 @@ class ApiClient {
     this.refreshSubscribers.push(cb);
   }
 
-  private async request<T>(endpoint: string, options: RequestOptions = {}, _isRetry = false): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestOptions = {}, _isRetry = false, responseType?: 'json' | 'blob'): Promise<T> {
     const { method = 'GET', headers = {}, body } = options;
 
     const isPublic = endpoint.startsWith('/public/') || endpoint.startsWith('/auth/');
@@ -90,7 +90,7 @@ class ApiClient {
                 method,
                 headers: { ...headers, Authorization: `Bearer ${newToken}` },
                 body,
-              }, true)
+              }, true, responseType)
             );
           });
         });
@@ -104,7 +104,7 @@ class ApiClient {
           method,
           headers: { ...headers, Authorization: `Bearer ${newToken}` },
           body,
-        }, true);
+        }, true, responseType);
       } catch {
         this.clearAuth();
         window.location.href = '/login';
@@ -130,11 +130,15 @@ class ApiClient {
       return text as unknown as T;
     }
 
+    if (responseType === 'blob') {
+      return response.blob() as unknown as Promise<T>;
+    }
+
     return response.json();
   }
 
-  async get<T>(endpoint: string, headers?: Record<string, string>): Promise<T> {
-    return this.request<T>(endpoint, { headers });
+  async get<T>(endpoint: string, headers?: Record<string, string>, responseType?: 'json' | 'blob'): Promise<T> {
+    return this.request<T>(endpoint, { headers }, false, responseType);
   }
 
   async post<T>(endpoint: string, body: unknown, headers?: Record<string, string>): Promise<T> {

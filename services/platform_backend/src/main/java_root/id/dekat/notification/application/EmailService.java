@@ -142,6 +142,17 @@ public class EmailService {
         sendTemplateEmail(to, "review-prompt", "Bagaimana Pengalamanmu di " + providerName + "?", vars);
     }
 
+    @Async
+    public void sendOtpEmail(String to, String code, String purpose) {
+        String subject = purpose.equals("REGISTER") ? "Kode Verifikasi Registrasi" : "Kode Verifikasi Login";
+        Map<String, String> vars = Map.of(
+            "otpCode", code,
+            "purpose", purpose,
+            "expiryMinutes", "5"
+        );
+        sendTemplateEmail(to, "otp", subject, vars);
+    }
+
     private String loadTemplate(String templateId) {
         try {
             ClassPathResource resource = new ClassPathResource("email-templates/" + templateId + ".html");

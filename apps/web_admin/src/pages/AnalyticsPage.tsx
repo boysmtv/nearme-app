@@ -74,7 +74,7 @@ export default function AnalyticsPage() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(v: number) => fmt(v)} />
+                  <Tooltip formatter={(v: any) => fmt(Number(v))} />
                   <Area type="monotone" dataKey="revenue" stroke="#6C63FF" fill="#6C63FF" fillOpacity={0.3} />
                 </AreaChart>
               </ResponsiveContainer>

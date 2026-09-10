@@ -16,7 +16,7 @@ export default function AdminRolesPage() {
     queryFn: () => api.get('/admin/users'),
   });
 
-  const users = usersRes?.data?.data ?? [];
+  const users = (usersRes as any)?.data?.data ?? [];
 
   const roleMutation = useMutation({
     mutationFn: ({ userId, role }: { userId: string; role: string }) =>

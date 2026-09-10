@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'dio_client.dart';
 import '../config/app_config.dart';
@@ -5,6 +7,10 @@ import '../config/app_config.dart';
 class ApiClient {
   static final ApiClient _instance = ApiClient._();
   factory ApiClient() => _instance;
+
+  /// Called by DioClient's auth interceptor when token refresh fails
+  /// and storage is cleared. Apps must set this to force logout + navigate.
+  static VoidCallback? onAuthFailure;
 
   late final Dio _dio;
 

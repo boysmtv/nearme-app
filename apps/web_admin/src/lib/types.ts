@@ -7,10 +7,10 @@ export interface AdminStats {
   totalTenants: number;
   totalBookings: number;
   totalRevenue: number;
-  userGrowth: number;
-  tenantGrowth: number;
-  bookingGrowth: number;
-  revenueGrowth: number;
+  userGrowth: { value: number; isPositive: boolean };
+  tenantGrowth: { value: number; isPositive: boolean };
+  bookingGrowth: { value: number; isPositive: boolean };
+  revenueGrowth: { value: number; isPositive: boolean };
 }
 
 export interface User {

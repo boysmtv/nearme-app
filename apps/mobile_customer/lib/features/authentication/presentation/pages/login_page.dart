@@ -38,6 +38,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         );
         ref.read(authProvider.notifier).clearError();
       }
+      if (next.isLoggedIn && !next.isLoading) {
+        final redirect = GoRouterState.of(context).uri.queryParameters['redirect'];
+        if (redirect != null && redirect.isNotEmpty) {
+          context.go(Uri.decodeComponent(redirect));
+        } else {
+          context.go('/discovery');
+        }
+      }
     });
 
     return Scaffold(

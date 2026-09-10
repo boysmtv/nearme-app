@@ -70,7 +70,7 @@ const AdminRolesPage = lazy(() => import('./pages/admin/RolesPage'));
 const AdminChatPage = lazy(() => import('./pages/admin/ChatPage'));
 
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
-  state = { hasError: false, error: null };
+  state: { hasError: boolean; error: Error | null } = { hasError: false, error: null };
   static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
   render() {
     if (this.state.hasError) {

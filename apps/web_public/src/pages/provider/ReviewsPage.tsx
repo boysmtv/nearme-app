@@ -13,7 +13,7 @@ export default function ReviewsPage() {
     queryFn: () => providerApi.reviews.list(),
   });
 
-  const reviews = res?.data?.data ?? [];
+  const reviews = (res as any)?.data?.data ?? [];
 
   const respondMutation = useMutation({
     mutationFn: ({ reviewId, body }: { reviewId: string; body: string }) =>

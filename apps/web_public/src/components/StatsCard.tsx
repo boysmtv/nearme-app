@@ -1,9 +1,11 @@
+interface ChangeInfo { value: number; isPositive: boolean }
+
 interface StatsCardProps {
   label: string;
   value: string | number;
   icon: string;
   color: 'blue' | 'green' | 'purple' | 'amber' | 'red';
-  change?: { value: number; isPositive: boolean };
+  change?: ChangeInfo;
 }
 
 const colorMap = {
@@ -15,6 +17,7 @@ const colorMap = {
 };
 
 export default function StatsCard({ label, value, icon, color, change }: StatsCardProps) {
+  const resolved = change;
   return (
     <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
       <div className="flex items-center justify-between">
@@ -23,13 +26,13 @@ export default function StatsCard({ label, value, icon, color, change }: StatsCa
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={icon} />
           </svg>
         </div>
-        {change && (
+        {resolved && (
           <span
             className={`flex items-center gap-1 text-xs font-medium ${
-              change.isPositive ? 'text-green-600' : 'text-red-600'
+              resolved.isPositive ? 'text-green-600' : 'text-red-600'
             }`}
           >
-            {change.isPositive ? (
+            {resolved.isPositive ? (
               <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
@@ -38,7 +41,7 @@ export default function StatsCard({ label, value, icon, color, change }: StatsCa
                 <path fillRule="evenodd" d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             )}
-            {Math.abs(change.value)}%
+            {Math.abs(resolved.value)}%
           </span>
         )}
       </div>

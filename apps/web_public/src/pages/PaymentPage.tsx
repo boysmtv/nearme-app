@@ -37,7 +37,6 @@ export default function PaymentPage() {
   const status = paymentRes?.status || 'UNKNOWN';
   const isCompleted = status === 'CAPTURED' || status === 'SETTLEMENT' || status === 'SUCCESS' || status === 'CONFIRMED';
   const isPending = status === 'PENDING' || status === 'PENDING_PAYMENT';
-  const isFailed = status === 'FAILED' || status === 'CANCELLED' || status === 'EXPIRED';
 
   return (
     <div className="flex min-h-screen flex-col">

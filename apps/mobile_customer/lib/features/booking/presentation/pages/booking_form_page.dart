@@ -293,10 +293,15 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
             '&currency=${summary.service.currency}');
       }
     } on DioException catch (e) {
+      final serverMsg = e.response?.data is Map<String, dynamic>
+          ? (e.response?.data['message'] as String? ?? e.response?.data['error'] as String?)
+          : null;
+      final detail = serverMsg ?? e.error?.toString() ?? e.message ?? 'Unknown error';
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Booking failed: ${e.error ?? e.message}'),
+          content: Text('Booking failed: $detail'),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
         ));
       }
     } catch (e) {
@@ -304,6 +309,7 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text('Booking failed: $e'),
           backgroundColor: Colors.red,
+          duration: const Duration(seconds: 4),
         ));
       }
     } finally {

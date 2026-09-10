@@ -45,7 +45,9 @@ class MainScaffold extends StatelessWidget {
       final refreshToken = await SecureStorageService.read(StorageKeys.refreshToken);
       try {
         await apiService.logout(refreshToken: refreshToken);
-      } catch (_) {}
+      } catch (e) {
+        debugPrint('Logout API error: $e');
+      }
       await SecureStorageService.deleteAll();
       if (context.mounted) context.go('/login');
     }
@@ -54,9 +56,28 @@ class MainScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final location = GoRouterState.of(context).matchedLocation;
-    return Scaffold(
-      key: partnerScaffoldKey,
-      drawer: Drawer(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Keluar?'),
+            content: const Text('Apakah anda ingin keluar dari aplikasi?'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Tidak')),
+              TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Ya', style: TextStyle(color: Colors.red))),
+            ],
+          ),
+        );
+        if (confirmed == true && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        key: partnerScaffoldKey,
+        drawer: Drawer(
         child: SafeArea(
           child: Column(
             children: [
@@ -195,6 +216,7 @@ class MainScaffold extends StatelessWidget {
           BottomNavigationBarItem(icon: Icon(Icons.people_outline), activeIcon: Icon(Icons.people), label: 'Staf'),
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart_outlined), activeIcon: Icon(Icons.bar_chart), label: 'Laporan'),
         ],
+      ),
       ),
     );
   }

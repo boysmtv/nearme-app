@@ -83,4 +83,7 @@ public class BookingItem {
     public java.math.BigDecimal lineTotal() {
         return java.math.BigDecimal.valueOf(price);
     }
+
+    public void setStartsAt(java.time.Instant startsAt) { this.startsAt = startsAt; }
+    public void setEndsAt(java.time.Instant endsAt) { this.endsAt = endsAt; }
 }

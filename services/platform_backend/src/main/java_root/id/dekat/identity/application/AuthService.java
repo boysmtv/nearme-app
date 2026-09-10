@@ -5,6 +5,7 @@ import id.dekat.access.domain.RoleAssignmentRepository;
 import id.dekat.access.domain.RoleRepository;
 import id.dekat.identity.domain.*;
 import id.dekat.identity.web.dto.*;
+import id.dekat.notification.application.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -38,6 +39,7 @@ public class AuthService {
     private final StringRedisTemplate redisTemplate;
     private final RoleAssignmentRepository roleAssignmentRepository;
     private final RoleRepository roleRepository;
+    private final EmailService emailService;
 
     private static final String OTP_KEY_PREFIX = "otp:";
     private static final String OTP_ATTEMPT_PREFIX = "otp_attempts:";
@@ -113,8 +115,12 @@ public class AuthService {
         }
         redisTemplate.opsForValue().set(attemptsKey, String.valueOf(attempts + 1), OTP_TTL_MINUTES + 5, TimeUnit.MINUTES);
 
-        // TODO: Send OTP via email/SMS provider
-        log.warn("[OTP] Generated code for {} (purpose={}) — email/SMS provider not configured", request.getEmail(), request.getPurpose());
+        try {
+            emailService.sendOtpEmail(request.getEmail(), code, request.getPurpose().name());
+        } catch (Exception e) {
+            log.warn("[OTP] Failed to send email to {}: {}", request.getEmail(), e.getMessage());
+        }
+        log.info("[OTP] Sent code to {} (purpose={})", request.getEmail(), request.getPurpose());
     }
 
     public TokenResponse verifyOtp(OtpRequest request) {

@@ -87,7 +87,7 @@ export const adminApi = {
   },
 
   export: {
-    users: (format: 'csv' | 'json' = 'csv') => apiClient.get<Blob>(`/admin/export/users?format=${format}`, { responseType: 'blob' }),
-    bookings: (format: 'csv' | 'json' = 'csv') => apiClient.get<Blob>(`/admin/export/bookings?format=${format}`, { responseType: 'blob' }),
+    users: (format: 'csv' | 'json' = 'csv') => apiClient.get<Blob>(`/admin/export/users?format=${format}`, undefined, 'blob'),
+    bookings: (format: 'csv' | 'json' = 'csv') => apiClient.get<Blob>(`/admin/export/bookings?format=${format}`, undefined, 'blob'),
   },
 };

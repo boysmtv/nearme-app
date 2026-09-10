@@ -26,16 +26,35 @@ class MainScaffold extends ConsumerWidget {
     final notificationCount = ref.watch(notificationCountProvider).valueOrNull ?? 0;
     final isLoggedIn = ref.watch(authProvider.select((s) => s.isLoggedIn));
 
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: NavigationBar(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final confirmed = await showDialog<bool>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Keluar?'),
+            content: const Text('Apakah anda ingin keluar dari aplikasi?'),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Tidak')),
+              TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Ya', style: TextStyle(color: Colors.red))),
+            ],
+          ),
+        );
+        if (confirmed == true && context.mounted) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        body: child,
+        bottomNavigationBar: NavigationBar(
         selectedIndex: currentIndex,
         onDestinationSelected: (index) {
           ref.read(currentIndexProvider.notifier).state = index;
           final tab = _tabs[index];
           final isProtected = tab == '/bookings' || tab == '/notifications' || tab == '/account' || tab == '/chat';
           if (isProtected && !isLoggedIn) {
-            context.push('/login');
+            context.go('/login?redirect=${Uri.encodeComponent(tab)}');
           } else {
             context.go(tab);
           }
@@ -56,6 +75,7 @@ class MainScaffold extends ConsumerWidget {
           ),
           const NavigationDestination(icon: Icon(Icons.person_outlined), selectedIcon: Icon(Icons.person), label: 'Account'),
         ],
+      ),
       ),
     );
   }

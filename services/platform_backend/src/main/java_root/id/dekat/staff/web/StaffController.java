@@ -11,7 +11,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -60,6 +62,32 @@ public class StaffController {
             @RequestBody StaffSchedule schedule) {
         StaffSchedule saved = staffService.addSchedule(id, schedule);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(saved));
+    }
+
+    @PostMapping("/{id}/check-in")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> checkIn(@PathVariable UUID id) {
+        Staff staff = staffService.getStaffById(id);
+        if (staff == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Staff not found"));
+        }
+        return ResponseEntity.ok(ApiResponse.ok(Map.of(
+                "staffId", id.toString(),
+                "status", "CHECKED_IN",
+                "checkedInAt", OffsetDateTime.now().toString()
+        )));
+    }
+
+    @PostMapping("/{id}/check-out")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> checkOut(@PathVariable UUID id) {
+        Staff staff = staffService.getStaffById(id);
+        if (staff == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Staff not found"));
+        }
+        return ResponseEntity.ok(ApiResponse.ok(Map.of(
+                "staffId", id.toString(),
+                "status", "CHECKED_OUT",
+                "checkedOutAt", OffsetDateTime.now().toString()
+        )));
     }
 
     private UUID resolveTenant(UUID tenantId) {

@@ -27,6 +27,7 @@ public interface BookingHoldRepository extends JpaRepository<BookingHold, UUID> 
         SELECT h FROM BookingHold h
         WHERE h.tenantId = :tenantId
           AND h.status = 'ACTIVE'
+          AND h.expiresAt > CURRENT_TIMESTAMP
           AND h.startsAt < :endsAt
           AND h.endsAt > :startsAt
     """)

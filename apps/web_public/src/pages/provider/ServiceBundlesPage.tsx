@@ -51,8 +51,8 @@ export default function ServiceBundlesPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['bundles'] }),
   });
 
-  const services = servicesRes?.data ?? [];
-  const bundles = bundlesRes?.data ?? [];
+  const services = (servicesRes as any)?.data ?? [];
+  const bundles = (bundlesRes as any)?.data ?? [];
 
   const resetForm = () => {
     setBundleName('');

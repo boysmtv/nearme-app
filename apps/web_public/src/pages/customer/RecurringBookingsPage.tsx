@@ -189,9 +189,10 @@ export default function RecurringBookingsPage() {
                           r.active ? 'translate-x-5' : 'translate-x-0'
                         }`} />
                       </button>
-                      <button
+                       <button
                         onClick={() => {
-                          /* TODO: navigate to manage page */
+                          // TODO: navigate to manage page - for now toggle active state
+                          toggleMutation.mutate({ id: r.id, active: r.active });
                         }}
                         className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-primary-600 hover:text-primary-700 hover:bg-primary-50 rounded-lg transition-colors"
                       >

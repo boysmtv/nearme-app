@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
@@ -70,7 +71,9 @@ class PartnerAuthNotifier extends StateNotifier<PartnerAuthState> {
     final refreshToken = await SecureStorageService.read(StorageKeys.refreshToken);
     try {
       await _apiService.logout(refreshToken: refreshToken);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Logout API error: $e');
+    }
     await SecureStorageService.deleteAll();
     state = const PartnerAuthState();
   }
@@ -79,6 +82,11 @@ class PartnerAuthNotifier extends StateNotifier<PartnerAuthState> {
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
+  // Force-logout when token refresh fails (401 + refresh expired)
+  ApiClient.onAuthFailure = () {
+    ref.read(partnerAuthProvider.notifier).logout();
+  };
+
   return GoRouter(
     initialLocation: '/calendar',
     debugLogDiagnostics: true,

@@ -34,8 +34,8 @@ export default function DashboardPage() {
   const today = new Date();
   const thirtyDaysAgo = new Date(today);
   thirtyDaysAgo.setDate(today.getDate() - 30);
-  const startDate = thirtyDaysAgo.toISOString().split('T')[0];
-  const endDate = today.toISOString().split('T')[0];
+  const startDate = thirtyDaysAgo.toISOString().split('T')[0]!;
+  const endDate = today.toISOString().split('T')[0]!;
 
   const { data: analyticsRes } = useQuery({
     queryKey: ['dashboard', 'analytics'],
@@ -99,7 +99,7 @@ export default function DashboardPage() {
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" tick={{ fontSize: 11 }} />
                   <YAxis tick={{ fontSize: 11 }} />
-                  <Tooltip formatter={(v: number) => formatPrice(v)} />
+                  <Tooltip formatter={(v: any) => formatPrice(Number(v))} />
                   <Area type="monotone" dataKey="revenue" stroke="#6C63FF" fill="#6C63FF" fillOpacity={0.2} />
                 </AreaChart>
               </ResponsiveContainer>

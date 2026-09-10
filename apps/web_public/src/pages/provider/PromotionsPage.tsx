@@ -5,7 +5,7 @@ import ProviderLayout from '../../components/ProviderLayout';
 
 function LoyaltyTab() {
   const queryClient = useQueryClient();
-  const [search, setSearch] = useState('');
+  const [search] = useState('');
   const [showEarn, setShowEarn] = useState(false);
   const [earnForm, setEarnForm] = useState({ customerId: '', points: 10, description: '' });
   const [historyCustomerId, setHistoryCustomerId] = useState<string | null>(null);

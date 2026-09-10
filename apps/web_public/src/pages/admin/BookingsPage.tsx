@@ -14,7 +14,7 @@ export default function BookingsPage() {
   const [page, setPage] = useState(1);
   const [exporting, setExporting] = useState(false);
   const { data: res, isLoading } = useQuery({ queryKey: ['admin', 'bookings', page, status], queryFn: () => adminApi.bookings.list({ page, limit: 20, status }) });
-  const handleExport = async () => { setExporting(true); try { const response = await adminApi.export.bookings('csv'); downloadBlob(response.data as unknown as Blob, 'bookings.csv'); } catch (e) { console.error('Export failed:', e); } finally { setExporting(false); } };
+  const handleExport = async () => { setExporting(true); try { const response = await adminApi.export.bookings('csv'); downloadBlob(response as unknown as Blob, 'bookings.csv'); } catch (e) { console.error('Export failed:', e); } finally { setExporting(false); } };
 
   const columns = [
     { key: 'code', label: 'Kode', render: (b: AdminBooking) => <span className="font-medium text-primary-600">{b.code}</span> },

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { providerApi } from '../../lib/api';
 import ProviderLayout from '../../components/ProviderLayout';
-import { Link } from 'react-router-dom';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'Semua' },
@@ -60,7 +59,7 @@ export default function ProviderBookingsPage() {
   });
 
   const bookings = data?.data?.data ?? [];
-  const totalPages = data?.data?.totalPages ?? 1;
+  const totalPages = data?.data?.pagination?.totalPages ?? 1;
   const detail = detailData?.data;
 
   return (

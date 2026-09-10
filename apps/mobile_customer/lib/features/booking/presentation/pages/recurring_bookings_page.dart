@@ -80,14 +80,22 @@ class _RecurringBookingsPageState extends ConsumerState<RecurringBookingsPage> {
     try {
       await ApiService().updateRecurringBooking(id, {'isActive': !current});
       ref.invalidate(recurringBookingsFutureProvider);
-    } catch (_) {}
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal update: $e')));
+      }
+    }
   }
 
   Future<void> _delete(String id) async {
     try {
       await ApiService().deleteRecurringBooking(id);
       ref.invalidate(recurringBookingsFutureProvider);
-    } catch (_) {}
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal hapus: $e')));
+      }
+    }
   }
 
   @override

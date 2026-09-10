@@ -299,6 +299,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = GoRouterRefresh(ref);
+
+  // Force-logout when token refresh fails (401 + refresh expired)
+  ApiClient.onAuthFailure = () {
+    ref.read(authProvider.notifier).logout();
+  };
+
   return GoRouter(
     refreshListenable: refresh,
     initialLocation: '/discovery',

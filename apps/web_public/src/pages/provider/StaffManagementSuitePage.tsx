@@ -47,8 +47,8 @@ export default function StaffManagementSuitePage() {
     },
   });
 
-  const staff = staffRes?.data ?? [];
-  const stats = statsRes?.data ?? {};
+  const staff = (staffRes as any)?.data ?? [];
+  const stats = (statsRes as any)?.data ?? {};
 
   return (
     <div className="max-w-screen-2xl mx-auto p-6 space-y-6">

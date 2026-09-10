@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 
@@ -9,10 +10,16 @@ Future<void> initCore() async {
   try {
     await NotificationService.initialize(
       onForegroundMessage: (message) {
-        // Show local notification or in-app banner
+        // Show in-app banner or local notification
+        debugPrint('FCM foreground: ${message.notification?.title}');
       },
       onNotificationOpened: (message) {
-        // Navigate to relevant screen based on payload
+        final data = NotificationService.parsePayload(message);
+        if (data == null) return;
+        final type = data['type'] as String?;
+        final id = data['bookingId'] as String? ?? data['notificationId'] as String?;
+        // Navigation handled by router redirect; data stored for pickup
+        debugPrint('FCM opened: type=$type, id=$id');
       },
       onTokenRegistered: (token) async {
         try {

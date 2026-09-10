@@ -140,6 +140,13 @@ public class BookingService {
         // Temporarily set items for total calculation, then clear before save
         // (items don't have bookingId yet, so cascade persist would insert NULL booking_id)
         if (items != null) {
+            // Fill in null startsAt/endsAt from hold (DB columns are NOT NULL)
+            java.time.Instant holdStarts = hold.getStartsAt().toInstant();
+            java.time.Instant holdEnds = hold.getEndsAt().toInstant();
+            for (id.dekat.booking.domain.BookingItem item : items) {
+                if (item.getStartsAt() == null) item.setStartsAt(holdStarts);
+                if (item.getEndsAt() == null) item.setEndsAt(holdEnds);
+            }
             booking.setItems(new ArrayList<>(items));
         }
         booking.recalculateTotal();

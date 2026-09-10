@@ -1,35 +1,50 @@
 package id.dekat.customer.web;
 
+import id.dekat.customer.domain.*;
 import id.dekat.sharedkernel.web.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/customer/referrals")
+@RequiredArgsConstructor
 public class ReferralController {
 
-    // In-memory store (production would use DB table)
-    private static final Map<UUID, Map<String, Object>> referralStore = new HashMap<>();
-    private static final Map<String, UUID> codeToCustomer = new HashMap<>();
+    private final ReferralRepository referralRepository;
+    private final ReferralRedemptionRepository redemptionRepository;
 
     @GetMapping
     public ResponseEntity<ApiResponse<Map<String, Object>>> getReferralInfo(
             @RequestHeader(value = "X-Customer-Id", required = false) UUID customerId) {
-        Map<String, Object> info = referralStore.get(customerId);
-        if (info == null) {
-            String code = "REF-" + customerId.toString().substring(0, 8).toUpperCase();
-            info = new LinkedHashMap<>();
-            info.put("code", code);
-            info.put("totalReferred", 0);
-            info.put("totalEarnings", 0);
-            info.put("referredFriends", new ArrayList<>());
-            referralStore.put(customerId, info);
-            codeToCustomer.put(code, customerId);
-        }
+        Referral referral = referralRepository.findByReferrerId(customerId)
+                .orElseGet(() -> {
+                    String code = "REF-" + customerId.toString().substring(0, 8).toUpperCase();
+                    Referral newRef = Referral.builder()
+                            .referrerId(customerId)
+                            .code(code)
+                            .build();
+                    return referralRepository.save(newRef);
+                });
+
+        List<ReferralRedemption> redemptions = redemptionRepository.findByReferrerId(customerId);
+        List<Map<String, Object>> friends = redemptions.stream().map(r -> {
+            Map<String, Object> m = new LinkedHashMap<>();
+            m.put("referredId", r.getReferredId().toString());
+            m.put("reward", r.getRewardAmount());
+            m.put("createdAt", r.getCreatedAt().toString());
+            return m;
+        }).collect(Collectors.toList());
+
+        Map<String, Object> info = new LinkedHashMap<>();
+        info.put("code", referral.getCode());
+        info.put("totalReferred", referral.getTotalReferred());
+        info.put("totalEarnings", referral.getTotalEarnings());
+        info.put("referredFriends", friends);
         return ResponseEntity.ok(ApiResponse.ok(info));
     }
 
@@ -37,11 +52,11 @@ public class ReferralController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> validateCode(
             @RequestBody Map<String, Object> body) {
         String code = (String) body.get("code");
-        UUID referrerId = codeToCustomer.get(code);
-        if (referrerId != null) {
+        Optional<Referral> referral = referralRepository.findByCode(code);
+        if (referral.isPresent()) {
             return ResponseEntity.ok(ApiResponse.ok(Map.of(
                     "valid", true,
-                    "referrerId", referrerId.toString()
+                    "referrerId", referral.get().getReferrerId().toString()
             )));
         }
         return ResponseEntity.ok(ApiResponse.ok(Map.of("valid", false)));
@@ -53,32 +68,28 @@ public class ReferralController {
             @RequestHeader(value = "X-Customer-Id", required = false) UUID customerId,
             @RequestBody Map<String, Object> body) {
         String code = (String) body.get("code");
-        UUID referrerId = codeToCustomer.get(code);
-        if (referrerId == null || referrerId.equals(customerId)) {
-            throw new RuntimeException("Invalid referral code");
+        Referral referral = referralRepository.findByCode(code)
+                .orElseThrow(() -> new RuntimeException("Invalid referral code"));
+
+        if (referral.getReferrerId().equals(customerId)) {
+            throw new RuntimeException("Cannot refer yourself");
         }
 
-        Map<String, Object> referrerInfo = referralStore.computeIfAbsent(referrerId, k -> {
-            Map<String, Object> m = new LinkedHashMap<>();
-            m.put("code", code);
-            m.put("totalReferred", 0);
-            m.put("totalEarnings", 0);
-            m.put("referredFriends", new ArrayList<>());
-            return m;
-        });
+        if (redemptionRepository.existsByReferralIdAndReferredId(referral.getId(), customerId)) {
+            throw new RuntimeException("Referral already applied");
+        }
 
-        int currentReferred = (int) referrerInfo.getOrDefault("totalReferred", 0);
-        referrerInfo.put("totalReferred", currentReferred + 1);
-        int currentEarnings = (int) referrerInfo.getOrDefault("totalEarnings", 0);
-        referrerInfo.put("totalEarnings", currentEarnings + 20000);
+        referral.setTotalReferred(referral.getTotalReferred() + 1);
+        referral.setTotalEarnings(referral.getTotalEarnings() + 20000);
+        referralRepository.save(referral);
 
-        List<Map<String, Object>> friends = (List<Map<String, Object>>) referrerInfo.getOrDefault("referredFriends", new ArrayList<>());
-        friends.add(Map.of(
-                "customerId", customerId.toString(),
-                "reward", 20000,
-                "createdAt", OffsetDateTime.now().toString()
-        ));
-        referrerInfo.put("referredFriends", friends);
+        ReferralRedemption redemption = ReferralRedemption.builder()
+                .referralId(referral.getId())
+                .referrerId(referral.getReferrerId())
+                .referredId(customerId)
+                .rewardAmount(20000)
+                .build();
+        redemptionRepository.save(redemption);
 
         return ResponseEntity.ok(ApiResponse.ok(Map.of(
                 "success", true,

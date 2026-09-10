@@ -55,12 +55,7 @@ export default function SmartSchedulingPage() {
     },
   ];
 
-  const peakHours = (insightsRes as any)?.data ?? {
-    hourly: Array.from({ length: 14 }, (_, i) => ({
-      hour: i + 8,
-      count: Math.floor(Math.random() * 20) + 5,
-    })),
-  };
+  const peakHours = (insightsRes as any)?.data ?? { hourly: [] };
 
   const getImpactColor = (impact: string) => {
     switch (impact) {

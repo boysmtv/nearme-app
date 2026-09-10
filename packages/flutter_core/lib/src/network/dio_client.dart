@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../config/app_config.dart';
 import '../services/secure_storage_service.dart';
+import 'api_client.dart';
 
 class DioClient {
   late final Dio _dio;
@@ -75,10 +76,14 @@ class _AuthInterceptor extends Interceptor {
           err.requestOptions.headers['Authorization'] = 'Bearer $token';
           try {
             final response = await Dio().fetch(err.requestOptions);
+            _isRefreshing = false;
+            _pendingToken = null;
             handler.resolve(response);
             return;
           } catch (_) {}
         }
+        _isRefreshing = false;
+        _pendingToken = null;
         handler.next(err);
         return;
       }
@@ -112,9 +117,15 @@ class _AuthInterceptor extends Interceptor {
           await SecureStorageService.deleteAll();
           _isRefreshing = false;
           _pendingToken = null;
+          // Force-logout: notify the app so it can update state and navigate
+          ApiClient.onAuthFailure?.call();
           handler.next(err);
           return;
         }
+      } else {
+        // No refresh token available — force logout
+        await SecureStorageService.deleteAll();
+        ApiClient.onAuthFailure?.call();
       }
       _isRefreshing = false;
       _pendingToken = null;

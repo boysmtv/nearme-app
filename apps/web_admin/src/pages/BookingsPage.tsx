@@ -31,8 +31,8 @@ export default function BookingsPage() {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const response = await adminApi.export.bookings('csv');
-      downloadBlob(response.data as unknown as Blob, 'bookings.csv');
+      const blob = await adminApi.export.bookings('csv');
+      downloadBlob(blob, 'bookings.csv');
     } catch (e) {
       console.error('Export failed:', e);
     } finally {

@@ -36,7 +36,7 @@ export default function ServicesImportPage() {
     reader.onload = (event) => {
       const text = event.target?.result as string;
       const lines = text.split('\n').filter((l) => l.trim());
-      const headers = lines[0].split(',').map((h) => h.trim().toLowerCase());
+      const headers = lines[0]?.split(',').map((h) => h.trim().toLowerCase()) ?? [];
 
       const nameIdx = headers.indexOf('name');
       const descIdx = headers.indexOf('description');
@@ -52,7 +52,7 @@ export default function ServicesImportPage() {
           duration: parseInt(cols[durationIdx] || '60', 10),
           price: parseInt(cols[priceIdx] || '0', 10),
           category: cols[categoryIdx] || '',
-          status: 'pending',
+          status: 'pending' as const,
         };
       }).filter((r) => r.name);
 

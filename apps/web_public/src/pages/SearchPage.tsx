@@ -68,9 +68,9 @@ export default function SearchPage() {
   const activeFilterCount = useMemo(() => {
     let count = 0;
     if (filters.category) count++;
-    if (filters.minPrice > 0) count++;
-    if (filters.maxPrice > 0) count++;
-    if (filters.minRating > 0) count++;
+    if ((filters.minPrice ?? 0) > 0) count++;
+    if ((filters.maxPrice ?? 0) > 0) count++;
+    if ((filters.minRating ?? 0) > 0) count++;
     if (filters.date) count++;
     return count;
   }, [filters]);

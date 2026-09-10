@@ -6,11 +6,6 @@ import StatusBadge from '../../components/admin/StatusBadge';
 
 function fmt(n: number) { return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(n); }
 
-function toChange(v?: number): { value: number; isPositive: boolean } | undefined {
-  if (v == null) return undefined;
-  return { value: Math.abs(v), isPositive: v >= 0 };
-}
-
 export default function DashboardPage() {
   const { data: res, isLoading } = useQuery({ queryKey: ['admin', 'stats'], queryFn: () => adminApi.dashboard.getStats() });
   const stats = res?.data;
@@ -34,10 +29,10 @@ export default function DashboardPage() {
             ))
           ) : (
             <>
-              <StatsCard label="Total Users" value={stats?.totalUsers ?? 0} color="blue" change={toChange(stats?.userGrowth)} icon="users" />
-              <StatsCard label="Total Tenants" value={stats?.totalTenants ?? 0} color="green" change={toChange(stats?.tenantGrowth)} icon="building" />
-              <StatsCard label="Total Bookings" value={stats?.totalBookings ?? 0} color="purple" change={toChange(stats?.bookingGrowth)} icon="calendar" />
-              <StatsCard label="Total Revenue" value={fmt(stats?.totalRevenue ?? 0)} color="amber" change={toChange(stats?.revenueGrowth)} icon="currency" />
+              <StatsCard label="Total Users" value={stats?.totalUsers ?? 0} color="blue" change={stats?.userGrowth} icon="users" />
+              <StatsCard label="Total Tenants" value={stats?.totalTenants ?? 0} color="green" change={stats?.tenantGrowth} icon="building" />
+              <StatsCard label="Total Bookings" value={stats?.totalBookings ?? 0} color="purple" change={stats?.bookingGrowth} icon="calendar" />
+              <StatsCard label="Total Revenue" value={fmt(stats?.totalRevenue ?? 0)} color="amber" change={stats?.revenueGrowth} icon="currency" />
             </>
           )}
         </div>

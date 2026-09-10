@@ -101,7 +101,9 @@ class _NotificationInboxPageState extends ConsumerState<NotificationInboxPage> {
                               try {
                                 await ApiService().markNotificationRead(n['id']);
                                 setState(() => n['read'] = true);
-                              } catch (e) {}
+                              } catch (e) {
+                                debugPrint('Mark read error: $e');
+                              }
                             }
                           },
                         ),

@@ -231,7 +231,11 @@ class _SocialFeedPageState extends ConsumerState<SocialFeedPage> {
                                     try {
                                       await ApiService().likePost(p['id'].toString());
                                       ref.invalidate(feedFutureProvider);
-                                    } catch (_) {}
+                                    } catch (e) {
+                                      if (context.mounted) {
+                                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal like: $e')));
+                                      }
+                                    }
                                   },
                                   child: Row(
                                     children: [

@@ -1,73 +1,89 @@
 package id.dekat.customer.web;
 
+import id.dekat.customer.domain.*;
 import id.dekat.sharedkernel.web.ApiResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.net.URI;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/customer/recurring-bookings")
+@RequiredArgsConstructor
 public class RecurringBookingController {
 
-    // In-memory store (production would use DB table)
-    private static final Map<UUID, List<Map<String, Object>>> store = new HashMap<>();
+    private final RecurringBookingRepository repository;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> list(
+    public ResponseEntity<ApiResponse<List<RecurringBooking>>> list(
             @RequestHeader(value = "X-Customer-Id", required = false) UUID customerId) {
-        List<Map<String, Object>> bookings = store.getOrDefault(customerId, new ArrayList<>());
+        List<RecurringBooking> bookings = repository.findByCustomerId(customerId);
         return ResponseEntity.ok(ApiResponse.ok(bookings));
     }
 
     @PostMapping
     @Transactional
-    public ResponseEntity<ApiResponse<Map<String, Object>>> create(
+    public ResponseEntity<ApiResponse<RecurringBooking>> create(
             @RequestHeader(value = "X-Customer-Id", required = false) UUID customerId,
             @RequestBody Map<String, Object> body) {
-        Map<String, Object> booking = new LinkedHashMap<>();
-        booking.put("id", UUID.randomUUID().toString());
-        booking.put("customerId", customerId.toString());
-        booking.put("serviceName", body.get("serviceName"));
-        booking.put("providerName", body.get("providerName"));
-        booking.put("frequency", body.getOrDefault("frequency", "weekly"));
-        booking.put("dayOfWeek", body.get("dayOfWeek"));
-        booking.put("time", body.get("time"));
-        booking.put("isActive", true);
-        booking.put("nextBooking", OffsetDateTime.now().plusDays(7).toString());
-        booking.put("createdAt", OffsetDateTime.now().toString());
+        UUID tenantId = UUID.fromString((String) body.get("tenantId"));
+        UUID serviceId = UUID.fromString((String) body.get("serviceId"));
+        UUID staffId = body.get("staffId") != null ? UUID.fromString((String) body.get("staffId")) : null;
+        String frequency = (String) body.getOrDefault("frequency", "WEEKLY");
+        Integer dayOfWeek = body.get("dayOfWeek") != null ? ((Number) body.get("dayOfWeek")).intValue() : null;
+        Integer dayOfMonth = body.get("dayOfMonth") != null ? ((Number) body.get("dayOfMonth")).intValue() : null;
+        String timeStr = (String) body.get("time");
+        LocalTime timeOfDay = timeStr != null ? LocalTime.parse(timeStr) : null;
+        String startDateStr = (String) body.getOrDefault("startDate", LocalDate.now().toString());
+        LocalDate startDate = LocalDate.parse(startDateStr);
 
-        store.computeIfAbsent(customerId, k -> new ArrayList<>()).add(booking);
-        return ResponseEntity.ok(ApiResponse.ok(booking));
+        RecurringBooking booking = RecurringBooking.builder()
+                .customerId(customerId)
+                .tenantId(tenantId)
+                .serviceId(serviceId)
+                .staffId(staffId)
+                .frequency(frequency)
+                .dayOfWeek(dayOfWeek)
+                .dayOfMonth(dayOfMonth)
+                .timeOfDay(timeOfDay)
+                .startDate(startDate)
+                .nextOccurrence(startDate.plusWeeks(1))
+                .isActive(true)
+                .build();
+
+        RecurringBooking saved = repository.save(booking);
+        return ResponseEntity.ok(ApiResponse.ok(saved));
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public ResponseEntity<ApiResponse<Map<String, Object>>> update(
+    public ResponseEntity<ApiResponse<RecurringBooking>> update(
             @PathVariable UUID id,
             @RequestBody Map<String, Object> body) {
-        for (List<Map<String, Object>> bookings : store.values()) {
-            for (Map<String, Object> b : bookings) {
-                if (id.toString().equals(b.get("id"))) {
-                    if (body.containsKey("frequency")) b.put("frequency", body.get("frequency"));
-                    if (body.containsKey("dayOfWeek")) b.put("dayOfWeek", body.get("dayOfWeek"));
-                    if (body.containsKey("time")) b.put("time", body.get("time"));
-                    if (body.containsKey("isActive")) b.put("isActive", body.get("isActive"));
-                    return ResponseEntity.ok(ApiResponse.ok(b));
-                }
-            }
-        }
-        throw new RuntimeException("Recurring booking not found");
+        RecurringBooking booking = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Recurring booking not found"));
+
+        if (body.containsKey("frequency")) booking.setFrequency((String) body.get("frequency"));
+        if (body.containsKey("dayOfWeek")) booking.setDayOfWeek(((Number) body.get("dayOfWeek")).intValue());
+        if (body.containsKey("dayOfMonth")) booking.setDayOfMonth(((Number) body.get("dayOfMonth")).intValue());
+        if (body.containsKey("time")) booking.setTimeOfDay(LocalTime.parse((String) body.get("time")));
+        if (body.containsKey("isActive")) booking.setIsActive((Boolean) body.get("isActive"));
+
+        RecurringBooking saved = repository.save(booking);
+        return ResponseEntity.ok(ApiResponse.ok(saved));
     }
 
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
-        for (List<Map<String, Object>> bookings : store.values()) {
-            bookings.removeIf(b -> id.toString().equals(b.get("id")));
-        }
+        repository.deleteById(id);
         return ResponseEntity.ok(ApiResponse.ok(null));
     }
 }

@@ -10,7 +10,7 @@ export default function NotificationsPage() {
     queryFn: () => providerApi.notifications.list(),
   });
 
-  const notifications = res?.data?.data ?? [];
+  const notifications = (res as any)?.data?.data ?? [];
 
   const markRead = useMutation({
     mutationFn: (id: string) => providerApi.notifications.markRead(id),

@@ -201,6 +201,8 @@ export interface SearchResult {
 
 export interface DashboardStats {
   todayBookings: number;
+  todayRevenue: number;
+  weekBookings: number;
   weekRevenue: number;
   totalCustomers: number;
   avgRating: number;
@@ -217,11 +219,15 @@ export interface Booking {
   serviceName: string;
   staffName: string;
   time: string;
+  slotTime?: string;
   startsAt?: string;
   endTime: string;
   status: BookingStatus;
   amount: number;
+  totalAmount?: number;
   depositPaid: number;
+  depositAmount?: number;
+  confirmationPin?: string;
   notes: string;
   createdAt: string;
 }
@@ -230,6 +236,7 @@ export type BookingStatus =
   | 'HELD'
   | 'PENDING_PAYMENT'
   | 'PENDING_APPROVAL'
+  | 'IN_PROGRESS'
   | 'CONFIRMED'
   | 'CHECKED_IN'
   | 'EN_ROUTE'

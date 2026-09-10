@@ -5,7 +5,7 @@ import { api } from '../../lib/api';
 export default function AnalyticsDeepPage() {
   const [period, setPeriod] = useState('30d');
 
-  const { data: analyticsRes, isLoading } = useQuery({
+  const { data: analyticsRes } = useQuery({
     queryKey: ['analytics-deep', period],
     queryFn: () => api.get(`/provider/analytics/deep?period=${period}`),
   });
@@ -22,23 +22,18 @@ export default function AnalyticsDeepPage() {
 
   const analytics = (analyticsRes as any)?.data ?? {
     revenue: { total: 0, growth: 0, daily: [] },
-    bookings: { total: 0, growth: 0, byStatus: {} },
+    bookings: { total: 0, growth: 0, completed: 0, cancelled: 0 },
     customers: { new: 0, returning: 0, churnRate: 0 },
     topServices: [],
     staffPerformance: [],
   };
 
-  const segmentation = (segmentationRes as any)?.data ?? [
-    { segment: 'VIP', count: 15, percentage: 12, revenue: 1500000, color: '#6C63FF' },
-    { segment: 'Regular', count: 45, percentage: 35, revenue: 2250000, color: '#10B981' },
-    { segment: 'New', count: 30, percentage: 23, revenue: 900000, color: '#F59E0B' },
-    { segment: 'Inactive', count: 40, percentage: 30, revenue: 0, color: '#EF4444' },
-  ];
+  const segmentation = (segmentationRes as any)?.data ?? [];
 
   const forecast = (forecastRes as any)?.data ?? {
-    nextWeek: { predicted: 45, confidence: 85 },
-    nextMonth: { predicted: 180, confidence: 75 },
-    recommendation: 'Berdasarkan tren, booking akan naik 15% minggu depan. Siapkan staf tambahan.',
+    nextWeek: { predicted: 0, confidence: 0 },
+    nextMonth: { predicted: 0, confidence: 0 },
+    recommendation: 'Belum cukup data untuk prediksi.',
   };
 
   return (
@@ -99,12 +94,7 @@ export default function AnalyticsDeepPage() {
       <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-6">
         <h3 className="font-semibold text-gray-900 mb-4">Layanan Terlaris</h3>
         <div className="space-y-3">
-          {(analytics.topServices.length > 0 ? analytics.topServices : [
-            { name: 'Potong Rambut', count: 85, revenue: 4250000 },
-            { name: 'Creambath', count: 42, revenue: 2100000 },
-            { name: 'Hair Color', count: 28, revenue: 2800000 },
-            { name: 'Shaving', count: 35, revenue: 875000 },
-          ]).map((service: any, i: number) => (
+          {(analytics.topServices.length > 0 ? analytics.topServices : []).map((service: any, i: number) => (
             <div key={i} className="flex items-center gap-3">
               <span className="text-lg font-bold text-gray-400 w-6">{i + 1}</span>
               <div className="flex-1">
@@ -142,11 +132,7 @@ export default function AnalyticsDeepPage() {
               </tr>
             </thead>
             <tbody>
-              {(analytics.staffPerformance.length > 0 ? analytics.staffPerformance : [
-                { name: 'Andi', bookings: 35, rating: 4.9, repeatRate: '72%', revenue: 1750000 },
-                { name: 'Budi', bookings: 28, rating: 4.7, repeatRate: '65%', revenue: 1400000 },
-                { name: 'Rudi', bookings: 22, rating: 4.8, repeatRate: '70%', revenue: 1100000 },
-              ]).map((staff: any) => (
+              {(analytics.staffPerformance.length > 0 ? analytics.staffPerformance : []).map((staff: any) => (
                 <tr key={staff.name} className="border-b border-gray-100 hover:bg-gray-50">
                   <td className="py-3 font-medium text-gray-900">{staff.name}</td>
                   <td className="py-3 text-center">{staff.bookings}</td>

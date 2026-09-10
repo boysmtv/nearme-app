@@ -17,7 +17,7 @@ export default function Header() {
     enabled: isAuthenticated,
   });
 
-  const notifRaw = notifData?.data;
+  const notifRaw = (notifData as any)?.data;
   const notifList = Array.isArray(notifRaw) ? notifRaw : (notifRaw as any)?.data ?? [];
   const unreadCount = notifList.filter((n: any) => !n.read).length;
 

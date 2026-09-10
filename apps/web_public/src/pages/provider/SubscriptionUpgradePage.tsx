@@ -75,7 +75,7 @@ export default function SubscriptionUpgradePage() {
     },
   });
 
-  const currentPlan = currentSub?.data?.planId || 'FREE';
+  const currentPlan = (currentSub as any)?.data?.data?.planId || 'FREE';
 
   return (
     <div className="max-w-screen-2xl mx-auto p-6 space-y-6">

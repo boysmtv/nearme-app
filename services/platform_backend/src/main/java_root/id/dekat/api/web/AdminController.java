@@ -277,6 +277,30 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.ok(result, "User status updated"));
     }
 
+    @PutMapping("/users/{id}/role")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> updateUserRole(
+            @PathVariable UUID id, @RequestBody Map<String, String> body) {
+        Optional<User> userOpt = userRepository.findById(id);
+        if (userOpt.isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.ok(Map.of("error", "User not found")));
+        }
+        String roleName = body.getOrDefault("role", "ROLE_CUSTOMER");
+        Optional<id.dekat.access.domain.Role> roleOpt = roleRepository.findByName(roleName);
+        if (roleOpt.isEmpty()) {
+            return ResponseEntity.ok(ApiResponse.ok(Map.of("error", "Role not found: " + roleName)));
+        }
+        List<RoleAssignment> existing = roleAssignmentRepository.findByUserId(id);
+        for (RoleAssignment ra : existing) {
+            roleAssignmentRepository.delete(ra);
+        }
+        RoleAssignment assignment = new RoleAssignment();
+        assignment.setUserId(id);
+        assignment.setRoleId(roleOpt.get().getId());
+        roleAssignmentRepository.save(assignment);
+        Map<String, Object> result = Map.of("id", id.toString(), "role", roleName);
+        return ResponseEntity.ok(ApiResponse.ok(result, "User role updated"));
+    }
+
     @GetMapping("/tenants")
     public ResponseEntity<ApiResponse<Map<String, Object>>> listTenants(
             @RequestParam(defaultValue = "1") int page,

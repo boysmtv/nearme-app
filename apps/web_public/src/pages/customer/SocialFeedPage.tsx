@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { publicApi, api } from '../../lib/api';
+import { api } from '../../lib/api';
 
 interface FeedPost {
   id: string;
@@ -42,29 +42,18 @@ export default function SocialFeedPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['social-feed'] }),
   });
 
-  const posts: FeedPost[] = (feedRes as any)?.data ?? [
-    {
-      id: '1', providerId: 'p1', providerName: 'Barbershop Central', providerAvatar: '',
-      type: 'PROMO', title: 'Diskon 20% untuk Potong Rambut!', body: 'Hanya minggu ini! Potong rambut jadi Rp 40.000 dari Rp 50.000. Buruan ke lokasi kami!',
-      imageUrl: '', createdAt: new Date().toISOString(), likes: 24, comments: 8, isLiked: false, isFollowing: true,
-    },
-    {
-      id: '2', providerId: 'p2', providerName: 'Beauty Salon', providerAvatar: '',
-      type: 'GALLERY', title: 'Hasil Creambath Terbaru', body: 'Hasil creambath dari pelanggan kami. Rambut sehat berkilau!',
-      imageUrl: '', createdAt: new Date(Date.now() - 86400000).toISOString(), likes: 15, comments: 3, isLiked: true, isFollowing: true,
-    },
-    {
-      id: '3', providerId: 'p3', providerName: 'Spa & Wellness', providerAvatar: '',
-      type: 'REVIEW', title: 'Review dari Siti', body: 'Pelayanan sangat memuaskan! Tempatnya bersih dan stafnya ramah. Pasti akan kembali lagi.',
-      imageUrl: '', createdAt: new Date(Date.now() - 172800000).toISOString(), likes: 32, comments: 12, isLiked: false, isFollowing: false,
-    },
-  ];
+  const posts: FeedPost[] = (feedRes as any)?.data ?? [];
 
-  const trending = (trendingRes as any)?.data ?? [
-    { id: '1', name: 'Barbershop Central', bookingCount: 120, followers: 450 },
-    { id: '2', name: 'Beauty Salon', bookingCount: 98, followers: 380 },
-    { id: '3', name: 'Spa & Wellness', bookingCount: 85, followers: 320 },
-  ];
+  const createPostMutation = useMutation({
+    mutationFn: (data: { title: string; body: string; type: string }) =>
+      api.post('/social/feed', data),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['social-feed'] });
+      setPostText('');
+    },
+  });
+
+  const trending = (trendingRes as any)?.data ?? [];
 
   const getTypeBadge = (type: string) => {
     switch (type) {
@@ -101,8 +90,10 @@ export default function SocialFeedPage() {
                     <button className="text-gray-400 hover:text-primary-600">📷 Foto</button>
                     <button className="text-gray-400 hover:text-primary-600">📍 Lokasi</button>
                   </div>
-                  <button className="px-4 py-1.5 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 disabled:opacity-50" disabled={!postText.trim()}>
-                    Posting
+                  <button
+                    onClick={() => createPostMutation.mutate({ title: postText.slice(0, 50), body: postText, type: 'REVIEW' })}
+                    className="px-4 py-1.5 bg-primary-600 text-white rounded-lg text-sm font-semibold hover:bg-primary-700 disabled:opacity-50" disabled={!postText.trim() || createPostMutation.isPending}>
+                    {createPostMutation.isPending ? 'Posting...' : 'Posting'}
                   </button>
                 </div>
               </div>

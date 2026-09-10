@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 
@@ -8,14 +9,20 @@ Future<void> initCore() async {
 
   try {
     await AnalyticsService.initialize();
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('Analytics init error: $e');
+  }
   try {
     await NotificationService.initialize(
       onForegroundMessage: (message) {
-        // Show local notification or in-app banner
+        debugPrint('FCM foreground: ${message.notification?.title}');
       },
       onNotificationOpened: (message) {
-        // Navigate to relevant screen based on payload
+        final data = NotificationService.parsePayload(message);
+        if (data == null) return;
+        final type = data['type'] as String?;
+        final id = data['bookingId'] as String? ?? data['notificationId'] as String?;
+        debugPrint('FCM opened: type=$type, id=$id');
       },
       onTokenRegistered: (token) async {
         try {
@@ -23,11 +30,17 @@ Future<void> initCore() async {
           if (tokenStored != null) {
             await ApiService().updateFcmToken(token);
           }
-        } catch (_) {}
+        } catch (e) {
+          debugPrint('FCM token update error: $e');
+        }
       },
     );
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('Notification init error: $e');
+  }
   try {
     await LocalizationService.initialize();
-  } catch (_) {}
+  } catch (e) {
+    debugPrint('Localization init error: $e');
+  }
 }

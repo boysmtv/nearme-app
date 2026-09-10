@@ -98,6 +98,7 @@ public class BookingController {
                 : UUID.fromString(jwt.getSubject());
 
         // Convert BookingItemRequest DTOs to BookingItem domain entities
+        // Hold times are used as defaults when items don't specify their own times
         List<id.dekat.booking.domain.BookingItem> domainItems = null;
         if (request.getItems() != null) {
             domainItems = new java.util.ArrayList<>();

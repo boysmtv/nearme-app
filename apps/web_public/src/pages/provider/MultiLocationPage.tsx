@@ -25,7 +25,7 @@ export default function MultiLocationPage() {
     queryFn: () => api.get('/provider/locations'),
   });
 
-  const locations = locationsRes?.data ?? [];
+  const locations = (locationsRes as any)?.data ?? [];
 
   const createMutation = useMutation({
     mutationFn: (data: any) => api.post('/provider/locations', data),

@@ -15,7 +15,7 @@ export default function UsersPage() {
   const qc = useQueryClient();
   const { data: res, isLoading } = useQuery({ queryKey: ['admin', 'users', page, search], queryFn: () => adminApi.users.list({ page, limit: 20, search }) });
   const statusMut = useMutation({ mutationFn: ({ id, status }: { id: string; status: string }) => adminApi.users.updateStatus(id, status), onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users'] }) });
-  const handleExport = async () => { setExporting(true); try { const response = await adminApi.export.users('csv'); downloadBlob(response.data as unknown as Blob, 'users.csv'); } catch (e) { console.error('Export failed:', e); } finally { setExporting(false); } };
+  const handleExport = async () => { setExporting(true); try { const response = await adminApi.export.users('csv'); downloadBlob(response as unknown as Blob, 'users.csv'); } catch (e) { console.error('Export failed:', e); } finally { setExporting(false); } };
 
   const columns = [
     { key: 'name', label: 'Nama', render: (u: User) => <div><p className="font-medium text-gray-900">{u.name}</p><p className="text-[13px] text-gray-500">{u.email}</p></div> },

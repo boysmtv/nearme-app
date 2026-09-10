@@ -36,8 +36,8 @@ export default function UsersPage() {
   const handleExport = async () => {
     setExporting(true);
     try {
-      const response = await adminApi.export.users('csv');
-      downloadBlob(response.data as unknown as Blob, 'users.csv');
+      const blob = await adminApi.export.users('csv');
+      downloadBlob(blob, 'users.csv');
     } catch (e) {
       console.error('Export failed:', e);
     } finally {
