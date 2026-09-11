@@ -9,17 +9,25 @@ import '../../../../shared/models/rows.dart';
 
 final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final selectedTimeSlotProvider = StateProvider<String?>((ref) => null);
+final selectedStaffIdProvider = StateProvider<String?>((ref) => null);
 
-// Use String key "providerId|date" to avoid Map identity loop (previous bug: new Map each build caused infinite refetch)
+// Use String key "providerId|date|staffId" to avoid Map identity loop
 final availabilityProvider =
     FutureProvider.autoDispose.family<List<SlotRow>, String>((ref, key) async {
   final parts = key.split('|');
   final providerId = parts[0];
   final date = parts[1];
-  final response = await ApiService().getProviderAvailability(providerId, date);
+  final staffId = parts.length > 2 ? parts[2] : null;
+  final response = await ApiService().getProviderAvailability(providerId, date, staffId: staffId);
   return ((response.data['data'] ?? []) as List)
       .map((e) => SlotRow.fromJson(e as Map<String, dynamic>))
       .toList();
+});
+
+final providerStaffProvider =
+    FutureProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, providerId) async {
+  final response = await ApiService().getProviderStaff(providerId);
+  return ((response.data['data'] ?? []) as List).cast<Map<String, dynamic>>();
 });
 
 final bookingServicesProvider =
@@ -42,6 +50,7 @@ class AvailabilityPage extends ConsumerStatefulWidget {
 
 class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
   String? _selectedServiceId;
+  String? _selectedStaffId;
 
   @override
   void initState() {
@@ -231,6 +240,153 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
     );
   }
 
+  void _showStaffPicker(List<Map<String, dynamic>> staffList) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.grey[300], borderRadius: BorderRadius.circular(2))),
+              const SizedBox(height: 16),
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                const Text('Pilih Staf', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                IconButton(onPressed: () => Navigator.pop(ctx), icon: const Icon(Icons.close_rounded, size: 20)),
+              ]),
+              const SizedBox(height: 8),
+              // Option: Any staff (no filter)
+              InkWell(
+                onTap: () {
+                  setState(() => _selectedStaffId = null);
+                  ref.read(selectedTimeSlotProvider.notifier).state = null;
+                  Navigator.pop(ctx);
+                },
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                  decoration: BoxDecoration(
+                    color: _selectedStaffId == null ? DEKATColors.primary.withOpacity(0.06) : Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: _selectedStaffId == null ? DEKATColors.primary.withOpacity(0.3) : Colors.transparent),
+                  ),
+                  child: Row(children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: _selectedStaffId == null ? DEKATColors.primary : Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Icon(Icons.groups_rounded, color: _selectedStaffId == null ? Colors.white : Colors.grey[600], size: 22),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Semua Staf', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: _selectedStaffId == null ? DEKATColors.primary : Colors.black87)),
+                        const SizedBox(height: 2),
+                        Text('Tampilkan semua slot tersedia', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                      ]),
+                    ),
+                    const SizedBox(width: 12),
+                    Container(
+                      width: 28,
+                      height: 28,
+                      decoration: BoxDecoration(
+                        color: _selectedStaffId == null ? DEKATColors.primary : Colors.white,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: _selectedStaffId == null ? DEKATColors.primary : Colors.grey[300]!),
+                      ),
+                      child: Icon(_selectedStaffId == null ? Icons.check_rounded : Icons.circle_outlined, size: 16, color: _selectedStaffId == null ? Colors.white : Colors.grey[400]),
+                    ),
+                  ]),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Flexible(
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: staffList.length,
+                  separatorBuilder: (_, __) => Divider(color: Colors.grey[100], height: 1, indent: 16, endIndent: 16),
+                  itemBuilder: (c, i) {
+                    final s = staffList[i];
+                    final staffId = s['id'] as String;
+                    final name = s['displayName'] as String? ?? s['name'] as String? ?? 'Staff';
+                    final specialties = (s['specialties'] as List?)?.cast<String>() ?? [];
+                    final rating = (s['rating'] as num?)?.toDouble() ?? 0.0;
+                    final reviewCount = (s['reviewCount'] as num?)?.toInt() ?? 0;
+                    final isSelected = staffId == _selectedStaffId;
+                    return InkWell(
+                      onTap: () {
+                        setState(() => _selectedStaffId = staffId);
+                        ref.read(selectedTimeSlotProvider.notifier).state = null;
+                        Navigator.pop(ctx);
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                        decoration: BoxDecoration(
+                          color: isSelected ? DEKATColors.primary.withOpacity(0.06) : Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: isSelected ? DEKATColors.primary.withOpacity(0.3) : Colors.transparent),
+                        ),
+                        child: Row(children: [
+                          Container(
+                            width: 48,
+                            height: 48,
+                            decoration: BoxDecoration(
+                              color: isSelected ? DEKATColors.primary : DEKATColors.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Center(
+                              child: Text(name.isNotEmpty ? name[0].toUpperCase() : 'S',
+                                  style: TextStyle(color: isSelected ? Colors.white : DEKATColors.primary, fontWeight: FontWeight.w800, fontSize: 18)),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(name, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: isSelected ? DEKATColors.primary : Colors.black87)),
+                              const SizedBox(height: 2),
+                              Row(children: [
+                                if (rating > 0) ...[
+                                  Icon(Icons.star_rounded, size: 14, color: Colors.amber[600]),
+                                  const SizedBox(width: 2),
+                                  Text('${rating.toStringAsFixed(1)} ($reviewCount)', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                                  const SizedBox(width: 8),
+                                ],
+                                if (specialties.isNotEmpty)
+                                  Text(specialties.take(2).join(', '), maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey[500], fontSize: 11)),
+                              ]),
+                            ]),
+                          ),
+                          const SizedBox(width: 12),
+                          Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: isSelected ? DEKATColors.primary : Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: isSelected ? DEKATColors.primary : Colors.grey[300]!),
+                            ),
+                            child: Icon(isSelected ? Icons.check_rounded : Icons.circle_outlined, size: 16, color: isSelected ? Colors.white : Colors.grey[400]),
+                          ),
+                        ]),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ]),
+          ),
+        );
+      },
+    );
+  }
+
   List<SlotRow> _filterByPeriod(List<SlotRow> slots, int startHour, int endHour) {
     return slots.where((s) {
       final hour = int.tryParse(s.time.split(':').first) ?? 0;
@@ -243,9 +399,10 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
     final selectedDate = ref.watch(selectedDateProvider);
     final selectedTimeSlot = ref.watch(selectedTimeSlotProvider);
     final dateStr = _dateStr(selectedDate);
-    final cacheKey = '${widget.providerId}|$dateStr';
+    final cacheKey = '${widget.providerId}|$dateStr|${_selectedStaffId ?? ''}';
     final slotsAsync = ref.watch(availabilityProvider(cacheKey));
     final servicesAsync = ref.watch(bookingServicesProvider(widget.providerId));
+    final staffAsync = ref.watch(providerStaffProvider(widget.providerId));
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FF),
@@ -382,6 +539,65 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                   TextButton(onPressed: () => ref.invalidate(bookingServicesProvider(widget.providerId)), child: const Text('Retry')),
                 ]),
               ),
+            ),
+          ),
+          // Staff Selector - bottom sheet picker
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 0),
+            child: staffAsync.when(
+              data: (staffList) {
+                if (staffList.isEmpty) return const SizedBox.shrink();
+                final selectedName = staffList
+                    .where((s) => s['id'] == _selectedStaffId)
+                    .map((s) => s['displayName'] as String? ?? s['name'] as String? ?? 'Staff')
+                    .firstOrNull;
+                return InkWell(
+                  onTap: () => _showStaffPicker(staffList),
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: _selectedStaffId != null ? DEKATColors.primary.withOpacity(0.3) : Colors.grey[200]!),
+                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 3))],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(colors: [Colors.purple.shade400, Colors.purple.shade300], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [BoxShadow(color: Colors.purple.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 3))],
+                          ),
+                          child: const Icon(Icons.person_rounded, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Text('PILIH STAF', style: TextStyle(color: Colors.grey[500], fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
+                            const SizedBox(height: 2),
+                            Text(
+                              _selectedStaffId == null ? 'Semua staf' : (selectedName ?? 'Pilih staf...'),
+                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: _selectedStaffId != null ? Colors.black87 : Colors.grey[500]),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ]),
+                        ),
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(color: Colors.grey[100], shape: BoxShape.circle, border: Border.all(color: Colors.grey[200]!)),
+                          child: Icon(Icons.keyboard_arrow_down_rounded, color: Colors.grey[700], size: 18),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) => const SizedBox.shrink(),
             ),
           ),
           // Separator - jarak jelas ke Available Times
@@ -582,7 +798,8 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                       '&serviceId=$_selectedServiceId'
                       '&date=$dateStr'
                       '&time=${Uri.encodeComponent(selectedTimeSlot)}'
-                      '${widget.locationId != null ? '&locationId=${widget.locationId}' : ''}')
+                      '${widget.locationId != null ? '&locationId=${widget.locationId}' : ''}'
+                      '${_selectedStaffId != null ? '&staffId=$_selectedStaffId' : ''}')
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: DEKATColors.primary,

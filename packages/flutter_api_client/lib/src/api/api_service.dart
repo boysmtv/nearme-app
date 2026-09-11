@@ -66,8 +66,10 @@ class ApiService {
     return _dio.get('${Endpoints.providers}/$providerId/staff');
   }
 
-  Future<Response> getProviderAvailability(String providerId, String date) {
-    return _dio.get('${Endpoints.providers}/$providerId/availability', queryParameters: {'date': date});
+  Future<Response> getProviderAvailability(String providerId, String date, {String? staffId}) {
+    final params = <String, dynamic>{'date': date};
+    if (staffId != null) params['staffId'] = staffId;
+    return _dio.get('${Endpoints.providers}/$providerId/availability', queryParameters: params);
   }
 
   Future<Response> createHold(Map<String, dynamic> data) {

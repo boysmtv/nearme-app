@@ -402,6 +402,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           date: state.uri.queryParameters['date'],
           time: state.uri.queryParameters['time'],
           locationId: state.uri.queryParameters['locationId'],
+          staffId: state.uri.queryParameters['staffId'],
         ),
       ),
       GoRoute(

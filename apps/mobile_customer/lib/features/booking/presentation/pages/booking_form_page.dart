@@ -10,7 +10,8 @@ import '../../../../shared/models/rows.dart';
 class BookingSummary {
   final ServiceRow service;
   final String providerName;
-  const BookingSummary({required this.service, required this.providerName});
+  final String? staffName;
+  const BookingSummary({required this.service, required this.providerName, this.staffName});
 }
 
 final bookingSummaryProvider =
@@ -18,6 +19,7 @@ final bookingSummaryProvider =
   final parts = key.split('|');
   final providerId = parts[0];
   final serviceId = parts.length > 1 ? parts[1] : '';
+  final staffId = parts.length > 2 ? parts[2] : null;
   final servicesRes = await ApiService().getProviderServices(providerId);
   final services = ((servicesRes.data['data'] ?? []) as List)
       .map((e) => ServiceRow.fromJson(e as Map<String, dynamic>))
@@ -26,8 +28,18 @@ final bookingSummaryProvider =
     (s) => s.id == serviceId,
     orElse: () => throw Exception('Selected service not found'),
   );
-  // Provider name instant, no extra network
-  return BookingSummary(service: service, providerName: 'Provider');
+  String? staffName;
+  if (staffId != null && staffId.isNotEmpty) {
+    try {
+      final staffRes = await ApiService().getProviderStaff(providerId);
+      final staffList = ((staffRes.data['data'] ?? []) as List).cast<Map<String, dynamic>>();
+      final match = staffList.where((s) => s['id'] == staffId);
+      if (match.isNotEmpty) {
+        staffName = match.first['displayName'] as String? ?? match.first['name'] as String?;
+      }
+    } catch (_) {}
+  }
+  return BookingSummary(service: service, providerName: 'Provider', staffName: staffName);
 });
 
 class BookingFormPage extends ConsumerStatefulWidget {
@@ -36,6 +48,7 @@ class BookingFormPage extends ConsumerStatefulWidget {
   final String? date;
   final String? time;
   final String? locationId;
+  final String? staffId;
   const BookingFormPage({
     super.key,
     required this.providerId,
@@ -43,6 +56,7 @@ class BookingFormPage extends ConsumerStatefulWidget {
     this.date,
     this.time,
     this.locationId,
+    this.staffId,
   });
 
   @override
@@ -76,7 +90,7 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
         ),
       );
     }
-    final summaryAsync = ref.watch(bookingSummaryProvider('${widget.providerId}|${widget.serviceId!}'));
+    final summaryAsync = ref.watch(bookingSummaryProvider('${widget.providerId}|${widget.serviceId!}|${widget.staffId ?? ''}'));
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FF),
       appBar: AppBar(
@@ -110,10 +124,14 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
                         Container(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6), decoration: BoxDecoration(color: Colors.green[50], borderRadius: BorderRadius.circular(20), border: Border.all(color: Colors.green[100]!)), child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(Icons.verified_rounded, size: 14, color: Colors.green[600]), const SizedBox(width: 4), Text(formatRupiah(summary.service.price), style: TextStyle(color: Colors.green[700], fontWeight: FontWeight.w800, fontSize: 12))])),
                       ]),
                     ),
-                    Padding(
+                      Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(children: [
                         _SummaryRow(label: 'Layanan', value: summary.service.name),
+                        if (summary.staffName != null) ...[
+                          const SizedBox(height: 6),
+                          _SummaryRow(label: 'Staf', value: summary.staffName!),
+                        ],
                         const SizedBox(height: 10),
                         Row(children: [
                           Expanded(child: _InfoChip(icon: Icons.schedule_rounded, label: '${summary.service.durationMinutes} min', color: Colors.grey[700]!)),
@@ -247,7 +265,7 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
   String _wibDateTime(String date, String time) => '$date T$time:00+07:00'.replaceAll(' ', '');
 
   Future<void> _handleBooking() async {
-    final summary = ref.read(bookingSummaryProvider('${widget.providerId}|${widget.serviceId!}')).valueOrNull;
+    final summary = ref.read(bookingSummaryProvider('${widget.providerId}|${widget.serviceId!}|${widget.staffId ?? ''}')).valueOrNull;
     setState(() => _isLoading = true);
     try {
       final customerId = await SecureStorageService.read(StorageKeys.userId);
@@ -262,6 +280,7 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
         'tenantId': widget.providerId,
         'locationId': widget.locationId,
         'serviceId': widget.serviceId,
+        'staffId': widget.staffId,
         'customerId': customerId,
         'startsAt': startsAt,
         'endsAt': endsAt,
