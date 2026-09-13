@@ -6,6 +6,7 @@ import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class BookingSummary {
   final ServiceRow service;
@@ -172,15 +173,7 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
                     ),
                   ]),
                 ),
-                loading: () => Container(
-                  height: 120,
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey[200]!)),
-                  child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: DEKATColors.primary)),
-                    const SizedBox(height: 8),
-                    Text('Memuat layanan...', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
-                  ])),
-                ),
+                loading: () => const ShimmerBox(height: 120),
                 error: (e, _) => Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.red[100]!)),
