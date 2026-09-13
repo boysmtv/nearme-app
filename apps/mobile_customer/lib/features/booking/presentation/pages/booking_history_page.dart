@@ -3,12 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 enum BookingFilter { all, pending, confirmed, completed, cancelled }
 
 final bookingFilterProvider = StateProvider<BookingFilter>((ref) => BookingFilter.all);
 
-final bookingsProvider = FutureProvider.autoDispose<List<BookingRow>>((ref) async {
+final bookingsProvider = FutureProvider<List<BookingRow>>((ref) async {
   final filter = ref.watch(bookingFilterProvider);
   final params = <String, dynamic>{'page': 1, 'limit': 50};
   if (filter != BookingFilter.all) params['status'] = filter.name.toUpperCase();
@@ -72,7 +73,7 @@ class BookingHistoryPage extends ConsumerWidget {
                 },
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const ShimmerBookingList(),
             error: (e, _) => Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,

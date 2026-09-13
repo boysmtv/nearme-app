@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 final chatMessagesProvider = FutureProvider.autoDispose.family<List<ChatMessageRow>, String>((ref, chatId) async {
   final res = await ApiService().getChatMessages(chatId);
@@ -123,7 +124,7 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
                 },
               );
             },
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const ShimmerCardList(),
             error: (e, _) => Center(child: Text('Error: $e')),
           ),
         ),

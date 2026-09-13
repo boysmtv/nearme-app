@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 final recurringBookingsFutureProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
   try {
@@ -198,7 +199,7 @@ class _RecurringBookingsPageState extends ConsumerState<RecurringBookingsPage> {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerBookingList(),
         error: (e, _) => Center(child: Text('Gagal memuat: $e')),
       ),
     );

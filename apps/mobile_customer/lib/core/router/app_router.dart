@@ -231,7 +231,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> logout() async {
     try {
-      await _apiService.logout();
+      final refreshToken = await SecureStorageService.read(StorageKeys.refreshToken);
+      if (refreshToken != null) {
+        await _apiService.logout(refreshToken: refreshToken);
+      }
     } catch (_) {}
     await SecureStorageService.deleteAll();
     state = const AuthState();
@@ -325,43 +328,89 @@ final routerProvider = Provider<GoRouter>((ref) {
         name: 'forgotPassword',
         builder: (context, state) => const ForgotPasswordPage(),
       ),
-      ShellRoute(
-        builder: (context, state, child) => MainScaffold(child: child),
-        routes: [
-          GoRoute(
-            path: '/discovery',
-            name: 'discovery',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: DiscoveryPage(),
-            ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) => MainScaffold(navigationShell: navigationShell),
+        branches: [
+          // Branch 0: Discover
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/discovery',
+                name: 'discovery',
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: DiscoveryPage(),
+                ),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/search',
-            name: 'search',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: SearchPage(),
-            ),
+          // Branch 1: Search
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/search',
+                name: 'search',
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: SearchPage(),
+                ),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/bookings',
-            name: 'bookings',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: BookingHistoryPage(),
-            ),
+          // Branch 2: Chat
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/chat',
+                name: 'chatList',
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: ChatListPage(),
+                ),
+                routes: [
+                  GoRoute(
+                    path: ':id',
+                    name: 'chatDetail',
+                    builder: (context, state) => ChatDetailPage(
+                      chatId: state.pathParameters['id']!,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/notifications',
-            name: 'notifications',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: NotificationPage(),
-            ),
+          // Branch 3: Bookings
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/bookings',
+                name: 'bookings',
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: BookingHistoryPage(),
+                ),
+              ),
+            ],
           ),
-          GoRoute(
-            path: '/account',
-            name: 'account',
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: AccountPage(),
-            ),
+          // Branch 4: Notifications
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/notifications',
+                name: 'notifications',
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: NotificationPage(),
+                ),
+              ),
+            ],
+          ),
+          // Branch 5: Account
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/account',
+                name: 'account',
+                pageBuilder: (context, state) => const NoTransitionPage(
+                  child: AccountPage(),
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -454,16 +503,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/profile/complete',
         name: 'profileComplete',
         builder: (context, state) => const ProfileCompletePage(),
-      ),
-      GoRoute(
-        path: '/chat',
-        name: 'chatList',
-        builder: (context, state) => const ChatListPage(),
-      ),
-      GoRoute(
-        path: '/chat/:id',
-        name: 'chatDetail',
-        builder: (context, state) => ChatDetailPage(chatId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/favorites',

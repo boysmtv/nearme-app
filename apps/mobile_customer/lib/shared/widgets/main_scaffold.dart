@@ -6,23 +6,21 @@ import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../core/router/app_router.dart';
 import '../models/rows.dart';
 
-final currentIndexProvider = StateProvider<int>((ref) => 0);
-
-final notificationCountProvider = FutureProvider.autoDispose<int>((ref) async {
+final notificationCountProvider = FutureProvider<int>((ref) async {
   final response = await ApiService().getNotifications(params: {'page': 1, 'limit': 50});
   final rows = parsePaginated(response.data['data'], NotificationRow.fromJson).items;
   return rows.where((n) => !n.read).length;
 });
 
 class MainScaffold extends ConsumerWidget {
-  final Widget child;
-  const MainScaffold({super.key, required this.child});
+  final StatefulNavigationShell navigationShell;
+  const MainScaffold({super.key, required this.navigationShell});
 
   static const _tabs = ['/discovery', '/search', '/chat', '/bookings', '/notifications', '/account'];
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final currentIndex = ref.watch(currentIndexProvider);
+    final currentIndex = navigationShell.currentIndex;
     final notificationCount = ref.watch(notificationCountProvider).valueOrNull ?? 0;
     final isLoggedIn = ref.watch(authProvider.select((s) => s.isLoggedIn));
 
@@ -30,6 +28,14 @@ class MainScaffold extends ConsumerWidget {
       canPop: false,
       onPopInvokedWithResult: (didPop, _) async {
         if (didPop) return;
+
+        // If current branch has its own navigator stack, pop that first
+        final navigator = Navigator.of(context);
+        if (navigator.canPop()) {
+          navigator.pop();
+          return;
+        }
+
         final confirmed = await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
@@ -46,36 +52,38 @@ class MainScaffold extends ConsumerWidget {
         }
       },
       child: Scaffold(
-        body: child,
+        body: navigationShell,
         bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        onDestinationSelected: (index) {
-          ref.read(currentIndexProvider.notifier).state = index;
-          final tab = _tabs[index];
-          final isProtected = tab == '/bookings' || tab == '/notifications' || tab == '/account' || tab == '/chat';
-          if (isProtected && !isLoggedIn) {
-            context.go('/login?redirect=${Uri.encodeComponent(tab)}');
-          } else {
-            context.go(tab);
-          }
-        },
-        destinations: [
-          const NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: 'Discover'),
-          const NavigationDestination(icon: Icon(Icons.search_outlined), selectedIcon: Icon(Icons.search), label: 'Search'),
-          const NavigationDestination(icon: Icon(Icons.chat_bubble_outline), selectedIcon: Icon(Icons.chat_bubble), label: 'Chat'),
-          const NavigationDestination(icon: Icon(Icons.calendar_today_outlined), selectedIcon: Icon(Icons.calendar_today), label: 'Bookings'),
-          NavigationDestination(
-            icon: notificationCount > 0
-                ? badges.Badge(badgeContent: Text('$notificationCount', style: const TextStyle(color: Colors.white, fontSize: 10)), child: const Icon(Icons.notifications_outlined))
-                : const Icon(Icons.notifications_outlined),
-            selectedIcon: notificationCount > 0
-                ? badges.Badge(badgeContent: Text('$notificationCount', style: const TextStyle(color: Colors.white, fontSize: 10)), child: const Icon(Icons.notifications))
-                : const Icon(Icons.notifications),
-            label: 'Alerts',
-          ),
-          const NavigationDestination(icon: Icon(Icons.person_outlined), selectedIcon: Icon(Icons.person), label: 'Account'),
-        ],
-      ),
+          selectedIndex: currentIndex,
+          onDestinationSelected: (index) {
+            final tab = _tabs[index];
+            final isProtected = tab == '/bookings' || tab == '/notifications' || tab == '/account' || tab == '/chat';
+            if (isProtected && !isLoggedIn) {
+              context.go('/login?redirect=${Uri.encodeComponent(tab)}');
+            } else {
+              navigationShell.goBranch(
+                index,
+                initialLocation: index == currentIndex,
+              );
+            }
+          },
+          destinations: [
+            const NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: 'Discover'),
+            const NavigationDestination(icon: Icon(Icons.search_outlined), selectedIcon: Icon(Icons.search), label: 'Search'),
+            const NavigationDestination(icon: Icon(Icons.chat_bubble_outline), selectedIcon: Icon(Icons.chat_bubble), label: 'Chat'),
+            const NavigationDestination(icon: Icon(Icons.calendar_today_outlined), selectedIcon: Icon(Icons.calendar_today), label: 'Bookings'),
+            NavigationDestination(
+              icon: notificationCount > 0
+                  ? badges.Badge(badgeContent: Text('$notificationCount', style: const TextStyle(color: Colors.white, fontSize: 10)), child: const Icon(Icons.notifications_outlined))
+                  : const Icon(Icons.notifications_outlined),
+              selectedIcon: notificationCount > 0
+                  ? badges.Badge(badgeContent: Text('$notificationCount', style: const TextStyle(color: Colors.white, fontSize: 10)), child: const Icon(Icons.notifications))
+                  : const Icon(Icons.notifications),
+              label: 'Alerts',
+            ),
+            const NavigationDestination(icon: Icon(Icons.person_outlined), selectedIcon: Icon(Icons.person), label: 'Account'),
+          ],
+        ),
       ),
     );
   }

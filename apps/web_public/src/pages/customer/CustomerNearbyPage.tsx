@@ -1,8 +1,9 @@
-import { useState, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { publicApi } from '../../lib/api';
 import CustomerLayout from '../../components/CustomerLayout';
+import LeafletMap from '../../components/LeafletMap';
 
 const SORT_OPTIONS = [
   { value: 'distance', label: 'Jarak Terdekat' },
@@ -80,6 +81,7 @@ function SkeletonCard() {
 }
 
 export default function CustomerNearbyPage() {
+  const navigate = useNavigate();
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [radius, setRadius] = useState(5);
   const [sortBy, setSortBy] = useState<'distance' | 'rating'>('distance');
@@ -115,6 +117,13 @@ export default function CustomerNearbyPage() {
     }
     return list;
   }, [data, sortBy]);
+
+  const handleProviderClick = useCallback(
+    (provider: any) => {
+      if (provider.slug) navigate(`/provider/${provider.slug}`);
+    },
+    [navigate]
+  );
 
   return (
     <CustomerLayout>
@@ -153,36 +162,21 @@ export default function CustomerNearbyPage() {
           </div>
         </div>
 
-        {/* Map Placeholder */}
-        <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-primary-50 via-blue-50 to-indigo-50 h-52 sm:h-64">
-          <div className="absolute inset-0 opacity-10">
-            <svg className="w-full h-full" viewBox="0 0 800 300">
-              <defs>
-                <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-                  <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-primary-400" />
-                </pattern>
-              </defs>
-              <rect width="800" height="300" fill="url(#grid)" />
-            </svg>
-          </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-center bg-white/80 backdrop-blur-sm rounded-2xl px-8 py-6 shadow-sm ring-1 ring-white/50">
-              <div className="w-14 h-14 rounded-full bg-primary-100 flex items-center justify-center mx-auto mb-3">
-                <svg className="w-7 h-7 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <p className="text-primary-700 font-semibold text-lg">Peta Terdekat</p>
-              <p className="text-primary-500 text-sm mt-1">Integrasi peta akan segera hadir</p>
-            </div>
-          </div>
-          {userLocation && (
-            <div className="absolute bottom-3 right-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs text-gray-600 ring-1 ring-gray-200/50">
+        {/* Map */}
+        {userLocation && (
+          <div className="relative rounded-2xl overflow-hidden ring-1 ring-gray-200 h-72 sm:h-96">
+            <LeafletMap
+              center={userLocation}
+              zoom={13}
+              providers={providers}
+              radius={radius}
+              onProviderClick={handleProviderClick}
+            />
+            <div className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-sm rounded-lg px-3 py-1.5 text-xs text-gray-600 ring-1 ring-gray-200/50 z-[1000]">
               <span className="font-medium">Lokasi:</span> {userLocation.lat.toFixed(4)}, {userLocation.lng.toFixed(4)}
             </div>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Sort Controls */}
         <div className="flex items-center justify-between">

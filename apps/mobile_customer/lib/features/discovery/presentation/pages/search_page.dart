@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
 final searchResultsProvider = FutureProvider.autoDispose<List<ProviderRow>>((ref) async {
@@ -192,7 +193,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       itemBuilder: (context, index) => _providerCard(context, results[index]),
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator(color: DEKATColors.primary)),
+                  loading: () => const ShimmerCardList(),
                   error: (e, _) => Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -218,7 +219,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                       itemBuilder: (context, index) => _providerCard(context, results[index]),
                     );
                   },
-                  loading: () => const Center(child: CircularProgressIndicator(color: DEKATColors.primary)),
+                  loading: () => const ShimmerCardList(),
                   error: (e, _) => Center(
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

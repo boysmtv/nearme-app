@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:dio/dio.dart';
 import 'dio_client.dart';
 import '../config/app_config.dart';
+import '../services/secure_storage_service.dart';
 
 class ApiClient {
   static final ApiClient _instance = ApiClient._();
@@ -52,13 +53,16 @@ class ApiClient {
   }
 
   Future<Response> refreshToken(String refreshToken) {
-    return _dio.post('/auth/refresh', data: {
-      'refresh_token': refreshToken,
+    return _dio.post('/auth/refresh', queryParameters: {
+      'refreshToken': refreshToken,
     });
   }
 
-  Future<Response> logout() {
-    return _dio.post('/auth/logout');
+  Future<Response> logout() async {
+    final refreshToken = await SecureStorageService.read('refresh_token');
+    return _dio.post('/auth/logout', queryParameters: {
+      if (refreshToken != null) 'refreshToken': refreshToken,
+    });
   }
 
   Future<Response> forgotPassword(String email) {

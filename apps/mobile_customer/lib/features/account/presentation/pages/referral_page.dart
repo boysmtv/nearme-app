@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class ReferralPage extends ConsumerStatefulWidget {
   const ReferralPage({super.key});
@@ -50,7 +51,7 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Undang Teman')),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const ShimmerCardList()
           : SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: Column(

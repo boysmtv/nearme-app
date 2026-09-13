@@ -2,24 +2,33 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
-final notificationsProvider = FutureProvider.autoDispose<List<NotificationRow>>((ref) async {
+final notificationsProvider = FutureProvider<List<NotificationRow>>((ref) async {
   final response = await ApiService().getNotifications(params: {'page': 1, 'limit': 50});
   return parsePaginated(response.data['data'], NotificationRow.fromJson).items;
 });
 
-class NotificationPage extends ConsumerWidget {
+class NotificationPage extends ConsumerStatefulWidget {
   const NotificationPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<NotificationPage> createState() => _NotificationPageState();
+}
+
+class _NotificationPageState extends ConsumerState<NotificationPage> {
+  bool _markingAllRead = false;
+
+  @override
+  Widget build(BuildContext context) {
     final notificationsAsync = ref.watch(notificationsProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Notifications'),
         actions: [
           TextButton(
-            onPressed: () async {
+            onPressed: _markingAllRead ? null : () async {
+              setState(() => _markingAllRead = true);
               try {
                 await ApiService().markAllNotificationsRead();
                 ref.invalidate(notificationsProvider);
@@ -27,9 +36,13 @@ class NotificationPage extends ConsumerWidget {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red));
                 }
+              } finally {
+                if (mounted) setState(() => _markingAllRead = false);
               }
             },
-            child: const Text('Mark all read'),
+            child: _markingAllRead
+                ? const SizedBox(height: 14, width: 14, child: CircularProgressIndicator(strokeWidth: 2))
+                : const Text('Mark all read'),
           ),
         ],
       ),
@@ -80,7 +93,7 @@ class NotificationPage extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerCardList(),
         error: (e, _) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

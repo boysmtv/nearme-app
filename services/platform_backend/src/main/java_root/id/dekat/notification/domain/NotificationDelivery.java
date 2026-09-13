@@ -25,7 +25,7 @@ public class NotificationDelivery {
     @Column(name = "recipient_id", nullable = false, columnDefinition = "uuid")
     private UUID recipientId;
 
-    @Column(name = "template_id", nullable = false, columnDefinition = "uuid")
+    @Column(name = "template_id", columnDefinition = "uuid")
     private UUID templateId;
 
     @Column(name = "channel", nullable = false, length = 16)
@@ -51,6 +51,11 @@ public class NotificationDelivery {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) createdAt = Instant.now();
+    }
 
     @Column(name = "delivered_at")
     private Instant deliveredAt;

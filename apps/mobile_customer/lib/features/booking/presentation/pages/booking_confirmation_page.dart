@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 final bookingConfirmationProvider =
     FutureProvider.autoDispose.family<BookingRow, String>((ref, id) async {
@@ -41,7 +42,7 @@ class BookingConfirmationPage extends ConsumerWidget {
             ]))),
             const SizedBox(height: 24),
           ]),
-          loading: () => const CircularProgressIndicator(),
+          loading: () => const ShimmerProviderDetail(),
           error: (e, _) => Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Icon(Icons.error_outline, size: 64, color: Colors.red),
             const SizedBox(height: 16),

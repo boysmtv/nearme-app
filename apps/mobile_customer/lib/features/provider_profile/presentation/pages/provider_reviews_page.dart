@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class ProviderReviewsPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -36,7 +37,7 @@ class _ProviderReviewsPageState extends ConsumerState<ProviderReviewsPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_loading) return const ShimmerCardList();
     if (_reviews.isEmpty) {
       return Center(
         child: Column(

@@ -3,41 +3,31 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
+import '../../providers/discovery_providers.dart';
 
-final discoveryProvider = FutureProvider.autoDispose<List<ProviderRow>>((ref) async {
-  final response = await ApiService().getProviders();
-  return ((response.data['data'] ?? []) as List)
-      .map((e) => ProviderRow.fromJson(e as Map<String, dynamic>))
-      .toList();
-});
-
-final categoriesProvider = FutureProvider.autoDispose<List<Category>>((ref) async {
-  final response = await ApiService().getCategories();
-  return ((response.data['data'] ?? []) as List)
-      .map((e) => Category.fromJson(e as Map<String, dynamic>))
-      .toList();
-});
+export '../../providers/discovery_providers.dart' show discoveryProvidersProvider, categoriesProvider, dashboardProfileProvider;
 
 class DiscoveryPage extends ConsumerWidget {
   const DiscoveryPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final providersAsync = ref.watch(discoveryProvider);
+    final providersAsync = ref.watch(discoveryProvidersProvider);
     final categoriesAsync = ref.watch(categoriesProvider);
 
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            ref.invalidate(discoveryProvider);
+            ref.invalidate(discoveryProvidersProvider);
             ref.invalidate(categoriesProvider);
             await Future.wait([
-              ref.read(discoveryProvider.future).catchError((_) => <ProviderRow>[]),
+              ref.read(discoveryProvidersProvider.future).catchError((_) => <ProviderRow>[]),
               ref.read(categoriesProvider.future).catchError((_) => <Category>[]),
             ]);
           },
           child: CustomScrollView(
+            key: const PageStorageKey<String>('discovery_scroll'),
             physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
             slivers: [
               SliverToBoxAdapter(
@@ -185,6 +175,23 @@ class DiscoveryPage extends ConsumerWidget {
                   return SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
+                        // Last item: load more button
+                        if (index == providers.length) {
+                          final notifier = ref.read(discoveryProvidersProvider.notifier);
+                          if (!notifier.hasMore) return const SizedBox.shrink();
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: notifier.isLoadingMore
+                                  ? const CircularProgressIndicator(strokeWidth: 2)
+                                  : TextButton.icon(
+                                      onPressed: () => notifier.loadMore(),
+                                      icon: const Icon(Icons.expand_more, size: 18),
+                                      label: const Text('Muat Lebih Banyak'),
+                                    ),
+                            ),
+                          );
+                        }
                         final provider = providers[index];
                         return TweenAnimationBuilder<double>(
                           tween: Tween(begin: 0, end: 1),
@@ -204,7 +211,8 @@ class DiscoveryPage extends ConsumerWidget {
                           ),
                         );
                       },
-                      childCount: providers.length,
+                      // +1 for load more button
+                      childCount: providers.length + (ref.read(discoveryProvidersProvider.notifier).hasMore ? 1 : 0),
                     ),
                   );
                 },
@@ -231,7 +239,7 @@ class DiscoveryPage extends ConsumerWidget {
                           const SizedBox(height: 4),
                           Text(e.toString().replaceAll('Exception: ', ''), textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
                           const SizedBox(height: 12),
-                          FilledButton.icon(onPressed: () => ref.invalidate(discoveryProvider), icon: const Icon(Icons.refresh_rounded, size: 16), label: const Text('Coba Lagi')),
+                           FilledButton.icon(onPressed: () => ref.invalidate(discoveryProvidersProvider), icon: const Icon(Icons.refresh_rounded, size: 16), label: const Text('Coba Lagi')),
                         ],
                       ),
                     ),
@@ -516,7 +524,7 @@ class _ShimmerCardState extends State<_ShimmerCard> with SingleTickerProviderSta
 class _DashboardSummary extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync = ref.watch(_dashboardProfileProvider);
+    final profileAsync = ref.watch(dashboardProfileProvider);
     return Container(
       margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
       padding: const EdgeInsets.all(16),
@@ -572,20 +580,6 @@ class _DashboardSummary extends ConsumerWidget {
     );
   }
 }
-
-final _dashboardProfileProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
-  try {
-    final res = await ApiService().getCustomerProfile();
-    final data = res.data;
-    if (data is Map<String, dynamic>) {
-      final profileData = data['data'];
-      if (profileData is Map<String, dynamic>) return profileData;
-    }
-    return {};
-  } catch (_) {
-    return {};
-  }
-});
 
 class _DashboardItem extends StatelessWidget {
   final IconData icon;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class LoyaltyPage extends ConsumerStatefulWidget {
   const LoyaltyPage({super.key});
@@ -45,7 +46,7 @@ class _LoyaltyPageState extends ConsumerState<LoyaltyPage> {
         foregroundColor: Colors.white,
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const ShimmerCardList()
           : Column(
               children: [
                 Container(

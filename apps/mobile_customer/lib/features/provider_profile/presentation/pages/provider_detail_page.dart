@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class ProviderDetail {
   final String id;
@@ -92,6 +93,7 @@ class ProviderDetailPage extends ConsumerWidget {
         data: (provider) {
           final servicesAsync = ref.watch(providerServicesProvider(provider.id));
           return CustomScrollView(
+            key: const PageStorageKey<String>('provider_detail_scroll'),
             slivers: [
               SliverAppBar(
                 expandedHeight: 280,
@@ -472,7 +474,7 @@ class ProviderDetailPage extends ConsumerWidget {
             ],
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerProviderDetail(),
         error: (e, _) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

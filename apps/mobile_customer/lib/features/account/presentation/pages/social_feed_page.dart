@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 final feedFutureProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
   try {
@@ -264,10 +265,7 @@ class _SocialFeedPageState extends ConsumerState<SocialFeedPage> {
                   }).toList(),
                 );
               },
-              loading: () => const Center(child: Padding(
-                padding: EdgeInsets.all(32),
-                child: CircularProgressIndicator(),
-              )),
+              loading: () => const ShimmerCardList(),
               error: (e, _) => Center(
                 child: Padding(
                   padding: const EdgeInsets.all(32),

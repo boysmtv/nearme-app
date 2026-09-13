@@ -6,6 +6,7 @@ import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 final bookingDetailProvider2 = FutureProvider.autoDispose.family<BookingRow, String>((ref, id) async {
   final response = await ApiService().getBooking(id);
@@ -297,7 +298,7 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
             ]),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerProviderDetail(),
         error: (e, _) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,

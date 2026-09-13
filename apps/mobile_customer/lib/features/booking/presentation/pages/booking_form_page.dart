@@ -102,6 +102,7 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
         leading: IconButton(icon: const Icon(Icons.arrow_back_rounded), onPressed: () => context.pop()),
       ),
       body: CustomScrollView(
+        key: const PageStorageKey<String>('booking_form_scroll'),
         slivers: [
           SliverToBoxAdapter(
             child: Padding(

@@ -3,8 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
-final chatListProvider = FutureProvider.autoDispose<List<ConversationRow>>((ref) async {
+final chatListProvider = FutureProvider<List<ConversationRow>>((ref) async {
   final res = await ApiService().getChats();
   final data = res.data['data'] as List;
   return data.map((e) => ConversationRow.fromJson(e as Map<String, dynamic>)).toList();
@@ -64,7 +65,7 @@ class ChatListPage extends ConsumerWidget {
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerCardList(),
         error: (e, _) => Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Error: $e'), TextButton(onPressed: () => ref.invalidate(chatListProvider), child: const Text('Retry'))])),
       ),
       floatingActionButton: FloatingActionButton(

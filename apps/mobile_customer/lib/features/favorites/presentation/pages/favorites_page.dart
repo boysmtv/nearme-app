@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class FavoritesPage extends ConsumerStatefulWidget {
   const FavoritesPage({super.key});
@@ -14,6 +15,7 @@ class FavoritesPage extends ConsumerStatefulWidget {
 class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   List<dynamic> _favorites = [];
   bool _loading = true;
+  bool _removingId = false;
 
   @override
   void initState() {
@@ -44,7 +46,7 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
         foregroundColor: Colors.white,
       ),
       body: _loading
-          ? const Center(child: CircularProgressIndicator())
+          ? const ShimmerCardList()
           : _favorites.isEmpty
               ? Center(
                   child: Column(
@@ -81,8 +83,8 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
                           title: Text(fav['staffName'] ?? 'Staff'),
                           subtitle: Text(fav['specialties'] ?? 'Provider staff'),
                           trailing: IconButton(
-                            icon: const Icon(Icons.favorite, color: Colors.red),
-                            onPressed: () => _removeFavorite(fav['staffId']),
+                            icon: _removingId ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.red)) : const Icon(Icons.favorite, color: Colors.red),
+                            onPressed: _removingId ? null : () => _removeFavorite(fav['staffId']),
                           ),
                         ),
                       );
@@ -93,10 +95,15 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
   }
 
   Future<void> _removeFavorite(String staffId) async {
+    setState(() => _removingId = true);
     try {
       await ApiService().removeFavorite(staffId);
-      setState(() => _favorites.removeWhere((f) => f['staffId'] == staffId));
+      setState(() {
+        _favorites.removeWhere((f) => f['staffId'] == staffId);
+        _removingId = false;
+      });
     } catch (e) {
+      setState(() => _removingId = false);
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed: $e')));
     }
   }

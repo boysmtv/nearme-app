@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class MyReviewsPage extends ConsumerStatefulWidget {
   const MyReviewsPage({super.key});
@@ -41,7 +42,7 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Ulasan Saya')),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const ShimmerCardList()
           : _bookings.isEmpty
               ? Center(
                   child: Column(

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import '../../../../shared/models/rows.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 final providerListProvider = FutureProvider.autoDispose<List<ProviderRow>>((ref) async {
   final response = await ApiService().getProviders();
@@ -63,7 +64,7 @@ class ProviderListPage extends ConsumerWidget {
             },
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const ShimmerCardList(),
         error: (e, _) => Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
