@@ -79,6 +79,13 @@ services:
       - SPRING_DATA_REDIS_PORT=6379
       - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MIDTRANS_SERVER_KEY=${MIDTRANS_SERVER_KEY}
+      - MIDTRANS_WEBHOOK_SECRET=${MIDTRANS_WEBHOOK_SECRET}
+      - MIDTRANS_API_URL=${MIDTRANS_API_URL:https://api.midtrans.com}
+      - FCM_PROJECT_ID=${FCM_PROJECT_ID}
+      - FCM_SERVICE_ACCOUNT_PATH=${FCM_SERVICE_ACCOUNT_PATH:./fcm/service-account.json}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4318
       - OTEL_SERVICE_NAME=api-blue
       - JAVA_OPTS=${API_JAVA_OPTS:--Xms512m -Xmx1024m}
@@ -86,7 +93,7 @@ services:
       - app
       - edge
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/api/v1/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -106,6 +113,13 @@ services:
       - SPRING_DATA_REDIS_PORT=6379
       - SPRING_DATA_REDIS_PASSWORD=${REDIS_PASSWORD}
       - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+      - MIDTRANS_SERVER_KEY=${MIDTRANS_SERVER_KEY}
+      - MIDTRANS_WEBHOOK_SECRET=${MIDTRANS_WEBHOOK_SECRET}
+      - MIDTRANS_API_URL=${MIDTRANS_API_URL:https://api.midtrans.com}
+      - FCM_PROJECT_ID=${FCM_PROJECT_ID}
+      - FCM_SERVICE_ACCOUNT_PATH=${FCM_SERVICE_ACCOUNT_PATH:./fcm/service-account.json}
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://alloy:4318
       - OTEL_SERVICE_NAME=api-green
       - JAVA_OPTS=${API_JAVA_OPTS:--Xms512m -Xmx1024m}
@@ -113,7 +127,7 @@ services:
       - app
       - edge
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/api/v1/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -140,7 +154,7 @@ services:
       - app
       - data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/api/v1/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -148,7 +162,7 @@ services:
 
   # ──────────────────────── Data Layer ────────────────────────
   postgres:
-    image: postgres:18.6-alpine
+    image: postgis/postgis:17-3.4
     container_name: dekat-postgres
     restart: unless-stopped
     environment:
@@ -291,6 +305,7 @@ services:
     restart: unless-stopped
     volumes:
       - ../observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../observability/prometheus/rules:/etc/prometheus/rules:ro
       - prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"

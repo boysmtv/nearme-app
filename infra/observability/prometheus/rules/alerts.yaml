@@ -135,3 +135,66 @@ groups:
         annotations:
           summary: "Dead letter queue messages detected"
           description: "{{ $value }} messages in DLT"
+
+      - alert: BookingRateAnomaly
+        expr: abs(sum(rate(dekat_bookings_created_total[1h])) - avg_over_time(sum(rate(dekat_bookings_created_total[1h]))[24h:1h])) > 3 * stddev_over_time(sum(rate(dekat_bookings_created_total[1h]))[24h:1h])
+        for: 30m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Booking rate anomaly detected"
+          description: "Booking rate deviates significantly from 24h average"
+
+      - alert: PaymentSettlementDelay
+        expr: dekat_payment_settlement_age_seconds > 3600
+        for: 10m
+        labels:
+          severity: high
+        annotations:
+          summary: "Payment settlement delayed"
+          description: "Unsettled payments older than 1 hour: {{ $value }}"
+
+      - alert: FCMPushFailureRate
+        expr: sum(rate(dekat_fcm_push_errors_total[10m])) / sum(rate(dekat_fcm_push_total[10m])) > 0.1
+        for: 10m
+        labels:
+          severity: high
+        annotations:
+          summary: "FCM push failure rate high"
+          description: "Push failure rate is {{ $value | humanizePercentage }}"
+
+      - alert: Caddy5xxRate
+        expr: sum(rate(caddy_http_response_status_count{status=~"5.."}[5m])) / sum(rate(caddy_http_response_status_count[5m])) > 0.01
+        for: 5m
+        labels:
+          severity: high
+        annotations:
+          summary: "Caddy 5xx error rate high"
+          description: "Reverse proxy error rate is {{ $value | humanizePercentage }}"
+
+      - alert: KafkaUnderReplicatedPartitions
+        expr: kafka_server_replicamanager_underreplicatedpartitions > 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Kafka under-replicated partitions"
+          description: "{{ $value }} under-replicated partitions"
+
+      - alert: PostgreSQLConnectionsHigh
+        expr: pg_stat_activity_count > 80
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "PostgreSQL connections high"
+          description: "{{ $value }} active connections (threshold: 80)"
+
+      - alert: RedisRejectedConnections
+        expr: increase(redis_rejected_connections_total[5m]) > 0
+        for: 0m
+        labels:
+          severity: high
+        annotations:
+          summary: "Redis rejecting connections"
+          description: "{{ $value }} rejected connections in last 5 minutes"

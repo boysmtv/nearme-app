@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# DEKAT Booking Platform - Deployment Script
+# ═══════════════════════════════════════════════════════════════
+# DEKAT Booking Platform - Blue-Green Deployment Script
 # Usage: ./deploy.sh [blue|green] [tag]
+# ═══════════════════════════════════════════════════════════════
 
 set -euo pipefail
 
@@ -9,6 +11,7 @@ DEPLOYMENT="${1:-blue}"
 API_TAG="${2:-latest}"
 COMPOSE_DIR="$(dirname "$0")/../compose"
 CURRENT_ENV_FILE="${COMPOSE_DIR}/.env"
+CADDYFILE="../caddy/Caddyfile"
 
 # --- Colors ---
 RED='\033[0;31m'
@@ -48,14 +51,15 @@ else
   warn "Active slot (${ACTIVE}) is not healthy, proceeding anyway"
 fi
 
+# --- Pull new image ---
+log "Pulling image: ghcr.io/dekat/api:${API_TAG}"
+docker pull "ghcr.io/dekat/api:${API_TAG}" 2>/dev/null || warn "Pull failed, using local image"
+
 # --- Update and start new slot ---
 log "Updating ${DEPLOYMENT} slot with image tag: ${API_TAG}"
 export API_TAG="${API_TAG}"
 
 cd "${COMPOSE_DIR}"
-
-# Pull the new image
-docker compose -f compose.yaml pull "api-${DEPLOYMENT}"
 
 # Start the new slot
 docker compose -f compose.yaml up -d "api-${DEPLOYMENT}"
@@ -83,11 +87,29 @@ if [ ${ELAPSED} -ge ${MAX_WAIT} ]; then
   exit 1
 fi
 
-# --- Switch traffic ---
-log "Switching traffic to ${DEPLOYMENT} slot..."
-# Update Caddy to route to new active slot
-# This is a placeholder - implement based on your Caddy config update mechanism
+# --- Run smoke test ---
+log "Running smoke test..."
+SMOKE_RESULT=$(docker exec "dekat-api-${DEPLOYMENT}" \
+  wget -q -O - http://localhost:8080/api/v1/actuator/health 2>/dev/null || echo "FAILED")
 
+if echo "${SMOKE_RESULT}" | grep -q '"status":"UP"'; then
+  log "Smoke test passed"
+else
+  warn "Smoke test returned: ${SMOKE_RESULT}"
+fi
+
+# --- Switch Caddy traffic ---
+log "Switching traffic to ${DEPLOYMENT} slot..."
+# Update Caddy config to point to new active slot
+if [ -f "${CADDYFILE}" ]; then
+  # Replace the default reverse_proxy target
+  sed -i "s|reverse_proxy api-blue:8080|reverse_proxy api-${DEPLOYMENT}:8080|g" "${CADDYFILE}" 2>/dev/null || true
+  # Reload Caddy
+  docker exec dekat-caddy caddy reload --config /etc/caddy/Caddyfile 2>/dev/null || warn "Caddy reload failed"
+fi
+
+log "═══════════════════════════════════════════════════════════"
 log "Deployment of API ${DEPLOYMENT} (${API_TAG}) complete!"
 log "Previous active slot: ${ACTIVE}"
 log "New active slot: ${DEPLOYMENT}"
+log "═══════════════════════════════════════════════════════════"

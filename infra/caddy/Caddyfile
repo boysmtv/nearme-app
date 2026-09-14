@@ -6,7 +6,7 @@
 	}
 }
 
-# ──────────────────────── Public App ────────────────────────
+# ──────────────────────── Public App (Customer + Provider) ────────────────────────
 {$PUBLIC_DOMAIN} {
 	encode gzip zstd
 	header {
@@ -21,26 +21,6 @@
 		-X-Powered-By
 	}
 	reverse_proxy web-public:80 {
-		header_up X-Real-IP {remote_host}
-		header_up X-Forwarded-For {remote_host}
-		header_up X-Forwarded-Proto {scheme}
-	}
-}
-
-# ──────────────────────── Provider App ────────────────────────
-{$PROVIDER_DOMAIN} {
-	encode gzip zstd
-	header {
-		Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
-		X-Content-Type-Options "nosniff"
-		X-Frame-Options "DENY"
-		X-XSS-Protection "1; mode=block"
-		Referrer-Policy "strict-origin-when-cross-origin"
-		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://{$MINIO_HOST}; font-src 'self'; connect-src 'self' https://{$API_DOMAIN} wss://{$API_DOMAIN}; frame-ancestors 'none'"
-		Server "DEKAT"
-		-X-Powered-By
-	}
-	reverse_proxy web-provider:80 {
 		header_up X-Real-IP {remote_host}
 		header_up X-Forwarded-For {remote_host}
 		header_up X-Forwarded-Proto {scheme}
@@ -93,14 +73,6 @@
 		header_up X-Real-IP {remote_host}
 		header_up X-Forwarded-For {remote_host}
 		header_up X-Forwarded-Proto {scheme}
-	}
-
-	# Rate limiting
-	@api_rate_limit {
-		rate_limit 100r/s
-	}
-	handle @api_rate_limit {
-		respond "Rate limit exceeded" 429
 	}
 
 	# Health check passthrough

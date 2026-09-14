@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
+# ═══════════════════════════════════════════════════════════════
 # DEKAT Booking Platform - Rollback Script
 # Usage: ./rollback.sh [blue|green]
+# ═══════════════════════════════════════════════════════════════
 
 set -euo pipefail
 
 # --- Configuration ---
 COMPOSE_DIR="$(dirname "$0")/../compose"
-CURRENT_ENV_FILE="${COMPOSE_DIR}/.env"
+CADDYFILE="../caddy/Caddyfile"
 
 # --- Colors ---
 RED='\033[0;31m'
@@ -63,7 +65,7 @@ if [ "${STATUS}" != "healthy" ]; then
   docker compose -f compose.yaml up -d "api-${ROLLBACK_SLOT}"
 
   # Wait for health
-  MAX_WAIT=60
+  MAX_WAIT=120
   INTERVAL=5
   ELAPSED=0
 
@@ -83,15 +85,31 @@ if [ "${STATUS}" != "healthy" ]; then
   fi
 fi
 
-# --- Switch traffic ---
+# --- Run smoke test ---
+log "Running smoke test on ${ROLLBACK_SLOT}..."
+SMOKE_RESULT=$(docker exec "dekat-api-${ROLLBACK_SLOT}" \
+  wget -q -O - http://localhost:8080/api/v1/actuator/health 2>/dev/null || echo "FAILED")
+
+if echo "${SMOKE_RESULT}" | grep -q '"status":"UP"'; then
+  log "Smoke test passed"
+else
+  warn "Smoke test returned: ${SMOKE_RESULT}"
+fi
+
+# --- Switch Caddy traffic ---
 log "Switching traffic to ${ROLLBACK_SLOT} slot..."
-# Update Caddy to route to rollback slot
-# This is a placeholder - implement based on your Caddy config update mechanism
+if [ -f "${CADDYFILE}" ]; then
+  sed -i "s|reverse_api-${CURRENT_SLOT}:8080|reverse_proxy api-${ROLLBACK_SLOT}:8080|g" "${CADDYFILE}" 2>/dev/null || true
+  docker exec dekat-caddy caddy reload --config /etc/caddy/Caddyfile 2>/dev/null || warn "Caddy reload failed"
+fi
 
 # --- Stop failed slot ---
 log "Stopping failed ${CURRENT_SLOT} slot..."
 cd "${COMPOSE_DIR}"
 docker compose -f compose.yaml stop "api-${CURRENT_SLOT}"
 
+log "═══════════════════════════════════════════════════════════"
 log "Rollback complete!"
 log "Active slot: ${ROLLBACK_SLOT}"
+log "Stopped slot: ${CURRENT_SLOT}"
+log "═══════════════════════════════════════════════════════════"

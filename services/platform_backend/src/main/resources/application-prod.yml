@@ -79,3 +79,16 @@ server:
     enabled: true
   http2:
     enabled: true
+
+# ===== Payment Gateway (prod) =====
+dekat:
+  payment:
+    gateway:
+      provider: midtrans
+      server-key: ${MIDTRANS_SERVER_KEY}
+      webhook-secret: ${MIDTRANS_WEBHOOK_SECRET}
+      api-url: ${MIDTRANS_API_URL:https://api.midtrans.com}
+  notification:
+    fcm:
+      project-id: ${FCM_PROJECT_ID}
+      service-account-path: ${FCM_SERVICE_ACCOUNT_PATH:./fcm/service-account.json}

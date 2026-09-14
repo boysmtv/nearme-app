@@ -16,11 +16,13 @@ vi.mock('../../lib/api', () => ({
   mediaApi: { upload: vi.fn() },
 }));
 
+const mockUseAuth = vi.fn(() => ({
+  user: null,
+  isAuthenticated: false,
+}));
+
 vi.mock('../../lib/auth', () => ({
-  useAuth: () => ({
-    user: null,
-    isAuthenticated: false,
-  }),
+  useAuth: (...args: any[]) => mockUseAuth(...args),
 }));
 
 vi.mock('../../components/Header', () => ({
@@ -347,7 +349,7 @@ describe('ProviderPage', () => {
     });
     await userEvent.click(screen.getByText(/Ulasan/));
     await waitFor(() => {
-      expect(screen.getByText(/Masuk untuk menulis ulasan/)).toBeInTheDocument();
+      expect(screen.getByText('Masuk untuk menulis ulasan setelah booking selesai.')).toBeInTheDocument();
     });
   });
 
@@ -378,5 +380,218 @@ describe('ProviderPage', () => {
     });
     expect(screen.getByText('4.5')).toBeInTheDocument();
     expect(screen.getByText('(12 ulasan)')).toBeInTheDocument();
+  });
+
+  it('hides rating when provider.rating is 0', async () => {
+    (publicApi.providers.getBySlug as any).mockResolvedValue({ data: { ...providerData, rating: 0, reviewCount: 0 } });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('(0 ulasan)')).not.toBeInTheDocument();
+  });
+
+  it('shows cover image when coverUrl exists', async () => {
+    (publicApi.providers.getBySlug as any).mockResolvedValue({ data: { ...providerData, coverUrl: 'http://example.com/cover.jpg' } });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    const coverImg = document.querySelector('img[alt="Barbershop Central"]');
+    expect(coverImg).toBeInTheDocument();
+  });
+
+  it('shows logo image when logoUrl exists', async () => {
+    (publicApi.providers.getBySlug as any).mockResolvedValue({ data: { ...providerData, logoUrl: 'http://example.com/logo.jpg' } });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    const logoImg = document.querySelector('img[alt="Barbershop Central"]');
+    expect(logoImg).toBeInTheDocument();
+  });
+
+  it('shows provider location fallback to address', async () => {
+    (publicApi.providers.getBySlug as any).mockResolvedValue({ data: { ...providerData, location: '', address: 'Jl. Test No. 1' } });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Jl. Test No. 1')).toBeInTheDocument();
+    });
+  });
+
+  it('shows provider address when location is undefined', async () => {
+    const dataWithoutLocation = { ...providerData };
+    delete (dataWithoutLocation as any).location;
+    (publicApi.providers.getBySlug as any).mockResolvedValue({ data: { ...dataWithoutLocation, address: 'Jl. Addr No. 2' } });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Jl. Addr No. 2')).toBeInTheDocument();
+    });
+  });
+
+  it('renders staff with more than 5 portfolio items', async () => {
+    const manyPortfolioStaff = [{
+      ...staffData[0],
+      portfolio: Array.from({ length: 7 }, (_, i) => ({ id: `p${i}`, url: `http://example.com/p${i}.jpg`, fileName: `portfolio${i}.jpg` })),
+    }];
+    (publicApi.staff.listByProvider as any).mockResolvedValue({ data: manyPortfolioStaff });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => { expect(screen.getByText('Andi')).toBeInTheDocument(); });
+    expect(screen.getByText('+2')).toBeInTheDocument();
+  });
+
+  it('renders staff with title undefined', async () => {
+    const staffNoTitle = [{ ...staffData[0], title: undefined }, staffData[1]];
+    (publicApi.staff.listByProvider as any).mockResolvedValue({ data: staffNoTitle });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => { expect(screen.getByText('Andi')).toBeInTheDocument(); });
+    expect(screen.getAllByText(/Staf/).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('shows review date formatting', async () => {
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Budi')).toBeInTheDocument(); });
+    expect(screen.getByText('10/9/2026')).toBeInTheDocument();
+  });
+
+  it('shows review without photos', async () => {
+    const reviewNoPhotos = [{ ...reviewsData[0], photos: [] }];
+    (publicApi.reviews.listByProvider as any).mockResolvedValue({ data: { data: reviewNoPhotos } });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Budi')).toBeInTheDocument(); });
+  });
+
+  it('shows review without verified booking', async () => {
+    const reviewUnverified = [{ ...reviewsData[0], verifiedBooking: false }];
+    (publicApi.reviews.listByProvider as any).mockResolvedValue({ data: { data: reviewUnverified } });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Budi')).toBeInTheDocument(); });
+    expect(screen.queryByText('✓ Verified booking')).not.toBeInTheDocument();
+  });
+
+  it('shows review without title', async () => {
+    const reviewNoTitle = [{ ...reviewsData[0], title: '' }];
+    (publicApi.reviews.listByProvider as any).mockResolvedValue({ data: { data: reviewNoTitle } });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Budi')).toBeInTheDocument(); });
+  });
+
+  it('shows review with no avatar (initial)', async () => {
+    const reviewNoAvatar = [{ ...reviewsData[0], customerAvatar: '' }];
+    (publicApi.reviews.listByProvider as any).mockResolvedValue({ data: { data: reviewNoAvatar } });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('B')).toBeInTheDocument(); });
+  });
+
+  it('shows review with null customerName', async () => {
+    const reviewNullName = [{ ...reviewsData[0], customerName: null }];
+    (publicApi.reviews.listByProvider as any).mockResolvedValue({ data: { data: reviewNullName } });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('?')).toBeInTheDocument(); });
+  });
+
+  it('shows review with no createdAt', async () => {
+    const reviewNoDate = [{ ...reviewsData[0], createdAt: '' }];
+    (publicApi.reviews.listByProvider as any).mockResolvedValue({ data: { data: reviewNoDate } });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Budi')).toBeInTheDocument(); });
+  });
+
+  it('toggles favorite on staff member', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => { expect(screen.getByText('Andi')).toBeInTheDocument(); });
+    const favButtons = screen.getAllByLabelText('Favorite');
+    await userEvent.click(favButtons[0]);
+    await waitFor(() => {
+      expect(publicApi.favorites.add).toHaveBeenCalled();
+    });
+  });
+
+  it('shows report success message', async () => {
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Budi')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText('Laporkan'));
+    await waitFor(() => {
+      expect(screen.getByText(/Laporan terkirim/)).toBeInTheDocument();
+    });
+  });
+
+  it('shows report error message', async () => {
+    (publicApi.reviews.report as any).mockRejectedValue(new Error('Report failed'));
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Budi')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText('Laporkan'));
+    await waitFor(() => {
+      expect(screen.getByText('Report failed')).toBeInTheDocument();
+    });
+  });
+
+  it('shows review comment via body field when comment is null', async () => {
+    const reviewBodyOnly = [{ ...reviewsData[0], comment: null, body: 'Body content' }];
+    (publicApi.reviews.listByProvider as any).mockResolvedValue({ data: { data: reviewBodyOnly } });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Body content')).toBeInTheDocument(); });
+  });
+
+  it('shows review with empty comment and body', async () => {
+    const reviewEmpty = [{ ...reviewsData[0], comment: null, body: null }];
+    (publicApi.reviews.listByProvider as any).mockResolvedValue({ data: { data: reviewEmpty } });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => { expect(screen.getByText('Budi')).toBeInTheDocument(); });
+  });
+
+  it('shows "not found" link back to search', async () => {
+    (publicApi.providers.getBySlug as any).mockResolvedValue({ data: null });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Provider tidak ditemukan')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Kembali ke pencarian')).toBeInTheDocument();
+  });
+
+  it('renders services with service cards', async () => {
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await waitFor(() => { expect(screen.getAllByTestId('service-card')).toHaveLength(2); });
+  });
+
+  it('handles gallery returning nested data', async () => {
+    (publicApi.media.publicProviderGallery as any).mockResolvedValue({ data: galleryData });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('2 foto dalam galeri')).toBeInTheDocument();
+    });
   });
 });

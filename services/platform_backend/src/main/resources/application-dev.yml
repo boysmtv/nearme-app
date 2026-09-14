@@ -82,9 +82,9 @@ dekat:
   payment:
     gateway:
       provider: midtrans
-      server-key: SB-Mid-server-XXXXXXXXXXXXXXXXXXXX
-      webhook-secret: SB-Mid-signature-key-XXXXXXXXXXXXXXXXXXXX
-      api-url: https://api.sandbox.midtrans.com
+      server-key: ${MIDTRANS_SERVER_KEY:SB-Mid-server-XXXXXXXXXXXXXXXXXXXX}
+      webhook-secret: ${MIDTRANS_WEBHOOK_SECRET:SB-Mid-signature-key-XXXXXXXXXXXXXXXXXXXX}
+      api-url: ${MIDTRANS_API_URL:https://api.sandbox.midtrans.com}
 
 # ===== Actuator (dev) =====
 management:
