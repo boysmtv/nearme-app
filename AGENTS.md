@@ -316,9 +316,9 @@ pnpm install && pnpm dev
 - **Profile completion race condition FIXED**: `ProfileCompletePage` uses `useEffect` to navigate after `hasProfile` state is confirmed updated, avoiding redirect loop with `RequireProfileGuard`
 
 ### Testing
-- **Total: ~1114 tests** across 5 platforms, all passing (829 web_public + 123 web_admin + 43 mobile_partner + 124 mobile_customer + 41 e2e). web_public coverage 70.21% lines. Verified 2026-09-14
+- **Total: ~1183 tests** across 5 platforms, all passing (892 web_public + 123 web_admin + 43 mobile_partner + 124 mobile_customer + 41 e2e). web_public coverage 74.06% lines. Verified 2026-09-14
 - Backend: 222 tests (BookingService + Media + Deposit + FAQ + Chat + Reporting + Coupon/Payment/Jwt + CouponServiceWeird + PaymentServiceWeird) — JUnit 5 + Mockito
-- web_public: 829 tests (89 files) — Vitest + @testing-library/react, 70.21% line coverage
+- web_public: 892 tests (89 files) — Vitest + @testing-library/react, 74.06% line coverage
 - web_admin: 123 tests (20 files) — Vitest + @testing-library/react
 - E2E Playwright: 41 tests (12 web-public + 7 booking-weird + 18 UI audit + 4 web-provider) — screenshots + functional
 - Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
@@ -391,13 +391,38 @@ pnpm install && pnpm dev
   - **Architecture + UX polish 2026-09-13** — (1) **StatefulShellRoute migration**: `app_router.dart` converted from ShellRoute to `StatefulShellRoute.indexedStack` with 6 branches (home, search, chat, bookings, notifications, account), preserving scroll position on tab switch. Chat tab moved into its own `StatefulNavigationShell` branch. `MainScaffold` rewritten to accept `StatefulNavigationShell`. (2) **Shimmer loading**: Created `shimmer_loading.dart` shared widget (7 variants: `ShimmerBox`, `ShimmerListTile`, `ShimmerCardList`, `ShimmerGrid`, `ShimmerProviderDetail`, `ShimmerBookingCard`, `ShimmerBookingList`). Applied to 17+ pages across all features (booking, notification, chat, favorites, loyalty, reviews, provider, search, discovery, social, support, referral, nearby). (3) **Button loading indicators**: Added to favorites remove button, notification mark-all-read, support submit, provider detail favorite toggle. (4) **Logout fix**: `ApiClient.logout()` now sends `refreshToken` as query param from secure storage; guard skips backend call if no refreshToken (avoids 500 on fresh install). (5) **Backend fix**: `NotificationDelivery.template_id` made nullable (`@PrePersist` + V30 migration), `BookingService.confirmBooking` fills null times from hold. (6) **Provider barrel files**: Created barrel exports for 6 feature directories. (7) **Pagination**: `DiscoveryProvidersNotifier` with `loadMore`/`hasMore`/`isLoadingMore` + load-more button in discovery page. `flutter analyze` 0 errors, 0 warnings. Web 134/134 pass.
   - **Backend rebuild + stale holds cleanup 2026-09-13** — (1) **Backend JAR rebuild**: `.\gradlew.bat :notification:clean :api:clean :sharedkernel:clean` + `:api:bootJar` — entity changes (V30, @PrePersist) now compiled into JAR. (2) **Docker image rebuild**: `docker compose -f infra/compose/compose.local.yaml up -d --build api` — new image `dekat-api` recreated. (3) **Stale booking holds cleaned**: 5 `EXPIRED` holds deleted from DB, 0 active holds remaining. (4) **V30 migration verified**: `flyway_schema_history` row exists with `success=true`. (5) **booking_form_page.dart shimmer**: replaced `CircularProgressIndicator` with `ShimmerBox(height: 120)` for service summary loading. (6) **Login smoke test**: `siti@gmail.com` → 200 OK, JWT returned. Final commit `1a59265`.
   - **web_public test fixes 2026-09-14** — Fixed 23 failing tests across 5 files: AnalyticsDeepPage (8: double "0 booking" text, regex /Sibuk/ matches heading+legend, rating 5.0 renders as 5, forecast data race condition, recommendation mock), SmartSchedulingPage (4: waitFor on static heading before API resolve, legend regex collision), ProviderPage (4: vi.mock hoisting overrides auth mock for all tests, tab label mismatch, async service data, double-nested gallery mock), CustomerAccountPage (3: missing fireEvent import, labels lack htmlFor so getByLabelText fails), CustomerBookingDetailPage (4: multiple identical text elements, getByText vs queryByText for .not assertions). Root causes: vi.mock() inside tests hoisted by Vitest and overrides module-level mocks, React Query race conditions when waiting for non-data-dependent text, DOM label/input association requires htmlFor attribute. web_public coverage: 67.84% → 70.21% lines.
+  - **web_public coverage improvement 2026-09-14** — Added/enhanced tests for 8 low-coverage files: LoginPage (12 tests: OTP flow, error handling), admin/ChatPage (10 tests: conversations, filtering, send), provider/FaqPage (14 tests: FAQ+policy CRUD), provider/ServicesPage (10 tests: service+addon CRUD), admin/FaqsPage (12 tests: FAQ/policy tables, modals), ChatWidget (10 tests: messages, send, file upload), SearchPage (10 tests: filters, sorting, pagination), StaffManagementSuitePage (16 tests: staff CRUD, check-in/out, details). web_public coverage: 70.21% → 74.06% lines. 892 tests all passing.
 
 ## What's Next
 
-- **Device testing (mobile)**: Run both apps on Mi A1 — verify FCM push notifications, booking flow end-to-end (service → staff → date → slot → confirm → payment → PIN verify), calendar sync, shimmer loading appearance
-- **Payment gateway sandbox testing**: Configure real Midtrans sandbox keys in `application-dev.yml` (`SB-Mid-server-XXX`, `SB-Mid-signature-key-XXX`) and test end-to-end with Midtrans sandbox dashboard
-- **Production deployment**: Docker Compose with real Midtrans production keys, PostgreSQL backup (pgBackRest), Caddy reverse proxy, SSL certificates
-- **Optional enhancements**: Push notification campaign system, advanced analytics, multi-language support, real-time WebSocket chat on mobile
+### Coverage Improvement (Priority - Resuming Tomorrow)
+- **Target**: web_public 74.06% → 100% lines (current: 2096/2830 lines covered)
+- **Remaining low-coverage files** (sorted by impact, lines uncovered):
+  1. `src/lib/api.ts` — 22.53% (3311 stmts, ~500+ uncovered lines, **biggest gap**)
+  2. `src/pages/BookingPage.tsx` — 37.83% (918 lines, multi-step flow tests need vi.hoisted() + Routes pattern)
+  3. `src/pages/admin/FaqsPage.tsx` — 43.75% (tests rewritten, need verification)
+  4. `src/components/ChatWidget.tsx` — 44.44% (tests rewritten, need verification)
+  5. `src/pages/provider/MediaPage.tsx` — 56.81% (drag-drop, reorder, upload validation)
+  6. `src/pages/provider/NotificationsPage.tsx` — 53.33%
+  7. `src/pages/customer/RecurringBookingsPage.tsx` — 52.5%
+  8. `src/pages/customer/SocialFeedPage.tsx` — 52.94%
+  9. `src/pages/provider/SubscriptionPage.tsx` — 58.33%
+  10. `src/pages/provider/StaffManagementSuitePage.tsx` — 66.66%
+
+### Key Lessons from Today's Session
+- **`vi.hoisted()` is mandatory** when mock variables are used inside `vi.mock()` factories — without it, mocks reference `undefined` due to hoisting
+- **React Query cache bleeds between tests** — each test needs fresh QueryClient with `gcTime: 0, staleTime: 0`
+- **Multi-step flow tests (BookingPage)** are fragile in test isolation — simpler step-by-step tests work better than full flow integration tests
+- **`getByText` fails on partial text** — use regex `/pattern/` when text is part of larger text content
+- **`getByText` with negation throws** — use `queryByText` for `.not.toBeInTheDocument()` assertions
+- **StaffManagementSuitePage mock pattern**: `api.get`/`api.post` (not `publicApi`), `mockPost` with `toHaveBeenCalledWith` for mutation verification
+- **FaqsPage delete confirm**: button text "Hapus" appears in both table and modal — use `getAllByText` and target last occurrence
+
+### Other Tasks
+- **Device testing (mobile)**: Run both apps on Mi A1 — verify FCM push notifications, booking flow end-to-end
+- **Payment gateway sandbox testing**: Configure real Midtrans sandbox keys
+- **Production deployment**: Docker Compose with real Midtrans production keys
+- **Optional enhancements**: Push notification campaign, advanced analytics, multi-language support
 
 ## Deployment
 

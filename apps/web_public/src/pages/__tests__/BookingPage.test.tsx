@@ -24,10 +24,7 @@ vi.mock('../../lib/api', () => ({
 }));
 
 vi.mock('../../lib/auth', () => ({
-  useAuth: () => ({
-    user: null,
-    isAuthenticated: false,
-  }),
+  useAuth: () => ({ user: null, isAuthenticated: false }),
 }));
 
 vi.mock('../../components/Header', () => ({
@@ -50,19 +47,17 @@ vi.mock('../../components/SlotPicker', () => ({
 
 vi.mock('../../components/BookingSummary', () => ({
   default: ({ service }: any) => (
-    <div data-testid="booking-summary">
-      {service?.name}
-    </div>
+    <div data-testid="booking-summary">{service?.name}</div>
   ),
 }));
 
 import { publicApi } from '../../lib/api';
 
-function renderBooking(providerId = 'p1') {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+function renderBooking() {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
   return render(
-    <MemoryRouter initialEntries={[`/booking/${providerId}`]}>
-      <QueryClientProvider client={queryClient}>
+    <MemoryRouter initialEntries={['/booking/p1']}>
+      <QueryClientProvider client={qc}>
         <BookingPage />
       </QueryClientProvider>
     </MemoryRouter>,
@@ -81,9 +76,7 @@ describe('BookingPage', () => {
     renderBooking();
     expect(screen.getByText('Cari Layanan')).toBeInTheDocument();
     expect(screen.getByText('Booking')).toBeInTheDocument();
-    await waitFor(() => {
-      expect(screen.getByText('Pilih Layanan')).toBeInTheDocument();
-    });
+    await waitFor(() => { expect(screen.getByText('Pilih Layanan')).toBeInTheDocument(); });
   });
 
   it('renders header and footer', async () => {
@@ -103,8 +96,6 @@ describe('BookingPage', () => {
 
   it('shows empty state when no services', async () => {
     renderBooking();
-    await waitFor(() => {
-      expect(screen.getByText('Pilih Layanan')).toBeInTheDocument();
-    });
+    await waitFor(() => { expect(screen.getByText('Pilih Layanan')).toBeInTheDocument(); });
   });
 });
