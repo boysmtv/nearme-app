@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -22,9 +22,10 @@ import { mediaApi } from '../../../lib/api';
 const mockList = mediaApi.list as ReturnType<typeof vi.fn>;
 const mockUpload = mediaApi.upload as ReturnType<typeof vi.fn>;
 const mockDelete = mediaApi.delete as ReturnType<typeof vi.fn>;
+const mockReorder = mediaApi.reorder as ReturnType<typeof vi.fn>;
 
 function createQueryClient() {
-  return new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0 } } });
+  return new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0, staleTime: 0 } } });
 }
 
 function renderPage(qc?: QueryClient) {
@@ -34,7 +35,7 @@ function renderPage(qc?: QueryClient) {
       <QueryClientProvider client={client}>
         <MediaPage />
       </QueryClientProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
@@ -169,6 +170,171 @@ describe('MediaPage', () => {
     fileInput.dispatchEvent(new Event('change', { bubbles: true }));
     await waitFor(() => {
       expect(screen.getByText('Uploading...')).toBeInTheDocument();
+    });
+  });
+
+  it('shows upload error message', async () => {
+    mockUpload.mockRejectedValue(new Error('Upload failed'));
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(fileInput, 'files', { value: [file] });
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    await waitFor(() => {
+      expect(screen.getByText('Upload failed')).toBeInTheDocument();
+    });
+  });
+
+  it('shows upload success message', async () => {
+    mockUpload.mockResolvedValue({ data: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['test'], 'test.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(fileInput, 'files', { value: [file] });
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    await waitFor(() => {
+      expect(screen.getByText('Upload berhasil')).toBeInTheDocument();
+    });
+  });
+
+  it('rejects non-image file type (gif) with alert', async () => {
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['data'], 'anim.gif', { type: 'image/gif' });
+    Object.defineProperty(fileInput, 'files', { value: [file] });
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(alertSpy).toHaveBeenCalledWith('Unsupported type: image/gif');
+    expect(mockUpload).not.toHaveBeenCalled();
+    alertSpy.mockRestore();
+  });
+
+  it('rejects file > 10MB with alert', async () => {
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const bigFile = new File([new ArrayBuffer(11 * 1024 * 1024)], 'big.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(fileInput, 'files', { value: [bigFile] });
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    expect(alertSpy).toHaveBeenCalledWith('File too large max 10MB');
+    expect(mockUpload).not.toHaveBeenCalled();
+    alertSpy.mockRestore();
+  });
+
+  it('limits upload to 8 files', async () => {
+    mockUpload.mockResolvedValue({ data: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const files = Array.from({ length: 10 }, (_, i) =>
+      new File(['data'], `file${i}.jpg`, { type: 'image/jpeg' })
+    );
+    Object.defineProperty(fileInput, 'files', { value: files });
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    await waitFor(() => {
+      expect(mockUpload).toHaveBeenCalledTimes(8);
+    });
+  });
+
+  it('drag from position 0 to 1 calls reorderMut', async () => {
+    mockReorder.mockResolvedValue({ data: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const items = document.querySelectorAll('[draggable="true"]');
+    const dataTransfer = new DataTransfer();
+    fireEvent.dragStart(items[0], { dataTransfer });
+    fireEvent.dragOver(items[1], { dataTransfer });
+    fireEvent.drop(items[1], { dataTransfer });
+    await waitFor(() => {
+      expect(mockReorder).toHaveBeenCalled();
+    });
+  });
+
+  it('drag to same position does nothing', async () => {
+    mockReorder.mockResolvedValue({ data: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const items = document.querySelectorAll('[draggable="true"]');
+    const dataTransfer = new DataTransfer();
+    fireEvent.dragStart(items[0], { dataTransfer });
+    fireEvent.drop(items[0], { dataTransfer });
+    expect(mockReorder).not.toHaveBeenCalled();
+  });
+
+  it('shows "Reordering..." when reorder is pending', async () => {
+    mockReorder.mockReturnValue(new Promise(() => {}));
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const items = document.querySelectorAll('[draggable="true"]');
+    const dataTransfer = new DataTransfer();
+    fireEvent.dragStart(items[0], { dataTransfer });
+    fireEvent.dragOver(items[1], { dataTransfer });
+    fireEvent.drop(items[1], { dataTransfer });
+    await waitFor(() => {
+      expect(screen.getByText('Reordering...')).toBeInTheDocument();
+    });
+  });
+
+  it('shows ownerType labels on media items', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const ownerLabels = screen.getAllByText('provider');
+    expect(ownerLabels.length).toBe(3);
+  });
+
+  it('does not call upload for invalid type file among valid ones', async () => {
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    mockUpload.mockResolvedValue({ data: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const validFile = new File(['data'], 'valid.jpg', { type: 'image/jpeg' });
+    const invalidFile = new File(['data'], 'bad.gif', { type: 'image/gif' });
+    Object.defineProperty(fileInput, 'files', { value: [validFile, invalidFile] });
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    await waitFor(() => {
+      expect(mockUpload).toHaveBeenCalledTimes(1);
+      expect(mockUpload).toHaveBeenCalledWith(validFile, 'provider');
+    });
+    alertSpy.mockRestore();
+  });
+
+  it('accepts image/webp files', async () => {
+    mockUpload.mockResolvedValue({ data: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByAltText('photo1.jpg')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['data'], 'photo.webp', { type: 'image/webp' });
+    Object.defineProperty(fileInput, 'files', { value: [file] });
+    fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    await waitFor(() => {
+      expect(mockUpload).toHaveBeenCalledWith(file, 'provider');
     });
   });
 });

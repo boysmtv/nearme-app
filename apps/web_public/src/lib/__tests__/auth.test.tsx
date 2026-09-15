@@ -59,4 +59,49 @@ describe('auth', () => {
     expect(result.current.isAuthenticated).toBe(false);
     expect(localStorage.getItem('auth_token')).toBeNull();
   });
+
+  it('provides user name', () => {
+    localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@test.com', name: 'Siti', role: 'ROLE_CUSTOMER', hasProfile: true }));
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    expect(result.current.user?.name).toBe('Siti');
+  });
+
+  it('provides user role', () => {
+    localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@test.com', name: 'Siti', role: 'ROLE_CUSTOMER', hasProfile: true }));
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    expect(result.current.user?.role).toBe('ROLE_CUSTOMER');
+  });
+
+  it('provides hasProfile flag', () => {
+    localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@test.com', name: 'Siti', role: 'ROLE_CUSTOMER', hasProfile: false }));
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    expect(result.current.user?.hasProfile).toBe(false);
+  });
+
+  it('clears auth_refresh on logout', () => {
+    localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@test.com', name: 'Test', role: 'ROLE_CUSTOMER', hasProfile: true }));
+    localStorage.setItem('auth_refresh', 'refresh-token');
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    act(() => {
+      result.current.logout();
+    });
+    expect(localStorage.getItem('auth_refresh')).toBeNull();
+  });
+
+  it('clears has_profile on logout', () => {
+    localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@test.com', name: 'Test', role: 'ROLE_CUSTOMER', hasProfile: true }));
+    localStorage.setItem('has_profile', 'true');
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    act(() => {
+      result.current.logout();
+    });
+    expect(localStorage.getItem('has_profile')).toBeNull();
+  });
+
+  it('refreshUser updates user from localStorage', () => {
+    localStorage.setItem('auth_user', JSON.stringify({ id: '1', email: 'test@test.com', name: 'Old', role: 'ROLE_CUSTOMER', hasProfile: true }));
+    localStorage.setItem('auth_token', 'valid-token');
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    expect(result.current.user?.name).toBe('Old');
+  });
 });

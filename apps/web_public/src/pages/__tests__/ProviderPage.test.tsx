@@ -594,4 +594,547 @@ describe('ProviderPage', () => {
       expect(screen.getByText('2 foto dalam galeri')).toBeInTheDocument();
     });
   });
+
+  it('shows gallery section with grid layout', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('2 foto dalam galeri')).toBeInTheDocument();
+    });
+    const galleryImages = document.querySelectorAll('img[alt="gallery1.jpg"]');
+    expect(galleryImages.length).toBe(1);
+    const gallerySection = screen.getByText('Galeri').closest('div');
+    expect(gallerySection).toBeInTheDocument();
+  });
+
+  it('shows "Belum ada foto galeri" when no gallery', async () => {
+    (publicApi.media.publicProviderGallery as any).mockResolvedValue({ data: [] });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText(/Belum ada foto galeri/)).toBeInTheDocument();
+    });
+    expect(screen.getByText('0 foto dalam galeri')).toBeInTheDocument();
+  });
+
+  it('shows operating hours when available', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Jam Operasional')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Senin')).toBeInTheDocument();
+    expect(screen.getByText('Selasa')).toBeInTheDocument();
+    expect(screen.getByText('Sabtu')).toBeInTheDocument();
+  });
+
+  it('shows "Tutup" for closed days', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Minggu')).toBeInTheDocument();
+    });
+    const tutupElements = screen.getAllByText('Tutup');
+    expect(tutupElements.length).toBeGreaterThanOrEqual(1);
+    expect(tutupElements[0]).toHaveClass('text-red-500');
+  });
+
+  it('switches to staff tab', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    const staffTab = screen.getByText(/Staf/);
+    expect(staffTab.className).toContain('border-primary-500');
+  });
+
+  it('shows staff with avatar fallback initials', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    expect(screen.getByText('AN')).toBeInTheDocument();
+  });
+
+  it('shows staff with portfolio images', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    const portfolioImages = document.querySelectorAll('img[alt="portfolio1.jpg"]');
+    expect(portfolioImages.length).toBe(1);
+    expect(portfolioImages[0]).toHaveClass('rounded-lg');
+  });
+
+  it('shows staff with "+N more" portfolio overflow', async () => {
+    const manyPortfolioStaff = [{
+      ...staffData[0],
+      portfolio: Array.from({ length: 8 }, (_, i) => ({ id: `p${i}`, url: `http://example.com/p${i}.jpg`, fileName: `portfolio${i}.jpg` })),
+    }];
+    (publicApi.staff.listByProvider as any).mockResolvedValue({ data: manyPortfolioStaff });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => { expect(screen.getByText('Andi')).toBeInTheDocument(); });
+    expect(screen.getByText('+3')).toBeInTheDocument();
+  });
+
+  it('switches to reviews tab', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    const reviewsTabBtn = screen.getAllByText(/Ulasan/).find(
+      (el) => el.tagName === 'BUTTON',
+    )!;
+    await userEvent.click(reviewsTabBtn);
+    await waitFor(() => {
+      expect(screen.getByText('Budi')).toBeInTheDocument();
+    });
+    expect(reviewsTabBtn.className).toContain('border-primary-500');
+  });
+
+  it('shows review with photos in grid', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Budi')).toBeInTheDocument();
+    });
+    const photoGrid = document.querySelector('.grid.grid-cols-4');
+    expect(photoGrid).toBeInTheDocument();
+    const reviewPhotos = document.querySelectorAll('img[alt="photo1.jpg"]');
+    expect(reviewPhotos.length).toBe(1);
+  });
+
+  it('shows verified booking badge', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('✓ Verified booking')).toBeInTheDocument();
+    });
+    const badge = screen.getByText('✓ Verified booking');
+    expect(badge).toHaveClass('bg-green-100');
+  });
+
+  it('shows review report button', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Budi')).toBeInTheDocument();
+    });
+    const reportBtn = screen.getByText('Laporkan');
+    expect(reportBtn).toBeInTheDocument();
+    expect(reportBtn.tagName).toBe('BUTTON');
+  });
+
+  it('clicks report button → shows "Melaporkan..."', async () => {
+    (publicApi.reviews.report as any).mockReturnValue(new Promise(() => {}));
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Budi')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText('Laporkan'));
+    await waitFor(() => {
+      expect(screen.getByText('Melaporkan...')).toBeInTheDocument();
+    });
+  });
+
+  it('ReviewForm validation: requires booking ID', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Kirim Ulasan')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText('Kirim Ulasan'));
+    await waitFor(() => {
+      expect(screen.getByText(/Booking ID wajib diisi/)).toBeInTheDocument();
+    });
+  });
+
+  it('ReviewForm validation: requires rating >= 1', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Kirim Ulasan')).toBeInTheDocument();
+    });
+    const bookingInput = screen.getByPlaceholderText(/3fa85f64/);
+    await userEvent.type(bookingInput, 'some-booking-id');
+    await userEvent.click(screen.getByText('Kirim Ulasan'));
+    await waitFor(() => {
+      expect(screen.getByText(/Rating wajib diisi/)).toBeInTheDocument();
+    });
+  });
+
+  it('ReviewForm validation: requires body', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Kirim Ulasan')).toBeInTheDocument();
+    });
+    const bookingInput = screen.getByPlaceholderText(/3fa85f64/);
+    await userEvent.type(bookingInput, 'some-booking-id');
+    const rate5 = screen.getByLabelText('Rate 5');
+    await userEvent.click(rate5);
+    await userEvent.click(screen.getByText('Kirim Ulasan'));
+    await waitFor(() => {
+      expect(screen.getByText(/Komentar wajib diisi/)).toBeInTheDocument();
+    });
+  });
+
+  it('shows upload photo section in ReviewForm', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Foto Ulasan (maks 8)')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]');
+    expect(fileInput).toBeInTheDocument();
+    expect(fileInput).toHaveAttribute('accept', 'image/jpeg,image/png,image/webp');
+    expect(fileInput).toHaveAttribute('multiple');
+  });
+
+  it('toggles favorite on staff', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => { expect(screen.getByText('Andi')).toBeInTheDocument(); });
+    const favButton = screen.getAllByLabelText('Favorite')[0];
+    expect(favButton).toHaveClass('bg-gray-100');
+    await userEvent.click(favButton);
+    await waitFor(() => {
+      expect(publicApi.favorites.add).toHaveBeenCalledWith('st1');
+    });
+  });
+
+  it('shows cover image when coverUrl exists', async () => {
+    (publicApi.providers.getBySlug as any).mockResolvedValue({
+      data: { ...providerData, coverUrl: 'http://example.com/cover.jpg' },
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    const coverImg = document.querySelector('img[alt="Barbershop Central"]');
+    expect(coverImg).toBeInTheDocument();
+    expect(coverImg).toHaveAttribute('src', 'http://example.com/cover.jpg');
+    expect(coverImg).toHaveClass('object-cover');
+  });
+
+  it('shows logo fallback when no logoUrl', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    const logoFallback = screen.getByText('BA');
+    expect(logoFallback).toBeInTheDocument();
+    expect(logoFallback).toHaveClass('text-primary-600');
+    const logoContainer = logoFallback.closest('div');
+    expect(logoContainer).toHaveClass('bg-primary-100');
+  });
+
+  it('shows star rating component for provider', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    const stars = document.querySelectorAll('svg.text-yellow-400');
+    expect(stars.length).toBeGreaterThanOrEqual(4);
+    const emptyStars = document.querySelectorAll('svg.text-gray-200');
+    expect(emptyStars.length).toBe(1);
+  });
+
+  it('shows staff rating when > 0', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => {
+      expect(screen.getByText('4.8')).toBeInTheDocument();
+    });
+  });
+
+  it('hides staff rating when 0', async () => {
+    const staffWithZeroRating = [{ ...staffData[0], rating: 0 }, staffData[1]];
+    (publicApi.staff.listByProvider as any).mockResolvedValue({ data: staffWithZeroRating });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => { expect(screen.getByText('Andi')).toBeInTheDocument(); });
+    expect(screen.queryByText('0.0')).not.toBeInTheDocument();
+  });
+
+  it('shows staff specialties as badges', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => {
+      expect(screen.getByText('Potong Rambut')).toBeInTheDocument();
+    });
+    const specBadge = screen.getByText('Potong Rambut');
+    expect(specBadge).toHaveClass('rounded-full');
+    expect(specBadge).toHaveClass('bg-gray-100');
+  });
+
+  it('does not show favorite button when not authenticated', async () => {
+    mockUseAuth.mockReturnValue({
+      user: null,
+      isAuthenticated: false,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    expect(screen.queryByLabelText('Favorite')).not.toBeInTheDocument();
+  });
+
+  it('toggles favorite removes when already favorited', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => { expect(screen.getByText('Barbershop Central')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => { expect(screen.getByText('Andi')).toBeInTheDocument(); });
+    const favButton = screen.getAllByLabelText('Favorite')[0];
+    await userEvent.click(favButton);
+    await waitFor(() => {
+      expect(publicApi.favorites.add).toHaveBeenCalledWith('st1');
+    });
+    await userEvent.click(favButton);
+    await waitFor(() => {
+      expect(publicApi.favorites.remove).toHaveBeenCalledWith('st1');
+    });
+  });
+
+  it('shows review form fields for authenticated user', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Tulis Ulasan')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Booking ID')).toBeInTheDocument();
+    expect(screen.getByText('Rating')).toBeInTheDocument();
+    expect(screen.getByText('Judul')).toBeInTheDocument();
+    expect(screen.getByText('Komentar')).toBeInTheDocument();
+  });
+
+  it('shows operating hours section with correct day names', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Jam Operasional')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Senin')).toBeInTheDocument();
+    expect(screen.getByText('Selasa')).toBeInTheDocument();
+    expect(screen.getByText('Sabtu')).toBeInTheDocument();
+    expect(screen.getByText('Minggu')).toBeInTheDocument();
+  });
+
+  it('shows operating hours times for open days', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Jam Operasional')).toBeInTheDocument();
+    });
+    const times = screen.getAllByText('09:00 - 18:00');
+    expect(times.length).toBe(2);
+    expect(screen.getByText('10:00 - 16:00')).toBeInTheDocument();
+  });
+
+  it('shows provider without openingHours gracefully', async () => {
+    const providerNoHours = { ...providerData };
+    delete (providerNoHours as any).openingHours;
+    (publicApi.providers.getBySlug as any).mockResolvedValue({ data: providerNoHours });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Jam Operasional')).not.toBeInTheDocument();
+  });
+
+  it('shows provider with empty openingHours array', async () => {
+    (publicApi.providers.getBySlug as any).mockResolvedValue({ data: { ...providerData, openingHours: [] } });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Jam Operasional')).not.toBeInTheDocument();
+  });
+
+  it('shows staff bio text', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Staf/));
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Pengalaman 5 tahun')).toBeInTheDocument();
+    expect(screen.getByText('Baru bergabung')).toBeInTheDocument();
+  });
+
+  it('shows review serviceName', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Potong Rambut')).toBeInTheDocument();
+    });
+  });
+
+  it('shows review star rating', async () => {
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Budi')).toBeInTheDocument();
+    });
+    const reviewStars = document.querySelectorAll('.rounded-xl svg.text-yellow-400');
+    expect(reviewStars.length).toBeGreaterThanOrEqual(5);
+  });
+
+  it('shows ReviewForm description text', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText(/Ulasan memerlukan Booking ID/)).toBeInTheDocument();
+    });
+  });
+
+  it('shows ReviewForm body character count', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('0/2000')).toBeInTheDocument();
+    });
+  });
+
+  it('updates body character count on input', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('0/2000')).toBeInTheDocument();
+    });
+    const textarea = screen.getByPlaceholderText('Bagaimana pengalaman Anda?');
+    await userEvent.type(textarea, 'Test review');
+    expect(screen.getByText('11/2000')).toBeInTheDocument();
+  });
+
+  it('shows submit button text changes when pending', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    (publicApi.reviews.create as any).mockReturnValue(new Promise(() => {}));
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Kirim Ulasan')).toBeInTheDocument();
+    });
+    const bookingInput = screen.getByPlaceholderText(/3fa85f64/);
+    await userEvent.type(bookingInput, 'some-booking-id');
+    const rate5 = screen.getByLabelText('Rate 5');
+    await userEvent.click(rate5);
+    const textarea = screen.getByPlaceholderText('Bagaimana pengalaman Anda?');
+    await userEvent.type(textarea, 'Great service');
+    await userEvent.click(screen.getByText('Kirim Ulasan'));
+    await waitFor(() => {
+      expect(screen.getByText('Mengirim...')).toBeInTheDocument();
+    });
+  });
 });

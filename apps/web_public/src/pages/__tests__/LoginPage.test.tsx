@@ -1,18 +1,19 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import LoginPage from '../LoginPage';
 
+const mockNavigate = vi.fn();
+
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom');
-  return { ...actual, useNavigate: () => vi.fn() };
+  return { ...actual, useNavigate: () => mockNavigate };
 });
 
-const { mockLogin, mockRequestOtp, mockVerifyOtp } = vi.hoisted(() => ({
+const { mockLogin } = vi.hoisted(() => ({
   mockLogin: vi.fn(),
-  mockRequestOtp: vi.fn(),
-  mockVerifyOtp: vi.fn(),
 }));
 
 vi.mock('../../lib/auth', () => ({
@@ -24,6 +25,11 @@ vi.mock('../../lib/auth', () => ({
   }),
 }));
 
+const { mockRequestOtp, mockVerifyOtp } = vi.hoisted(() => ({
+  mockRequestOtp: vi.fn(),
+  mockVerifyOtp: vi.fn(),
+}));
+
 vi.mock('../../lib/api', () => ({
   publicApi: {
     auth: {
@@ -33,19 +39,18 @@ vi.mock('../../lib/api', () => ({
   },
 }));
 
-const qc = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-
-function renderLogin() {
+function renderPage() {
+  const qc = new QueryClient({ defaultOptions: { queries: { retry: false, gcTime: 0, staleTime: 0 } } });
   return render(
     <MemoryRouter>
       <QueryClientProvider client={qc}>
         <LoginPage />
       </QueryClientProvider>
-    </MemoryRouter>
+    </MemoryRouter>,
   );
 }
 
-describe('web_public LoginPage', () => {
+describe('LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
@@ -54,101 +59,230 @@ describe('web_public LoginPage', () => {
     mockVerifyOtp.mockResolvedValue({ data: { accessToken: 'tok', refreshToken: 'ref' } });
   });
 
-  it('renders login form with DEKAT branding', () => {
-    renderLogin();
+  it('renders DEKAT brand and heading', () => {
+    renderPage();
     expect(screen.getByText('DEKAT')).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Masuk' })).toBeInTheDocument();
+    expect(screen.getByText(/masuk ke akun dekat anda/i)).toBeInTheDocument();
   });
 
-  it('renders password and OTP mode toggle', () => {
-    renderLogin();
-    const btns = screen.getAllByRole('button');
-    expect(btns.find(b => b.textContent?.includes('Password'))).toBeInTheDocument();
-    expect(btns.find(b => b.textContent?.includes('Kode OTP'))).toBeInTheDocument();
-  });
-
-  it('renders email and password fields', () => {
-    renderLogin();
+  it('renders password form by default', () => {
+    renderPage();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /masuk$/i })).toBeInTheDocument();
+  });
+
+  it('renders mode toggle buttons', () => {
+    renderPage();
+    expect(screen.getByRole('button', { name: /password/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /kode otp/i })).toBeInTheDocument();
   });
 
   it('shows register link', () => {
-    renderLogin();
-    expect(screen.getByText(/daftar sekarang/i)).toBeInTheDocument();
+    renderPage();
+    const link = screen.getByRole('link', { name: /daftar sekarang/i });
+    expect(link).toHaveAttribute('href', '/register');
   });
 
-  it('switches to OTP mode', async () => {
-    renderLogin();
-    fireEvent.click(screen.getAllByRole('button').find(b => b.textContent?.includes('Kode OTP'))!);
-    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
+  it('DEKAT brand links to home', () => {
+    renderPage();
+    const brand = screen.getByText('DEKAT');
+    expect(brand.closest('a')).toHaveAttribute('href', '/');
   });
 
-  it('shows validation errors on empty submission', async () => {
-    renderLogin();
+  it('validates empty email on password submit', async () => {
+    renderPage();
     fireEvent.click(screen.getByRole('button', { name: /masuk$/i }));
-    await waitFor(() => { expect(screen.getByText(/email tidak valid/i)).toBeInTheDocument(); });
+    await waitFor(() => {
+      expect(screen.getByText(/email tidak valid/i)).toBeInTheDocument();
+    });
+  });
+
+  it('validates short password', async () => {
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'test@example.com' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: '12345' } });
+    fireEvent.click(screen.getByRole('button', { name: /masuk$/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/password harus minimal 6 karakter/i)).toBeInTheDocument();
+    });
   });
 
   it('calls login on valid password submission', async () => {
-    renderLogin();
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: '123456' } });
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@test.com' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: /masuk$/i }));
-    await waitFor(() => { expect(mockLogin).toHaveBeenCalledWith('a@b.com', '123456'); });
+    await waitFor(() => {
+      expect(mockLogin).toHaveBeenCalledWith('user@test.com', 'password123');
+    });
   });
 
   it('shows error on login failure', async () => {
     mockLogin.mockRejectedValue(new Error('bad'));
-    renderLogin();
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: '123456' } });
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@test.com' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: /masuk$/i }));
-    await waitFor(() => { expect(screen.getByText('Email atau password salah')).toBeInTheDocument(); });
-  });
-
-  it('request OTP success shows OTP input', async () => {
-    renderLogin();
-    fireEvent.click(screen.getAllByRole('button').find(b => b.textContent?.includes('Kode OTP'))!);
-    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
-    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'x@y.com' } });
-    fireEvent.click(screen.getByText(/kirim kode otp/i));
     await waitFor(() => {
-      expect(mockRequestOtp).toHaveBeenCalledWith('x@y.com', 'LOGIN');
-      expect(screen.getByText(/kode otp dikirim ke/i)).toBeInTheDocument();
+      expect(screen.getByText('Email atau password salah')).toBeInTheDocument();
     });
   });
 
-  it('request OTP failure shows error', async () => {
-    mockRequestOtp.mockRejectedValue(new Error('bad'));
-    renderLogin();
-    fireEvent.click(screen.getAllByRole('button').find(b => b.textContent?.includes('Kode OTP'))!);
+  it('shows loading state during password login', async () => {
+    mockLogin.mockReturnValue(new Promise(() => {}));
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@test.com' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
+    fireEvent.click(screen.getByRole('button', { name: /masuk$/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/masuk\.\.\./i)).toBeInTheDocument();
+    });
+  });
+
+  it('switches to OTP mode', async () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByLabelText(/password$/i)).not.toBeInTheDocument();
+  });
+
+  it('switches back to password mode from OTP', async () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
     await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
-    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'x@y.com' } });
+    fireEvent.click(screen.getByRole('button', { name: /^password$/i }));
+    await waitFor(() => {
+      expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
+    });
+  });
+
+  it('requests OTP successfully shows code input', async () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
+    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
+    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'otp@test.com' } });
     fireEvent.click(screen.getByText(/kirim kode otp/i));
-    await waitFor(() => { expect(screen.getByText('Gagal mengirim kode OTP')).toBeInTheDocument(); });
+    await waitFor(() => {
+      expect(mockRequestOtp).toHaveBeenCalledWith('otp@test.com', 'LOGIN');
+      expect(screen.getByText(/kode otp dikirim ke/i)).toBeInTheDocument();
+      expect(screen.getByText('otp@test.com')).toBeInTheDocument();
+    });
+  });
+
+  it('shows error on OTP request failure', async () => {
+    mockRequestOtp.mockRejectedValue(new Error('fail'));
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
+    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
+    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'otp@test.com' } });
+    fireEvent.click(screen.getByText(/kirim kode otp/i));
+    await waitFor(() => {
+      expect(screen.getByText('Gagal mengirim kode OTP')).toBeInTheDocument();
+    });
+  });
+
+  it('verifies OTP and navigates', async () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
+    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
+    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'otp@test.com' } });
+    fireEvent.click(screen.getByText(/kirim kode otp/i));
+    await waitFor(() => { expect(screen.getByText(/kode otp dikirim ke/i)).toBeInTheDocument(); });
+    const codeInput = screen.getByPlaceholderText('000000');
+    fireEvent.change(codeInput, { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: /verifikasi & masuk/i }));
+    await waitFor(() => {
+      expect(mockVerifyOtp).toHaveBeenCalledWith('otp@test.com', '123456', 'LOGIN');
+      expect(screen.getByText(/login berhasil!/i)).toBeInTheDocument();
+    });
+  });
+
+  it('shows error on OTP verify failure', async () => {
+    mockVerifyOtp.mockRejectedValue(new Error('bad'));
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
+    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
+    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'otp@test.com' } });
+    fireEvent.click(screen.getByText(/kirim kode otp/i));
+    await waitFor(() => { expect(screen.getByText(/kode otp dikirim ke/i)).toBeInTheDocument(); });
+    const codeInput = screen.getByPlaceholderText('000000');
+    fireEvent.change(codeInput, { target: { value: '111111' } });
+    fireEvent.click(screen.getByRole('button', { name: /verifikasi & masuk/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Kode OTP salah atau sudah kedaluwarsa')).toBeInTheDocument();
+    });
   });
 
   it('resend email resets OTP form', async () => {
-    renderLogin();
-    fireEvent.click(screen.getAllByRole('button').find(b => b.textContent?.includes('Kode OTP'))!);
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
     await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
-    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'x@y.com' } });
+    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'otp@test.com' } });
     fireEvent.click(screen.getByText(/kirim kode otp/i));
     await waitFor(() => { expect(screen.getByText(/kode otp dikirim ke/i)).toBeInTheDocument(); });
     fireEvent.click(screen.getByText(/ganti email atau kirim ulang/i));
-    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
+    await waitFor(() => {
+      expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument();
+    });
   });
 
-  it('mode toggle clears error', async () => {
-    mockLogin.mockRejectedValue(new Error('bad'));
-    renderLogin();
-    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'a@b.com' } });
-    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: '123456' } });
+  it('mode toggle clears previous error', async () => {
+    mockLogin.mockRejectedValueOnce(new Error('bad'));
+    renderPage();
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'user@test.com' } });
+    fireEvent.change(screen.getByLabelText(/password/i), { target: { value: 'password123' } });
     fireEvent.click(screen.getByRole('button', { name: /masuk$/i }));
     await waitFor(() => { expect(screen.getByText('Email atau password salah')).toBeInTheDocument(); });
-    mockLogin.mockResolvedValue(undefined);
-    fireEvent.click(screen.getAllByRole('button').find(b => b.textContent?.includes('Kode OTP'))!);
-    await waitFor(() => { expect(screen.queryByText('Email atau password salah')).not.toBeInTheDocument(); });
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
+    await waitFor(() => {
+      expect(screen.queryByText('Email atau password salah')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows otp success screen after verify', async () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
+    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
+    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'otp@test.com' } });
+    fireEvent.click(screen.getByText(/kirim kode otp/i));
+    await waitFor(() => { expect(screen.getByText(/kode otp dikirim ke/i)).toBeInTheDocument(); });
+    const codeInput = screen.getByPlaceholderText('000000');
+    fireEvent.change(codeInput, { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: /verifikasi & masuk/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/login berhasil!/i)).toBeInTheDocument();
+      expect(screen.getByText(/mengalihkan ke beranda/i)).toBeInTheDocument();
+    });
+  });
+
+  it('OTP verify stores tokens in localStorage', async () => {
+    renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /kode otp/i }));
+    await waitFor(() => { expect(screen.getByText(/kirim kode otp/i)).toBeInTheDocument(); });
+    fireEvent.change(screen.getByPlaceholderText(/email@contoh.com/i), { target: { value: 'otp@test.com' } });
+    fireEvent.click(screen.getByText(/kirim kode otp/i));
+    await waitFor(() => { expect(screen.getByText(/kode otp dikirim ke/i)).toBeInTheDocument(); });
+    const codeInput = screen.getByPlaceholderText('000000');
+    fireEvent.change(codeInput, { target: { value: '123456' } });
+    fireEvent.click(screen.getByRole('button', { name: /verifikasi & masuk/i }));
+    await waitFor(() => {
+      expect(localStorage.getItem('auth_token')).toBe('tok');
+      expect(localStorage.getItem('auth_refresh')).toBe('ref');
+    });
+  });
+
+  it('does not show OTP form in password mode', () => {
+    renderPage();
+    expect(screen.queryByRole('button', { name: /kirim kode otp/i })).not.toBeInTheDocument();
+  });
+
+  it('shows placeholder text in password fields', () => {
+    renderPage();
+    expect(screen.getByPlaceholderText(/email@contoh.com/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/masukkan password/i)).toBeInTheDocument();
   });
 });

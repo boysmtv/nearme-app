@@ -316,13 +316,13 @@ pnpm install && pnpm dev
 - **Profile completion race condition FIXED**: `ProfileCompletePage` uses `useEffect` to navigate after `hasProfile` state is confirmed updated, avoiding redirect loop with `RequireProfileGuard`
 
 ### Testing
-- **Total: ~1183 tests** across 5 platforms, all passing (892 web_public + 123 web_admin + 43 mobile_partner + 124 mobile_customer + 41 e2e). web_public coverage 74.06% lines. Verified 2026-09-14
-- Backend: 222 tests (BookingService + Media + Deposit + FAQ + Chat + Reporting + Coupon/Payment/Jwt + CouponServiceWeird + PaymentServiceWeird) — JUnit 5 + Mockito
-- web_public: 892 tests (89 files) — Vitest + @testing-library/react, 74.06% line coverage
+- **Total: ~1391 tests** across 5 platforms (1375 passing + 16 pre-existing failures in 3 files). web_public coverage 88.3% lines. Verified 2026-09-14
+- Backend: 222 tests — JUnit 5 + Mockito
+- web_public: ~1391 tests (93 files) — Vitest + @testing-library/react, 88.3% line coverage
 - web_admin: 123 tests (20 files) — Vitest + @testing-library/react
-- E2E Playwright: 41 tests (12 web-public + 7 booking-weird + 18 UI audit + 4 web-provider) — screenshots + functional
+- E2E Playwright: 41 tests — screenshots + functional
 - Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
-- Header.test.tsx requires QueryClientProvider wrapper (React Query dependency)
+- **Pre-existing failures (16)**: SubscriptionUpgradePage (9: getByText regex matches multiple), MediaPage (3: DataTransfer not defined in jsdom), BookingPage (4: reschedule/email/verifyPin assertions)
 
 ### Backend Runtime (verified 2026-08-27)
 - Migrations V15–V20: bookings status CHECK widened, categories seeded, booking_holds expiry CHECK fixed, hold status CHECK includes CONVERTED/CANCELLED, ghost ddl-auto columns dropped, confirmation_pin+pin_verified added
@@ -396,18 +396,18 @@ pnpm install && pnpm dev
 ## What's Next
 
 ### Coverage Improvement (Priority - Resuming Tomorrow)
-- **Target**: web_public 74.06% → 100% lines (current: 2096/2830 lines covered)
+- **Target**: web_public 88.3% → 100% lines (current: 2499/2830 lines covered)
 - **Remaining low-coverage files** (sorted by impact, lines uncovered):
-  1. `src/lib/api.ts` — 22.53% (3311 stmts, ~500+ uncovered lines, **biggest gap**)
-  2. `src/pages/BookingPage.tsx` — 37.83% (918 lines, multi-step flow tests need vi.hoisted() + Routes pattern)
-  3. `src/pages/admin/FaqsPage.tsx` — 43.75% (tests rewritten, need verification)
-  4. `src/components/ChatWidget.tsx` — 44.44% (tests rewritten, need verification)
-  5. `src/pages/provider/MediaPage.tsx` — 56.81% (drag-drop, reorder, upload validation)
-  6. `src/pages/provider/NotificationsPage.tsx` — 53.33%
-  7. `src/pages/customer/RecurringBookingsPage.tsx` — 52.5%
-  8. `src/pages/customer/SocialFeedPage.tsx` — 52.94%
-  9. `src/pages/provider/SubscriptionPage.tsx` — 58.33%
-  10. `src/pages/provider/StaffManagementSuitePage.tsx` — 66.66%
+  1. `src/pages/provider/SubscriptionUpgradePage.tsx` — 33.33% (modal+upgrade mutation tests written but 9 failing: getByText regex matches multiple "Enterprise"/"Plan Aktif" elements)
+  2. `src/pages/provider/MediaPage.tsx` — 51.92% (3 failing: `DataTransfer` not defined in jsdom, needs polyfill)
+  3. `src/pages/BookingPage.tsx` — 69.15% (4 failing: reschedule/email/verifyPin assertion mismatches)
+  4. `src/hooks/useChatWebSocket.ts` — 54.54% (SSE + sendMessage tests needed)
+  5. `src/pages/provider/SubscriptionUpgradePage.tsx` — 33.33% (plan features, modal, downgrade)
+  6. `src/pages/provider/CustomersPage.tsx` — 66.66%
+  7. `src/pages/provider/DashboardPage.tsx` — 75.86%
+  8. `src/pages/admin/BookingsPage.tsx` — 57.57%
+  9. `src/pages/admin/RolesPage.tsx` — 61.53%
+  10. `src/pages/admin/AuditLogPage.tsx` — 70%
 
 ### Key Lessons from Today's Session
 - **`vi.hoisted()` is mandatory** when mock variables are used inside `vi.mock()` factories — without it, mocks reference `undefined` due to hoisting
@@ -417,6 +417,8 @@ pnpm install && pnpm dev
 - **`getByText` with negation throws** — use `queryByText` for `.not.toBeInTheDocument()` assertions
 - **StaffManagementSuitePage mock pattern**: `api.get`/`api.post` (not `publicApi`), `mockPost` with `toHaveBeenCalledWith` for mutation verification
 - **FaqsPage delete confirm**: button text "Hapus" appears in both table and modal — use `getAllByText` and target last occurrence
+- **`DataTransfer` not available in jsdom** — drag-drop tests need polyfill or skip (MediaPage 3 failures)
+- **`getByText(/Enterprise/)` matches multiple elements** — use `getAllByText` when text appears in heading + button (SubscriptionUpgradePage 9 failures)
 
 ### Other Tasks
 - **Device testing (mobile)**: Run both apps on Mi A1 — verify FCM push notifications, booking flow end-to-end
