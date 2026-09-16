@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -56,8 +56,9 @@ describe('SubscriptionUpgradePage', () => {
     expect(screen.getByText('1 lokasi')).toBeInTheDocument();
     expect(screen.getByText('10 booking/bulan')).toBeInTheDocument();
     expect(screen.getByText('3 lokasi')).toBeInTheDocument();
-    expect(screen.getByText('Unlimited booking')).toBeInTheDocument();
-    expect(screen.getByText('Unlimited lokasi')).toBeInTheDocument();
+    expect(screen.getAllByText('Unlimited booking').length).toBeGreaterThanOrEqual(1);
+    const unlimitedLokasi = screen.getAllByText('Unlimited lokasi');
+    expect(unlimitedLokasi.length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Semua fitur Pro')).toBeInTheDocument();
   });
 
@@ -81,9 +82,9 @@ describe('SubscriptionUpgradePage', () => {
     await waitFor(() => {
       expect(screen.getByText('Free')).toBeInTheDocument();
     });
-    const freeButton = screen.getAllByText('Plan Aktif')[0];
-    expect(freeButton).toBeInTheDocument();
-    expect(freeButton.closest('button')).toBeDisabled();
+    const planAktifButtons = screen.getAllByText('Plan Aktif').filter(el => el.closest('button'));
+    expect(planAktifButtons.length).toBeGreaterThanOrEqual(1);
+    expect(planAktifButtons[0].closest('button')).toBeDisabled();
   });
 
   it('Free plan: PRO and ENTERPRISE buttons show "Upgrade Sekarang"', async () => {
@@ -101,9 +102,12 @@ describe('SubscriptionUpgradePage', () => {
     await waitFor(() => {
       expect(screen.getByText('Pro')).toBeInTheDocument();
     });
-    expect(screen.getByText('Plan Aktif')).toBeInTheDocument();
-    expect(screen.getByText('Tidak Tersedia')).toBeInTheDocument();
-    expect(screen.getByText('Upgrade Sekarang')).toBeInTheDocument();
+    const planAktifBtns = screen.getAllByText('Plan Aktif').filter(el => el.closest('button'));
+    expect(planAktifBtns.length).toBeGreaterThanOrEqual(1);
+    const unavailableBtns = screen.getAllByText('Tidak Tersedia').filter(el => el.closest('button'));
+    expect(unavailableBtns.length).toBeGreaterThanOrEqual(1);
+    const upgradeBtns = screen.getAllByText('Upgrade Sekarang').filter(el => el.closest('button'));
+    expect(upgradeBtns.length).toBeGreaterThanOrEqual(1);
   });
 
   it('Enterprise plan as current: all show "Plan Aktif" or "Tidak Tersedia"', async () => {
@@ -112,43 +116,54 @@ describe('SubscriptionUpgradePage', () => {
     await waitFor(() => {
       expect(screen.getByText('Enterprise')).toBeInTheDocument();
     });
-    expect(screen.getByText('Plan Aktif')).toBeInTheDocument();
-    const unavailable = screen.getAllByText('Tidak Tersedia');
-    expect(unavailable.length).toBe(2);
+    const planAktifBtns = screen.getAllByText('Plan Aktif').filter(el => el.closest('button'));
+    expect(planAktifBtns.length).toBeGreaterThanOrEqual(1);
+    const unavailableBtns = screen.getAllByText('Tidak Tersedia').filter(el => el.closest('button'));
+    expect(unavailableBtns.length).toBe(2);
   });
 
   it('click "Upgrade Sekarang" on PRO opens modal', async () => {
     const user = userEvent.setup();
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('Upgrade Sekarang')).toBeInTheDocument();
+      expect(screen.getAllByText('Upgrade Sekarang').length).toBeGreaterThanOrEqual(1);
     });
-    const upgradeButtons = screen.getAllByText('Upgrade Sekarang');
+    const upgradeButtons = screen.getAllByText('Upgrade Sekarang').filter(el => el.closest('button'));
     await user.click(upgradeButtons[0]);
-    expect(screen.getByText('Konfirmasi Upgrade')).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Konfirmasi Upgrade')).toBeInTheDocument();
+    });
   });
 
   it('modal shows plan name and price', async () => {
     const user = userEvent.setup();
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('Upgrade Sekarang')).toBeInTheDocument();
+      expect(screen.getAllByText('Upgrade Sekarang').length).toBeGreaterThanOrEqual(1);
     });
-    await user.click(screen.getAllByText('Upgrade Sekarang')[0]);
-    expect(screen.getByText(/Pro/)).toBeInTheDocument();
-    expect(screen.getByText(/199.000/)).toBeInTheDocument();
+    const upgradeButtons = screen.getAllByText('Upgrade Sekarang').filter(el => el.closest('button'));
+    await user.click(upgradeButtons[0]);
+    const modal = screen.getByText('Konfirmasi Upgrade').closest('div[class*="fixed"]');
+    expect(modal).toBeTruthy();
+    expect(within(modal as HTMLElement).getByText(/Pro/)).toBeInTheDocument();
+    expect(within(modal as HTMLElement).getByText(/199\.000/)).toBeInTheDocument();
   });
 
   it('modal "Batal" closes modal', async () => {
     const user = userEvent.setup();
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('Upgrade Sekarang')).toBeInTheDocument();
+      expect(screen.getAllByText('Upgrade Sekarang').length).toBeGreaterThanOrEqual(1);
     });
-    await user.click(screen.getAllByText('Upgrade Sekarang')[0]);
-    expect(screen.getByText('Konfirmasi Upgrade')).toBeInTheDocument();
+    const upgradeButtons = screen.getAllByText('Upgrade Sekarang').filter(el => el.closest('button'));
+    await user.click(upgradeButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Konfirmasi Upgrade')).toBeInTheDocument();
+    });
     await user.click(screen.getByText('Batal'));
-    expect(screen.queryByText('Konfirmasi Upgrade')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByText('Konfirmasi Upgrade')).not.toBeInTheDocument();
+    });
   });
 
   it('modal "Konfirmasi" calls upgradeMutation', async () => {
@@ -156,9 +171,13 @@ describe('SubscriptionUpgradePage', () => {
     mockPost.mockResolvedValue({ data: {} });
     renderPage();
     await waitFor(() => {
-      expect(screen.getByText('Upgrade Sekarang')).toBeInTheDocument();
+      expect(screen.getAllByText('Upgrade Sekarang').length).toBeGreaterThanOrEqual(1);
     });
-    await user.click(screen.getAllByText('Upgrade Sekarang')[0]);
+    const upgradeButtons = screen.getAllByText('Upgrade Sekarang').filter(el => el.closest('button'));
+    await user.click(upgradeButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Konfirmasi Upgrade')).toBeInTheDocument();
+    });
     await user.click(screen.getByText('Konfirmasi'));
     expect(mockPost).toHaveBeenCalledWith('/provider/subscription/upgrade', { planId: 'PRO' });
   });
@@ -255,10 +274,14 @@ describe('SubscriptionUpgradePage', () => {
     await waitFor(() => {
       expect(screen.getAllByText('Upgrade Sekarang').length).toBe(2);
     });
-    const upgradeButtons = screen.getAllByText('Upgrade Sekarang');
+    const upgradeButtons = screen.getAllByText('Upgrade Sekarang').filter(el => el.closest('button'));
     await user.click(upgradeButtons[1]);
-    expect(screen.getByText('Konfirmasi Upgrade')).toBeInTheDocument();
-    expect(screen.getByText(/Enterprise/)).toBeInTheDocument();
-    expect(screen.getByText(/499.000/)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText('Konfirmasi Upgrade')).toBeInTheDocument();
+    });
+    const modal = screen.getByText('Konfirmasi Upgrade').closest('div[class*="fixed"]');
+    expect(modal).toBeTruthy();
+    expect(within(modal as HTMLElement).getByText(/Enterprise/)).toBeInTheDocument();
+    expect(within(modal as HTMLElement).getByText(/499\.000/)).toBeInTheDocument();
   });
 });

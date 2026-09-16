@@ -40,6 +40,26 @@ window.scrollTo = vi.fn();
 // Mock scrollIntoView
 Element.prototype.scrollIntoView = vi.fn();
 
+// Polyfill DataTransfer for jsdom (drag-drop tests)
+class DataTransferItem {
+  kind = 'string' as const;
+  type = '';
+  getAsString(callback: (data: string) => void) { callback(''); }
+  getAsFile() { return null; }
+}
+class DataTransfer {
+  dropEffect = 'none';
+  effectAllowed = 'all';
+  files: File[] = [];
+  items: DataTransferItem[] = [];
+  types: string[] = [];
+  clearData() {}
+  setData(format: string, data: string) {}
+  getData(format: string) { return ''; }
+  setDragImage() {}
+}
+Object.defineProperty(window, 'DataTransfer', { writable: true, value: DataTransfer });
+
 // Mock matchMedia
 Object.defineProperty(window, 'matchMedia', {
   writable: true,
