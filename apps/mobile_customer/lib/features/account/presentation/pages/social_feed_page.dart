@@ -197,7 +197,7 @@ class _SocialFeedPageState extends ConsumerState<SocialFeedPage> {
                                 Container(
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: _getTypeColor(p['type']?.toString() ?? '').withOpacity(0.1),
+                                    color: _getTypeColor(p['type']?.toString() ?? '').withValues(alpha:0.1),
                                     borderRadius: BorderRadius.circular(12),
                                   ),
                                   child: Text(_getTypeLabel(p['type']?.toString() ?? ''),

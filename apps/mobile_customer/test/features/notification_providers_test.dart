@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_customer/shared/models/rows.dart';
 
-import 'package:mobile_customer/features/notification/presentation/pages/notification_page.dart';
+import 'package:mobile_customer/features/notification/domain/entities/notification_entity.dart';
+import 'package:mobile_customer/features/notification/presentation/viewmodel/notification_viewmodel.dart';
 
 void main() {
   group('notificationsProvider', () {
@@ -10,14 +10,14 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           notificationsProvider.overrideWith((ref) => Future.value([
-                const NotificationRow(
+                const NotificationEntity(
                   id: 'n1',
                   channel: 'PUSH',
                   subject: 'Booking Confirmed',
                   body: 'Your booking DKT-001 is confirmed.',
                   read: false,
                 ),
-                const NotificationRow(
+                const NotificationEntity(
                   id: 'n2',
                   channel: 'EMAIL',
                   subject: 'Welcome',
@@ -40,7 +40,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           notificationsProvider
-              .overrideWith((ref) => Future.value(<NotificationRow>[])),
+              .overrideWith((ref) => Future.value(<NotificationEntity>[])),
         ],
       );
       addTearDown(container.dispose);
@@ -68,7 +68,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           notificationsProvider.overrideWith((ref) => Future.value([
-                const NotificationRow(
+                const NotificationEntity(
                   id: 'n3',
                   channel: 'PUSH',
                   subject: '',
@@ -89,11 +89,11 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           notificationsProvider.overrideWith((ref) => Future.value([
-                const NotificationRow(
+                const NotificationEntity(
                     id: 'n1', channel: 'PUSH', subject: 'First', body: 'b1', read: false),
-                const NotificationRow(
+                const NotificationEntity(
                     id: 'n2', channel: 'EMAIL', subject: 'Second', body: 'b2', read: false),
-                const NotificationRow(
+                const NotificationEntity(
                     id: 'n3', channel: 'PUSH', subject: 'Third', body: 'b3', read: true),
               ])),
         ],

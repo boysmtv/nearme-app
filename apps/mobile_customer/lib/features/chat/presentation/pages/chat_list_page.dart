@@ -2,14 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../../shared/models/rows.dart';
-import '../../../../shared/widgets/shimmer_loading.dart';
 
-final chatListProvider = FutureProvider<List<ConversationRow>>((ref) async {
-  final res = await ApiService().getChats();
-  final data = res.data['data'] as List;
-  return data.map((e) => ConversationRow.fromJson(e as Map<String, dynamic>)).toList();
-});
+import '../../../chat/presentation/viewmodel/chat_viewmodel.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class ChatListPage extends ConsumerWidget {
   const ChatListPage({super.key});

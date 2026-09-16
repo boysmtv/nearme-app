@@ -1,1 +1,1 @@
-export '../presentation/pages/social_feed_page.dart' show feedFutureProvider, trendingFutureProvider;
+export '../presentation/viewmodel/account_viewmodel.dart' show profileProvider, loyaltyProvider, myReviewsProvider, feedProvider, trendingProvider;

@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../../shared/models/rows.dart';
+import '../../domain/entities/booking_entity.dart';
+import '../../../../shared/utils/format_rupiah.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
 
 final bookingConfirmationProvider =
-    FutureProvider.autoDispose.family<BookingRow, String>((ref, id) async {
+    FutureProvider.autoDispose.family<BookingEntity, String>((ref, id) async {
   final response = await ApiService().getBooking(id);
-  return BookingRow.fromJson(response.data['data'] as Map<String, dynamic>);
+  return BookingEntity.fromJson(response.data['data'] as Map<String, dynamic>);
 });
 
 class BookingConfirmationPage extends ConsumerWidget {

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mobile_customer/core/router/app_router.dart';
+import 'package:mobile_customer/core/auth/auth_provider.dart';
 
 String _makeJwt(Map<String, dynamic> claims) {
   final header = base64Url.encode(utf8.encode('{"alg":"HS256","typ":"JWT"}'));

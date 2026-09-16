@@ -26,12 +26,13 @@ class _ProviderReviewsPageState extends ConsumerState<ProviderReviewsPage> {
     try {
       final response = await ApiService().getProviderReviews(widget.providerId);
       final data = response.data['data'];
+      if (!mounted) return;
       setState(() {
         _reviews = data is List ? data : [];
         _loading = false;
       });
     } catch (e) {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 

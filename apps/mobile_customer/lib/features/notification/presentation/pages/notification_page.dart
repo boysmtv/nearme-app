@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../../shared/models/rows.dart';
-import '../../../../shared/widgets/shimmer_loading.dart';
 
-final notificationsProvider = FutureProvider<List<NotificationRow>>((ref) async {
-  final response = await ApiService().getNotifications(params: {'page': 1, 'limit': 50});
-  return parsePaginated(response.data['data'], NotificationRow.fromJson).items;
-});
+import '../../../notification/presentation/viewmodel/notification_viewmodel.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class NotificationPage extends ConsumerStatefulWidget {
   const NotificationPage({super.key});

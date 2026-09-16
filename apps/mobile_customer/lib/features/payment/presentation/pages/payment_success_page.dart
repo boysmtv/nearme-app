@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../shared/models/rows.dart';
+import '../../../../shared/utils/format_rupiah.dart';
 
 class PaymentSuccessPage extends ConsumerWidget {
   final String bookingId;

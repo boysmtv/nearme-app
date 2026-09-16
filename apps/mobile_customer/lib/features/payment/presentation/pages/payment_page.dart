@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../../shared/models/rows.dart';
+import '../../../../shared/utils/format_rupiah.dart';
 
 class PaymentPage extends ConsumerStatefulWidget {
   final String bookingId;

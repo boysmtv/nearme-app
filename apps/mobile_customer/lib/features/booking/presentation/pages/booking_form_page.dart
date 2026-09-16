@@ -5,11 +5,12 @@ import 'package:dio/dio.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
-import '../../../../shared/models/rows.dart';
+import '../../../provider_profile/domain/entities/service_entity.dart';
+import '../../../../shared/utils/format_rupiah.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
 
 class BookingSummary {
-  final ServiceRow service;
+  final ServiceEntity service;
   final String providerName;
   final String? staffName;
   const BookingSummary({required this.service, required this.providerName, this.staffName});
@@ -23,7 +24,7 @@ final bookingSummaryProvider =
   final staffId = parts.length > 2 ? parts[2] : null;
   final servicesRes = await ApiService().getProviderServices(providerId);
   final services = ((servicesRes.data['data'] ?? []) as List)
-      .map((e) => ServiceRow.fromJson(e as Map<String, dynamic>))
+      .map((e) => ServiceEntity.fromJson(e as Map<String, dynamic>))
       .toList();
   final service = services.firstWhere(
     (s) => s.id == serviceId,
@@ -110,13 +111,13 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
               child: summaryAsync.when(
                 data: (summary) => Container(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey[200]!), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 12, offset: const Offset(0, 4))]),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey[200]!), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.04), blurRadius: 12, offset: const Offset(0, 4))]),
                   child: Column(children: [
                     Container(
                       padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(gradient: LinearGradient(colors: [DEKATColors.primary.withOpacity(0.08), DEKATColors.primary.withOpacity(0.03)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: const BorderRadius.vertical(top: Radius.circular(16))),
+                      decoration: BoxDecoration(gradient: LinearGradient(colors: [DEKATColors.primary.withValues(alpha:0.08), DEKATColors.primary.withValues(alpha:0.03)], begin: Alignment.topLeft, end: Alignment.bottomRight), borderRadius: const BorderRadius.vertical(top: Radius.circular(16))),
                       child: Row(children: [
-                        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: DEKATColors.primary, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: DEKATColors.primary.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 3))]), child: const Icon(Icons.receipt_long_rounded, color: Colors.white, size: 20)),
+                        Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: DEKATColors.primary, borderRadius: BorderRadius.circular(12), boxShadow: [BoxShadow(color: DEKATColors.primary.withValues(alpha:0.25), blurRadius: 8, offset: const Offset(0, 3))]), child: const Icon(Icons.receipt_long_rounded, color: Colors.white, size: 20)),
                         const SizedBox(width: 12),
                         Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           Text('Ringkasan Booking', style: TextStyle(color: Colors.grey[600], fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.6)),
@@ -239,13 +240,13 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
       ),
       bottomNavigationBar: Container(
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
-        decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, -4))], border: Border(top: BorderSide(color: Colors.grey[100]!))),
+        decoration: BoxDecoration(color: Colors.white, boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.06), blurRadius: 16, offset: const Offset(0, -4))], border: Border(top: BorderSide(color: Colors.grey[100]!))),
         child: SafeArea(
           child: SizedBox(
             height: 50,
             child: ElevatedButton(
               onPressed: _isLoading ? null : _handleBooking,
-              style: ElevatedButton.styleFrom(backgroundColor: DEKATColors.primary, disabledBackgroundColor: Colors.grey[200], shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)), elevation: _isLoading ? 0 : 6, shadowColor: DEKATColors.primary.withOpacity(0.4)),
+              style: ElevatedButton.styleFrom(backgroundColor: DEKATColors.primary, disabledBackgroundColor: Colors.grey[200], shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)), elevation: _isLoading ? 0 : 6, shadowColor: DEKATColors.primary.withValues(alpha:0.4)),
               child: _isLoading
                   ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
                   : const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Text('Konfirmasi Booking', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, color: Colors.white)), SizedBox(width: 8), Icon(Icons.arrow_forward_rounded, size: 18, color: Colors.white)]),
@@ -353,7 +354,7 @@ class _InfoChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(color: color.withOpacity(0.08), borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withOpacity(0.15))),
+      decoration: BoxDecoration(color: color.withValues(alpha:0.08), borderRadius: BorderRadius.circular(20), border: Border.all(color: color.withValues(alpha:0.15))),
       child: Row(mainAxisSize: MainAxisSize.min, children: [Icon(icon, size: 12, color: color), const SizedBox(width: 4), Text(label, style: TextStyle(color: color, fontWeight: FontWeight.w700, fontSize: 11))]),
     );
   }
@@ -375,10 +376,10 @@ class _PaymentCard extends StatelessWidget {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected ? DEKATColors.primary.withOpacity(0.06) : Colors.white,
+          color: isSelected ? DEKATColors.primary.withValues(alpha:0.06) : Colors.white,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: isSelected ? DEKATColors.primary.withOpacity(0.3) : Colors.grey[200]!),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(isSelected ? 0.06 : 0.03), blurRadius: 8, offset: const Offset(0, 3))],
+          border: Border.all(color: isSelected ? DEKATColors.primary.withValues(alpha:0.3) : Colors.grey[200]!),
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:isSelected ? 0.06 : 0.03), blurRadius: 8, offset: const Offset(0, 3))],
         ),
         child: Row(children: [
           Container(
@@ -399,7 +400,7 @@ class _PaymentCard extends StatelessWidget {
               color: isSelected ? DEKATColors.primary : Colors.white,
               shape: BoxShape.circle,
               border: Border.all(color: isSelected ? DEKATColors.primary : Colors.grey[300]!),
-              boxShadow: isSelected ? [BoxShadow(color: DEKATColors.primary.withOpacity(0.3), blurRadius: 6)] : null,
+              boxShadow: isSelected ? [BoxShadow(color: DEKATColors.primary.withValues(alpha:0.3), blurRadius: 6)] : null,
             ),
             child: Icon(isSelected ? Icons.check_rounded : Icons.circle_outlined, size: 14, color: isSelected ? Colors.white : Colors.grey[400]),
           ),

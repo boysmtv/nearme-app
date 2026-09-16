@@ -2,41 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
-import '../../../../shared/models/rows.dart';
-
-final selectedDateProvider = StateProvider<DateTime>((ref) => DateTime.now());
-final selectedTimeSlotProvider = StateProvider<String?>((ref) => null);
-final selectedStaffIdProvider = StateProvider<String?>((ref) => null);
-
-// Use String key "providerId|date|staffId" to avoid Map identity loop
-final availabilityProvider =
-    FutureProvider.autoDispose.family<List<SlotRow>, String>((ref, key) async {
-  final parts = key.split('|');
-  final providerId = parts[0];
-  final date = parts[1];
-  final staffId = parts.length > 2 ? parts[2] : null;
-  final response = await ApiService().getProviderAvailability(providerId, date, staffId: staffId);
-  return ((response.data['data'] ?? []) as List)
-      .map((e) => SlotRow.fromJson(e as Map<String, dynamic>))
-      .toList();
-});
-
-final providerStaffProvider =
-    FutureProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, providerId) async {
-  final response = await ApiService().getProviderStaff(providerId);
-  return ((response.data['data'] ?? []) as List).cast<Map<String, dynamic>>();
-});
-
-final bookingServicesProvider =
-    FutureProvider.autoDispose.family<List<ServiceRow>, String>((ref, providerId) async {
-  final response = await ApiService().getProviderServices(providerId);
-  return ((response.data['data'] ?? []) as List)
-      .map((e) => ServiceRow.fromJson(e as Map<String, dynamic>))
-      .toList();
-});
+import '../../domain/entities/slot_entity.dart';
+import '../../../provider_profile/domain/entities/service_entity.dart';
+import '../../../provider_profile/domain/entities/staff_entity.dart';
+import '../viewmodel/availability_viewmodel.dart';
+import '../../../../shared/utils/format_rupiah.dart';
 
 class AvailabilityPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -118,7 +90,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                 onPageChanged: (focusedDay) => tempFocused = focusedDay,
                 calendarStyle: CalendarStyle(
                   outsideDaysVisible: false,
-                  todayDecoration: BoxDecoration(color: DEKATColors.primary.withOpacity(0.15), shape: BoxShape.circle, border: Border.all(color: DEKATColors.primary.withOpacity(0.3))),
+                  todayDecoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha:0.15), shape: BoxShape.circle, border: Border.all(color: DEKATColors.primary.withValues(alpha:0.3))),
                   todayTextStyle: const TextStyle(color: DEKATColors.primary, fontWeight: FontWeight.bold),
                   selectedDecoration: const BoxDecoration(color: DEKATColors.primary, shape: BoxShape.circle),
                   selectedTextStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
@@ -145,7 +117,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
     );
   }
 
-  void _showServicePicker(List<ServiceRow> services) {
+  void _showServicePicker(List<ServiceEntity> services) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -181,16 +153,16 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                         decoration: BoxDecoration(
-                          color: isSelected ? DEKATColors.primary.withOpacity(0.06) : Colors.white,
+                          color: isSelected ? DEKATColors.primary.withValues(alpha:0.06) : Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: isSelected ? DEKATColors.primary.withOpacity(0.3) : Colors.transparent),
+                          border: Border.all(color: isSelected ? DEKATColors.primary.withValues(alpha:0.3) : Colors.transparent),
                         ),
                         child: Row(children: [
                           Container(
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: isSelected ? DEKATColors.primary : DEKATColors.primary.withOpacity(0.1),
+                              color: isSelected ? DEKATColors.primary : DEKATColors.primary.withValues(alpha:0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Icon(Icons.spa_rounded, color: isSelected ? Colors.white : DEKATColors.primary, size: 22),
@@ -223,7 +195,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                               color: isSelected ? DEKATColors.primary : Colors.white,
                               shape: BoxShape.circle,
                               border: Border.all(color: isSelected ? DEKATColors.primary : Colors.grey[300]!),
-                              boxShadow: isSelected ? [BoxShadow(color: DEKATColors.primary.withOpacity(0.3), blurRadius: 6, offset: const Offset(0, 2))] : null,
+                              boxShadow: isSelected ? [BoxShadow(color: DEKATColors.primary.withValues(alpha:0.3), blurRadius: 6, offset: const Offset(0, 2))] : null,
                             ),
                             child: Icon(isSelected ? Icons.check_rounded : Icons.chevron_right_rounded, size: 16, color: isSelected ? Colors.white : Colors.grey[500]),
                           ),
@@ -240,7 +212,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
     );
   }
 
-  void _showStaffPicker(List<Map<String, dynamic>> staffList) {
+  void _showStaffPicker(List<StaffEntity> staffList) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -269,9 +241,9 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                   decoration: BoxDecoration(
-                    color: _selectedStaffId == null ? DEKATColors.primary.withOpacity(0.06) : Colors.white,
+                    color: _selectedStaffId == null ? DEKATColors.primary.withValues(alpha:0.06) : Colors.white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: _selectedStaffId == null ? DEKATColors.primary.withOpacity(0.3) : Colors.transparent),
+                    border: Border.all(color: _selectedStaffId == null ? DEKATColors.primary.withValues(alpha:0.3) : Colors.transparent),
                   ),
                   child: Row(children: [
                     Container(
@@ -313,11 +285,11 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                   separatorBuilder: (_, __) => Divider(color: Colors.grey[100], height: 1, indent: 16, endIndent: 16),
                   itemBuilder: (c, i) {
                     final s = staffList[i];
-                    final staffId = s['id'] as String;
-                    final name = s['displayName'] as String? ?? s['name'] as String? ?? 'Staff';
-                    final specialties = (s['specialties'] as List?)?.cast<String>() ?? [];
-                    final rating = (s['rating'] as num?)?.toDouble() ?? 0.0;
-                    final reviewCount = (s['reviewCount'] as num?)?.toInt() ?? 0;
+                    final staffId = s.id;
+                    final name = s.displayName ?? s.name;
+                    final specialties = s.specialties;
+                    final rating = s.rating;
+                    final reviewCount = s.reviewCount;
                     final isSelected = staffId == _selectedStaffId;
                     return InkWell(
                       onTap: () {
@@ -329,16 +301,16 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                         decoration: BoxDecoration(
-                          color: isSelected ? DEKATColors.primary.withOpacity(0.06) : Colors.white,
+                          color: isSelected ? DEKATColors.primary.withValues(alpha:0.06) : Colors.white,
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: isSelected ? DEKATColors.primary.withOpacity(0.3) : Colors.transparent),
+                          border: Border.all(color: isSelected ? DEKATColors.primary.withValues(alpha:0.3) : Colors.transparent),
                         ),
                         child: Row(children: [
                           Container(
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: isSelected ? DEKATColors.primary : DEKATColors.primary.withOpacity(0.1),
+                              color: isSelected ? DEKATColors.primary : DEKATColors.primary.withValues(alpha:0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Center(
@@ -387,7 +359,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
     );
   }
 
-  List<SlotRow> _filterByPeriod(List<SlotRow> slots, int startHour, int endHour) {
+  List<SlotEntity> _filterByPeriod(List<SlotEntity> slots, int startHour, int endHour) {
     return slots.where((s) {
       final hour = int.tryParse(s.time.split(':').first) ?? 0;
       return hour >= startHour && hour < endHour;
@@ -427,13 +399,13 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: Colors.grey[200]!),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 3))],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.04), blurRadius: 10, offset: const Offset(0, 3))],
                 ),
                 child: Row(
                   children: [
                     Container(
                       padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(color: DEKATColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                      decoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha:0.1), borderRadius: BorderRadius.circular(12)),
                       child: const Icon(Icons.calendar_month_rounded, color: DEKATColors.primary, size: 20),
                     ),
                     const SizedBox(width: 12),
@@ -446,7 +418,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(color: DEKATColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                      decoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha:0.1), borderRadius: BorderRadius.circular(20)),
                       child: Row(mainAxisSize: MainAxisSize.min, children: [
                         const Icon(Icons.edit_calendar_rounded, size: 14, color: DEKATColors.primary),
                         const SizedBox(width: 4),
@@ -475,17 +447,17 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: selected != null ? DEKATColors.primary.withOpacity(0.3) : Colors.grey[200]!),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 3))],
+                      border: Border.all(color: selected != null ? DEKATColors.primary.withValues(alpha:0.3) : Colors.grey[200]!),
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.04), blurRadius: 10, offset: const Offset(0, 3))],
                     ),
                     child: Row(
                       children: [
                         Container(
                           padding: const EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(colors: [DEKATColors.primary, DEKATColors.primary.withOpacity(0.8)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                            gradient: LinearGradient(colors: [DEKATColors.primary, DEKATColors.primary.withValues(alpha:0.8)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [BoxShadow(color: DEKATColors.primary.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 3))],
+                            boxShadow: [BoxShadow(color: DEKATColors.primary.withValues(alpha:0.25), blurRadius: 8, offset: const Offset(0, 3))],
                           ),
                           child: const Icon(Icons.spa_rounded, color: Colors.white, size: 20),
                         ),
@@ -548,8 +520,8 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
               data: (staffList) {
                 if (staffList.isEmpty) return const SizedBox.shrink();
                 final selectedName = staffList
-                    .where((s) => s['id'] == _selectedStaffId)
-                    .map((s) => s['displayName'] as String? ?? s['name'] as String? ?? 'Staff')
+                    .where((s) => s.id == _selectedStaffId)
+                    .map((s) => s.displayName ?? s.name)
                     .firstOrNull;
                 return InkWell(
                   onTap: () => _showStaffPicker(staffList),
@@ -559,8 +531,8 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: _selectedStaffId != null ? DEKATColors.primary.withOpacity(0.3) : Colors.grey[200]!),
-                      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 3))],
+                      border: Border.all(color: _selectedStaffId != null ? DEKATColors.primary.withValues(alpha:0.3) : Colors.grey[200]!),
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.04), blurRadius: 10, offset: const Offset(0, 3))],
                     ),
                     child: Row(
                       children: [
@@ -569,7 +541,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                           decoration: BoxDecoration(
                             gradient: LinearGradient(colors: [Colors.purple.shade400, Colors.purple.shade300], begin: Alignment.topLeft, end: Alignment.bottomRight),
                             borderRadius: BorderRadius.circular(12),
-                            boxShadow: [BoxShadow(color: Colors.purple.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 3))],
+                            boxShadow: [BoxShadow(color: Colors.purple.withValues(alpha:0.25), blurRadius: 8, offset: const Offset(0, 3))],
                           ),
                           child: const Icon(Icons.person_rounded, color: Colors.white, size: 20),
                         ),
@@ -631,7 +603,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                 ]),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(color: DEKATColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: DEKATColors.primary.withOpacity(0.15))),
+                  decoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha:0.1), borderRadius: BorderRadius.circular(20), border: Border.all(color: DEKATColors.primary.withValues(alpha:0.15))),
                   child: Row(mainAxisSize: MainAxisSize.min, children: [
                     const Icon(Icons.calendar_today_rounded, size: 12, color: DEKATColors.primary),
                     const SizedBox(width: 4),
@@ -661,7 +633,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                 final morning = _filterByPeriod(slots, 9, 12);
                 final afternoon = _filterByPeriod(slots, 12, 15);
                 final evening = _filterByPeriod(slots, 15, 24);
-                Widget section(String title, IconData icon, List<SlotRow> list) {
+                Widget section(String title, IconData icon, List<SlotEntity> list) {
                   if (list.isEmpty) return const SizedBox.shrink();
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 14),
@@ -698,7 +670,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                                           : Colors.white,
                                   borderRadius: BorderRadius.circular(12),
                                   border: Border.all(color: !isAvailable ? Colors.grey[200]! : isSelected ? DEKATColors.primary : Colors.grey[300]!, width: isSelected ? 1.5 : 1),
-                                  boxShadow: isSelected ? [BoxShadow(color: DEKATColors.primary.withOpacity(0.25), blurRadius: 8, offset: const Offset(0, 3))] : [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 6, offset: const Offset(0, 2))],
+                                  boxShadow: isSelected ? [BoxShadow(color: DEKATColors.primary.withValues(alpha:0.25), blurRadius: 8, offset: const Offset(0, 3))] : [BoxShadow(color: Colors.black.withValues(alpha:0.03), blurRadius: 6, offset: const Offset(0, 2))],
                                 ),
                                 child: Text(slot.time,
                                     style: TextStyle(
@@ -785,7 +757,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 16, offset: const Offset(0, -4))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.06), blurRadius: 16, offset: const Offset(0, -4))],
           border: Border(top: BorderSide(color: Colors.grey[100]!)),
         ),
         child: SafeArea(
@@ -808,7 +780,7 @@ class _AvailabilityPageState extends ConsumerState<AvailabilityPage> {
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                 elevation: selectedTimeSlot != null && _selectedServiceId != null ? 4 : 0,
-                shadowColor: DEKATColors.primary.withOpacity(0.4),
+                shadowColor: DEKATColors.primary.withValues(alpha:0.4),
               ),
               child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Text(_selectedServiceId == null ? 'Select a Service to Continue' : 'Continue', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),

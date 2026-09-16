@@ -26,6 +26,7 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
     try {
       final api = ApiService();
       final res = await api.dio.get('/bookings?status=COMPLETED');
+      if (!mounted) return;
       if (res.data['success'] == true) {
         setState(() {
           _bookings = res.data['data'] as List<dynamic>? ?? [];
@@ -34,6 +35,7 @@ class _MyReviewsPageState extends ConsumerState<MyReviewsPage> {
     } catch (e) {
       debugPrint('Error loading bookings: $e');
     }
+    if (!mounted) return;
     setState(() => _isLoading = false);
   }
 

@@ -1,21 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../../shared/models/rows.dart';
+import '../../../booking/presentation/viewmodel/booking_viewmodel.dart';
+
 import '../../../../shared/widgets/shimmer_loading.dart';
-
-enum BookingFilter { all, pending, confirmed, completed, cancelled }
-
-final bookingFilterProvider = StateProvider<BookingFilter>((ref) => BookingFilter.all);
-
-final bookingsProvider = FutureProvider<List<BookingRow>>((ref) async {
-  final filter = ref.watch(bookingFilterProvider);
-  final params = <String, dynamic>{'page': 1, 'limit': 50};
-  if (filter != BookingFilter.all) params['status'] = filter.name.toUpperCase();
-  final response = await ApiService().getBookings(params: params);
-  return parsePaginated(response.data['data'], BookingRow.fromJson).items;
-});
 
 class BookingHistoryPage extends ConsumerWidget {
   const BookingHistoryPage({super.key});
@@ -65,7 +53,7 @@ class BookingHistoryPage extends ConsumerWidget {
                       trailing: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.end, children: [
                         _StatusChip(status: b.status),
                         const SizedBox(height: 4),
-                        Text(formatRupiah(b.total), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey[700])),
+                        Text(_formatRupiah(b.total), style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey[700])),
                       ]),
                       onTap: () => context.push('/booking/${b.id}'),
                     ),
@@ -91,6 +79,10 @@ class BookingHistoryPage extends ConsumerWidget {
 
   String _fmtDate(DateTime d) => '${d.day}/${d.month}/${d.year}';
   String _fmtTime(DateTime d) => '${d.hour.toString().padLeft(2, '0')}:${d.minute.toString().padLeft(2, '0')}';
+  String _formatRupiah(num amount) {
+    final value = amount.round().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return 'Rp $value';
+  }
 }
 
 class _StatusChip extends StatelessWidget {

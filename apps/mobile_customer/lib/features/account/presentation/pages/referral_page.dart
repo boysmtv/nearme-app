@@ -26,6 +26,7 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
     try {
       final api = ApiService();
       final res = await api.dio.get('/customer/profile');
+      if (!mounted) return;
       if (res.data['success'] == true) {
         final data = res.data['data'] as Map<String, dynamic>;
         setState(() {
@@ -36,6 +37,7 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
     } catch (e) {
       debugPrint('Error loading profile: $e');
     }
+    if (!mounted) return;
     setState(() => _isLoading = false);
   }
 
@@ -168,7 +170,7 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
             width: 32,
             height: 32,
             decoration: BoxDecoration(
-              color: const Color(0xFF6C63FF).withOpacity(0.1),
+              color: const Color(0xFF6C63FF).withValues(alpha:0.1),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Center(

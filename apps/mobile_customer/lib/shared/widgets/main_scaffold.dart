@@ -3,13 +3,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../core/router/app_router.dart';
-import '../models/rows.dart';
+import '../../core/auth/auth_provider.dart';
+
+class _NotificationRow {
+  final String id;
+  final bool read;
+  const _NotificationRow({required this.id, required this.read});
+  factory _NotificationRow.fromJson(Map<String, dynamic> json) =>
+      _NotificationRow(id: json['id'] as String, read: json['read'] == true);
+}
 
 final notificationCountProvider = FutureProvider<int>((ref) async {
   final response = await ApiService().getNotifications(params: {'page': 1, 'limit': 50});
-  final rows = parsePaginated(response.data['data'], NotificationRow.fromJson).items;
-  return rows.where((n) => !n.read).length;
+  final data = (response.data['data'] ?? []) as List;
+  final items = data.map((e) => _NotificationRow.fromJson(e as Map<String, dynamic>)).toList();
+  return items.where((n) => !n.read).length;
 });
 
 class MainScaffold extends ConsumerWidget {

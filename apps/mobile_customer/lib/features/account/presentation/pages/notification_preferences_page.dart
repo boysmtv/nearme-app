@@ -132,7 +132,7 @@ class _ToggleChip extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: value ? Colors.deepPurple.withOpacity(0.1) : Colors.grey[100],
+          color: value ? Colors.deepPurple.withValues(alpha:0.1) : Colors.grey[100],
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: value ? Colors.deepPurple : Colors.grey[300]!),
         ),

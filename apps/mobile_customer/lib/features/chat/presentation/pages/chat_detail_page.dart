@@ -3,14 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../shared/models/rows.dart';
-import '../../../../shared/widgets/shimmer_loading.dart';
 
-final chatMessagesProvider = FutureProvider.autoDispose.family<List<ChatMessageRow>, String>((ref, chatId) async {
-  final res = await ApiService().getChatMessages(chatId);
-  final data = res.data['data'] as List;
-  return data.map((e) => ChatMessageRow.fromJson(e as Map<String, dynamic>)).toList();
-});
+import '../../../chat/presentation/viewmodel/chat_viewmodel.dart';
+import '../../../../shared/widgets/shimmer_loading.dart';
 
 class ChatDetailPage extends ConsumerStatefulWidget {
   final String chatId;

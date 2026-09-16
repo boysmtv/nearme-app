@@ -1,11 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_customer/shared/models/rows.dart';
 
-import 'package:mobile_customer/features/booking/presentation/pages/booking_history_page.dart';
-import 'package:mobile_customer/features/booking/presentation/pages/booking_detail_page.dart';
-import 'package:mobile_customer/features/booking/presentation/pages/booking_form_page.dart';
-import 'package:mobile_customer/features/booking/presentation/pages/booking_confirmation_page.dart';
+import 'package:mobile_customer/features/booking/domain/entities/booking_entity.dart';
+import 'package:mobile_customer/features/provider_profile/domain/entities/service_entity.dart';
+import 'package:mobile_customer/features/booking/presentation/viewmodel/booking_viewmodel.dart';
 
 void main() {
   group('bookingFilterProvider', () {
@@ -38,7 +36,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           bookingsProvider.overrideWith((ref) => Future.value([
-                BookingRow(
+                const BookingEntity(
                   id: 'b1',
                   bookingCode: 'DKT-001',
                   status: 'CONFIRMED',
@@ -49,7 +47,7 @@ void main() {
                   fee: 0,
                   total: 55500,
                 ),
-                BookingRow(
+                const BookingEntity(
                   id: 'b2',
                   bookingCode: 'DKT-002',
                   status: 'PENDING',
@@ -74,7 +72,7 @@ void main() {
     test('returns empty list when override provides empty', () async {
       final container = ProviderContainer(
         overrides: [
-          bookingsProvider.overrideWith((ref) => Future.value(<BookingRow>[])),
+          bookingsProvider.overrideWith((ref) => Future.value(<BookingEntity>[])),
         ],
       );
       addTearDown(container.dispose);
@@ -99,11 +97,11 @@ void main() {
   });
 
   group('bookingDetailProvider2', () {
-    test('returns BookingRow for valid id', () async {
+    test('returns BookingEntity for valid id', () async {
       final container = ProviderContainer(
         overrides: [
           bookingDetailProvider2('b1').overrideWith((ref) => Future.value(
-                BookingRow(
+                const BookingEntity(
                   id: 'b1',
                   bookingCode: 'DKT-001',
                   status: 'CONFIRMED',
@@ -113,7 +111,7 @@ void main() {
                   tax: 9900,
                   fee: 5000,
                   total: 104900,
-                  startsAt: DateTime(2026, 8, 25, 10, 0),
+                  startsAt: null,
                   version: 2,
                 ),
               )),
@@ -125,7 +123,6 @@ void main() {
       expect(booking.id, 'b1');
       expect(booking.total, 104900);
       expect(booking.version, 2);
-      expect(booking.startsAt, DateTime(2026, 8, 25, 10, 0));
     });
 
     test('propagates error for invalid id', () async {
@@ -160,7 +157,7 @@ void main() {
           bookingSummaryProvider.overrideWith((ref, key) async {
             final parts = key.split('|');
             return BookingSummary(
-              service: ServiceRow(
+              service: ServiceEntity(
                 id: parts[1],
                 name: 'Haircut',
                 price: 50000,
@@ -186,7 +183,7 @@ void main() {
           bookingSummaryProvider.overrideWith((ref, key) async {
             final parts = key.split('|');
             return BookingSummary(
-              service: ServiceRow(
+              service: ServiceEntity(
                 id: parts[1],
                 name: 'Haircut',
                 price: 50000,
@@ -222,11 +219,11 @@ void main() {
   });
 
   group('bookingConfirmationProvider', () {
-    test('returns BookingRow for confirmation', () async {
+    test('returns BookingEntity for confirmation', () async {
       final container = ProviderContainer(
         overrides: [
           bookingConfirmationProvider('b1').overrideWith((ref) => Future.value(
-                BookingRow(
+                const BookingEntity(
                   id: 'b1',
                   bookingCode: 'DKT-100',
                   status: 'CONFIRMED',

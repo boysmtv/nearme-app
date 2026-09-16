@@ -3,64 +3,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
-import '../../../../shared/models/rows.dart';
+import '../../domain/entities/provider_entity.dart';
+import '../../domain/entities/service_entity.dart';
+import '../../../../shared/utils/format_rupiah.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
 
-class ProviderDetail {
-  final String id;
-  final String slug;
-  final String name;
-  final String? category;
-  final String? imageUrl;
-  final double rating;
-  final int reviewCount;
-  final String? city;
-  final String? address;
-  final String? description;
-  final List<Map<String, dynamic>> locations;
-
-  const ProviderDetail({
-    required this.id,
-    required this.slug,
-    required this.name,
-    this.category,
-    this.imageUrl,
-    required this.rating,
-    required this.reviewCount,
-    this.city,
-    this.address,
-    this.description,
-    required this.locations,
-  });
-
-  String? get firstLocationId =>
-      locations.isNotEmpty ? locations.first['id'] as String? : null;
-}
-
 final providerDetailProvider =
-    FutureProvider.autoDispose.family<ProviderDetail, String>((ref, slug) async {
+    FutureProvider.autoDispose.family<ProviderEntity, String>((ref, slug) async {
   final response = await ApiService().getProvider(slug);
   final data = response.data['data'] as Map<String, dynamic>;
-  return ProviderDetail(
-    id: data['id'] as String,
-    slug: (data['slug'] ?? slug) as String,
-    name: data['name'] as String,
-    category: data['category'] as String?,
-    imageUrl: data['imageUrl'] as String?,
-    rating: (data['rating'] as num?)?.toDouble() ?? 0,
-    reviewCount: (data['reviewCount'] as num?)?.toInt() ?? 0,
-    city: data['city'] as String?,
-    address: data['address'] as String?,
-    description: data['description'] as String?,
-    locations: ((data['locations'] ?? []) as List).cast<Map<String, dynamic>>(),
-  );
+  return ProviderEntity.fromJson(data);
 });
 
 final providerServicesProvider =
-    FutureProvider.autoDispose.family<List<ServiceRow>, String>((ref, providerId) async {
+    FutureProvider.autoDispose.family<List<ServiceEntity>, String>((ref, providerId) async {
   final response = await ApiService().getProviderServices(providerId);
   return ((response.data['data'] ?? []) as List)
-      .map((e) => ServiceRow.fromJson(e as Map<String, dynamic>))
+      .map((e) => ServiceEntity.fromJson(e as Map<String, dynamic>))
       .toList();
 });
 
@@ -106,7 +65,7 @@ class ProviderDetailPage extends ConsumerWidget {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [DEKATColors.primary.withOpacity(0.15), DEKATColors.primary.withOpacity(0.05)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                          gradient: LinearGradient(colors: [DEKATColors.primary.withValues(alpha:0.15), DEKATColors.primary.withValues(alpha:0.05)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
                         ),
                         child: provider.imageUrl != null && provider.imageUrl!.isNotEmpty
                             ? Image.network(provider.imageUrl!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.store_rounded, size: 80, color: Colors.grey))
@@ -114,7 +73,7 @@ class ProviderDetailPage extends ConsumerWidget {
                       ),
                       Container(
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(colors: [Colors.transparent, Colors.black.withOpacity(0.55)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
+                          gradient: LinearGradient(colors: [Colors.transparent, Colors.black.withValues(alpha:0.55)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
                         ),
                       ),
                       Positioned(
@@ -123,12 +82,12 @@ class ProviderDetailPage extends ConsumerWidget {
                         right: 16,
                         child: Container(
                           padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.12), blurRadius: 16, offset: const Offset(0, 6))]),
+                          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.12), blurRadius: 16, offset: const Offset(0, 6))]),
                           child: Row(children: [
                             Container(
                               width: 56,
                               height: 56,
-                              decoration: BoxDecoration(color: DEKATColors.primary.withOpacity(0.12), borderRadius: BorderRadius.circular(12), border: Border.all(color: DEKATColors.primary.withOpacity(0.15))),
+                              decoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha:0.12), borderRadius: BorderRadius.circular(12), border: Border.all(color: DEKATColors.primary.withValues(alpha:0.15))),
                               child: const Icon(Icons.store_rounded, color: DEKATColors.primary, size: 28),
                             ),
                             const SizedBox(width: 12),
@@ -139,13 +98,13 @@ class ProviderDetailPage extends ConsumerWidget {
                                 Row(children: [
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(color: DEKATColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                                    decoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha:0.1), borderRadius: BorderRadius.circular(6)),
                                     child: Text((provider.category ?? 'Umum').toUpperCase(), style: const TextStyle(color: DEKATColors.primary, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
                                   ),
                                   const SizedBox(width: 6),
                                   Icon(Icons.star_rounded, size: 14, color: Colors.amber[600]),
                                   const SizedBox(width: 2),
-                                  Text('${provider.rating.toStringAsFixed(1)}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
+                                  Text(provider.rating.toStringAsFixed(1), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12)),
                                   Text(' (${provider.reviewCount})', style: TextStyle(color: Colors.grey[600], fontSize: 12)),
                                 ]),
                                 if (provider.city != null) ...[
@@ -192,7 +151,7 @@ class ProviderDetailPage extends ConsumerWidget {
                       ]),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(color: DEKATColors.primary.withOpacity(0.08), borderRadius: BorderRadius.circular(20), border: Border.all(color: DEKATColors.primary.withOpacity(0.15))),
+                        decoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha:0.08), borderRadius: BorderRadius.circular(20), border: Border.all(color: DEKATColors.primary.withValues(alpha:0.15))),
                         child: Row(mainAxisSize: MainAxisSize.min, children: [
                           const Icon(Icons.verified_rounded, size: 12, color: DEKATColors.primary),
                           const SizedBox(width: 4),
@@ -293,7 +252,7 @@ class ProviderDetailPage extends ConsumerWidget {
                                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.grey[200]!)),
                                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                   Row(children: [
-                                    CircleAvatar(backgroundColor: DEKATColors.primary.withOpacity(0.12), child: Text((s['name'] as String? ?? '?').substring(0, 1).toUpperCase(), style: const TextStyle(color: DEKATColors.primary, fontWeight: FontWeight.w800))),
+                                    CircleAvatar(backgroundColor: DEKATColors.primary.withValues(alpha:0.12), child: Text((s['name'] as String? ?? '?').substring(0, 1).toUpperCase(), style: const TextStyle(color: DEKATColors.primary, fontWeight: FontWeight.w800))),
                                     const SizedBox(width: 10),
                                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                       Text(s['name'] as String? ?? '-', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
@@ -367,7 +326,7 @@ class ProviderDetailPage extends ConsumerWidget {
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
                               border: Border.all(color: Colors.grey[200]!),
-                              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 10, offset: const Offset(0, 4))],
+                              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.04), blurRadius: 10, offset: const Offset(0, 4))],
                             ),
                             child: Material(
                               color: Colors.transparent,
@@ -381,9 +340,9 @@ class ProviderDetailPage extends ConsumerWidget {
                                       width: 56,
                                       height: 56,
                                       decoration: BoxDecoration(
-                                        gradient: LinearGradient(colors: [DEKATColors.primary.withOpacity(0.15), DEKATColors.primary.withOpacity(0.08)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                                        gradient: LinearGradient(colors: [DEKATColors.primary.withValues(alpha:0.15), DEKATColors.primary.withValues(alpha:0.08)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                                         borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(color: DEKATColors.primary.withOpacity(0.12)),
+                                        border: Border.all(color: DEKATColors.primary.withValues(alpha:0.12)),
                                       ),
                                       child: const Icon(Icons.spa_rounded, color: DEKATColors.primary, size: 24),
                                     ),

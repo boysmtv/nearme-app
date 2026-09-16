@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../../shared/models/rows.dart';
+import '../../domain/entities/provider_entity.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
 
-final providerListProvider = FutureProvider.autoDispose<List<ProviderRow>>((ref) async {
+final providerListProvider = FutureProvider.autoDispose<List<ProviderEntity>>((ref) async {
   final response = await ApiService().getProviders();
   return ((response.data['data'] ?? []) as List)
-      .map((e) => ProviderRow.fromJson(e as Map<String, dynamic>))
+      .map((e) => ProviderEntity.fromJson(e as Map<String, dynamic>))
       .toList();
 });
 

@@ -1,1 +1,1 @@
-export '../presentation/pages/support_page.dart' show faqsProvider, policiesProvider;
+export '../presentation/viewmodel/support_viewmodel.dart' show supportRepositoryProvider;

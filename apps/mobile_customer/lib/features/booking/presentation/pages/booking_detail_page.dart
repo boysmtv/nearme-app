@@ -5,13 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../../../../shared/models/rows.dart';
+import '../../../booking/domain/entities/booking_entity.dart';
+import '../../../booking/presentation/viewmodel/booking_viewmodel.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
-
-final bookingDetailProvider2 = FutureProvider.autoDispose.family<BookingRow, String>((ref, id) async {
-  final response = await ApiService().getBooking(id);
-  return BookingRow.fromJson(response.data['data'] as Map<String, dynamic>);
-});
 
 class BookingDetailPage extends ConsumerStatefulWidget {
   final String bookingId;
@@ -55,7 +51,11 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
     }
   }
 
-  Future<void> _downloadIcs(BookingRow booking) async {
+  String formatRupiah(int amount) {
+    return 'Rp ${amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+  }
+
+  Future<void> _downloadIcs(BookingEntity booking) async {
     setState(() => _icsLoading = true);
     try {
       final res = await ApiService().getBookingIcs(widget.bookingId);
@@ -71,7 +71,7 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
     }
   }
 
-  Future<void> _openGoogleCalendar(BookingRow booking) async {
+  Future<void> _openGoogleCalendar(BookingEntity booking) async {
     try {
       final res = await ApiService().getBookingCalendarLink(widget.bookingId);
       final data = res.data['data'] as Map<String, dynamic>?;
@@ -89,7 +89,7 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
     }
   }
 
-  Future<void> _reschedule(BookingRow booking) async {
+  Future<void> _reschedule(BookingEntity booking) async {
     if (_rescheduleDate == null || _rescheduleTime == null) {
       setState(() => _rescheduleMsg = 'Pilih tanggal & jam baru');
       return;
@@ -160,7 +160,7 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
                 if (booking.fee > 0) _InfoRow(label: 'Fee', value: formatRupiah(booking.fee)),
                 _InfoRow(label: 'Total', value: formatRupiah(booking.total)),
                 const Divider(),
-                _InfoRow(label: 'Deposit', value: booking.depositRequired ? formatRupiah(booking.depositAmount) + ' Wajib' : 'Tidak ada'),
+                _InfoRow(label: 'Deposit', value: booking.depositRequired ? '${formatRupiah(booking.depositAmount)} Wajib' : 'Tidak ada'),
                 if (booking.depositRequired)
                   Container(
                     margin: const EdgeInsets.only(top: 8),

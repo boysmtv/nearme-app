@@ -1,18 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../../shared/models/rows.dart';
 
-final faqsProvider = FutureProvider.autoDispose<List<FaqRow>>((ref) async {
+class _FaqRow {
+  final String id;
+  final String question;
+  final String answer;
+  final String? category;
+  const _FaqRow({required this.id, required this.question, required this.answer, this.category});
+  factory _FaqRow.fromJson(Map<String, dynamic> json) => _FaqRow(
+        id: json['id'] as String,
+        question: json['question'] as String,
+        answer: json['answer'] as String,
+        category: json['category'] as String?,
+      );
+}
+
+class _PolicyRow {
+  final String id;
+  final String title;
+  final String body;
+  final String type;
+  const _PolicyRow({required this.id, required this.title, required this.body, required this.type});
+  factory _PolicyRow.fromJson(Map<String, dynamic> json) => _PolicyRow(
+        id: json['id'] as String,
+        title: json['title'] as String,
+        body: json['body'] as String,
+        type: json['type'] as String,
+      );
+}
+
+final faqsProvider = FutureProvider.autoDispose<List<_FaqRow>>((ref) async {
   final res = await ApiService().getPublicFaqs();
   final data = (res.data['data'] ?? []) as List;
-  return data.map((e) => FaqRow.fromJson(e as Map<String, dynamic>)).toList();
+  return data.map((e) => _FaqRow.fromJson(e as Map<String, dynamic>)).toList();
 });
 
-final policiesProvider = FutureProvider.autoDispose<List<PolicyRow>>((ref) async {
+final policiesProvider = FutureProvider.autoDispose<List<_PolicyRow>>((ref) async {
   final res = await ApiService().getPublicPolicies();
   final data = (res.data['data'] ?? []) as List;
-  return data.map((e) => PolicyRow.fromJson(e as Map<String, dynamic>)).toList();
+  return data.map((e) => _PolicyRow.fromJson(e as Map<String, dynamic>)).toList();
 });
 
 class SupportPage extends ConsumerStatefulWidget {

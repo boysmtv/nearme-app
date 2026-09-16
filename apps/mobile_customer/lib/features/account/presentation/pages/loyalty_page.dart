@@ -27,13 +27,14 @@ class _LoyaltyPageState extends ConsumerState<LoyaltyPage> {
     try {
       final response = await ApiService().getCustomerProfile();
       final data = response.data['data'];
+      if (!mounted) return;
       setState(() {
         _points = data['loyaltyPoints'] ?? 0;
         _history = data['loyaltyHistory'] is List ? data['loyaltyHistory'] : [];
         _loading = false;
       });
     } catch (e) {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 
@@ -53,7 +54,7 @@ class _LoyaltyPageState extends ConsumerState<LoyaltyPage> {
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [DEKATColors.primary, DEKATColors.primary.withOpacity(0.8)]),
+                    gradient: LinearGradient(colors: [DEKATColors.primary, DEKATColors.primary.withValues(alpha:0.8)]),
                   ),
                   child: Column(
                     children: [

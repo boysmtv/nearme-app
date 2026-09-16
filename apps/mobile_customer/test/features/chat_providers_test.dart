@@ -1,9 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:mobile_customer/shared/models/rows.dart';
 
-import 'package:mobile_customer/features/chat/presentation/pages/chat_list_page.dart';
-import 'package:mobile_customer/features/chat/presentation/pages/chat_detail_page.dart';
+import 'package:mobile_customer/features/chat/domain/entities/chat_entity.dart';
+import 'package:mobile_customer/features/chat/presentation/viewmodel/chat_viewmodel.dart';
 
 void main() {
   group('chatListProvider', () {
@@ -11,7 +10,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           chatListProvider.overrideWith((ref) => Future.value([
-                const ConversationRow(
+                const ConversationEntity(
                   id: 'c1',
                   tenantId: 't1',
                   customerId: 'cust1',
@@ -21,7 +20,7 @@ void main() {
                   lastMessageBody: 'Hello',
                   messageCount: 3,
                 ),
-                const ConversationRow(
+                const ConversationEntity(
                   id: 'c2',
                   tenantId: 't2',
                   customerId: 'cust1',
@@ -45,7 +44,7 @@ void main() {
     test('returns empty list when no conversations', () async {
       final container = ProviderContainer(
         overrides: [
-          chatListProvider.overrideWith((ref) => Future.value(<ConversationRow>[])),
+          chatListProvider.overrideWith((ref) => Future.value(<ConversationEntity>[])),
         ],
       );
       addTearDown(container.dispose);
@@ -73,7 +72,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           chatListProvider.overrideWith((ref) => Future.value([
-                const ConversationRow(
+                const ConversationEntity(
                   id: 'c3',
                   tenantId: 't1',
                   customerId: 'cust1',
@@ -96,7 +95,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           chatMessagesProvider('chat1').overrideWith((ref) => Future.value([
-                const ChatMessageRow(
+                const ChatMessageEntity(
                   id: 'm1',
                   conversationId: 'chat1',
                   senderId: 'cust1',
@@ -104,7 +103,7 @@ void main() {
                   body: 'Hello',
                   messageType: 'TEXT',
                 ),
-                const ChatMessageRow(
+                const ChatMessageEntity(
                   id: 'm2',
                   conversationId: 'chat1',
                   senderId: 'prov1',
@@ -137,7 +136,7 @@ void main() {
       final container = ProviderContainer(
         overrides: [
           chatMessagesProvider('chat1').overrideWith((ref) => Future.value([
-                const ChatMessageRow(
+                const ChatMessageEntity(
                   id: 'm3',
                   conversationId: 'chat1',
                   senderId: 'cust1',

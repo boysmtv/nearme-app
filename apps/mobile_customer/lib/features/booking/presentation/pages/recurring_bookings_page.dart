@@ -163,7 +163,7 @@ class _RecurringBookingsPageState extends ConsumerState<RecurringBookingsPage> {
                           Switch(
                             value: isActive,
                             onChanged: (_) => _toggleActive(b['id'].toString(), isActive),
-                            activeColor: Colors.deepPurple,
+                            activeThumbColor: Colors.deepPurple,
                           ),
                         ],
                       ),
@@ -233,7 +233,7 @@ class _RecurringBookingsPageState extends ConsumerState<RecurringBookingsPage> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedFrequency,
+                initialValue: _selectedFrequency,
                 decoration: const InputDecoration(labelText: 'Frekuensi'),
                 items: const [
                   DropdownMenuItem(value: 'weekly', child: Text('Mingguan')),
@@ -244,7 +244,7 @@ class _RecurringBookingsPageState extends ConsumerState<RecurringBookingsPage> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
-                value: _selectedDay,
+                initialValue: _selectedDay,
                 decoration: const InputDecoration(labelText: 'Hari'),
                 items: const [
                   DropdownMenuItem(value: 'monday', child: Text('Senin')),
@@ -295,7 +295,7 @@ class _InfoChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: Colors.deepPurple.withOpacity(0.1),
+        color: Colors.deepPurple.withValues(alpha:0.1),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(

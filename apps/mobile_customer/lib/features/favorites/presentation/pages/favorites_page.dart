@@ -28,12 +28,13 @@ class _FavoritesPageState extends ConsumerState<FavoritesPage> {
     try {
       final response = await ApiService().getFavorites();
       final data = response.data['data'];
+      if (!mounted) return;
       setState(() {
         _favorites = data is List ? data : [];
         _loading = false;
       });
     } catch (e) {
-      setState(() => _loading = false);
+      if (mounted) setState(() => _loading = false);
     }
   }
 

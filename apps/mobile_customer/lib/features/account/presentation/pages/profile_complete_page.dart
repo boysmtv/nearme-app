@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:mobile_customer/core/router/app_router.dart';
+import 'package:mobile_customer/core/auth/auth_provider.dart';
 
 class ProfileCompletePage extends ConsumerStatefulWidget {
   const ProfileCompletePage({super.key});
@@ -74,7 +74,11 @@ class _ProfileCompletePageState extends ConsumerState<ProfileCompletePage> {
                   : const Text('Save & Continue'),
             ),
             const SizedBox(height: 12),
-            TextButton(onPressed: () => ref.read(authProvider.notifier).logout().then((_) => context.go('/login')), child: const Text('Logout')),
+            TextButton(onPressed: () async {
+              final nav = GoRouter.of(context);
+              await ref.read(authProvider.notifier).logout();
+              if (context.mounted) nav.go('/login');
+            }, child: const Text('Logout')),
           ]),
         ),
       ),

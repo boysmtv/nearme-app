@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_api_client/flutter_api_client.dart';
+
 import 'package:flutter_design_system/flutter_design_system.dart';
-import '../../../../shared/models/rows.dart';
+import '../../../provider_profile/domain/entities/provider_entity.dart';
+import '../../../provider_profile/data/repositories/provider_repository_impl.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
+import '../../../../core/di/providers.dart';
 
 final searchQueryProvider = StateProvider<String>((ref) => '');
-final searchResultsProvider = FutureProvider.autoDispose<List<ProviderRow>>((ref) async {
+final searchResultsProvider = FutureProvider.autoDispose<List<ProviderEntity>>((ref) async {
   final query = ref.watch(searchQueryProvider);
+  final repo = ProviderRepositoryImpl(ref.read(apiServiceProvider));
   if (query.isEmpty) {
-    final response = await ApiService().getProviders();
-    return ((response.data['data'] ?? []) as List)
-        .map((e) => ProviderRow.fromJson(e as Map<String, dynamic>))
-        .toList();
+    final result = await repo.getProviders();
+    return result.fold((l) => throw Exception(l.message), (r) => r);
   }
-  final response = await ApiService().search(query);
-  return ((response.data['data'] ?? []) as List)
-      .map((e) => ProviderRow.fromJson(e as Map<String, dynamic>))
-      .toList();
+  final result = await repo.searchProviders(query);
+  return result.fold((l) => throw Exception(l.message), (r) => r);
 });
 
 final recentSearchesProvider = StateNotifierProvider<RecentSearchesNotifier, List<String>>((ref) {
@@ -55,13 +54,13 @@ class _SearchPageState extends ConsumerState<SearchPage> {
     return v.replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
   }
 
-  Widget _providerCard(BuildContext context, ProviderRow p) {
+  Widget _providerCard(BuildContext context, ProviderEntity p) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, 4))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha:0.05), blurRadius: 10, offset: const Offset(0, 4))],
         border: Border.all(color: Colors.grey[100]!),
       ),
       child: Material(
@@ -77,7 +76,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: DEKATColors.primary.withOpacity(0.08),
+                    color: DEKATColors.primary.withValues(alpha:0.08),
                     borderRadius: BorderRadius.circular(12),
                     image: p.imageUrl != null ? DecorationImage(image: NetworkImage(p.imageUrl!), fit: BoxFit.cover) : null,
                   ),
@@ -94,7 +93,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                         children: [
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(color: DEKATColors.primary.withOpacity(0.1), borderRadius: BorderRadius.circular(6)),
+                            decoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha:0.1), borderRadius: BorderRadius.circular(6)),
                             child: Text((p.category ?? 'General').toUpperCase(), style: const TextStyle(color: DEKATColors.primary, fontSize: 10, fontWeight: FontWeight.w700, letterSpacing: 0.3)),
                           ),
                           if (p.city != null) ...[

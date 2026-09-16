@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_api_client/flutter_api_client.dart';
-import '../../../../shared/models/rows.dart';
-import '../../providers/discovery_providers.dart';
 
-export '../../providers/discovery_providers.dart' show discoveryProvidersProvider, categoriesProvider, dashboardProfileProvider;
+import '../../../provider_profile/domain/entities/provider_entity.dart';
+import '../../../discovery/domain/entities/category_entity.dart';
+import '../viewmodel/discovery_viewmodel.dart';
+
+export '../viewmodel/discovery_viewmodel.dart' show discoveryProvidersProvider, categoriesProvider, dashboardProfileProvider;
 
 class DiscoveryPage extends ConsumerWidget {
   const DiscoveryPage({super.key});
@@ -22,8 +23,8 @@ class DiscoveryPage extends ConsumerWidget {
             ref.invalidate(discoveryProvidersProvider);
             ref.invalidate(categoriesProvider);
             await Future.wait([
-              ref.read(discoveryProvidersProvider.future).catchError((_) => <ProviderRow>[]),
-              ref.read(categoriesProvider.future).catchError((_) => <Category>[]),
+              ref.read(discoveryProvidersProvider.future).catchError((_) => <ProviderEntity>[]),
+              ref.read(categoriesProvider.future).catchError((_) => <CategoryEntity>[]),
             ]);
           },
           child: CustomScrollView(

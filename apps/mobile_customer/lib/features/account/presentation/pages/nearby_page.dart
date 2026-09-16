@@ -34,6 +34,7 @@ class _NearbyPageState extends State<NearbyPage> {
       final res = await api.dio.get(
         '/public/providers?q=&radius=$_radius&lat=${_userLocation?.latitude ?? -6.2088}&lng=${_userLocation?.longitude ?? 106.8456}',
       );
+      if (!mounted) return;
       if (res.data['success'] == true) {
         final data = res.data['data'];
         setState(() {
@@ -43,6 +44,7 @@ class _NearbyPageState extends State<NearbyPage> {
     } catch (e) {
       debugPrint('Error loading nearby: $e');
     }
+    if (!mounted) return;
     setState(() => _isLoading = false);
   }
 

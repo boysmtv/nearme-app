@@ -1,1 +1,1 @@
-export '../presentation/pages/notification_page.dart' show notificationsProvider;
+export '../presentation/viewmodel/notification_viewmodel.dart' show notificationsProvider;
