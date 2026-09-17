@@ -253,4 +253,150 @@ describe('SupportPage', () => {
       expect(searchInput).toBeInTheDocument();
     });
   });
+
+  it('submits contact form successfully', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    (api.post as any).mockResolvedValue({ data: {} });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Subjek')).toBeInTheDocument();
+    });
+    await userEvent.type(screen.getByLabelText('Subjek'), 'Test Subject Long');
+    await userEvent.type(screen.getByLabelText('Pesan'), 'This is a test message with enough chars');
+    await userEvent.click(screen.getByText('Kirim Pesan'));
+    await waitFor(() => {
+      expect(screen.getByText('Pesan berhasil dikirim!')).toBeInTheDocument();
+    });
+    expect(api.post).toHaveBeenCalledWith('/support/cases', expect.objectContaining({
+      subject: 'Test Subject Long',
+      message: 'This is a test message with enough chars',
+    }));
+  });
+
+  it('shows "Kirim Pesan Baru" button after success', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    (api.post as any).mockResolvedValue({ data: {} });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Subjek')).toBeInTheDocument();
+    });
+    await userEvent.type(screen.getByLabelText('Subjek'), 'Test Subject Long');
+    await userEvent.type(screen.getByLabelText('Pesan'), 'This is a test message with enough chars');
+    await userEvent.click(screen.getByText('Kirim Pesan'));
+    await waitFor(() => {
+      expect(screen.getByText('Kirim Pesan Baru')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText('Kirim Pesan Baru'));
+    await waitFor(() => {
+      expect(screen.getByLabelText('Subjek')).toBeInTheDocument();
+    });
+  });
+
+  it('shows 401 error on unauthorized submission', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    (api.post as any).mockRejectedValue({ response: { status: 401 } });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Subjek')).toBeInTheDocument();
+    });
+    await userEvent.type(screen.getByLabelText('Subjek'), 'Test Subject Long');
+    await userEvent.type(screen.getByLabelText('Pesan'), 'This is a test message with enough chars');
+    await userEvent.click(screen.getByText('Kirim Pesan'));
+    await waitFor(() => {
+      expect(screen.getByText('Silakan login terlebih dahulu untuk mengirim pesan.')).toBeInTheDocument();
+    });
+  });
+
+  it('shows generic error on failed submission', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    (api.post as any).mockRejectedValue({ response: { data: { message: 'Server error' } } });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Subjek')).toBeInTheDocument();
+    });
+    await userEvent.type(screen.getByLabelText('Subjek'), 'Test Subject Long');
+    await userEvent.type(screen.getByLabelText('Pesan'), 'This is a test message with enough chars');
+    await userEvent.click(screen.getByText('Kirim Pesan'));
+    await waitFor(() => {
+      expect(screen.getByText('Server error')).toBeInTheDocument();
+    });
+  });
+
+  it('collapses FAQ when clicked again', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: mockFaqs });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByText('Bagaimana cara booking?')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText('Bagaimana cara booking?'));
+    await waitFor(() => {
+      expect(screen.getByText('Pilih provider, pilih layanan, pilih jadwal, lalu konfirmasi.')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText('Bagaimana cara booking?'));
+    const answerEl = screen.getByText('Pilih provider, pilih layanan, pilih jadwal, lalu konfirmasi.');
+    const answerContainer = answerEl.closest('[class*="max-h"]');
+    expect(answerContainer).toBeTruthy();
+    expect(answerContainer!.className).toContain('max-h-0');
+  });
+
+  it('handles file input change', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByText('Pilih file untuk dilampirkan')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    expect(fileInput).toBeTruthy();
+  });
+
+  it('filters FAQ by "Teknis" category', async () => {
+    const techFaqs = [
+      { id: 't1', question: 'Bagaimana reset password?', answer: 'Klik lupa password.', category: 'Teknis' },
+      { id: 't2', question: 'Cara booking?', answer: 'Pilih provider.', category: 'Booking' },
+    ];
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: techFaqs });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByText('Bagaimana reset password?')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByRole('button', { name: 'Teknis' }));
+    await waitFor(() => {
+      expect(screen.getByText('Bagaimana reset password?')).toBeInTheDocument();
+      expect(screen.queryByText('Cara booking?')).not.toBeInTheDocument();
+    });
+  });
+
+  it('handles default error without response.data.message', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    (api.post as any).mockRejectedValue(new Error('Network'));
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByLabelText('Subjek')).toBeInTheDocument();
+    });
+    await userEvent.type(screen.getByLabelText('Subjek'), 'Test Subject Long');
+    await userEvent.type(screen.getByLabelText('Pesan'), 'This is a test message with enough chars');
+    await userEvent.click(screen.getByText('Kirim Pesan'));
+    await waitFor(() => {
+      expect(screen.getByText('Gagal mengirim pesan. Silakan coba lagi.')).toBeInTheDocument();
+    });
+  });
+
+  it('shows category label on FAQ items', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: mockFaqs });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByText('Booking')).toBeInTheDocument();
+    });
+    const bookingLabels = screen.getAllByText('Booking');
+    expect(bookingLabels.length).toBeGreaterThanOrEqual(1);
+  });
 });
