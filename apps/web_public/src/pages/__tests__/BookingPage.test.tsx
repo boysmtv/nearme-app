@@ -732,20 +732,19 @@ describe('BookingPage', () => {
     const user = userEvent.setup();
     renderBooking();
     await goToSuccessPage(user);
-    const dateInput = screen.getAllByDisplayValue('')[0]; // first empty date input
     // Find the reschedule date input specifically
     const dateInputs = document.querySelectorAll('input[type="date"]');
     const timeInputs = document.querySelectorAll('input[type="time"]');
     expect(dateInputs.length).toBeGreaterThanOrEqual(1);
-    await user.type(dateInputs[0], '2026-09-25');
-    await user.type(timeInputs[0], '14:00');
+    fireEvent.change(dateInputs[0], { target: { value: '2026-09-25' } });
+    fireEvent.change(timeInputs[0], { target: { value: '14:00' } });
     const rescheduleBtn = screen.getByText('Reschedule Booking');
     expect(rescheduleBtn).not.toBeDisabled();
     await user.click(rescheduleBtn);
     await waitFor(() => {
       expect(screen.getByText('Reschedule berhasil! Slot baru terkonfirmasi.')).toBeInTheDocument();
     });
-  });
+  }, 15000);
 
   it('reschedule failure shows error message', async () => {
     mockReschedule.mockRejectedValue(new Error('Reschedule failed: 409 Conflict limit'));
@@ -754,13 +753,13 @@ describe('BookingPage', () => {
     await goToSuccessPage(user);
     const dateInputs = document.querySelectorAll('input[type="date"]');
     const timeInputs = document.querySelectorAll('input[type="time"]');
-    await user.type(dateInputs[0], '2026-09-25');
-    await user.type(timeInputs[0], '14:00');
+    fireEvent.change(dateInputs[0], { target: { value: '2026-09-25' } });
+    fireEvent.change(timeInputs[0], { target: { value: '14:00' } });
     await user.click(screen.getByText('Reschedule Booking'));
     await waitFor(() => {
       expect(screen.getByText(/Batas reschedule gratis tercapai/)).toBeInTheDocument();
     });
-  });
+  }, 15000);
 
   it('reschedule failure with generic error', async () => {
     mockReschedule.mockRejectedValue(new Error('Network error'));
@@ -769,14 +768,14 @@ describe('BookingPage', () => {
     await goToSuccessPage(user);
     const dateInputs = document.querySelectorAll('input[type="date"]');
     const timeInputs = document.querySelectorAll('input[type="time"]');
-    await user.type(dateInputs[0], '2026-09-25');
-    await user.type(timeInputs[0], '14:00');
+    fireEvent.change(dateInputs[0], { target: { value: '2026-09-25' } });
+    fireEvent.change(timeInputs[0], { target: { value: '14:00' } });
     await user.click(screen.getByText('Reschedule Booking'));
     await waitFor(() => {
       const msgs = screen.getAllByText('Network error');
       expect(msgs.length).toBeGreaterThanOrEqual(1);
     });
-  });
+  }, 15000);
 
   it('reschedule failure with non-Error object', async () => {
     mockReschedule.mockRejectedValue('string error');
@@ -785,13 +784,13 @@ describe('BookingPage', () => {
     await goToSuccessPage(user);
     const dateInputs = document.querySelectorAll('input[type="date"]');
     const timeInputs = document.querySelectorAll('input[type="time"]');
-    await user.type(dateInputs[0], '2026-09-25');
-    await user.type(timeInputs[0], '14:00');
+    fireEvent.change(dateInputs[0], { target: { value: '2026-09-25' } });
+    fireEvent.change(timeInputs[0], { target: { value: '14:00' } });
     await user.click(screen.getByText('Reschedule Booking'));
     await waitFor(() => {
       expect(screen.getByText('Reschedule gagal')).toBeInTheDocument();
     });
-  });
+  }, 15000);
 
   it('shows processing state during reschedule', async () => {
     mockReschedule.mockReturnValue(new Promise(() => {})); // never resolves
@@ -800,14 +799,14 @@ describe('BookingPage', () => {
     await goToSuccessPage(user);
     const dateInputs = document.querySelectorAll('input[type="date"]');
     const timeInputs = document.querySelectorAll('input[type="time"]');
-    await user.type(dateInputs[0], '2026-09-25');
-    await user.type(timeInputs[0], '14:00');
+    fireEvent.change(dateInputs[0], { target: { value: '2026-09-25' } });
+    fireEvent.change(timeInputs[0], { target: { value: '14:00' } });
     await user.click(screen.getByText('Reschedule Booking'));
     await waitFor(() => {
       const btns = screen.getAllByText('Memproses...');
       expect(btns.length).toBeGreaterThanOrEqual(1);
     });
-  });
+  }, 15000);
 
   it('deposit success page shows pay deposit button', async () => {
     const user = userEvent.setup();

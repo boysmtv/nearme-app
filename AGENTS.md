@@ -316,13 +316,12 @@ pnpm install && pnpm dev
 - **Profile completion race condition FIXED**: `ProfileCompletePage` uses `useEffect` to navigate after `hasProfile` state is confirmed updated, avoiding redirect loop with `RequireProfileGuard`
 
 ### Testing
-- **Total: ~1391 tests** across 5 platforms (1375 passing + 16 pre-existing failures in 3 files). web_public coverage 88.3% lines. Verified 2026-09-14
+- **Total: ~1489 tests** web_public (93 files) — all green. Lines 93.18% (2637/2830), Statements 88.61%, Branches 81.74%, Functions 84.78%. Verified 2026-09-18
 - Backend: 222 tests — JUnit 5 + Mockito
-- web_public: ~1391 tests (93 files) — Vitest + @testing-library/react, 88.3% line coverage
 - web_admin: 123 tests (20 files) — Vitest + @testing-library/react
 - E2E Playwright: 41 tests — screenshots + functional
 - Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
-- **Pre-existing failures (16)**: SubscriptionUpgradePage (9: getByText regex matches multiple), MediaPage (3: DataTransfer not defined in jsdom), BookingPage (4: reschedule/email/verifyPin assertions)
+- **Flaky fix 2026-09-18**: BookingPage reschedule tests used `user.type` on date/time inputs (char-by-char, >5s) → replaced with `fireEvent.change` + 15s timeout. 66/66 pass.
 
 ### Backend Runtime (verified 2026-08-27)
 - Migrations V15–V20: bookings status CHECK widened, categories seeded, booking_holds expiry CHECK fixed, hold status CHECK includes CONVERTED/CANCELLED, ghost ddl-auto columns dropped, confirmation_pin+pin_verified added
@@ -393,22 +392,24 @@ pnpm install && pnpm dev
   - **web_public test fixes 2026-09-14** — Fixed 23 failing tests across 5 files: AnalyticsDeepPage (8: double "0 booking" text, regex /Sibuk/ matches heading+legend, rating 5.0 renders as 5, forecast data race condition, recommendation mock), SmartSchedulingPage (4: waitFor on static heading before API resolve, legend regex collision), ProviderPage (4: vi.mock hoisting overrides auth mock for all tests, tab label mismatch, async service data, double-nested gallery mock), CustomerAccountPage (3: missing fireEvent import, labels lack htmlFor so getByLabelText fails), CustomerBookingDetailPage (4: multiple identical text elements, getByText vs queryByText for .not assertions). Root causes: vi.mock() inside tests hoisted by Vitest and overrides module-level mocks, React Query race conditions when waiting for non-data-dependent text, DOM label/input association requires htmlFor attribute. web_public coverage: 67.84% → 70.21% lines.
   - **web_public coverage improvement 2026-09-14** — Added/enhanced tests for 8 low-coverage files: LoginPage (12 tests: OTP flow, error handling), admin/ChatPage (10 tests: conversations, filtering, send), provider/FaqPage (14 tests: FAQ+policy CRUD), provider/ServicesPage (10 tests: service+addon CRUD), admin/FaqsPage (12 tests: FAQ/policy tables, modals), ChatWidget (10 tests: messages, send, file upload), SearchPage (10 tests: filters, sorting, pagination), StaffManagementSuitePage (16 tests: staff CRUD, check-in/out, details). web_public coverage: 70.21% → 74.06% lines. 892 tests all passing.
   - **mobile_customer Clean Architecture refactoring 2026-09-16** — Full refactoring of `mobile_customer` from feature-first flat presentation to Clean Architecture + MVVM across all 12 features (availability, booking, chat, notification, provider_profile, account, authentication, payment, support, favorites, discovery, shared). Each feature now has `domain/` (entities, use cases, repository interfaces), `data/` (repository impls, DTOs), `presentation/` (viewmodel with AsyncNotifier, pages as UI only). New core layer: `core/error/` (AppException, Failure, ErrorHandler), `core/usecases/` (UseCase<T, Params>), `core/auth/` (AuthState, AuthNotifier), `core/di/` (providers.dart), `core/router/` (app_router.dart ~170 lines). Deleted dead code: `shared/models/rows.dart` (395 lines), `discovery_providers.dart`, `favorites_repository.dart`. Fixed 52 `withOpacity()` → `.withValues(alpha:)`. Fixed info hints (Type→T, string interpolation, deprecated params). Test cleanup: deleted 7 obsolete files, rewrote 2, fixed imports in 4. `flutter analyze lib/`: 0 errors, 0 warnings, 2 info (Radio deprecation). `flutter test`: 83/83 pass. Added `mounted` guards to 6 pages missing safety checks before `setState` after async operations.
+  - **6-file coverage boost 2026-09-17** — SubscriptionUpgradePage (28 tests), useChatWebSocket (24), AuditLogPage (20), LeafletMap (26), NotificationPreferencesPage (13), SupportPage (26). Overall 90.31% → 92.12% lines, 1391 → 1476 tests, all green.
+  - **Flaky fix + MultiLocation/Customers coverage 2026-09-18** — BookingPage 5 reschedule tests `user.type` → `fireEvent.change` + 15s timeout (was 1/66 timeout flaky, now 66/66). MultiLocationPage 4→13 tests (loading, Utama badge, add/edit/delete, validation, pending). CustomersPage 4→8 tests (loading, null lastBookingAt, search, pagination). Overall 92.12% → 93.18% lines (2637/2830), 1476 → 1489 tests, 93/93 files green.
 
 ## What's Next
 
-### Coverage Improvement (Priority - Resuming Tomorrow)
-- **Target**: web_public 88.3% → 100% lines (current: 2499/2830 lines covered)
-- **Remaining low-coverage files** (sorted by impact, lines uncovered):
-  1. `src/pages/provider/SubscriptionUpgradePage.tsx` — 33.33% (modal+upgrade mutation tests written but 9 failing: getByText regex matches multiple "Enterprise"/"Plan Aktif" elements)
-  2. `src/pages/provider/MediaPage.tsx` — 51.92% (3 failing: `DataTransfer` not defined in jsdom, needs polyfill)
-  3. `src/pages/BookingPage.tsx` — 69.15% (4 failing: reschedule/email/verifyPin assertion mismatches)
-  4. `src/hooks/useChatWebSocket.ts` — 54.54% (SSE + sendMessage tests needed)
-  5. `src/pages/provider/SubscriptionUpgradePage.tsx` — 33.33% (plan features, modal, downgrade)
-  6. `src/pages/provider/CustomersPage.tsx` — 66.66%
-  7. `src/pages/provider/DashboardPage.tsx` — 75.86%
-  8. `src/pages/admin/BookingsPage.tsx` — 57.57%
-  9. `src/pages/admin/RolesPage.tsx` — 61.53%
-  10. `src/pages/admin/AuditLogPage.tsx` — 70%
+### Coverage Improvement (sisa ~6.8% → 100%)
+- **Current**: web_public 93.18% lines (2637/2830, 193 lines uncovered). Statements 88.61%, Branches 81.74%, Functions 84.78%
+- **Top impact files** (lines uncovered):
+  1. `src/pages/BookingPage.tsx` — 87.02% (24 uncovered)
+  2. `src/pages/provider/PromotionsPage.tsx` — 84.11% (17 uncovered)
+  3. `src/pages/customer/CustomerBookingDetailPage.tsx` — 85.34% (17 uncovered)
+  4. `src/pages/admin/FaqsPage.tsx` — 82.5% (14 uncovered)
+  5. `src/pages/ProviderPage.tsx` — 87.5% (12 uncovered)
+  6. `src/App.tsx` — 89.15% (9 uncovered, router branches)
+  7. `src/pages/customer/RecurringBookingsPage.tsx` — 80% (8 uncovered)
+  8. `src/pages/provider/ServicesPage.tsx` — 83.78% (6 uncovered)
+  9. `src/pages/provider/ServiceBundlesPage.tsx` — 89.09% (6 uncovered)
+  10. `src/pages/provider/DashboardPage.tsx` — 81.48% (5 uncovered)
 
 ### Key Lessons from Today's Session
 - **`vi.hoisted()` is mandatory** when mock variables are used inside `vi.mock()` factories — without it, mocks reference `undefined` due to hoisting
