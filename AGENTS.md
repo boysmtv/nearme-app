@@ -12,8 +12,9 @@
 ```
 dekat-platform/
 ├── apps/
-│   ├── mobile_customer/     # Flutter customer app (id.dekat.customer)
-│   ├── mobile_partner/      # Flutter partner app (id.dekat.partner)
+│   ├── mobile_customer/     # Flutter customer app (id.dekat.customer) [DEPRECATED → mobile_dekat]
+│   ├── mobile_partner/      # Flutter partner app (id.dekat.partner) [DEPRECATED → mobile_dekat]
+│   ├── mobile_dekat/        # Flutter unified app (id.dekat.app) — customer+provider+admin shells
 │   ├── web_public/          # React unified app - customer+provider (port 4100)
 │   ├── web_provider/        # React provider portal (port 3001) [DEPRECATED - merged into web_public]
 │   └── web_admin/           # React platform admin (port 3002)
@@ -34,6 +35,17 @@ dekat-platform/
 ├── docs/                    # ADR + Runbooks
 └── .github/workflows/       # CI/CD
 ```
+
+## Unified Mobile App (`mobile_dekat`)
+
+Single Flutter app (id.dekat.app) with role-based routing:
+- **Customer shell**: `/discovery`, `/search`, `/provider/*`, `/booking/*`, `/favorites`, `/chat`, `/notifications`, `/account/*`
+- **Provider shell** (`PartnerScaffold`): `/provider/calendar`, `/provider/bookings`, `/provider/services`, `/provider/staff`, etc.
+- **Admin shell** (`AdminScaffold`): `/admin/dashboard`, `/admin/users`, `/admin/tenants`, `/admin/bookings`
+
+JWT role claims (`ROLE_CUSTOMER`, `ROLE_PROVIDER_OWNER`, `ROLE_PLATFORM_ADMIN`) drive shell selection via `auth_provider.dart`.
+Partner pages (calendar, bookings, services, earnings, reports, etc.) live under `features/{calendar,booking_management,service_management,...}/` and use `partnerScaffoldKey` for drawer access.
+Admin pages live under `features/admin/presentation/pages/`.
 
 ## Tech Stack
 
@@ -252,7 +264,7 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"admin@dekat.id","password":"admin123"}'
 
-# Flutter (from apps/mobile_customer/)
+# Flutter (from apps/mobile_dekat/)
 flutter pub get && flutter run
 
 # React Web (from apps/web_public/)
@@ -404,6 +416,7 @@ pnpm install && pnpm dev
   - **6-file coverage boost 2026-09-17** — SubscriptionUpgradePage (28 tests), useChatWebSocket (24), AuditLogPage (20), LeafletMap (26), NotificationPreferencesPage (13), SupportPage (26). Overall 90.31% → 92.12% lines, 1391 → 1476 tests, all green.
   - **Flaky fix + MultiLocation/Customers coverage 2026-09-18** — BookingPage 5 reschedule tests `user.type` → `fireEvent.change` + 15s timeout (was 1/66 timeout flaky, now 66/66). MultiLocationPage 4→13 tests (loading, Utama badge, add/edit/delete, validation, pending). CustomersPage 4→8 tests (loading, null lastBookingAt, search, pagination). Overall 92.12% → 93.18% lines (2637/2830), 1476 → 1489 tests, 93/93 files green.
   - **100% lines 2026-09-18** — 93.18% → 100% (2824/2824), 1489 → 1625 tests. BookingPage calendar/ics/chat/auth/filter/deposit (+12), PromotionsPage loyalty-history/campaign (+11), CustomerBookingDetail reschedule/PIN/backdrop (+6), FaqsPage update/cancel/validation/× (+10), ProviderPage photo-upload/rating/success (+6), provider Dashboard copy/clipboard, Nearby geolocation-fallback/radius/map-click, CustomerDashboard/Loyalty/Notifications/Bookings/Reviews/Referral/Account, admin Dashboard/Analytics/Bookings/Users/AuditLog/Chat, Settings/Services/Reports/Faq/Notifications/Staff/Waitlist/Commission/Import/Scheduling, App ErrorBoundary/guards, Header/ProviderLayout/ProtectedRoute/theme/auth. Dead code removed: `useChatWebSocket` else-if, Referral history table + `ClockIcon`.
+  - **Unified mobile_dekat app 2026-09-18** — Created `apps/mobile_dekat` (id.dekat.app) by copying `mobile_customer` + 17 partner feature folders. Router rewritten with 3 shell routes: customer (`MainScaffold`), provider (`PartnerScaffold` with drawer), admin (`AdminScaffold` with bottom nav). JWT role claims (`ROLE_CUSTOMER`, `ROLE_PROVIDER_OWNER`, `ROLE_PLATFORM_ADMIN`) drive shell selection via `auth_provider.dart`. Fixed: broken `partner_payment_detail_page.dart` (reverted bad rename, re-created from partner source), `google-services.json` package_name → `id.dekat.app`, `fl_chart` dep added, `partnerScaffoldKey` global key + imports in 5 partner pages, `DekaCustomerApp` → `DekaApp` rename. 114/114 tests pass, 61.6MB release APK installed on Mi A1. Committed `5a79fd1`.
 
 ## What's Next
 
@@ -423,7 +436,7 @@ pnpm install && pnpm dev
 - **`getByText(/Enterprise/)` matches multiple elements** — use `getAllByText` when text appears in heading + button (SubscriptionUpgradePage 9 failures)
 
 ### Other Tasks
-- **Device testing (mobile)**: Run both apps on Mi A1 — verify FCM push notifications, booking flow end-to-end
+- **Device testing (mobile_dekat)**: Run unified app on Mi A1 — verify customer/provider/admin shell routing, FCM push notifications, booking flow end-to-end
 - **Payment gateway sandbox testing**: Configure real Midtrans sandbox keys
 - **Production deployment**: Docker Compose with real Midtrans production keys
 - **Optional enhancements**: Push notification campaign, advanced analytics, multi-language support
