@@ -18,20 +18,10 @@ class ChatDetailPage extends ConsumerStatefulWidget {
 class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
   final _controller = TextEditingController();
   final _scrollController = ScrollController();
-  Timer? _pollTimer;
   bool _sending = false;
 
   @override
-  void initState() {
-    super.initState();
-    _pollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (mounted) ref.invalidate(chatMessagesProvider(widget.chatId));
-    });
-  }
-
-  @override
   void dispose() {
-    _pollTimer?.cancel();
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
@@ -44,7 +34,7 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
     try {
       await ApiService().sendChatMessage(widget.chatId, {'body': text, 'messageType': 'TEXT'});
       _controller.clear();
-      ref.invalidate(chatMessagesProvider(widget.chatId));
+      ref.invalidate(chatMessagesStreamProvider(widget.chatId));
       // scroll to bottom
       Future.delayed(const Duration(milliseconds: 300), () {
         if (_scrollController.hasClients) _scrollController.animateTo(_scrollController.position.maxScrollExtent, duration: const Duration(milliseconds: 300), curve: Curves.easeOut);
@@ -58,7 +48,14 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
 
   Future<void> _sendAttachment() async {
     final picker = ImagePicker();
-    final file = await picker.pickImage(source: ImageSource.gallery);
+    // Kompresi native (max 1280px, quality 80) agar upload cepat & hemat kuota.
+    // Tanpa ini foto galeri full-res (3-8MB) diupload mentah via multipart.
+    final file = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1280,
+      maxHeight: 1280,
+      imageQuality: 80,
+    );
     if (file == null) return;
     setState(() => _sending = true);
     try {
@@ -68,7 +65,7 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
       final body = _controller.text.trim().isEmpty ? '📎 Lampiran' : _controller.text.trim();
       await ApiService().sendChatMessage(widget.chatId, {'body': body, 'messageType': 'IMAGE', 'attachmentUrl': url});
       _controller.clear();
-      ref.invalidate(chatMessagesProvider(widget.chatId));
+      ref.invalidate(chatMessagesStreamProvider(widget.chatId));
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
     } finally {
@@ -78,14 +75,14 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final messagesAsync = ref.watch(chatMessagesProvider(widget.chatId));
+    final messagesAsync = ref.watch(chatMessagesStreamProvider(widget.chatId));
     return Scaffold(
       appBar: AppBar(
         title: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('Chat ${widget.chatId.substring(0, 8)}', style: const TextStyle(fontSize: 16)),
-          const Text('Realtime via SSE + polling 3s • WebSocket /ws-chat', style: TextStyle(fontSize: 10, color: Colors.white70)),
+          const Text('Realtime via SSE • WebSocket /ws-chat (fallback polling bila SSE mati)', style: TextStyle(fontSize: 10, color: Colors.white70)),
         ]),
-        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: () => ref.invalidate(chatMessagesProvider(widget.chatId)))],
+        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: () => ref.invalidate(chatMessagesStreamProvider(widget.chatId)))],
       ),
       body: Column(children: [
         Expanded(

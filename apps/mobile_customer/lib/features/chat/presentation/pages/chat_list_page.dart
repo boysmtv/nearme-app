@@ -35,7 +35,7 @@ class ChatListPage extends ConsumerWidget {
                   child: const Text('Buat Percakapan'),
                 ),
                 const SizedBox(height: 8),
-                Text('Realtime: WebSocket /ws-chat + SSE /chats/{id}/events (polling 3s fallback)', style: TextStyle(fontSize: 11, color: Colors.grey[500]), textAlign: TextAlign.center),
+                Text('Realtime: SSE /chats/{id}/events + WebSocket /ws-chat (fallback polling bila SSE mati)', style: TextStyle(fontSize: 11, color: Colors.grey[500]), textAlign: TextAlign.center),
               ]),
             );
           }

@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_core/flutter_core.dart';
 import '../../domain/entities/chat_entity.dart';
 import '../../domain/repositories/chat_repository.dart';
 import '../../../../core/error/failure.dart';
@@ -8,7 +12,11 @@ import '../../../shared/data/models/dto.dart';
 
 class ChatRepositoryImpl implements ChatRepository {
   final ApiService _api;
-  ChatRepositoryImpl(this._api);
+  final SseClient? _sseClientOverride;
+
+  /// [sseClientOverride] hanya untuk testing (injeksi SSE palsu).
+  ChatRepositoryImpl(this._api, {SseClient? sseClientOverride})
+      : _sseClientOverride = sseClientOverride;
 
   @override
   Future<Either<Failure, List<ConversationEntity>>> getChats() async {
@@ -62,5 +70,65 @@ class ChatRepositoryImpl implements ChatRepository {
     } catch (e) {
       return Left(Failure.fromException(ErrorHandler.handle(e)));
     }
+  }
+
+  @override
+  Stream<List<ChatMessageEntity>> watchChatMessages(
+    String chatId, {
+    Duration fallbackPollInterval = const Duration(seconds: 15),
+  }) {
+    final controller = StreamController<List<ChatMessageEntity>>();
+    final cancelToken = CancelToken();
+    var disposed = false;
+
+    Future<void> emitCurrent({bool reportError = false}) async {
+      try {
+        final result = await getChatMessages(chatId);
+        result.fold(
+          (l) {
+            if (reportError && !disposed) {
+              controller.addError(Exception(l.message));
+            }
+            // Error susulan diabaikan: UI tetap menampilkan data terakhir
+            // agar blink putus-nyambung tidak menghapus percakapan.
+          },
+          (r) {
+            if (!disposed) controller.add(r);
+          },
+        );
+      } catch (e) {
+        if (reportError && !disposed) controller.addError(e);
+      }
+    }
+
+    Future<void> pump() async {
+      // 1. Data awal secepatnya (perilaku sama seperti FutureProvider lama).
+      await emitCurrent(reportError: true);
+      final sse = _sseClientOverride ?? SseClient(_api.dio);
+      // 2. Realtime via SSE; bila putus, fallback polling jarang + reconnect.
+      while (!disposed) {
+        try {
+          await for (final _ in sse.subscribe('/chats/$chatId/events',
+              cancelToken: cancelToken)) {
+            if (disposed) break;
+            await emitCurrent();
+          }
+        } catch (_) {
+          if (disposed) break;
+          // Jatuh ke fallback di bawah (sekaligus reconnect SSE).
+        }
+        if (disposed) break;
+        await Future.delayed(fallbackPollInterval);
+        if (!disposed) await emitCurrent();
+      }
+      if (!controller.isClosed) await controller.close();
+    }
+
+    controller.onListen = pump;
+    controller.onCancel = () {
+      disposed = true;
+      if (!cancelToken.isCancelled) cancelToken.cancel();
+    };
+    return controller.stream;
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -43,10 +45,29 @@ class SearchPage extends ConsumerStatefulWidget {
 class _SearchPageState extends ConsumerState<SearchPage> {
   final _searchController = TextEditingController();
   final _focusNode = FocusNode();
+  Timer? _debounce;
+
+  /// Debounce 400ms: tanpa ini setiap keystroke memicu rebuild provider +
+  /// 1 HTTP request (spam API + hasil balapan). Timer adalah pemakaian
+  /// Timer yang valid — bukan polling data, melainkan penunda aksi user.
+  void _onSearchChanged(String v) {
+    setState(() {}); // refresh suffix icon clear secara instan (sync, murah)
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 400), () {
+      if (!mounted) return;
+      ref.read(searchQueryProvider.notifier).state = v;
+    });
+  }
+
   @override
   void initState() { super.initState(); }
   @override
-  void dispose() { _searchController.dispose(); _focusNode.dispose(); super.dispose(); }
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   String _formatPrice(num? price) {
     if (price == null) return '';
@@ -154,7 +175,7 @@ class _SearchPageState extends ConsumerState<SearchPage> {
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
                   filled: true, fillColor: Colors.grey[200],
                 ),
-                onChanged: (v) { setState(() {}); ref.read(searchQueryProvider.notifier).state = v; },
+                onChanged: _onSearchChanged,
                 onSubmitted: (v) { if (v.isNotEmpty) ref.read(recentSearchesProvider.notifier).add(v); },
               ),
             ),

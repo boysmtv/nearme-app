@@ -10,3 +10,4 @@ export 'src/services/storage_service.dart';
 export 'src/services/secure_storage_service.dart';
 export 'src/network/api_client.dart';
 export 'src/network/dio_client.dart';
+export 'src/network/sse_client.dart';

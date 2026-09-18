@@ -299,7 +299,13 @@ class StaffListPage extends ConsumerWidget {
 
   Future<void> _pickAndUploadPortfolio(BuildContext context, WidgetRef ref, String staffId) async {
     final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
+    // maxWidth/maxHeight penting: imageQuality saja tidak mengecilkan dimensi.
+    final picked = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1280,
+      maxHeight: 1280,
+      imageQuality: 85,
+    );
     if (picked == null) return;
     try {
       await ApiService().uploadMedia(picked.path, 'staff', staffId);

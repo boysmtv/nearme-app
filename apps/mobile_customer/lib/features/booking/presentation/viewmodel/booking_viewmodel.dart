@@ -38,7 +38,14 @@ final bookingSummaryProvider =
   final serviceId = parts.length > 1 ? parts[1] : '';
   final staffId = parts.length > 2 ? parts[2] : null;
 
-  final servicesRes = await ref.read(apiServiceProvider).getProviderServices(providerId);
+  // Services & staff independen (keduanya hanya butuh providerId) → jalan paralel.
+  // Jangan await berurutan: hemat ~1 RTT di halaman ringkasan booking.
+  final api = ref.read(apiServiceProvider);
+  final results = await Future.wait([
+    api.getProviderServices(providerId),
+    if (staffId != null && staffId.isNotEmpty) api.getProviderStaff(providerId),
+  ]);
+  final servicesRes = results[0];
   final services = ((servicesRes.data['data'] ?? []) as List)
       .map((e) => ServiceDto.fromJson(e as Map<String, dynamic>))
       .toList();
@@ -48,9 +55,9 @@ final bookingSummaryProvider =
   );
 
   String? staffName;
-  if (staffId != null && staffId.isNotEmpty) {
+  if (staffId != null && staffId.isNotEmpty && results.length > 1) {
     try {
-      final staffRes = await ref.read(apiServiceProvider).getProviderStaff(providerId);
+      final staffRes = results[1];
       final staffList = ((staffRes.data['data'] ?? []) as List).cast<Map<String, dynamic>>();
       final match = staffList.where((s) => s['id'] == staffId);
       if (match.isNotEmpty) {

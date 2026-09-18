@@ -14,3 +14,14 @@ final chatMessagesProvider = FutureProvider.autoDispose.family<List<ChatMessageE
   final result = await repo.getChatMessages(chatId);
   return result.fold((l) => throw Exception(l.message), (r) => r);
 });
+
+/// Stream realtime pengganti polling Timer (lihat chat_detail_page).
+/// - Data awal langsung dari fetch (cepat, seperti Future biasa).
+/// - Update berikutnya didorong server via SSE; bila SSE mati, repository
+///   otomatis fallback ke polling jarang (15s) + reconnect.
+/// - `ref.invalidate` tetap berfungsi: StreamProvider di-subscribe ulang.
+final chatMessagesStreamProvider =
+    StreamProvider.autoDispose.family<List<ChatMessageEntity>, String>((ref, chatId) {
+  final repo = ChatRepositoryImpl(ref.read(apiServiceProvider));
+  return repo.watchChatMessages(chatId);
+});

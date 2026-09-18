@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_core/flutter_core.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../shared/models/rows.dart';
 
@@ -9,6 +11,57 @@ final partnerChatMessagesProvider = FutureProvider.autoDispose.family<List<ChatM
   final res = await ApiService().getChatMessages(chatId);
   final data = res.data['data'] as List;
   return data.map((e) => ChatMessageRow.fromJson(e as Map<String, dynamic>)).toList();
+});
+
+Future<List<ChatMessageRow>> _fetchPartnerMessages(String chatId) async {
+  final res = await ApiService().getChatMessages(chatId);
+  final data = res.data['data'] as List;
+  return data.map((e) => ChatMessageRow.fromJson(e as Map<String, dynamic>)).toList();
+}
+
+/// Stream realtime pengganti polling Timer 3 detik.
+/// SSE primer (`GET /chats/{id}/events`), fallback polling 15s + reconnect
+/// bila channel realtime mati. `ref.invalidate` tetap bisa dipakai untuk refresh manual.
+final partnerChatMessagesStreamProvider =
+    StreamProvider.autoDispose.family<List<ChatMessageRow>, String>((ref, chatId) {
+  final controller = StreamController<List<ChatMessageRow>>();
+  final cancelToken = CancelToken();
+  var disposed = false;
+
+  Future<void> emitCurrent({bool reportError = false}) async {
+    try {
+      final rows = await _fetchPartnerMessages(chatId);
+      if (!disposed) controller.add(rows);
+    } catch (e) {
+      if (reportError && !disposed) controller.addError(e);
+    }
+  }
+
+  Future<void> pump() async {
+    await emitCurrent(reportError: true);
+    final sse = SseClient(ApiService().dio);
+    while (!disposed) {
+      try {
+        await for (final _ in sse.subscribe('/chats/$chatId/events', cancelToken: cancelToken)) {
+          if (disposed) break;
+          await emitCurrent();
+        }
+      } catch (_) {
+        if (disposed) break;
+      }
+      if (disposed) break;
+      await Future.delayed(const Duration(seconds: 15));
+      if (!disposed) await emitCurrent();
+    }
+    if (!controller.isClosed) await controller.close();
+  }
+
+  controller.onListen = pump;
+  controller.onCancel = () {
+    disposed = true;
+    if (!cancelToken.isCancelled) cancelToken.cancel();
+  };
+  return controller.stream;
 });
 
 class PartnerChatDetailPage extends ConsumerStatefulWidget {
@@ -21,18 +74,10 @@ class PartnerChatDetailPage extends ConsumerStatefulWidget {
 
 class _PartnerChatDetailPageState extends ConsumerState<PartnerChatDetailPage> {
   final _controller = TextEditingController();
-  Timer? _timer;
   bool _sending = false;
 
   @override
-  void initState() {
-    super.initState();
-    _timer = Timer.periodic(const Duration(seconds: 3), (_) => ref.invalidate(partnerChatMessagesProvider(widget.chatId)));
-  }
-
-  @override
   void dispose() {
-    _timer?.cancel();
     _controller.dispose();
     super.dispose();
   }
@@ -44,7 +89,7 @@ class _PartnerChatDetailPageState extends ConsumerState<PartnerChatDetailPage> {
     try {
       await ApiService().sendChatMessage(widget.chatId, {'body': text, 'messageType': 'TEXT'});
       _controller.clear();
-      ref.invalidate(partnerChatMessagesProvider(widget.chatId));
+      ref.invalidate(partnerChatMessagesStreamProvider(widget.chatId));
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Send failed: $e')));
     } finally {
@@ -54,7 +99,13 @@ class _PartnerChatDetailPageState extends ConsumerState<PartnerChatDetailPage> {
 
   Future<void> _attach() async {
     final picker = ImagePicker();
-    final file = await picker.pickImage(source: ImageSource.gallery);
+    // Kompresi native (max 1280px, quality 80) agar upload cepat & hemat kuota.
+    final file = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 1280,
+      maxHeight: 1280,
+      imageQuality: 80,
+    );
     if (file == null) return;
     setState(() => _sending = true);
     try {
@@ -62,7 +113,7 @@ class _PartnerChatDetailPageState extends ConsumerState<PartnerChatDetailPage> {
       final url = (uploadRes.data['data']['url'] ?? uploadRes.data['url']) as String?;
       await ApiService().sendChatMessage(widget.chatId, {'body': _controller.text.trim().isEmpty ? '📎 Lampiran' : _controller.text.trim(), 'messageType': 'IMAGE', 'attachmentUrl': url});
       _controller.clear();
-      ref.invalidate(partnerChatMessagesProvider(widget.chatId));
+      ref.invalidate(partnerChatMessagesStreamProvider(widget.chatId));
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload failed: $e')));
     } finally {
@@ -72,9 +123,9 @@ class _PartnerChatDetailPageState extends ConsumerState<PartnerChatDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final messagesAsync = ref.watch(partnerChatMessagesProvider(widget.chatId));
+    final messagesAsync = ref.watch(partnerChatMessagesStreamProvider(widget.chatId));
     return Scaffold(
-      appBar: AppBar(title: Text('Chat ${widget.chatId.substring(0, 8)}'), actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: () => ref.invalidate(partnerChatMessagesProvider(widget.chatId)))]),
+      appBar: AppBar(title: Text('Chat ${widget.chatId.substring(0, 8)}'), actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: () => ref.invalidate(partnerChatMessagesStreamProvider(widget.chatId)))]),
       body: Column(children: [
         Expanded(
           child: messagesAsync.when(
