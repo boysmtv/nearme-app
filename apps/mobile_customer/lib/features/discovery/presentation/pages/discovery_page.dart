@@ -106,7 +106,10 @@ class DiscoveryPage extends ConsumerWidget {
                         // Tanpa animasi per-item: TweenAnimationBuilder di tiap
                         // chip membuat layer Opacity+Transform per item dan
                         // restart tiap rebuild → jank di HP lama.
-                        return _CategoryItem(icon: _iconForCategory(cat.name), label: cat.name, onTap: () => context.push('/search?category=${cat.name}'));
+                        // RepaintBoundary: repaint tiap chip terisolasi.
+                        return RepaintBoundary(
+                          child: _CategoryItem(icon: _iconForCategory(cat.name), label: cat.name, onTap: () => context.push('/search?category=${cat.name}')),
+                        );
                       },
                     ),
                     // Satu shimmer shader (tanpa rebuild per-frame) untuk
@@ -205,13 +208,17 @@ class DiscoveryPage extends ConsumerWidget {
                         // Tanpa animasi per-item (alasan sama seperti kategori):
                         // kartu yang baru ter-build saat scroll ikut menganimasi
                         // 0.3-1.2 detik → scroll jank di GPU lama.
-                        return _FeaturedCard(
-                          name: provider.name,
-                          category: provider.category ?? 'Umum',
-                          rating: provider.rating,
-                          distance: provider.city ?? '',
-                          imageUrl: provider.imageUrl,
-                          onTap: () => context.push('/provider/${provider.slug}'),
+                        // RepaintBoundary: tiap kartu repaint terisolasi saat
+                        // scroll (pola project referensi), shadow ikut ter-cache.
+                        return RepaintBoundary(
+                          child: _FeaturedCard(
+                            name: provider.name,
+                            category: provider.category ?? 'Umum',
+                            rating: provider.rating,
+                            distance: provider.city ?? '',
+                            imageUrl: provider.imageUrl,
+                            onTap: () => context.push('/provider/${provider.slug}'),
+                          ),
                         );
                       },
                       // +1 for load more button
@@ -377,7 +384,10 @@ class _FeaturedCardState extends State<_FeaturedCard> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: widget.imageUrl != null && widget.imageUrl!.isNotEmpty
-                                ? CachedNetworkImage(imageUrl: widget.imageUrl!, fit: BoxFit.cover, placeholder: (_, __) => Container(color: Colors.grey[100]), errorWidget: (_, __, ___) => const Icon(Icons.store_rounded, color: Colors.grey))
+                                // Decode secukupnya (2x ukuran tampil, ala project
+                                // referensi): foto full-res yang di-decode penuh
+                                // memberatkan raster GPU lama + boros memori.
+                                ? CachedNetworkImage(imageUrl: widget.imageUrl!, fit: BoxFit.cover, memCacheWidth: 144, memCacheHeight: 144, placeholder: (_, __) => Container(color: Colors.grey[100]), errorWidget: (_, __, ___) => const Icon(Icons.store_rounded, color: Colors.grey))
                                 : const Icon(Icons.store_rounded, color: Colors.grey),
                           ),
                         ),

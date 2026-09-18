@@ -146,7 +146,7 @@ class StaffListPage extends ConsumerWidget {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
                                       child: url.isNotEmpty
-                                          ? CachedNetworkImage(imageUrl: url, width: 70, height: 70, fit: BoxFit.cover, placeholder: (_, __) => Container(width: 70, height: 70, color: Colors.grey[200]), errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 20, color: Colors.grey)))
+                                          ? CachedNetworkImage(imageUrl: url, width: 70, height: 70, fit: BoxFit.cover, memCacheWidth: 140, memCacheHeight: 140, placeholder: (_, __) => Container(width: 70, height: 70, color: Colors.grey[200]), errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 20, color: Colors.grey)))
                                           : Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
                                     ),
                                     Positioned(
