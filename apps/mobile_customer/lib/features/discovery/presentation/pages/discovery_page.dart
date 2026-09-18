@@ -93,9 +93,11 @@ class DiscoveryPage extends ConsumerWidget {
                 child: _DashboardSummary(),
               ),
               SliverToBoxAdapter(
-                child: SizedBox(
-                  height: 96,
-                  child: categoriesAsync.when(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: SizedBox(
+                    height: 96,
+                    child: categoriesAsync.when(
                     data: (categories) => ListView.builder(
                       scrollDirection: Axis.horizontal,
                       physics: const BouncingScrollPhysics(),
@@ -142,10 +144,11 @@ class DiscoveryPage extends ConsumerWidget {
                     ),
                   ),
                 ),
+                ),
               ),
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
