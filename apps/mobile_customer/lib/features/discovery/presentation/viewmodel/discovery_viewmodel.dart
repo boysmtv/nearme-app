@@ -3,6 +3,7 @@ import '../../domain/entities/category_entity.dart';
 import '../../domain/repositories/discovery_repository.dart';
 import '../../data/repositories/discovery_repository_impl.dart';
 import '../../../provider_profile/domain/entities/provider_entity.dart';
+import '../../../../core/auth/auth_provider.dart';
 import '../../../../core/di/providers.dart';
 
 final discoveryRepositoryProvider = Provider<DiscoveryRepository>((ref) {
@@ -74,6 +75,11 @@ final categoriesProvider =
 );
 
 final dashboardProfileProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+  // Endpoint profil butuh login; guest selalu 401 → gagalkan diam-diam tanpa
+  // network (UI menampilkan 0, sama seperti branch error). Menghemat 1 request
+  // + 1 putaran logout()/rebuild router di tiap cold start sebagai guest.
+  final isLoggedIn = ref.watch(authProvider.select((s) => s.isLoggedIn));
+  if (!isLoggedIn) return <String, dynamic>{};
   final repo = ref.read(discoveryRepositoryProvider);
   final result = await repo.getDashboardProfile();
   return result.fold((l) => throw Exception(l.message), (r) => r);

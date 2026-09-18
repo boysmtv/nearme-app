@@ -34,6 +34,22 @@ class User {
         if (avatarUrl != null) 'avatarUrl': avatarUrl,
         if (role != null) 'role': role,
       };
+
+  // Value equality: dibutuhkan agar Riverpod tidak me-notify ulang saat
+  // state di-assign dengan nilai yang identik (badai rebuild + refetch).
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is User &&
+          id == other.id &&
+          email == other.email &&
+          name == other.name &&
+          phone == other.phone &&
+          avatarUrl == other.avatarUrl &&
+          role == other.role;
+
+  @override
+  int get hashCode => Object.hash(id, email, name, phone, avatarUrl, role);
 }
 
 class ProviderModel {

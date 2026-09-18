@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:equatable/equatable.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_core/flutter_core.dart';
 
-class AuthState {
+class AuthState extends Equatable {
   final bool isLoading;
   final bool isLoggedIn;
   final User? user;
@@ -19,6 +20,10 @@ class AuthState {
     this.hasProfile = true,
     this.profileChecked = false,
   });
+
+  @override
+  List<Object?> get props =>
+      [isLoading, isLoggedIn, user, error, hasProfile, profileChecked];
 
   AuthState copyWith({
     bool? isLoading,
@@ -180,6 +185,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   Future<void> logout() async {
+    // Short-circuit: tiap respons 401 saat guest memanggil onAuthFailure.
+    // Tanpa ini setiap 401 → deleteAll + notify → rebuild seluruh router
+    // (badai rebuild di HP lama), padahal state tidak berubah.
+    if (state == const AuthState()) return;
     try {
       final refreshToken = await SecureStorageService.read(StorageKeys.refreshToken);
       if (refreshToken != null) {

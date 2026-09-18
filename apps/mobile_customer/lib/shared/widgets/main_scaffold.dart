@@ -14,6 +14,10 @@ class _NotificationRow {
 }
 
 final notificationCountProvider = FutureProvider<int>((ref) async {
+  // Jangan tembak API saat guest: pasti 401 → memicu onAuthFailure/logout
+  // → rebuild seluruh router. Badge 0 tanpa network sama sekali.
+  final isLoggedIn = ref.watch(authProvider.select((s) => s.isLoggedIn));
+  if (!isLoggedIn) return 0;
   final response = await ApiService().getNotifications(params: {'page': 1, 'limit': 50});
   final data = (response.data['data'] ?? []) as List;
   final items = data.map((e) => _NotificationRow.fromJson(e as Map<String, dynamic>)).toList();
