@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../provider_profile/domain/entities/provider_entity.dart';
 import '../../../discovery/domain/entities/category_entity.dart';
@@ -102,25 +103,31 @@ class DiscoveryPage extends ConsumerWidget {
                       itemCount: categories.length,
                       itemBuilder: (context, index) {
                         final cat = categories[index];
-                        return TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0, end: 1),
-                          duration: Duration(milliseconds: 320 + index * 55),
-                          curve: Curves.easeOutBack,
-                          builder: (context, value, child) => Opacity(
-                            opacity: value.clamp(0.0, 1.0),
-                            child: Transform.scale(scale: 0.92 + 0.08 * value.clamp(0.0, 1.0), child: child),
-                          ),
-                          child: _CategoryItem(icon: _iconForCategory(cat.name), label: cat.name, onTap: () => context.push('/search?category=${cat.name}')),
-                        );
+                        // Tanpa animasi per-item: TweenAnimationBuilder di tiap
+                        // chip membuat layer Opacity+Transform per item dan
+                        // restart tiap rebuild → jank di HP lama.
+                        return _CategoryItem(icon: _iconForCategory(cat.name), label: cat.name, onTap: () => context.push('/search?category=${cat.name}'));
                       },
                     ),
-                    loading: () => ListView.builder(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: 6,
-                      itemBuilder: (_, __) => const Padding(
-                        padding: EdgeInsets.only(right: 12),
-                        child: _ShimmerCategory(),
+                    // Satu shimmer shader (tanpa rebuild per-frame) untuk
+                    // seluruh baris — bukan 1 AnimationController per item.
+                    loading: () => Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: 6,
+                        itemBuilder: (_, __) => Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: Column(
+                            children: [
+                              Container(width: 64, height: 64, decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: Colors.white)),
+                              const SizedBox(height: 8),
+                              Container(width: 48, height: 8, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
+                            ],
+                          ),
+                        ),
                       ),
                     ),
                     error: (e, _) => Center(
@@ -195,22 +202,16 @@ class DiscoveryPage extends ConsumerWidget {
                           );
                         }
                         final provider = providers[index];
-                        return TweenAnimationBuilder<double>(
-                          tween: Tween(begin: 0, end: 1),
-                          duration: Duration(milliseconds: 340 + index * 45),
-                          curve: Curves.easeOutCubic,
-                          builder: (context, value, child) => Opacity(
-                            opacity: value,
-                            child: Transform.translate(offset: Offset(0, 18 * (1 - value)), child: child),
-                          ),
-                          child: _FeaturedCard(
-                            name: provider.name,
-                            category: provider.category ?? 'Umum',
-                            rating: provider.rating,
-                            distance: provider.city ?? '',
-                            imageUrl: provider.imageUrl,
-                            onTap: () => context.push('/provider/${provider.slug}'),
-                          ),
+                        // Tanpa animasi per-item (alasan sama seperti kategori):
+                        // kartu yang baru ter-build saat scroll ikut menganimasi
+                        // 0.3-1.2 detik → scroll jank di GPU lama.
+                        return _FeaturedCard(
+                          name: provider.name,
+                          category: provider.category ?? 'Umum',
+                          rating: provider.rating,
+                          distance: provider.city ?? '',
+                          imageUrl: provider.imageUrl,
+                          onTap: () => context.push('/provider/${provider.slug}'),
                         );
                       },
                       // +1 for load more button
@@ -222,7 +223,7 @@ class DiscoveryPage extends ConsumerWidget {
                   delegate: SliverChildBuilderDelegate(
                     (_, __) => const Padding(
                       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      child: _ShimmerCard(),
+                      child: _StaticShimmerCard(),
                     ),
                     childCount: 4,
                   ),
@@ -424,100 +425,37 @@ class _FeaturedCardState extends State<_FeaturedCard> {
   }
 }
 
-class _ShimmerCategory extends StatefulWidget {
-  const _ShimmerCategory();
-  @override
-  State<_ShimmerCategory> createState() => _ShimmerCategoryState();
-}
-
-class _ShimmerCategoryState extends State<_ShimmerCategory> with SingleTickerProviderStateMixin {
-  late AnimationController _c;
-  @override
-  void initState() {
-    super.initState();
-    _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat();
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
+/// Placeholder loading statis (tanpa AnimationController sendiri).
+/// Shimmer versi ticker-per-item sebelumnya membuat ~10 ticker + rebuild
+/// per-frame selama loading; placeholder statis gratis total dan hanya
+/// tampil sepersekian detik.
+class _StaticShimmerCard extends StatelessWidget {
+  const _StaticShimmerCard();
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (_, __) => Column(
+    return Container(
+      height: 96,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[100]!),
+      ),
+      child: Row(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              gradient: LinearGradient(
-                colors: [Colors.grey[200]!, Colors.grey[100]!, Colors.grey[200]!],
-                stops: [0.2, 0.5 + 0.2 * _c.value, 0.8],
-                begin: Alignment(-1 - _c.value, 0),
-                end: Alignment(1 + _c.value, 0),
-              ),
+          Container(width: 72, height: 72, margin: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(12))),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(width: 120, height: 12, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(6))),
+                const SizedBox(height: 8),
+                Container(width: 80, height: 8, decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(4))),
+              ],
             ),
           ),
-          const SizedBox(height: 8),
-          Container(width: 48, height: 8, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(4))),
         ],
-      ),
-    );
-  }
-}
-
-class _ShimmerCard extends StatefulWidget {
-  const _ShimmerCard();
-  @override
-  State<_ShimmerCard> createState() => _ShimmerCardState();
-}
-
-class _ShimmerCardState extends State<_ShimmerCard> with SingleTickerProviderStateMixin {
-  late AnimationController _c;
-  @override
-  void initState() {
-    super.initState();
-    _c = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200))..repeat();
-  }
-
-  @override
-  void dispose() {
-    _c.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _c,
-      builder: (_, __) => Container(
-        height: 96,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey[100]!),
-        ),
-        child: Row(
-          children: [
-            Container(width: 72, height: 72, margin: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(12))),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Container(width: 120, height: 12, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(6))),
-                  const SizedBox(height: 8),
-                  Container(width: 80, height: 8, decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(4))),
-                ],
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
