@@ -24,6 +24,42 @@ public class PaymentService {
 
     private static final int PAYMENT_EXPIRY_MINUTES = 30;
 
+    private static final java.util.Set<String> ALLOWED_METHODS = java.util.Set.of(
+            "CASH", "CARD", "BANK_TRANSFER", "E_WALLET", "QRIS", "VIRTUAL_ACCOUNT");
+
+    /**
+     * Normalisasi metode pembayaran ke nilai kanonis kolom DB
+     * ({@code payment_intents_method_check}).
+     *
+     * <p>Menerima alias umum dari klien (case-insensitive):
+     * {@code cash}, {@code ewallet}/{@code e-wallet}, {@code bank},
+     * {@code card}, {@code qris}, {@code va}. {@code null} berarti
+     * "belum dipilih" (user memilih di halaman gateway) dan diizinkan
+     * karena kolom DB nullable.
+     *
+     * @throws IllegalArgumentException (→ HTTP 400) untuk nilai tak dikenal.
+     *         Tanpa ini nilai mentah lolos ke INSERT dan meledak sebagai
+     *         HTTP 500 constraint-violation yang membingungkan.
+     */
+    public static String normalizePaymentMethod(String method) {
+        if (method == null) return null;
+        String m = method.trim().toUpperCase().replace('-', '_').replace(' ', '_');
+        switch (m) {
+            case "CASH": return "CASH";
+            case "CARD": case "CREDIT_CARD": case "CREDITCARD":
+            case "DEBIT": case "DEBIT_CARD": return "CARD";
+            case "BANK": case "BANK_TRANSFER": case "TRANSFER":
+            case "TRANSFER_BANK": return "BANK_TRANSFER";
+            case "EWALLET": case "E_WALLET": case "WALLET": return "E_WALLET";
+            case "QRIS": return "QRIS";
+            case "VA": case "VIRTUAL_ACCOUNT": return "VIRTUAL_ACCOUNT";
+            default:
+                throw new IllegalArgumentException(
+                        "Unsupported payment method: '" + method +
+                        "'. Use one of CASH, CARD, BANK_TRANSFER, E_WALLET, QRIS, VIRTUAL_ACCOUNT (or omit to choose at gateway).");
+        }
+    }
+
     private final PaymentRepository paymentRepository;
     private final RefundRepository refundRepository;
     private final PaymentTransactionRepository paymentTransactionRepository;
@@ -42,6 +78,7 @@ public class PaymentService {
         if (currency == null || currency.isBlank()) {
             throw new IllegalArgumentException("Currency is required");
         }
+        method = normalizePaymentMethod(method);
 
         PaymentIntent existing = paymentRepository.findByBookingIdAndStatus(
                 bookingId, PaymentStatus.PENDING

@@ -32,6 +32,23 @@ class _PaymentMethod {
   final IconData icon;
   final Color softBg;
   final Color iconColor;
+
+  /// Nilai kanonis sesuai CHECK `payment_intents_method_check` backend.
+  /// JANGAN kirim [id] mentah (lowercase) → 500 constraint-violation.
+  String get apiValue {
+    switch (id) {
+      case 'ewallet':
+        return 'E_WALLET';
+      case 'bank':
+        return 'BANK_TRANSFER';
+      case 'card':
+        return 'CARD';
+      case 'cash':
+      default:
+        return 'CASH';
+    }
+  }
+
   const _PaymentMethod({
     required this.id,
     required this.title,
@@ -386,7 +403,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
               'tenantId': widget.tenantId,
               'amount': widget.amount,
               'currency': widget.currency,
-              'method': _selectedMethod,
+              'method': _selected.apiValue,
             },
           );
       if (mounted) {
@@ -394,7 +411,7 @@ class _PaymentPageState extends ConsumerState<PaymentPage> {
             '?bookingId=${widget.bookingId}'
             '&amount=${widget.amount}'
             '&currency=${Uri.encodeComponent(widget.currency)}'
-            '&method=$_selectedMethod');
+            '&method=${_selected.id}');
       }
     } on DioException catch (e) {
       if (mounted) {

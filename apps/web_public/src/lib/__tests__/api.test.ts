@@ -407,19 +407,28 @@ describe('publicApi.bookings', () => {
 
   it('createPaymentIntent creates payment intent', async () => {
     mockFetch.mockResolvedValueOnce(mockResponse({ success: true, data: { paymentUrl: 'https://pay.midtrans.com', redirectUrl: '', orderId: 'ORD-1' } }));
-    await publicApi.bookings.createPaymentIntent('bk-1', 'midtrans', { tenantId: 't-1', amount: 50000, currency: 'IDR' });
+    await publicApi.bookings.createPaymentIntent('bk-1', 'QRIS', { tenantId: 't-1', amount: 50000, currency: 'IDR' });
     const [url, opts] = mockFetch.mock.calls[0];
     expect(url).toContain('/bookings/bk-1/payment-intents');
     expect(opts.method).toBe('POST');
     const body = JSON.parse(opts.body);
-    expect(body.method).toBe('midtrans');
+    expect(body.method).toBe('QRIS');
     expect(body.amount).toBe(50000);
     expect(body.tenantId).toBe('t-1');
   });
 
+  it('createPaymentIntent omits method when undefined (choose at gateway)', async () => {
+    mockFetch.mockResolvedValueOnce(mockResponse({ success: true, data: {} }));
+    await publicApi.bookings.createPaymentIntent('bk-1', undefined, { tenantId: 't-1', amount: 50000, currency: 'IDR' });
+    const [, opts] = mockFetch.mock.calls[0];
+    const body = JSON.parse(opts.body);
+    expect('method' in body).toBe(false);
+    expect(body.amount).toBe(50000);
+  });
+
   it('createPaymentIntent uses defaults', async () => {
     mockFetch.mockResolvedValueOnce(mockResponse({ success: true, data: {} }));
-    await publicApi.bookings.createPaymentIntent('bk-1', 'midtrans');
+    await publicApi.bookings.createPaymentIntent('bk-1');
     const [, opts] = mockFetch.mock.calls[0];
     const body = JSON.parse(opts.body);
     expect(body.amount).toBe(0);

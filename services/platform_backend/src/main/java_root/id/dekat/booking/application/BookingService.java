@@ -177,8 +177,10 @@ public class BookingService {
         if (Boolean.TRUE.equals(savedBooking.getDepositRequired()) && savedBooking.getDepositAmount() != null && savedBooking.getDepositAmount() > 0) {
             try {
                 if (paymentService != null) {
-                    // create deposit payment intent - will be in PENDING state, gateway will handle
-                    paymentService.createPaymentIntent(savedBooking.getId(), tenantId, savedBooking.getDepositAmount(), currency, "DEPOSIT");
+                    // Metode belum dipilih user saat confirm (dipilih di halaman
+                    // gateway) → null lolos CHECK constraint; JANGAN string
+                    // bebas seperti "DEPOSIT" (500 constraint-violation).
+                    paymentService.createPaymentIntent(savedBooking.getId(), tenantId, savedBooking.getDepositAmount(), currency, null);
                     log.info("[BookingService] Deposit payment intent created for booking {} amount {}", savedBooking.getId(), savedBooking.getDepositAmount());
                 } else {
                     log.warn("[BookingService] Deposit required but PaymentService not available for booking {}", savedBooking.getId());

@@ -180,14 +180,17 @@ export const publicApi = {
       apiClient.get<ApiResponse<{ valid: boolean; discountType: string; discountValue: number; discountAmount: number; finalPrice: number; message?: string }>>(
         `/public/bookings/validate-coupon?code=${encodeURIComponent(code)}&providerId=${providerId}&serviceId=${serviceId}`,
       ),
-    createPaymentIntent: (bookingId: string, method: string = 'midtrans', data?: { tenantId?: string; amount?: number; currency?: string }) =>
+    createPaymentIntent: (bookingId: string, method?: string, data?: { tenantId?: string; amount?: number; currency?: string }) =>
       apiClient.post<ApiResponse<{ paymentUrl: string; redirectUrl: string; orderId: string }>>(
         `/bookings/${bookingId}/payment-intents`,
         {
           tenantId: data?.tenantId,
           amount: data?.amount ?? 0,
           currency: data?.currency ?? 'IDR',
-          method,
+          // method opsional: bila diisi harus salah satu
+          // CASH/CARD/BANK_TRANSFER/E_WALLET/QRIS/VIRTUAL_ACCOUNT,
+          // bila kosong user memilih di halaman gateway.
+          ...(method ? { method } : {}),
         },
       ),
     getPaymentStatus: (bookingId: string) =>

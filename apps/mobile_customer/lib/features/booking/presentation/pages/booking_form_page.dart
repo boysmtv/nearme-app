@@ -32,7 +32,9 @@ class BookingFormPage extends ConsumerStatefulWidget {
 
 class _BookingFormPageState extends ConsumerState<BookingFormPage> {
   final _notesController = TextEditingController();
-  String _selectedPaymentMethod = 'cash';
+  // Nilai kanonis sesuai CHECK backend (CASH/CARD/BANK_TRANSFER/...).
+  // Jangan lowercase: backend melempar 400 untuk nilai tak dikenal.
+  String _selectedPaymentMethod = 'CASH';
   bool _isLoading = false;
 
   @override
@@ -193,11 +195,11 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 24),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                _PaymentCard(title: 'Tunai', subtitle: 'Bayar di tempat', icon: Icons.money_rounded, iconBg: Colors.green[50]!, iconColor: Colors.green[600]!, value: 'cash', groupValue: _selectedPaymentMethod, onChanged: (v) => setState(() => _selectedPaymentMethod = v!)),
+                _PaymentCard(title: 'Tunai', subtitle: 'Bayar di tempat', icon: Icons.money_rounded, iconBg: Colors.green[50]!, iconColor: Colors.green[600]!, value: 'CASH', groupValue: _selectedPaymentMethod, onChanged: (v) => setState(() => _selectedPaymentMethod = v!)),
                 const SizedBox(height: 10),
-                _PaymentCard(title: 'E-Wallet', subtitle: 'GoPay • OVO • Dana • LinkAja', icon: Icons.account_balance_wallet_rounded, iconBg: Colors.blue[50]!, iconColor: Colors.blue[600]!, value: 'ewallet', groupValue: _selectedPaymentMethod, onChanged: (v) => setState(() => _selectedPaymentMethod = v!)),
+                _PaymentCard(title: 'E-Wallet', subtitle: 'GoPay • OVO • Dana • LinkAja', icon: Icons.account_balance_wallet_rounded, iconBg: Colors.blue[50]!, iconColor: Colors.blue[600]!, value: 'E_WALLET', groupValue: _selectedPaymentMethod, onChanged: (v) => setState(() => _selectedPaymentMethod = v!)),
                 const SizedBox(height: 10),
-                _PaymentCard(title: 'Transfer Bank', subtitle: 'BCA • Mandiri • BRI • BNI', icon: Icons.account_balance_rounded, iconBg: Colors.orange[50]!, iconColor: Colors.orange[700]!, value: 'bank', groupValue: _selectedPaymentMethod, onChanged: (v) => setState(() => _selectedPaymentMethod = v!)),
+                _PaymentCard(title: 'Transfer Bank', subtitle: 'BCA • Mandiri • BRI • BNI', icon: Icons.account_balance_rounded, iconBg: Colors.orange[50]!, iconColor: Colors.orange[700]!, value: 'BANK_TRANSFER', groupValue: _selectedPaymentMethod, onChanged: (v) => setState(() => _selectedPaymentMethod = v!)),
               ]),
             ),
           ),

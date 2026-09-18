@@ -55,7 +55,7 @@ class PaymentServiceWeirdTest {
         });
         when(paymentTransactionRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         when(gateway.createTransaction(any())).thenReturn(PaymentResult.builder().success(true).referenceId("REF123").build());
-        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans");
+        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS");
         assertThat(intent.getAmount()).isEqualTo(50000);
         assertThat(intent.getStatus()).isEqualTo(PaymentStatus.AUTHORIZED);
         assertThat(intent.getGatewayReference()).isEqualTo("REF123");
@@ -63,16 +63,16 @@ class PaymentServiceWeirdTest {
 
     @Test @DisplayName("P: existing PENDING not expired -> return existing (idempotent)")
     void createIntent_existing_pending_return() {
-        PaymentIntent existing = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans", OffsetDateTime.now().plusMinutes(20));
+        PaymentIntent existing = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS", OffsetDateTime.now().plusMinutes(20));
         when(paymentRepository.findByBookingIdAndStatus(bookingId, PaymentStatus.PENDING)).thenReturn(Optional.of(existing));
-        PaymentIntent res = paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans");
+        PaymentIntent res = paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS");
         assertThat(res).isEqualTo(existing);
         verify(gateway, never()).createTransaction(any());
     }
 
     @Test @DisplayName("P: processWebhook payment.success -> CAPTURED + ledger")
     void webhook_success_captured() {
-        PaymentIntent intent = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans", OffsetDateTime.now().plusMinutes(30));
+        PaymentIntent intent = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS", OffsetDateTime.now().plusMinutes(30));
         intent.markAuthorized("REF123");
         when(webhookEventRepository.findByGatewayProviderAndEventId(any(), any())).thenReturn(Optional.empty());
         when(paymentRepository.findByGatewayReference("REF123")).thenReturn(Optional.of(intent));
@@ -95,26 +95,45 @@ class PaymentServiceWeirdTest {
     // N
     @Test @DisplayName("N: createIntent amount 0 throw")
     void createIntent_zero_throw() {
-        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, 0, "IDR", "midtrans"))
+        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, 0, "IDR", "QRIS"))
                 .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("positive");
     }
 
     @Test @DisplayName("N: createIntent amount negatif throw")
     void createIntent_negative_throw() {
-        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, -100, "IDR", "midtrans"))
+        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, -100, "IDR", "QRIS"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test @DisplayName("N: createIntent amount null throw")
     void createIntent_null_throw() {
-        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, null, "IDR", "midtrans"))
+        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, null, "IDR", "QRIS"))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test @DisplayName("N: createIntent currency blank throw")
     void createIntent_blankCurrency_throw() {
-        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, 50000, "  ", "midtrans"))
+        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, 50000, "  ", "QRIS"))
                 .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Currency");
+    }
+
+    @Test @DisplayName("P: normalizePaymentMethod maps client aliases")
+    void normalizeMethod_aliases() {
+        assertThat(PaymentService.normalizePaymentMethod("cash")).isEqualTo("CASH");
+        assertThat(PaymentService.normalizePaymentMethod("ewallet")).isEqualTo("E_WALLET");
+        assertThat(PaymentService.normalizePaymentMethod("e-wallet")).isEqualTo("E_WALLET");
+        assertThat(PaymentService.normalizePaymentMethod("bank")).isEqualTo("BANK_TRANSFER");
+        assertThat(PaymentService.normalizePaymentMethod("card")).isEqualTo("CARD");
+        assertThat(PaymentService.normalizePaymentMethod("qris")).isEqualTo("QRIS");
+        assertThat(PaymentService.normalizePaymentMethod("va")).isEqualTo("VIRTUAL_ACCOUNT");
+        assertThat(PaymentService.normalizePaymentMethod("QRIS")).isEqualTo("QRIS");
+        assertThat(PaymentService.normalizePaymentMethod(null)).isNull();
+    }
+
+    @Test @DisplayName("N: createIntent unknown method 400 (not 500)")
+    void createIntent_unknownMethod_throw() {
+        assertThatThrownBy(() -> paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans"))
+                .isInstanceOf(IllegalArgumentException.class).hasMessageContaining("Unsupported payment method");
     }
 
     @Test @DisplayName("N: webhook missing gateway_reference throw")
@@ -147,7 +166,7 @@ class PaymentServiceWeirdTest {
         });
         when(paymentTransactionRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         when(gateway.createTransaction(any())).thenReturn(PaymentResult.builder().success(false).build());
-        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, 1, "IDR", "midtrans");
+        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, 1, "IDR", "QRIS");
         assertThat(intent.getAmount()).isEqualTo(1);
         assertThat(intent.getStatus()).isEqualTo(PaymentStatus.FAILED); // gateway fail -> FAILED
     }
@@ -162,13 +181,13 @@ class PaymentServiceWeirdTest {
         });
         when(paymentTransactionRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         when(gateway.createTransaction(any())).thenReturn(PaymentResult.builder().success(true).referenceId("REFMAX").build());
-        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, 999999999, "IDR", "midtrans");
+        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, 999999999, "IDR", "QRIS");
         assertThat(intent.getAmount()).isEqualTo(999999999);
     }
 
     @Test @DisplayName("E: existing PENDING expired -> cancelled then new intent")
     void createIntent_expired_recreate() {
-        PaymentIntent expired = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans", OffsetDateTime.now().minusMinutes(1));
+        PaymentIntent expired = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS", OffsetDateTime.now().minusMinutes(1));
         // expired PENDING
         when(paymentRepository.findByBookingIdAndStatus(bookingId, PaymentStatus.PENDING)).thenReturn(Optional.of(expired));
         when(paymentRepository.save(any())).thenAnswer(inv -> {
@@ -178,7 +197,7 @@ class PaymentServiceWeirdTest {
         });
         when(paymentTransactionRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         when(gateway.createTransaction(any())).thenReturn(PaymentResult.builder().success(true).referenceId("REFNEW").build());
-        PaymentIntent res = paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans");
+        PaymentIntent res = paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS");
         assertThat(expired.getStatus()).isEqualTo(PaymentStatus.CANCELLED);
         assertThat(res).isNotNull();
         assertThat(res.getId()).isNotEqualTo(expired.getId());
@@ -195,7 +214,7 @@ class PaymentServiceWeirdTest {
 
     @Test @DisplayName("E: webhook CAPTURED + payment.success duplicate ignored")
     void webhook_alreadyCaptured_ignored() {
-        PaymentIntent intent = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans", OffsetDateTime.now().plusMinutes(30));
+        PaymentIntent intent = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS", OffsetDateTime.now().plusMinutes(30));
         intent.markAuthorized("REF123"); intent.markCaptured();
         when(webhookEventRepository.findByGatewayProviderAndEventId(any(), any())).thenReturn(Optional.empty());
         when(paymentRepository.findByGatewayReference("REF123")).thenReturn(Optional.of(intent));
@@ -217,13 +236,13 @@ class PaymentServiceWeirdTest {
         });
         when(paymentTransactionRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         when(gateway.createTransaction(any())).thenReturn(PaymentResult.builder().success(false).build());
-        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans");
+        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS");
         assertThat(intent.getStatus()).isEqualTo(PaymentStatus.FAILED);
     }
 
     @Test @DisplayName("A: webhook unknown eventType -> transaction FAILED")
     void webhook_unknown_markFailed() {
-        PaymentIntent intent = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans", OffsetDateTime.now().plusMinutes(30));
+        PaymentIntent intent = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS", OffsetDateTime.now().plusMinutes(30));
         intent.markAuthorized("REFUNK");
         when(webhookEventRepository.findByGatewayProviderAndEventId(any(), any())).thenReturn(Optional.empty());
         when(paymentRepository.findByGatewayReference("REFUNK")).thenReturn(Optional.of(intent));
@@ -245,7 +264,7 @@ class PaymentServiceWeirdTest {
     @Test @DisplayName("A: calculateRefund tiered >48h full, 24-48h 50%, 6-24h 25%, <6h 0")
     void calculateRefund_tiered() {
         // mock paid intent
-        PaymentIntent paid = new PaymentIntent(bookingId, tenantId, 100000, "IDR", "midtrans", OffsetDateTime.now().plusMinutes(30));
+        PaymentIntent paid = new PaymentIntent(bookingId, tenantId, 100000, "IDR", "QRIS", OffsetDateTime.now().plusMinutes(30));
         paid.markAuthorized("REF"); paid.markCaptured();
         when(paymentRepository.findByBookingIdAndStatus(bookingId, PaymentStatus.CAPTURED)).thenReturn(Optional.of(paid));
         when(refundRepository.findByBookingId(any())).thenReturn(List.of());
@@ -262,7 +281,7 @@ class PaymentServiceWeirdTest {
 
     @Test @DisplayName("A: processRefund amount exceeds paid throw")
     void refund_exceeds_throw() {
-        PaymentIntent paid = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans", OffsetDateTime.now().plusMinutes(30));
+        PaymentIntent paid = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS", OffsetDateTime.now().plusMinutes(30));
         paid.markAuthorized("REF"); paid.markCaptured();
         when(paymentRepository.findByBookingIdAndStatus(bookingId, PaymentStatus.CAPTURED)).thenReturn(Optional.of(paid));
         when(refundRepository.findByBookingId(bookingId)).thenReturn(List.of());
@@ -278,7 +297,7 @@ class PaymentServiceWeirdTest {
 
     @Test @DisplayName("A: refund success marks ledger")
     void refund_success_ledger() {
-        PaymentIntent paid = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "midtrans", OffsetDateTime.now().plusMinutes(30));
+        PaymentIntent paid = new PaymentIntent(bookingId, tenantId, 50000, "IDR", "QRIS", OffsetDateTime.now().plusMinutes(30));
         paid.markAuthorized("REF"); paid.markCaptured();
         when(paymentRepository.findByBookingIdAndStatus(bookingId, PaymentStatus.CAPTURED)).thenReturn(Optional.of(paid));
         when(refundRepository.findByBookingId(any())).thenReturn(List.of());
@@ -305,7 +324,7 @@ class PaymentServiceWeirdTest {
         });
         when(paymentTransactionRepository.save(any())).thenAnswer(i -> i.getArgument(0));
         when(gateway.createTransaction(any())).thenReturn(PaymentResult.builder().success(true).referenceId("REFMAX").build());
-        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, Integer.MAX_VALUE, "IDR", "midtrans");
+        PaymentIntent intent = paymentService.createPaymentIntent(bookingId, tenantId, Integer.MAX_VALUE, "IDR", "QRIS");
         assertThat(intent.getAmount()).isEqualTo(Integer.MAX_VALUE);
     }
 }

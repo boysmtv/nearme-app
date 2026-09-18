@@ -131,8 +131,10 @@ export default function BookingPage() {
   });
 
   const createPaymentIntent = useMutation({
+    // Tanpa method: user memilih di halaman gateway (Midtrans).
+    // Jangan kirim string bebas (dulu 'midtrans') → backend 400/500.
     mutationFn: ({ bookingId, amount }: { bookingId: string; amount: number }) =>
-      publicApi.bookings.createPaymentIntent(bookingId, 'midtrans', { amount, currency: 'IDR' }),
+      publicApi.bookings.createPaymentIntent(bookingId, undefined, { amount, currency: 'IDR' }),
   });
 
   const services = servicesRes?.data ?? [];

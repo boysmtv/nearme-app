@@ -849,7 +849,7 @@ describe('BookingPage', () => {
     const payBtn = screen.getByText(/Bayar Deposit/);
     await user.click(payBtn);
     await waitFor(() => {
-      expect(mockCreatePaymentIntent).toHaveBeenCalledWith('bk2', 'midtrans', { amount: 50000, currency: 'IDR' });
+      expect(mockCreatePaymentIntent).toHaveBeenCalledWith('bk2', undefined, { amount: 50000, currency: 'IDR' });
     });
   });
 
