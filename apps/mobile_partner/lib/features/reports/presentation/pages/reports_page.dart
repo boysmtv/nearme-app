@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 import '../../../../shared/models/rows.dart';
 import '../../../../shared/widgets/main_scaffold.dart';
 
@@ -22,6 +23,11 @@ final analyticsProvider = FutureProvider.autoDispose<AnalyticsRow>((ref) async {
   return AnalyticsRow.fromJson(data);
 });
 
+const _monthNames = [
+  '', 'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
+  'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'
+];
+
 class ReportsPage extends ConsumerWidget {
   const ReportsPage({super.key});
 
@@ -31,12 +37,17 @@ class ReportsPage extends ConsumerWidget {
     final analyticsAsync = ref.watch(analyticsProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FF),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () => partnerScaffoldKey.currentState?.openDrawer(),
         ),
-        title: const Text('Reports • Analytics'),
+        title: const Text('Laporan & Analitik',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1A1D26),
+        elevation: 0,
       ),
       body: RefreshIndicator(
         onRefresh: () async {
@@ -46,19 +57,21 @@ class ReportsPage extends ConsumerWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _buildPeriodCard(context, ref),
+            const SizedBox(height: 16),
             reportAsync.when(
               data: (report) {
                 return Column(children: [
                   Row(children: [
-                    _StatCard(title: 'Bookings', value: '${report.totalBookings}', icon: Icons.calendar_today, color: Colors.blue),
+                    _StatCard(title: 'Booking', value: '${report.totalBookings}', icon: Icons.calendar_month_outlined, color: DEKATColors.primary),
                     const SizedBox(width: 12),
-                    _StatCard(title: 'Revenue', value: formatRupiah(report.totalRevenue), icon: Icons.payments, color: Colors.green),
+                    _StatCard(title: 'Pendapatan', value: formatRupiah(report.totalRevenue), icon: Icons.payments_outlined, color: Colors.green),
                   ]),
                   const SizedBox(height: 12),
                   Row(children: [
-                    _StatCard(title: 'Completed', value: '${report.completedBookings}', icon: Icons.check_circle, color: Colors.purple),
+                    _StatCard(title: 'Selesai', value: '${report.completedBookings}', icon: Icons.check_circle_outline, color: Colors.purple),
                     const SizedBox(width: 12),
-                    _StatCard(title: 'Avg Rating', value: report.avgRating.toStringAsFixed(1), icon: Icons.star, color: Colors.amber),
+                    _StatCard(title: 'Rata-rata Rating', value: report.avgRating.toStringAsFixed(1), icon: Icons.star_outline, color: Colors.amber),
                   ]),
                 ]);
               },
@@ -66,16 +79,20 @@ class ReportsPage extends ConsumerWidget {
               error: (e, _) => Center(child: Text('Failed: $e')),
             ),
             const SizedBox(height: 24),
-            const Text('Analytics Lanjutan', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Text('GET /provider/reports/analytics?startDate&endDate&granularity → {revenueByDay, bookingsByStatus, retention, funnel, topServices, staffUtilization} • Export CSV /provider/reports/export', style: TextStyle(fontSize: 11, color: Colors.grey[600])),
+            const Text('Analitik Lanjutan',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 4),
+            Text('Tren pendapatan, status booking, dan performa layanan Anda',
+                style: TextStyle(fontSize: 12, color: Colors.grey[500])),
             const SizedBox(height: 16),
             analyticsAsync.when(
               data: (a) {
                 return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   // Revenue by day AreaChart (LineChart with filled area)
                   _SectionCard(
-                    title: 'Revenue by Day (AreaChart)',
+                    title: 'Pendapatan Harian',
+                    subtitle: 'Tren pendapatan bulan berjalan',
+                    icon: Icons.trending_up,
                     child: SizedBox(
                       height: 180,
                       child: a.revenueByDay.isEmpty
@@ -107,7 +124,9 @@ class ReportsPage extends ConsumerWidget {
                   const SizedBox(height: 12),
                   // Bookings by status BarChart
                   _SectionCard(
-                    title: 'Bookings by Status (BarChart)',
+                    title: 'Booking per Status',
+                    subtitle: 'Sebaran status booking periode ini',
+                    icon: Icons.bar_chart_outlined,
                     child: SizedBox(
                       height: 180,
                       child: a.bookingsByStatus.isEmpty
@@ -129,7 +148,9 @@ class ReportsPage extends ConsumerWidget {
                   const SizedBox(height: 12),
                   // Funnel PieChart
                   _SectionCard(
-                    title: 'Funnel search→view→hold→confirm (Pie)',
+                    title: 'Corong Konversi',
+                    subtitle: 'Pencarian → dilihat → ditahan → dikonfirmasi',
+                    icon: Icons.filter_alt_outlined,
                     child: SizedBox(
                       height: 180,
                       child: a.funnel.isEmpty
@@ -141,31 +162,35 @@ class ReportsPage extends ConsumerWidget {
                   // Retention
                   if (a.retention.isNotEmpty)
                     _SectionCard(
-                      title: 'Retention',
+                      title: 'Retensi Pelanggan',
+                      subtitle: 'Pelanggan yang kembali memakai layanan',
+                      icon: Icons.repeat_outlined,
                       child: Row(children: [
-                        Expanded(child: _MiniStat(label: 'Total Customers', value: '${a.retention['totalCustomers'] ?? 0}')),
-                        Expanded(child: _MiniStat(label: 'Returning', value: '${a.retention['returningCustomers'] ?? 0}')),
-                        Expanded(child: _MiniStat(label: 'Rate', value: '${a.retention['retentionPercent'] ?? 0}%')),
+                        Expanded(child: _MiniStat(label: 'Total Pelanggan', value: '${a.retention['totalCustomers'] ?? 0}')),
+                        Expanded(child: _MiniStat(label: 'Pelanggan Kembali', value: '${a.retention['returningCustomers'] ?? 0}')),
+                        Expanded(child: _MiniStat(label: 'Tingkat Retensi', value: '${a.retention['retentionPercent'] ?? 0}%')),
                       ]),
                     ),
-                  const SizedBox(height: 12),
+                  if (a.retention.isNotEmpty) const SizedBox(height: 12),
                   // Top Services table
                   _SectionCard(
-                    title: 'Top Services (join catalog)',
+                    title: 'Layanan Terlaris',
+                    subtitle: 'Layanan dengan booking terbanyak',
+                    icon: Icons.workspace_premium_outlined,
                     child: a.topServices.isEmpty
                         ? const Text('No top services', style: TextStyle(color: Colors.grey))
-                        : Column(children: a.topServices.map((s) => ListTile(dense: true, title: Text(s['serviceName'] ?? '-', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: Text('Bookings: ${s['bookingCount']} • Revenue: ${formatRupiah((s['revenue'] as num?)?.toInt() ?? 0)}', style: const TextStyle(fontSize: 11)), leading: const Icon(Icons.spa, size: 18, color: Color(0xFF6C63FF)),)).toList()),
+                        : Column(children: a.topServices.map((s) => RepaintBoundary(child: ListTile(dense: true, contentPadding: EdgeInsets.zero, title: Text(s['serviceName'] ?? '-', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)), subtitle: Text('Bookings: ${s['bookingCount']} • Revenue: ${formatRupiah((s['revenue'] as num?)?.toInt() ?? 0)}', style: const TextStyle(fontSize: 11)), leading: Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)), child: const Icon(Icons.spa, size: 18, color: DEKATColors.primary)),))).toList()),
                   ),
                   const SizedBox(height: 12),
                   // Staff Utilization
                   _SectionCard(
-                    title: 'Staff Utilization (booking count per staff)',
+                    title: 'Utilisasi Staf',
+                    subtitle: 'Jumlah booking yang ditangani tiap staf',
+                    icon: Icons.groups_outlined,
                     child: a.staffUtilization.isEmpty
                         ? const Text('No staff data', style: TextStyle(color: Colors.grey))
-                        : Column(children: a.staffUtilization.map((s) { final count = (s['bookingCount'] as num?)?.toInt() ?? 0; final max = a.staffUtilization.map((e) => (e['bookingCount'] as num?)?.toInt() ?? 0).reduce((a, b) => a > b ? a : b); final ratio = max == 0 ? 0.0 : count / max; return Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [Expanded(flex: 2, child: Text(s['staffName'] ?? '-', style: const TextStyle(fontSize: 12))), Expanded(flex: 3, child: LinearProgressIndicator(value: ratio, color: const Color(0xFF10B981), backgroundColor: Colors.grey[200])), const SizedBox(width: 8), Text('$count', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))])); }).toList()),
+                        : Column(children: a.staffUtilization.map((s) { final count = (s['bookingCount'] as num?)?.toInt() ?? 0; final max = a.staffUtilization.map((e) => (e['bookingCount'] as num?)?.toInt() ?? 0).reduce((a, b) => a > b ? a : b); final ratio = max == 0 ? 0.0 : count / max; return RepaintBoundary(child: Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: Row(children: [Expanded(flex: 2, child: Text(s['staffName'] ?? '-', style: const TextStyle(fontSize: 12))), Expanded(flex: 3, child: ClipRRect(borderRadius: BorderRadius.circular(4), child: LinearProgressIndicator(value: ratio, minHeight: 8, color: const Color(0xFF10B981), backgroundColor: Colors.grey.shade100))), const SizedBox(width: 8), Text('$count', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold))]))); }).toList()),
                   ),
-                  const SizedBox(height: 12),
-                  Align(alignment: Alignment.centerRight, child: TextButton.icon(icon: const Icon(Icons.download, size: 16), label: const Text('Export CSV'), onPressed: () async { try { final res = await ApiService().exportAnalytics(params: {'startDate': '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-01', 'endDate': '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}'}); if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('CSV exported (check backend /provider/reports/export)'))); } catch (e) { if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Export failed: $e'))); } })),
                 ]);
               },
               loading: () => const Center(child: CircularProgressIndicator()),
@@ -173,6 +198,59 @@ class ReportsPage extends ConsumerWidget {
             ),
           ]),
         ),
+      ),
+    );
+  }
+
+  Widget _buildPeriodCard(BuildContext context, WidgetRef ref) {
+    final now = DateTime.now();
+    final range =
+        '01 ${_monthNames[now.month]} – ${now.day} ${_monthNames[now.month]} ${now.year}';
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: DEKATColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: const Icon(Icons.date_range_outlined,
+                color: DEKATColors.primary, size: 22),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Bulan Ini',
+                    style: TextStyle(
+                        fontSize: 12, color: Colors.grey[500])),
+                const SizedBox(height: 2),
+                Text(range,
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w600)),
+              ],
+            ),
+          ),
+          OutlinedButton.icon(
+            icon: const Icon(Icons.download, size: 16),
+            label: const Text('Ekspor CSV'),
+            onPressed: () async { try { await ApiService().exportAnalytics(params: {'startDate': '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-01', 'endDate': '${DateTime.now().year}-${DateTime.now().month.toString().padLeft(2, '0')}-${DateTime.now().day.toString().padLeft(2, '0')}'}); if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('CSV exported (check backend /provider/reports/export)'))); } catch (e) { if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Export failed: $e'))); } },
+            style: OutlinedButton.styleFrom(
+              foregroundColor: DEKATColors.primary,
+              side: const BorderSide(color: DEKATColors.primary),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -185,17 +263,88 @@ class _StatCard extends StatelessWidget {
   const _StatCard({required this.title, required this.value, required this.icon, required this.color});
   @override
   Widget build(BuildContext context) {
-    return Expanded(child: Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Container(padding: const EdgeInsets.all(8), decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)), child: Icon(icon, color: color, size: 20)), const SizedBox(height: 12), Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)), const SizedBox(height: 4), Text(title, style: const TextStyle(fontSize: 12, color: Colors.grey))]))));
+    return Expanded(
+        child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.grey.shade200),
+            ),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: color.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Icon(icon, color: color, size: 22)),
+                  const SizedBox(height: 12),
+                  Text(value,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 4),
+                  Text(title,
+                      style:
+                          TextStyle(fontSize: 12, color: Colors.grey[500])),
+                ])));
   }
 }
 
 class _SectionCard extends StatelessWidget {
   final String title;
+  final String? subtitle;
+  final IconData? icon;
   final Widget child;
-  const _SectionCard({required this.title, required this.child});
+  const _SectionCard(
+      {required this.title, this.subtitle, this.icon, required this.child});
   @override
   Widget build(BuildContext context) {
-    return Card(child: Padding(padding: const EdgeInsets.all(16), child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text(title, style: const TextStyle(fontWeight: FontWeight.bold)), const SizedBox(height: 12), child])));
+    return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                if (icon != null) ...[
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color:
+                          DEKATColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(icon,
+                        size: 18, color: DEKATColors.primary),
+                  ),
+                  const SizedBox(width: 10),
+                ],
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(title,
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w600, fontSize: 15)),
+                        if (subtitle != null) ...[
+                          const SizedBox(height: 2),
+                          Text(subtitle!,
+                              style: TextStyle(
+                                  fontSize: 12, color: Colors.grey[500])),
+                        ],
+                      ]),
+                ),
+              ]),
+              const SizedBox(height: 12),
+              child
+            ]));
   }
 }
 
@@ -204,6 +353,25 @@ class _MiniStat extends StatelessWidget {
   const _MiniStat({required this.label, required this.value});
   @override
   Widget build(BuildContext context) {
-    return Column(children: [Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)), Text(label, style: const TextStyle(fontSize: 11, color: Colors.grey))]);
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF8F9FF),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(children: [
+        Text(value,
+            style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: DEKATColors.primary)),
+        const SizedBox(height: 4),
+        Text(label,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 11, color: Colors.grey[500])),
+      ]),
+    );
   }
 }

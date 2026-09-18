@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../../shared/models/rows.dart';
 import '../../../../shared/widgets/main_scaffold.dart';
@@ -28,156 +29,391 @@ class StaffListPage extends ConsumerWidget {
     final staffAsync = ref.watch(staffProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FF),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () => partnerScaffoldKey.currentState?.openDrawer(),
         ),
-        title: const Text('Staff'),
+        title: const Text('Staf'),
+        backgroundColor: DEKATColors.primary,
+        foregroundColor: Colors.white,
       ),
       body: staffAsync.when(
         data: (staffList) {
           if (staffList.isEmpty) {
-            return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(Icons.people_outline, size: 64, color: Colors.grey[300]),
-              const SizedBox(height: 16),
-              Text('No staff members', style: TextStyle(color: Colors.grey[500])),
-              const SizedBox(height: 8),
-              Text('Add staff to manage bookings', style: TextStyle(color: Colors.grey[400], fontSize: 12)),
-            ]));
+            return Center(
+                child: Padding(
+              padding: const EdgeInsets.all(32),
+              child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Container(
+                  width: 96,
+                  height: 96,
+                  decoration: BoxDecoration(
+                    color: DEKATColors.primary.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.people_outline, size: 44, color: DEKATColors.primary),
+                ),
+                const SizedBox(height: 20),
+                const Text('Belum ada staf',
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                Text('Tambahkan staf untuk mengelola booking',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+              ]),
+            ));
           }
-          return ListView.builder(
-            padding: const EdgeInsets.all(16),
-            itemCount: staffList.length,
-            itemBuilder: (context, index) {
-              final s = staffList[index];
-              final isActive = s.isActive;
-              final portfolioAsync = ref.watch(staffPortfolioProvider(s.id));
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: Column(
-                  children: [
-                    ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Theme.of(context).colorScheme.primary.withValues(alpha: isActive ? 0.1 : 0.05),
-                        child: Icon(Icons.person, color: isActive ? Theme.of(context).colorScheme.primary : Colors.grey),
-                      ),
-                      title: Text(s.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(s.title ?? '-'),
-                        if (s.specialties != null && s.specialties!.isNotEmpty)
-                          Wrap(spacing: 4, children: s.specialties!.map((sp) => Chip(label: Text(sp, style: const TextStyle(fontSize: 10)), visualDensity: VisualDensity.compact, materialTapTargetSize: MaterialTapTargetSize.shrinkWrap)).toList()),
-                      ]),
-                      trailing: Row(mainAxisSize: MainAxisSize.min, children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: isActive ? Colors.green[50] : Colors.grey[100],
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(isActive ? 'Active' : 'Inactive',
-                              style: TextStyle(fontSize: 12, color: isActive ? Colors.green : Colors.grey, fontWeight: FontWeight.w500)),
+          final activeCount = staffList.where((s) => s.isActive).length;
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: DEKATColors.primary,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                          child: _StaffHeaderStat(
+                              value: '${staffList.length}', label: 'Total Staf')),
+                      Container(
+                          width: 1,
+                          height: 36,
+                          color: Colors.white.withValues(alpha: 0.3)),
+                      Expanded(
+                          child: _StaffHeaderStat(
+                              value: '$activeCount', label: 'Aktif')),
+                      Container(
+                          width: 1,
+                          height: 36,
+                          color: Colors.white.withValues(alpha: 0.3)),
+                      Expanded(
+                          child: _StaffHeaderStat(
+                              value: '${staffList.length - activeCount}',
+                              label: 'Nonaktif')),
+                    ],
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.builder(
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 88),
+                  itemCount: staffList.length,
+                  itemBuilder: (context, index) {
+                    final s = staffList[index];
+                    final isActive = s.isActive;
+                    final portfolioAsync = ref.watch(staffPortfolioProvider(s.id));
+                    final avatarUrl = s.avatarUrl;
+                    return RepaintBoundary(
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.grey.shade200),
                         ),
-                        PopupMenuButton<String>(
-                          onSelected: (action) async {
-                            try {
-                              if (action == 'deactivate') {
-                                await ApiService().deleteStaff(s.id);
-                              } else if (action == 'activate') {
-                                await ApiService().updateStaff(s.id, {});
-                              } else if (action == 'schedule') {
-                                if (context.mounted) _showScheduleDialog(context, ref, s.id);
-                                return;
-                              } else if (action == 'portfolio') {
-                                if (context.mounted) _pickAndUploadPortfolio(context, ref, s.id);
-                                return;
-                              } else if (action == 'specialties') {
-                                if (context.mounted) _editSpecialtiesDialog(context, ref, s);
-                                return;
-                              }
-                              ref.invalidate(staffProvider);
-                            } catch (e) {
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
-                                );
-                              }
-                            }
-                          },
-                          itemBuilder: (_) => [
-                            const PopupMenuItem(value: 'schedule', child: Text('Edit Schedule')),
-                            const PopupMenuItem(value: 'portfolio', child: Text('Upload Portfolio')),
-                            const PopupMenuItem(value: 'specialties', child: Text('Edit Specialties')),
-                            if (isActive)
-                              const PopupMenuItem(value: 'deactivate', child: Text('Deactivate'))
-                            else
-                              const PopupMenuItem(value: 'activate', child: Text('Activate')),
-                          ],
-                        ),
-                      ]),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Row(children: [
-                          const Icon(Icons.photo_library_outlined, size: 14, color: Colors.grey),
-                          const SizedBox(width: 4),
-                          const Text('Portfolio', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey)),
-                          const Spacer(),
-                          TextButton.icon(
-                            onPressed: () => _pickAndUploadPortfolio(context, ref, s.id),
-                            icon: const Icon(Icons.add_a_photo, size: 14),
-                            label: const Text('Upload', style: TextStyle(fontSize: 12)),
-                          ),
-                        ]),
-                        portfolioAsync.when(
-                          data: (photos) {
-                            if (photos.isEmpty) return Text('Belum ada portfolio — POST /media/upload ownerType=staff', style: TextStyle(color: Colors.grey[500], fontSize: 11));
-                            return SizedBox(
-                              height: 70,
-                              child: ListView.separated(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: photos.length,
-                                separatorBuilder: (_, __) => const SizedBox(width: 6),
-                                itemBuilder: (context, idx) {
-                                  final p = photos[idx];
-                                  final url = p['url'] as String? ?? '';
-                                  return Stack(children: [
-                                    ClipRRect(
-                                      borderRadius: BorderRadius.circular(8),
-                                      child: url.isNotEmpty
-                                          ? CachedNetworkImage(imageUrl: url, width: 70, height: 70, fit: BoxFit.cover, memCacheWidth: 140, memCacheHeight: 140, placeholder: (_, __) => Container(width: 70, height: 70, color: Colors.grey[200]), errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 20, color: Colors.grey)))
-                                          : Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
-                                    ),
-                                    Positioned(
-                                      top: 2,
-                                      right: 2,
-                                      child: GestureDetector(
-                                        onTap: () async {
-                                          try {
-                                            await ApiService().deleteMedia(p['id'] as String);
-                                            ref.invalidate(staffPortfolioProvider(s.id));
-                                          } catch (e) {
-                                            if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Delete failed: $e')));
-                                          }
-                                        },
-                                        child: Container(decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.all(2), child: const Icon(Icons.close, size: 12, color: Colors.white)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  if (avatarUrl != null && avatarUrl.isNotEmpty)
+                                    ClipOval(
+                                      child: CachedNetworkImage(
+                                        imageUrl: avatarUrl,
+                                        width: 56,
+                                        height: 56,
+                                        fit: BoxFit.cover,
+                                        memCacheWidth: 112,
+                                        memCacheHeight: 112,
+                                        placeholder: (_, __) => Container(
+                                            width: 56,
+                                            height: 56,
+                                            color: Colors.grey[200]),
+                                        errorWidget: (_, __, ___) => Container(
+                                          width: 56,
+                                          height: 56,
+                                          color: DEKATColors.primary.withValues(alpha: 0.1),
+                                          child: Icon(Icons.person,
+                                              color: DEKATColors.primary, size: 28),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    Container(
+                                      width: 56,
+                                      height: 56,
+                                      decoration: BoxDecoration(
+                                        color: DEKATColors.primary.withValues(
+                                            alpha: isActive ? 0.1 : 0.05),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Center(
+                                        child: Text(
+                                          s.displayName.isNotEmpty
+                                              ? s.displayName[0].toUpperCase()
+                                              : '?',
+                                          style: TextStyle(
+                                            fontSize: 22,
+                                            fontWeight: FontWeight.bold,
+                                            color: isActive
+                                                ? DEKATColors.primary
+                                                : Colors.grey,
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                  ]);
-                                },
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(s.displayName,
+                                            style: const TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15)),
+                                        const SizedBox(height: 2),
+                                        Row(
+                                          children: [
+                                            Icon(Icons.badge_outlined,
+                                                size: 13, color: Colors.grey[500]),
+                                            const SizedBox(width: 4),
+                                            Expanded(
+                                              child: Text(s.title ?? '-',
+                                                  style: TextStyle(
+                                                      color: Colors.grey[600],
+                                                      fontSize: 12)),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 10, vertical: 4),
+                                          decoration: BoxDecoration(
+                                            color: isActive
+                                                ? Colors.green[50]
+                                                : Colors.grey[100],
+                                            borderRadius: BorderRadius.circular(20),
+                                            border: Border.all(
+                                                color: isActive
+                                                    ? Colors.green.shade200
+                                                    : Colors.grey.shade300),
+                                          ),
+                                          child: Text(
+                                              isActive ? 'Aktif' : 'Nonaktif',
+                                              style: TextStyle(
+                                                  fontSize: 11,
+                                                  color: isActive
+                                                      ? Colors.green[700]
+                                                      : Colors.grey[600],
+                                                  fontWeight: FontWeight.w600)),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  PopupMenuButton<String>(
+                                    icon: Container(
+                                      padding: const EdgeInsets.all(6),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[100],
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(Icons.more_vert, size: 18),
+                                    ),
+                                    onSelected: (action) async {
+                                      try {
+                                        if (action == 'deactivate') {
+                                          await ApiService().deleteStaff(s.id);
+                                        } else if (action == 'activate') {
+                                          await ApiService().updateStaff(s.id, {});
+                                        } else if (action == 'schedule') {
+                                          if (context.mounted) _showScheduleDialog(context, ref, s.id);
+                                          return;
+                                        } else if (action == 'portfolio') {
+                                          if (context.mounted) _pickAndUploadPortfolio(context, ref, s.id);
+                                          return;
+                                        } else if (action == 'specialties') {
+                                          if (context.mounted) _editSpecialtiesDialog(context, ref, s);
+                                          return;
+                                        }
+                                        ref.invalidate(staffProvider);
+                                      } catch (e) {
+                                        if (context.mounted) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Failed: $e'), backgroundColor: Colors.red),
+                                          );
+                                        }
+                                      }
+                                    },
+                                    itemBuilder: (_) => [
+                                      const PopupMenuItem(value: 'schedule', child: Text('Ubah Jadwal')),
+                                      const PopupMenuItem(value: 'portfolio', child: Text('Unggah Portfolio')),
+                                      const PopupMenuItem(value: 'specialties', child: Text('Ubah Keahlian')),
+                                      if (isActive)
+                                        const PopupMenuItem(value: 'deactivate', child: Text('Nonaktifkan'))
+                                      else
+                                        const PopupMenuItem(value: 'activate', child: Text('Aktifkan')),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            );
-                          },
-                          loading: () => const SizedBox(height: 30, child: Center(child: CircularProgressIndicator(strokeWidth: 1.5))),
-                          error: (e, _) => Text('Gagal load portfolio: $e', style: const TextStyle(fontSize: 11, color: Colors.red)),
+                              if (s.specialties != null && s.specialties!.isNotEmpty) ...[
+                                const SizedBox(height: 10),
+                                Wrap(
+                                  spacing: 6,
+                                  runSpacing: 6,
+                                  children: s.specialties!
+                                      .map((sp) => Container(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10, vertical: 5),
+                                            decoration: BoxDecoration(
+                                              color: DEKATColors.primary
+                                                  .withValues(alpha: 0.08),
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Text(sp,
+                                                style: TextStyle(
+                                                    fontSize: 11,
+                                                    color: DEKATColors.primary,
+                                                    fontWeight: FontWeight.w500)),
+                                          ))
+                                      .toList(),
+                                ),
+                              ],
+                              const SizedBox(height: 12),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 12, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF8F9FF),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.grey.shade200),
+                                ),
+                                child: Row(children: [
+                                  Icon(Icons.calendar_month_outlined,
+                                      size: 16, color: DEKATColors.primary),
+                                  const SizedBox(width: 8),
+                                  const Expanded(
+                                    child: Text('Jadwal mingguan',
+                                        style: TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w600)),
+                                  ),
+                                  TextButton(
+                                    style: TextButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8),
+                                    ),
+                                    onPressed: () =>
+                                        _showScheduleDialog(context, ref, s.id),
+                                    child: const Text('Ubah',
+                                        style: TextStyle(fontSize: 12)),
+                                  ),
+                                ]),
+                              ),
+                              const SizedBox(height: 10),
+                              Row(children: [
+                                Icon(Icons.photo_library_outlined,
+                                    size: 14, color: Colors.grey[500]),
+                                const SizedBox(width: 4),
+                                Text('Portfolio',
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.grey[600])),
+                                const Spacer(),
+                                TextButton.icon(
+                                  style: TextButton.styleFrom(
+                                    visualDensity: VisualDensity.compact,
+                                  ),
+                                  onPressed: () => _pickAndUploadPortfolio(
+                                      context, ref, s.id),
+                                  icon: const Icon(Icons.add_a_photo, size: 14),
+                                  label: const Text('Unggah',
+                                      style: TextStyle(fontSize: 12)),
+                                ),
+                              ]),
+                              portfolioAsync.when(
+                                data: (photos) {
+                                  if (photos.isEmpty) {
+                                    return Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 12),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.grey.shade200),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        'Belum ada foto portfolio',
+                                        textAlign: TextAlign.center,
+                                        style: TextStyle(
+                                            color: Colors.grey[500],
+                                            fontSize: 11),
+                                      ),
+                                    );
+                                  }
+                                  return SizedBox(
+                                    height: 70,
+                                    child: ListView.separated(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: photos.length,
+                                      separatorBuilder: (_, __) =>
+                                          const SizedBox(width: 6),
+                                      itemBuilder: (context, idx) {
+                                        final p = photos[idx];
+                                        final url = p['url'] as String? ?? '';
+                                        return Stack(children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                            child: url.isNotEmpty
+                                                ? CachedNetworkImage(imageUrl: url, width: 70, height: 70, fit: BoxFit.cover, memCacheWidth: 140, memCacheHeight: 140, placeholder: (_, __) => Container(width: 70, height: 70, color: Colors.grey[200]), errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 20, color: Colors.grey)))
+                                                : Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
+                                          ),
+                                          Positioned(
+                                            top: 2,
+                                            right: 2,
+                                            child: GestureDetector(
+                                              onTap: () async {
+                                                try {
+                                                  await ApiService().deleteMedia(p['id'] as String);
+                                                  ref.invalidate(staffPortfolioProvider(s.id));
+                                                } catch (e) {
+                                                  if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Delete failed: $e')));
+                                                }
+                                              },
+                                              child: Container(decoration: BoxDecoration(color: Colors.black54, borderRadius: BorderRadius.circular(12)), padding: const EdgeInsets.all(2), child: const Icon(Icons.close, size: 12, color: Colors.white)),
+                                            ),
+                                          ),
+                                        ]);
+                                      },
+                                    ),
+                                  );
+                                },
+                                loading: () => const SizedBox(height: 30, child: Center(child: CircularProgressIndicator(strokeWidth: 1.5))),
+                                error: (e, _) => Text('Gagal load portfolio: $e', style: const TextStyle(fontSize: 11, color: Colors.red)),
+                              ),
+                            ],
+                          ),
                         ),
-                      ]),
-                    ),
-                  ],
+                      ),
+                    );
+                  },
                 ),
-              );
-            },
+              ),
+            ],
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -191,9 +427,12 @@ class StaffListPage extends ConsumerWidget {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddStaffDialog(context, ref),
-        child: const Icon(Icons.person_add),
+        backgroundColor: DEKATColors.primary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.person_add),
+        label: const Text('Tambah Staf'),
       ),
     );
   }
@@ -205,11 +444,12 @@ class StaffListPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Add Staff'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Tambah Staf'),
         content: Form(key: formKey, child: Column(mainAxisSize: MainAxisSize.min, children: [
           TextFormField(
             controller: nameController,
-            decoration: const InputDecoration(labelText: 'Name', prefixIcon: Icon(Icons.person_outline)),
+            decoration: const InputDecoration(labelText: 'Nama', prefixIcon: Icon(Icons.person_outline)),
             validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
           ),
           const SizedBox(height: 12),
@@ -225,7 +465,7 @@ class StaffListPage extends ConsumerWidget {
           ),
         ])),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
           TextButton(
             onPressed: () async {
               if (formKey.currentState!.validate()) {
@@ -245,7 +485,7 @@ class StaffListPage extends ConsumerWidget {
                 }
               }
             },
-            child: const Text('Add'),
+            child: const Text('Tambah'),
           ),
         ],
       ),
@@ -261,7 +501,8 @@ class StaffListPage extends ConsumerWidget {
       context: context,
       builder: (ctx) => StatefulBuilder(builder: (context, setState) {
         return AlertDialog(
-          title: const Text('Edit Schedule'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Ubah Jadwal'),
           content: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: [
             ...schedule.asMap().entries.map((e) {
               final idx = e.key;
@@ -322,10 +563,11 @@ class StaffListPage extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text('Edit Specialties - ${staff.displayName}'),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text('Ubah Keahlian - ${staff.displayName}'),
         content: TextField(
           controller: ctrl,
-          decoration: const InputDecoration(labelText: 'Specialties (comma separated)', hintText: 'Fade, Undercut, Coloring'),
+          decoration: const InputDecoration(labelText: 'Keahlian (pisahkan koma)', hintText: 'Fade, Undercut, Coloring'),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
@@ -345,6 +587,24 @@ class StaffListPage extends ConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _StaffHeaderStat extends StatelessWidget {
+  final String value;
+  final String label;
+  const _StaffHeaderStat({required this.value, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(value,
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white)),
+        const SizedBox(height: 2),
+        Text(label, style: TextStyle(fontSize: 12, color: Colors.white.withValues(alpha: 0.85))),
+      ],
     );
   }
 }

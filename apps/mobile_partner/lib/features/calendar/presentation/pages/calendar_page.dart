@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 import '../../../../shared/models/rows.dart';
 import '../../../../shared/widgets/main_scaffold.dart';
 
@@ -36,42 +37,43 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
     final statsAsync = ref.watch(partnerStatsProvider);
 
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FF),
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.menu),
           onPressed: () => partnerScaffoldKey.currentState?.openDrawer(),
         ),
-        title: const Text('Calendar'),
+        title: const Text('Kalender'),
         actions: [
           IconButton(icon: const Icon(Icons.today), onPressed: () => setState(() { _focusedDay = DateTime.now(); _selectedDay = DateTime.now(); })),
         ],
       ),
       body: Column(children: [
-        // Dashboard Stats
+        // Ringkasan statistik usaha
         statsAsync.when(
-          data: (stats) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          data: (stats) => Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             child: Row(
               children: [
                 _StatCard(
-                  icon: Icons.calendar_today,
+                  icon: Icons.calendar_today_rounded,
                   label: 'Hari Ini',
                   value: '${stats['todayBookings'] ?? 0}',
                   color: Colors.blue,
                 ),
                 const SizedBox(width: 8),
                 _StatCard(
-                  icon: Icons.attach_money,
+                  icon: Icons.attach_money_rounded,
                   label: 'Minggu Ini',
                   value: _formatPrice(stats['weekRevenue'] ?? 0),
                   color: Colors.green,
                 ),
                 const SizedBox(width: 8),
                 _StatCard(
-                  icon: Icons.people,
+                  icon: Icons.people_rounded,
                   label: 'Pelanggan',
                   value: '${stats['totalCustomers'] ?? 0}',
-                  color: Colors.purple,
+                  color: DEKATColors.primary,
                 ),
               ],
             ),
@@ -79,35 +81,83 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
           loading: () => const SizedBox(height: 80),
           error: (_, __) => const SizedBox(height: 80),
         ),
-        TableCalendar(
-          firstDay: DateTime.now().subtract(const Duration(days: 30)),
-          lastDay: DateTime.now().add(const Duration(days: 90)),
-          focusedDay: _focusedDay,
-          calendarFormat: _calendarFormat,
-          selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-          onDaySelected: (s, f) => setState(() { _selectedDay = s; _focusedDay = f; }),
-          onFormatChanged: (f) => setState(() => _calendarFormat = f),
-          calendarStyle: CalendarStyle(
-            outsideDaysVisible: false,
-            todayDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.3), shape: BoxShape.circle),
-            selectedDecoration: BoxDecoration(color: Theme.of(context).colorScheme.primary, shape: BoxShape.circle),
-            markerDecoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-            markerSize: 8, markersMaxCount: 3,
+        // Kartu kalender bulan
+        Container(
+          margin: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: Colors.grey.shade200),
           ),
-          headerStyle: const HeaderStyle(formatButtonVisible: true, titleCentered: true),
+          child: TableCalendar(
+            firstDay: DateTime.now().subtract(const Duration(days: 30)),
+            lastDay: DateTime.now().add(const Duration(days: 90)),
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+            onDaySelected: (s, f) => setState(() { _selectedDay = s; _focusedDay = f; }),
+            onFormatChanged: (f) => setState(() => _calendarFormat = f),
+            daysOfWeekStyle: DaysOfWeekStyle(
+              weekdayStyle: TextStyle(color: Colors.grey.shade600, fontWeight: FontWeight.w600, fontSize: 12),
+              weekendStyle: TextStyle(color: Colors.red.shade300, fontWeight: FontWeight.w600, fontSize: 12),
+            ),
+            calendarStyle: CalendarStyle(
+              outsideDaysVisible: false,
+              todayDecoration: BoxDecoration(color: DEKATColors.primary.withValues(alpha: 0.15), shape: BoxShape.circle),
+              todayTextStyle: const TextStyle(color: DEKATColors.primary, fontWeight: FontWeight.bold),
+              selectedDecoration: const BoxDecoration(color: DEKATColors.primary, shape: BoxShape.circle),
+              markerDecoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
+              markerSize: 8,
+              markersMaxCount: 3,
+            ),
+            headerStyle: HeaderStyle(
+              formatButtonVisible: true,
+              titleCentered: true,
+              titleTextStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              leftChevronIcon: const Icon(Icons.chevron_left_rounded, color: DEKATColors.primary),
+              rightChevronIcon: const Icon(Icons.chevron_right_rounded, color: DEKATColors.primary),
+              formatButtonDecoration: BoxDecoration(
+                border: Border.all(color: DEKATColors.primary.withValues(alpha: 0.4)),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              formatButtonTextStyle: const TextStyle(color: DEKATColors.primary, fontSize: 12),
+            ),
+          ),
         ),
-        const Divider(),
+        // Judul agenda hari yang dipilih
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 8),
+          child: Row(
+            children: [
+              const Text('Agenda', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  _formatDayId(selectedDay),
+                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
+          ),
+        ),
         Expanded(child: bookingsAsync.when(
           data: (bookings) {
             if (bookings.isEmpty) {
               return Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Icon(Icons.event_available, size: 80, color: Colors.grey[300]),
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle, border: Border.all(color: Colors.grey.shade200)),
+                  child: Icon(Icons.event_available_rounded, size: 40, color: DEKATColors.primary.withValues(alpha: 0.6)),
+                ),
                 const SizedBox(height: 16),
-                Text('No bookings for this day', style: TextStyle(color: Colors.grey)),
+                const Text('Belum ada booking hari ini', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                const SizedBox(height: 4),
+                Text('Jadwal yang masuk akan tampil di sini', style: TextStyle(color: Colors.grey.shade500, fontSize: 13)),
               ]));
             }
             return ListView.builder(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
               itemCount: bookings.length,
               itemBuilder: (context, index) {
                 final b = bookings[index];
@@ -118,25 +168,82 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
                   'COMPLETED' => Colors.blue,
                   _ => Colors.orange,
                 };
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 8),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: color.withValues(alpha: 0.1),
-                      child: Icon(Icons.person, color: color),
+                final initial = b.customerName.isNotEmpty ? b.customerName[0].toUpperCase() : '?';
+                return RepaintBoundary(
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade200),
                     ),
-                    title: Text(b.customerName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('${b.serviceName.isEmpty ? "Service" : b.serviceName} - ${b.time}'),
-                    trailing: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: color.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(16),
+                      onTap: () => context.push('/booking/${b.id}'),
+                      child: Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Row(
+                          children: [
+                            CircleAvatar(
+                              radius: 24,
+                              backgroundColor: color.withValues(alpha: 0.12),
+                              child: Text(initial, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: color)),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(b.customerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.spa_rounded, size: 13, color: Colors.grey.shade500),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          b.serviceName.isEmpty ? 'Layanan' : b.serviceName,
+                                          style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      Icon(Icons.access_time_rounded, size: 13, color: Colors.grey.shade500),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        b.time.isEmpty ? '-' : b.time,
+                                        style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: color.withValues(alpha: 0.12),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(_statusLabel(status),
+                                      style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w600)),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(formatRupiah(b.amount), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      child: Text(status.isNotEmpty ? status[0] + status.substring(1).toLowerCase() : '-',
-                          style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w500)),
                     ),
-                    onTap: () => context.push('/booking/${b.id}'),
                   ),
                 );
               },
@@ -147,10 +254,10 @@ class _CalendarPageState extends ConsumerState<CalendarPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Failed to load bookings'),
+                const Text('Gagal memuat booking'),
                 TextButton(
                   onPressed: () => ref.invalidate(calendarBookingsProvider(selectedDay)),
-                  child: const Text('Coba lagi'),
+                  child: const Text('Coba Lagi'),
                 ),
               ],
             ),
@@ -169,6 +276,36 @@ String _formatPrice(dynamic amount) {
     return '${(value / 1000).toStringAsFixed(0)}rb';
   }
   return '$value';
+}
+
+String _formatDayId(DateTime d) {
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+  return '${days[d.weekday - 1]}, ${d.day} ${months[d.month - 1]} ${d.year}';
+}
+
+String _statusLabel(String status) {
+  switch (status.toUpperCase()) {
+    case 'PENDING':
+    case 'PENDING_APPROVAL':
+      return 'Menunggu';
+    case 'HELD':
+      return 'Ditahan';
+    case 'CONFIRMED':
+      return 'Terkonfirmasi';
+    case 'CHECKED_IN':
+      return 'Check-in';
+    case 'IN_SERVICE':
+      return 'Dilayani';
+    case 'COMPLETED':
+      return 'Selesai';
+    case 'CANCELLED':
+      return 'Dibatalkan';
+    case 'NO_SHOW':
+      return 'Tidak Hadir';
+    default:
+      return status.isEmpty ? '-' : status[0] + status.substring(1).toLowerCase();
+  }
 }
 
 class _StatCard extends StatelessWidget {
@@ -190,27 +327,34 @@ class _StatCard extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: color.withValues(alpha: 0.1),
-          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: color, size: 20),
-            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: color.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(icon, color: color, size: 18),
+            ),
+            const SizedBox(height: 8),
             Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: color,
               ),
             ),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: color.withValues(alpha: 0.8),
+                color: Colors.grey.shade600,
               ),
             ),
           ],

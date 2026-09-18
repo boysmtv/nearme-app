@@ -48,15 +48,22 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FF),
       appBar: AppBar(
-        title: const Text('Promotions'),
-        backgroundColor: DEKATColors.primary,
-        foregroundColor: Colors.white,
+        title: const Text('Promosi',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1A1D26),
+        elevation: 0,
         bottom: TabBar(
           controller: _tabController,
+          labelColor: DEKATColors.primary,
+          unselectedLabelColor: Colors.grey,
+          indicatorColor: DEKATColors.primary,
+          indicatorWeight: 3,
           tabs: const [
-            Tab(text: 'Coupons'),
-            Tab(text: 'Campaigns'),
+            Tab(text: 'Kupon'),
+            Tab(text: 'Kampanye'),
           ],
         ),
       ),
@@ -66,6 +73,18 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
           _buildCouponsTab(),
           _buildCampaignsTab(),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: DEKATColors.primary,
+        foregroundColor: Colors.white,
+        onPressed: () {
+          if (_tabController.index == 0) {
+            _showCreateCouponDialog();
+          } else {
+            _showCreateCampaignDialog();
+          }
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -79,13 +98,34 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.local_offer_outlined, size: 64, color: Colors.grey[300]),
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Icon(Icons.local_offer_outlined,
+                      size: 48, color: Colors.grey[300]),
+                ),
                 const SizedBox(height: 16),
-                const Text('Belum ada coupon'),
-                const SizedBox(height: 8),
-                ElevatedButton(
+                const Text('Belum ada kupon',
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Text('Buat kupon diskon untuk menarik pelanggan',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[500])),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
                   onPressed: () => _showCreateCouponDialog(),
-                  child: const Text('Buat Coupon'),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Buat Kupon'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: DEKATColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
                 ),
               ],
             ),
@@ -101,58 +141,109 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
               final isActive = coupon['active'] ?? true;
               final discountType = coupon['discountType'] ?? 'FLAT';
               final discountValue = coupon['discountValue'] ?? 0;
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
+              return RepaintBoundary(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          Icon(Icons.local_offer, color: DEKATColors.primary, size: 20),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              coupon['code'] ?? '',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace', fontSize: 16),
-                            ),
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: isActive
+                              ? DEKATColors.primary.withValues(alpha: 0.06)
+                              : Colors.grey.shade50,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(16),
+                            topRight: Radius.circular(16),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: isActive ? Colors.green[100] : Colors.grey[100],
-                              borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: isActive
+                                    ? DEKATColors.primary
+                                    : Colors.grey.shade300,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(Icons.local_offer,
+                                  color: Colors.white, size: 20),
                             ),
-                            child: Text(
-                              isActive ? 'Active' : 'Inactive',
-                              style: TextStyle(fontSize: 12, color: isActive ? Colors.green : Colors.grey),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    coupon['code'] ?? '',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                        letterSpacing: 1.2),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    discountType == 'PERCENTAGE'
+                                        ? 'Diskon ${discountValue.toString()}%'
+                                        : 'Diskon Rp ${discountValue.toString()}',
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: DEKATColors.primary),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                            _StatusBadge(
+                                label: isActive ? 'Aktif' : 'Nonaktif',
+                                active: isActive),
+                          ],
+                        ),
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        discountType == 'PERCENTAGE'
-                            ? 'Diskon ${discountValue.toString()}%'
-                            : 'Diskon Rp ${discountValue.toString()}',
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                      if (coupon['minOrder'] != null && coupon['minOrder'] > 0)
-                        Text('Min. order: Rp ${coupon['minOrder']}', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
-                      if (coupon['maxDiscount'] != null && coupon['maxDiscount'] > 0)
-                        Text('Maks. diskon: Rp ${coupon['maxDiscount']}', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
-                      if (coupon['expiresAt'] != null)
-                        Text('Berlaku hingga: ${coupon['expiresAt']}', style: TextStyle(color: Colors.grey[500], fontSize: 12)),
-                      const SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          IconButton(
-                            icon: const Icon(Icons.delete_outline, size: 20, color: Colors.red),
-                            onPressed: () => _deleteCoupon(coupon['id']),
-                          ),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.all(14),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (coupon['minOrder'] != null &&
+                                coupon['minOrder'] > 0)
+                              _MetaRow(
+                                  icon: Icons.shopping_cart_outlined,
+                                  text:
+                                      'Min. order: Rp ${coupon['minOrder']}'),
+                            if (coupon['maxDiscount'] != null &&
+                                coupon['maxDiscount'] > 0)
+                              _MetaRow(
+                                  icon: Icons.savings_outlined,
+                                  text:
+                                      'Maks. diskon: Rp ${coupon['maxDiscount']}'),
+                            if (coupon['expiresAt'] != null)
+                              _MetaRow(
+                                  icon: Icons.event_outlined,
+                                  text:
+                                      'Berlaku hingga: ${coupon['expiresAt']}'),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                TextButton.icon(
+                                  icon: const Icon(Icons.delete_outline,
+                                      size: 18, color: Colors.red),
+                                  label: const Text('Hapus',
+                                      style: TextStyle(color: Colors.red)),
+                                  onPressed: () =>
+                                      _deleteCoupon(coupon['id']),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
@@ -176,13 +267,34 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.campaign_outlined, size: 64, color: Colors.grey[300]),
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Icon(Icons.campaign_outlined,
+                      size: 48, color: Colors.grey[300]),
+                ),
                 const SizedBox(height: 16),
-                const Text('Belum ada campaign'),
-                const SizedBox(height: 8),
-                ElevatedButton(
+                const Text('Belum ada kampanye',
+                    style:
+                        TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                const SizedBox(height: 4),
+                Text('Buat kampanye untuk mempromosikan layanan Anda',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[500])),
+                const SizedBox(height: 16),
+                ElevatedButton.icon(
                   onPressed: () => _showCreateCampaignDialog(),
-                  child: const Text('Buat Campaign'),
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Buat Kampanye'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: DEKATColors.primary,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                  ),
                 ),
               ],
             ),
@@ -196,44 +308,75 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
             itemBuilder: (context, index) {
               final campaign = campaigns[index];
               final status = campaign['status'] ?? 'DRAFT';
-              return Card(
-                margin: const EdgeInsets.only(bottom: 12),
-                child: Padding(
-                  padding: const EdgeInsets.all(12),
+              final isActive = status == 'ACTIVE';
+              return RepaintBoundary(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.campaign, color: DEKATColors.primary, size: 20),
-                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: isActive
+                                  ? Colors.green.withValues(alpha: 0.12)
+                                  : DEKATColors.primary
+                                      .withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Icon(Icons.campaign,
+                                color: isActive
+                                    ? Colors.green.shade700
+                                    : DEKATColors.primary,
+                                size: 20),
+                          ),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: Text(
                               campaign['name'] ?? '',
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w600, fontSize: 15),
                             ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: status == 'ACTIVE' ? Colors.green[100] : Colors.grey[100],
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(status, style: const TextStyle(fontSize: 12)),
-                          ),
+                          _StatusBadge(
+                              label: _campaignStatusLabel(status),
+                              active: isActive),
                         ],
                       ),
                       if (campaign['description'] != null)
                         Padding(
-                          padding: const EdgeInsets.only(top: 8),
-                          child: Text(campaign['description'], style: TextStyle(color: Colors.grey[600])),
+                          padding: const EdgeInsets.only(top: 10),
+                          child: Text(campaign['description'].toString(),
+                              style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 13,
+                                  height: 1.5)),
                         ),
-                      if (campaign['startDate'] != null || campaign['endDate'] != null)
+                      if (campaign['startDate'] != null ||
+                          campaign['endDate'] != null)
                         Padding(
-                          padding: const EdgeInsets.only(top: 4),
-                          child: Text(
-                            '${campaign['startDate'] ?? '?'} — ${campaign['endDate'] ?? '?'}',
-                            style: TextStyle(color: Colors.grey[500], fontSize: 12),
+                          padding: const EdgeInsets.only(top: 8),
+                          child: Row(
+                            children: [
+                              Icon(Icons.date_range_outlined,
+                                  size: 14, color: Colors.grey[400]),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  '${campaign['startDate'] ?? '?'} — ${campaign['endDate'] ?? '?'}',
+                                  style: TextStyle(
+                                      color: Colors.grey[500], fontSize: 12),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       const SizedBox(height: 8),
@@ -241,14 +384,31 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           if (status != 'ACTIVE')
-                            TextButton(
-                              onPressed: () => _activateCampaign(campaign['id']),
-                              child: const Text('Activate'),
+                            ElevatedButton.icon(
+                              icon: const Icon(Icons.play_arrow, size: 16),
+                              label: const Text('Aktifkan'),
+                              onPressed: () =>
+                                  _activateCampaign(campaign['id']),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                              ),
                             ),
                           if (status == 'ACTIVE')
-                            TextButton(
-                              onPressed: () => _pauseCampaign(campaign['id']),
-                              child: const Text('Pause'),
+                            OutlinedButton.icon(
+                              icon: const Icon(Icons.pause, size: 16),
+                              label: const Text('Jeda'),
+                              onPressed: () =>
+                                  _pauseCampaign(campaign['id']),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.orange.shade700,
+                                side: BorderSide(
+                                    color: Colors.orange.shade300),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                              ),
                             ),
                         ],
                       ),
@@ -265,6 +425,21 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
     );
   }
 
+  String _campaignStatusLabel(String status) {
+    switch (status) {
+      case 'ACTIVE':
+        return 'Aktif';
+      case 'PAUSED':
+        return 'Dijeda';
+      case 'DRAFT':
+        return 'Draf';
+      case 'ENDED':
+        return 'Berakhir';
+      default:
+        return status;
+    }
+  }
+
   void _showCreateCouponDialog() {
     final codeCtrl = TextEditingController();
     final discountTypeCtrl = TextEditingController(text: 'FLAT');
@@ -274,15 +449,17 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Buat Coupon'),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Buat Kupon'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: codeCtrl, decoration: const InputDecoration(labelText: 'Kode Coupon', hintText: 'DISKON10'), textCapitalization: TextCapitalization.characters),
+              TextField(controller: codeCtrl, decoration: const InputDecoration(labelText: 'Kode Kupon', hintText: 'DISKON10'), textCapitalization: TextCapitalization.characters),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                value: 'FLAT',
+                initialValue: 'FLAT',
                 items: const [
                   DropdownMenuItem(value: 'FLAT', child: Text('Flat (Rp)')),
                   DropdownMenuItem(value: 'PERCENTAGE', child: Text('Persen (%)')),
@@ -318,6 +495,10 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: DEKATColors.primary,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Simpan'),
           ),
         ],
@@ -333,12 +514,14 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Buat Campaign'),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Buat Kampanye'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nama Campaign')),
+              TextField(controller: nameCtrl, decoration: const InputDecoration(labelText: 'Nama Kampanye')),
               const SizedBox(height: 8),
               TextField(controller: descCtrl, decoration: const InputDecoration(labelText: 'Deskripsi'), maxLines: 2),
               const SizedBox(height: 8),
@@ -365,6 +548,10 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
               }
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: DEKATColors.primary,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Simpan'),
           ),
         ],
@@ -376,8 +563,10 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Hapus Coupon?'),
-        content: const Text('Coupon yang dihapus tidak dapat dikembalikan.'),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Hapus Kupon?'),
+        content: const Text('Kupon yang dihapus tidak dapat dikembalikan.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Batal')),
           TextButton(onPressed: () => Navigator.pop(ctx, true), child: const Text('Hapus', style: TextStyle(color: Colors.red))),
@@ -409,5 +598,68 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
     }
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String label;
+  final bool active;
+  const _StatusBadge({required this.label, required this.active});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: active ? Colors.green.shade50 : Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+            color: active ? Colors.green.shade200 : Colors.grey.shade300),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: active ? Colors.green : Colors.grey,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: active ? Colors.green.shade700 : Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetaRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const _MetaRow({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        children: [
+          Icon(icon, size: 14, color: Colors.grey[400]),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(text,
+                style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+          ),
+        ],
+      ),
+    );
   }
 }
