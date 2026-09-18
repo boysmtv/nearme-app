@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mobile_customer/core/auth/auth_provider.dart';
+import '../widgets/auth_back_guard.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -48,9 +49,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       }
     });
 
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
+    // AuthBackGuard: back tidak boleh langsung menutup aplikasi (lihat file guard).
+    return AuthBackGuard(
+      child: Scaffold(
+        body: SafeArea(
+          child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Form(
             key: _formKey,
@@ -225,7 +228,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
           ),
         ),
       ),
-    );
+    ));
+
   }
 
   void _handleLogin() {

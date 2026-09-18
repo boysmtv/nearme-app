@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import '../widgets/auth_back_guard.dart';
 
 class ForgotPasswordPage extends ConsumerStatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -24,17 +25,20 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+    return AuthBackGuard(
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            // Sama seperti system back: jangan tutup aplikasi / terjebak loop.
+            onPressed: () => AuthBackGuard.handleBack(context),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: _emailSent ? _buildSuccessView() : _buildFormView(),
+        body: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: _emailSent ? _buildSuccessView() : _buildFormView(),
+          ),
         ),
       ),
     );
@@ -92,7 +96,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
           ),
           const SizedBox(height: 16),
           TextButton(
-            onPressed: () => context.pop(),
+            onPressed: () => context.go('/login'),
             child: const Text('Back to Login'),
           ),
         ],
