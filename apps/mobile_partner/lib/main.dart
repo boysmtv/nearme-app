@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'core/bootstrap/bootstrap.dart';
-import 'app.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-  } catch (_) {}
-  await initCore();
-  runApp(const ProviderScope(child: DekaPartnerApp()));
+  // Frame pertama (splash) dirender seketika; init berat berjalan paralel
+  // di background via BootstrapGate. Jangan await apa pun di sini.
+  runApp(const ProviderScope(child: BootstrapGate()));
 }

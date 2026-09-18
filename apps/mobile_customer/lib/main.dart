@@ -1,19 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'core/bootstrap/bootstrap.dart';
-import 'app.dart';
 
-void main() async {
+void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await Firebase.initializeApp();
-  } catch (_) {}
-  await initCore();
-
-  runApp(
-    const ProviderScope(
-      child: DekaCustomerApp(),
-    ),
-  );
+  // Frame pertama (splash) dirender seketika; init berat (Firebase, Hive,
+  // FCM token network, dsb.) berjalan paralel di background via BootstrapGate.
+  // Jangan await apa pun di sini — itu yang dulu bikin black screen lama.
+  runApp(const ProviderScope(child: BootstrapGate()));
 }
