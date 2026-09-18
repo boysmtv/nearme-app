@@ -499,4 +499,33 @@ class ApiService {
   Future<Response> getStaffCheckins() {
     return _dio.get('/provider/staff');
   }
+
+  // Platform Admin (aplikasi unifikasi: modul admin mobile)
+  Future<Response> getAdminStats() {
+    return _dio.get('/admin/dashboard/stats');
+  }
+
+  Future<Response> getAdminUsers({Map<String, dynamic>? params}) {
+    return _dio.get('/admin/users', queryParameters: params);
+  }
+
+  Future<Response> updateAdminUserStatus(String id, String status) {
+    return _dio.put('/admin/users/$id/status', data: {'status': status});
+  }
+
+  Future<Response> getAdminTenants({Map<String, dynamic>? params}) {
+    return _dio.get('/admin/tenants', queryParameters: params);
+  }
+
+  Future<Response> approveAdminTenant(String id) {
+    return _dio.put('/admin/tenants/$id/approve');
+  }
+
+  Future<Response> rejectAdminTenant(String id) {
+    return _dio.put('/admin/tenants/$id/reject');
+  }
+
+  Future<Response> getAdminBookings({Map<String, dynamic>? params}) {
+    return _dio.get('/admin/bookings', queryParameters: params);
+  }
 }

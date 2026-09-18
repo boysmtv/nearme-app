@@ -1,0 +1,573 @@
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
+
+import '../../../provider_profile/domain/entities/provider_entity.dart';
+import '../../../discovery/domain/entities/category_entity.dart';
+import '../viewmodel/discovery_viewmodel.dart';
+
+export '../viewmodel/discovery_viewmodel.dart' show discoveryProvidersProvider, categoriesProvider, dashboardProfileProvider;
+
+class DiscoveryPage extends ConsumerWidget {
+  const DiscoveryPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final providersAsync = ref.watch(discoveryProvidersProvider);
+    final categoriesAsync = ref.watch(categoriesProvider);
+
+    return Scaffold(
+      body: SafeArea(
+        child: RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(discoveryProvidersProvider);
+            ref.invalidate(categoriesProvider);
+            await Future.wait([
+              ref.read(discoveryProvidersProvider.future).catchError((_) => <ProviderEntity>[]),
+              ref.read(categoriesProvider.future).catchError((_) => <CategoryEntity>[]),
+            ]);
+          },
+          child: CustomScrollView(
+            key: const PageStorageKey<String>('discovery_scroll'),
+            physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+            slivers: [
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TweenAnimationBuilder<double>(
+                        tween: Tween(begin: 0, end: 1),
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, value, child) => Opacity(
+                          opacity: value,
+                          child: Transform.translate(offset: Offset(0, 12 * (1 - value)), child: child),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Discover', style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: FontWeight.bold, letterSpacing: -0.5)),
+                            const SizedBox(height: 4),
+                            Text('Temukan layanan terbaik di sekitarmu', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600])),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      GestureDetector(
+                        onTap: () => context.push('/search'),
+                        child: Hero(
+                          tag: 'search-bar',
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 200),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(14),
+                              border: Border.all(color: Colors.grey[200]!),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.search_rounded, color: Colors.grey[600], size: 20),
+                                const SizedBox(width: 12),
+                                Text('Cari layanan, salon, spa...', style: TextStyle(color: Colors.grey[600], fontSize: 14)),
+                                const Spacer(),
+                                Container(
+                                  padding: const EdgeInsets.all(6),
+                                  decoration: BoxDecoration(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
+                                  child: Icon(Icons.tune_rounded, color: Theme.of(context).colorScheme.primary, size: 16),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: _DashboardSummary(),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: SizedBox(
+                    height: 96,
+                    child: categoriesAsync.when(
+                    data: (categories) => ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: categories.length,
+                      itemBuilder: (context, index) {
+                        final cat = categories[index];
+                        // Tanpa animasi per-item: TweenAnimationBuilder di tiap
+                        // chip membuat layer Opacity+Transform per item dan
+                        // restart tiap rebuild → jank di HP lama.
+                        // RepaintBoundary: repaint tiap chip terisolasi.
+                        return RepaintBoundary(
+                          child: _CategoryItem(icon: _iconForCategory(cat.name), label: cat.name, onTap: () => context.push('/search?category=${cat.name}')),
+                        );
+                      },
+                    ),
+                    // Satu shimmer shader (tanpa rebuild per-frame) untuk
+                    // seluruh baris — bukan 1 AnimationController per item.
+                    loading: () => Shimmer.fromColors(
+                      baseColor: Colors.grey[300]!,
+                      highlightColor: Colors.grey[100]!,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: 6,
+                        itemBuilder: (_, __) => Padding(
+                          padding: const EdgeInsets.only(right: 12),
+                          child: Column(
+                            children: [
+                              Container(width: 64, height: 64, decoration: BoxDecoration(borderRadius: BorderRadius.circular(16), color: Colors.white)),
+                              const SizedBox(height: 8),
+                              Container(width: 48, height: 8, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(4))),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    error: (e, _) => Center(
+                      child: TextButton.icon(
+                        onPressed: () => ref.invalidate(categoriesProvider),
+                        icon: const Icon(Icons.refresh_rounded, size: 16),
+                        label: const Text('Muat ulang kategori'),
+                      ),
+                    ),
+                  ),
+                ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Rekomendasi', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                      TextButton(
+                        onPressed: () => context.push('/providers'),
+                        style: TextButton.styleFrom(visualDensity: VisualDensity.compact),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Text('Lihat Semua'),
+                            const SizedBox(width: 4),
+                            Icon(Icons.arrow_forward_rounded, size: 14, color: Theme.of(context).colorScheme.primary),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              providersAsync.when(
+                data: (providers) {
+                  if (providers.isEmpty) {
+                    return SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Column(
+                          children: [
+                            Icon(Icons.store_outlined, size: 48, color: Colors.grey[300]),
+                            const SizedBox(height: 12),
+                            Text('Belum ada provider', style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 4),
+                            Text('Coba lagi nanti atau jelajahi kategori', style: TextStyle(color: Colors.grey[500], fontSize: 13)),
+                          ],
+                        ),
+                      ),
+                    );
+                  }
+                  return SliverList(
+                    delegate: SliverChildBuilderDelegate(
+                      (context, index) {
+                        // Last item: load more button
+                        if (index == providers.length) {
+                          final notifier = ref.read(discoveryProvidersProvider.notifier);
+                          if (!notifier.hasMore) return const SizedBox.shrink();
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: notifier.isLoadingMore
+                                  ? const CircularProgressIndicator(strokeWidth: 2)
+                                  : TextButton.icon(
+                                      onPressed: () => notifier.loadMore(),
+                                      icon: const Icon(Icons.expand_more, size: 18),
+                                      label: const Text('Muat Lebih Banyak'),
+                                    ),
+                            ),
+                          );
+                        }
+                        final provider = providers[index];
+                        // Tanpa animasi per-item (alasan sama seperti kategori):
+                        // kartu yang baru ter-build saat scroll ikut menganimasi
+                        // 0.3-1.2 detik → scroll jank di GPU lama.
+                        // RepaintBoundary: tiap kartu repaint terisolasi saat
+                        // scroll (pola project referensi), shadow ikut ter-cache.
+                        return RepaintBoundary(
+                          child: _FeaturedCard(
+                            name: provider.name,
+                            category: provider.category ?? 'Umum',
+                            rating: provider.rating,
+                            distance: provider.city ?? '',
+                            imageUrl: provider.imageUrl,
+                            onTap: () => context.push('/provider/${provider.slug}'),
+                          ),
+                        );
+                      },
+                      // +1 for load more button
+                      childCount: providers.length + (ref.read(discoveryProvidersProvider.notifier).hasMore ? 1 : 0),
+                    ),
+                  );
+                },
+                loading: () => SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (_, __) => const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                      child: _StaticShimmerCard(),
+                    ),
+                    childCount: 4,
+                  ),
+                ),
+                error: (e, _) => SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey[200]!)),
+                      child: Column(
+                        children: [
+                          Icon(Icons.wifi_off_rounded, size: 36, color: Colors.grey[400]),
+                          const SizedBox(height: 10),
+                          Text('Gagal memuat', style: TextStyle(color: Colors.grey[700], fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 4),
+                          Text(e.toString().replaceAll('Exception: ', ''), textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
+                          const SizedBox(height: 12),
+                           FilledButton.icon(onPressed: () => ref.invalidate(discoveryProvidersProvider), icon: const Icon(Icons.refresh_rounded, size: 16), label: const Text('Coba Lagi')),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SliverToBoxAdapter(child: SizedBox(height: 24)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static IconData _iconForCategory(String name) {
+    final n = name.toLowerCase();
+    if (n.contains('barber')) return Icons.content_cut_rounded;
+    if (n.contains('salon')) return Icons.face_retouching_natural_rounded;
+    if (n.contains('spa')) return Icons.spa_rounded;
+    if (n.contains('kecantikan')) return Icons.brush_rounded;
+    if (n.contains('kesehatan')) return Icons.favorite_rounded;
+    if (n.contains('olahraga')) return Icons.fitness_center_rounded;
+    return Icons.apps_rounded;
+  }
+}
+
+class _CategoryItem extends StatefulWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+  const _CategoryItem({required this.icon, required this.label, required this.onTap});
+  @override
+  State<_CategoryItem> createState() => _CategoryItemState();
+}
+
+class _CategoryItemState extends State<_CategoryItem> with SingleTickerProviderStateMixin {
+  double _scale = 1.0;
+  void _onTapDown(_) => setState(() => _scale = 0.92);
+  void _onTapUp(_) => setState(() => _scale = 1.0);
+  void _onTapCancel() => setState(() => _scale = 1.0);
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: widget.onTap,
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      child: AnimatedScale(
+        scale: _scale,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        child: Padding(
+          padding: const EdgeInsets.only(right: 14),
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12)),
+                ),
+                child: Icon(widget.icon, color: Theme.of(context).colorScheme.primary, size: 26),
+              ),
+              const SizedBox(height: 8),
+              SizedBox(
+                width: 72,
+                child: Text(widget.label, textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600, fontSize: 11)),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _FeaturedCard extends StatefulWidget {
+  final String name;
+  final String category;
+  final double rating;
+  final String distance;
+  final String? imageUrl;
+  final VoidCallback onTap;
+  const _FeaturedCard({required this.name, required this.category, required this.rating, required this.distance, this.imageUrl, required this.onTap});
+  @override
+  State<_FeaturedCard> createState() => _FeaturedCardState();
+}
+
+class _FeaturedCardState extends State<_FeaturedCard> {
+  bool _pressed = false;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _pressed = true),
+      onTapUp: (_) => setState(() => _pressed = false),
+      onTapCancel: () => setState(() => _pressed = false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _pressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 140),
+        curve: Curves.easeOut,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withValues(alpha: _pressed ? 0.02 : 0.06), blurRadius: _pressed ? 8 : 14, offset: const Offset(0, 4)),
+            ],
+            border: Border.all(color: Colors.grey[100]!),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: widget.onTap,
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: [
+                      Hero(
+                        tag: 'provider-${widget.name}',
+                        child: Container(
+                          width: 72,
+                          height: 72,
+                          decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(12)),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(12),
+                            child: widget.imageUrl != null && widget.imageUrl!.isNotEmpty
+                                // Decode secukupnya (2x ukuran tampil, ala project
+                                // referensi): foto full-res yang di-decode penuh
+                                // memberatkan raster GPU lama + boros memori.
+                                ? CachedNetworkImage(imageUrl: widget.imageUrl!, fit: BoxFit.cover, memCacheWidth: 144, memCacheHeight: 144, placeholder: (_, __) => Container(color: Colors.grey[100]), errorWidget: (_, __, ___) => const Icon(Icons.store_rounded, color: Colors.grey))
+                                : const Icon(Icons.store_rounded, color: Colors.grey),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(widget.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                            const SizedBox(height: 3),
+                            Text(widget.category, style: TextStyle(color: Colors.grey[600], fontSize: 12)),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Icon(Icons.star_rounded, size: 14, color: Colors.amber[600]),
+                                const SizedBox(width: 3),
+                                Text(widget.rating.toStringAsFixed(1), style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                                if (widget.distance.isNotEmpty) ...[
+                                  const SizedBox(width: 10),
+                                  Icon(Icons.location_on_rounded, size: 14, color: Colors.grey[400]),
+                                  const SizedBox(width: 3),
+                                  Expanded(child: Text(widget.distance, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: Colors.grey[600], fontSize: 12))),
+                                ],
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        padding: const EdgeInsets.all(7),
+                        decoration: BoxDecoration(color: _pressed ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12) : Colors.grey[100], shape: BoxShape.circle),
+                        child: Icon(Icons.chevron_right_rounded, size: 18, color: _pressed ? Theme.of(context).colorScheme.primary : Colors.grey[500]),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Placeholder loading statis (tanpa AnimationController sendiri).
+/// Shimmer versi ticker-per-item sebelumnya membuat ~10 ticker + rebuild
+/// per-frame selama loading; placeholder statis gratis total dan hanya
+/// tampil sepersekian detik.
+class _StaticShimmerCard extends StatelessWidget {
+  const _StaticShimmerCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 96,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey[100]!),
+      ),
+      child: Row(
+        children: [
+          Container(width: 72, height: 72, margin: const EdgeInsets.all(12), decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(12))),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(width: 120, height: 12, decoration: BoxDecoration(color: Colors.grey[200], borderRadius: BorderRadius.circular(6))),
+                const SizedBox(height: 8),
+                Container(width: 80, height: 8, decoration: BoxDecoration(color: Colors.grey[100], borderRadius: BorderRadius.circular(4))),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DashboardSummary extends ConsumerWidget {
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(dashboardProfileProvider);
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.primary.withValues(alpha: 0.8),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: profileAsync.when(
+        data: (profile) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _DashboardItem(
+              icon: Icons.calendar_today_rounded,
+              label: 'Booking Aktif',
+              value: '${profile['totalBookings'] ?? 0}',
+            ),
+            _DashboardItem(
+              icon: Icons.star_rounded,
+              label: 'Poin Loyalitas',
+              value: '${profile['loyaltyPoints'] ?? 0}',
+            ),
+            _DashboardItem(
+              icon: Icons.favorite_rounded,
+              label: 'Favorit',
+              value: '${profile['totalFavorites'] ?? 0}',
+            ),
+          ],
+        ),
+        loading: () => const Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _DashboardItem(icon: Icons.calendar_today_rounded, label: 'Booking Aktif', value: '-'),
+            _DashboardItem(icon: Icons.star_rounded, label: 'Poin Loyalitas', value: '-'),
+            _DashboardItem(icon: Icons.favorite_rounded, label: 'Favorit', value: '-'),
+          ],
+        ),
+        error: (_, __) => Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            _DashboardItem(icon: Icons.calendar_today_rounded, label: 'Booking Aktif', value: '0'),
+            _DashboardItem(icon: Icons.star_rounded, label: 'Poin Loyalitas', value: '0'),
+            _DashboardItem(icon: Icons.favorite_rounded, label: 'Favorit', value: '0'),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DashboardItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _DashboardItem({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: Colors.white, size: 24),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        Text(
+          label,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.9),
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+}
