@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
+import 'package:flutter_design_system/flutter_design_system.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
 
 class ReferralPage extends ConsumerStatefulWidget {
@@ -51,7 +52,13 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Undang Teman')),
+      backgroundColor: const Color(0xFFF8F9FF),
+      appBar: AppBar(
+        title: const Text('Undang Teman'),
+        backgroundColor: Colors.white,
+        foregroundColor: DEKATColors.textPrimary,
+        elevation: 0,
+      ),
       body: _isLoading
           ? const ShimmerCardList()
           : SingleChildScrollView(
@@ -61,98 +68,183 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFFF59E0B), Color(0xFFEA580C)],
+                      gradient: LinearGradient(
+                        colors: [
+                          DEKATColors.primary,
+                          DEKATColors.primary.withValues(alpha: 0.8),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(16),
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Stack(
                       children: [
-                        const Text('Kode Referral Anda', style: TextStyle(color: Colors.white70, fontSize: 14)),
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Text(
-                              _referralCode,
-                              style: const TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 2),
+                        Positioned(
+                          right: -24,
+                          top: -24,
+                          child: Container(
+                            width: 110,
+                            height: 110,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color:
+                                  Colors.white.withValues(alpha: 0.08),
                             ),
-                            const Spacer(),
-                            IconButton(
-                              onPressed: _copyCode,
-                              icon: const Icon(Icons.copy, color: Colors.white),
+                          ),
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white
+                                        .withValues(alpha: 0.2),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: const Icon(
+                                    Icons.person_add_outlined,
+                                    color: Colors.white,
+                                    size: 20,
+                                  ),
+                                ),
+                                const SizedBox(width: 10),
+                                const Text(
+                                  'Kode Referral Anda',
+                                  style: TextStyle(
+                                      color: Colors.white70, fontSize: 14),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              decoration: BoxDecoration(
+                                color:
+                                    Colors.white.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.white
+                                      .withValues(alpha: 0.3),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _referralCode,
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 2,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: _copyCode,
+                                    tooltip: 'Salin kode',
+                                    icon: const Icon(Icons.copy_rounded,
+                                        color: Colors.white),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            const Text(
+                              'Bagikan kode ini kepada teman — Anda dan teman sama-sama dapat 50 poin.',
+                              style: TextStyle(
+                                  color: Colors.white70, fontSize: 13),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 8),
-                        const Text('Bagikan kode ini kepada teman Anda', style: TextStyle(color: Colors.white70)),
                       ],
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   Row(
                     children: [
                       Expanded(
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                Text('$_referralCount', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF6C63FF))),
-                                const SizedBox(height: 4),
-                                Text('Teman Diundang', style: TextStyle(color: Colors.grey[600])),
-                              ],
-                            ),
+                        child: RepaintBoundary(
+                          child: _StatCard(
+                            icon: Icons.group_outlined,
+                            iconColor: DEKATColors.primary,
+                            value: '$_referralCount',
+                            label: 'Teman Diundang',
                           ),
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(20),
-                            child: Column(
-                              children: [
-                                Text('${_referralCount * 50}', style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFFF59E0B))),
-                                const SizedBox(height: 4),
-                                Text('Poin Didapat', style: TextStyle(color: Colors.grey[600])),
-                              ],
-                            ),
+                        child: RepaintBoundary(
+                          child: _StatCard(
+                            icon: Icons.stars_outlined,
+                            iconColor: Colors.amber[700]!,
+                            value: '${_referralCount * 50}',
+                            label: 'Poin Didapat',
                           ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
-                  Card(
-                    child: Padding(
+                  const SizedBox(height: 16),
+                  RepaintBoundary(
+                    child: Container(
+                      width: double.infinity,
                       padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border:
+                            Border.all(color: Colors.grey.shade200),
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Cara Kerja', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                          const Text('Cara Kerja',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Tiga langkah mudah dapat poin tambahan',
+                            style: TextStyle(
+                                color: Colors.grey[500], fontSize: 13),
+                          ),
                           const SizedBox(height: 16),
-                          _buildStep(1, 'Bagikan Kode', 'Kirim kode referral ke teman'),
-                          _buildStep(2, 'Teman Mendaftar', 'Teman daftar dengan kode Anda'),
-                          _buildStep(3, 'Dapat 50 Poin', 'Anda dan teman dapat 50 poin'),
+                          _buildStep(1, 'Bagikan Kode',
+                              'Kirim kode referral ke teman'),
+                          _buildStep(2, 'Teman Mendaftar',
+                              'Teman daftar dengan kode Anda'),
+                          _buildStep(3, 'Dapat 50 Poin',
+                              'Anda dan teman dapat 50 poin'),
                         ],
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
-                    child: ElevatedButton(
+                    child: ElevatedButton.icon(
                       onPressed: _copyCode,
+                      icon: const Icon(Icons.share_outlined, size: 20),
+                      label: const Text('Bagikan ke Teman',
+                          style: TextStyle(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6C63FF),
+                        backgroundColor: DEKATColors.primary,
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding:
+                            const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
-                      child: const Text('Bagikan ke Teman', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ),
                 ],
@@ -163,18 +255,23 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
 
   Widget _buildStep(int number, String title, String subtitle) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 14),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 32,
-            height: 32,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
-              color: const Color(0xFF6C63FF).withValues(alpha:0.1),
-              borderRadius: BorderRadius.circular(8),
+              color: DEKATColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
-              child: Text('$number', style: const TextStyle(color: Color(0xFF6C63FF), fontWeight: FontWeight.bold)),
+              child: Text('$number',
+                  style: const TextStyle(
+                      color: DEKATColors.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15)),
             ),
           ),
           const SizedBox(width: 12),
@@ -182,11 +279,73 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-                Text(subtitle, style: TextStyle(color: Colors.grey[600], fontSize: 13)),
+                Text(title,
+                    style:
+                        const TextStyle(fontWeight: FontWeight.w600)),
+                const SizedBox(height: 2),
+                Text(subtitle,
+                    style: TextStyle(
+                        color: Colors.grey[500], fontSize: 13)),
               ],
             ),
           ),
+          Container(
+            margin: const EdgeInsets.only(top: 2),
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: Colors.green.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.check,
+                size: 14, color: Colors.green),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StatCard extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String value;
+  final String label;
+
+  const _StatCard({
+    required this.icon,
+    required this.iconColor,
+    required this.value,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: iconColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(icon, color: iconColor, size: 20),
+          ),
+          const SizedBox(height: 10),
+          Text(value,
+              style: const TextStyle(
+                  fontSize: 26, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 2),
+          Text(label,
+              style:
+                  TextStyle(color: Colors.grey[500], fontSize: 13)),
         ],
       ),
     );
