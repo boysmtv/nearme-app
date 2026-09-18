@@ -19,7 +19,13 @@ vi.mock('../../../components/CustomerLayout', () => ({
 }));
 
 vi.mock('../../../components/LeafletMap', () => ({
-  default: () => <div data-testid="leaflet-map" />,
+  default: (props: any) => (
+    <div data-testid="leaflet-map">
+      <button onClick={() => props?.onProviderClick?.({ id: '1', slug: 'barber-shop' })}>
+        MapProviderTrigger
+      </button>
+    </div>
+  ),
 }));
 
 import { publicApi } from '../../../lib/api';
@@ -196,6 +202,73 @@ describe('CustomerNearbyPage', () => {
     renderNearby();
     await waitFor(() => {
       expect(screen.getByText('3 provider ditemukan')).toBeInTheDocument();
+    });
+  });
+
+  it('falls back to Jakarta when geolocation errors', async () => {
+    Object.defineProperty(navigator, 'geolocation', {
+      value: {
+        getCurrentPosition: (_success: PositionCallback, error: PositionErrorCallback) => {
+          error({ code: 1, message: 'denied', PERMISSION_DENIED: 1, POSITION_UNAVAILABLE: 2, TIMEOUT: 3 } as GeolocationPositionError);
+        },
+      },
+      writable: true,
+    });
+    (publicApi.providers.search as any).mockResolvedValue({ data: { providers: [] } });
+    renderNearby();
+    await waitFor(() => {
+      expect(publicApi.providers.search).toHaveBeenCalledWith(
+        expect.objectContaining({ lat: -6.2088, lng: 106.8456 }),
+      );
+    });
+  });
+
+  it('falls back to Jakarta when geolocation unavailable', async () => {
+    Object.defineProperty(navigator, 'geolocation', { value: undefined, writable: true });
+    (publicApi.providers.search as any).mockResolvedValue({ data: { providers: [] } });
+    renderNearby();
+    await waitFor(() => {
+      expect(publicApi.providers.search).toHaveBeenCalledWith(
+        expect.objectContaining({ lat: -6.2088, lng: 106.8456 }),
+      );
+    });
+  });
+
+  it('sets 20km radius and refetches', async () => {
+    (publicApi.providers.search as any).mockResolvedValue({ data: { providers: [] } });
+    renderNearby();
+    await waitFor(() => {
+      expect(screen.getByText('20 km')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('20 km'));
+    await waitFor(() => {
+      expect(publicApi.providers.search).toHaveBeenCalledWith(
+        expect.objectContaining({ radius: 20 }),
+      );
+    });
+  });
+
+  it('clicking provider card navigates to detail', async () => {
+    (publicApi.providers.search as any).mockResolvedValue({ data: { providers: [mockProviders[0]] } });
+    renderNearby();
+    await waitFor(() => {
+      expect(screen.getByText('Barber Shop')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('MapProviderTrigger'));
+    expect(screen.getByTestId('leaflet-map')).toBeInTheDocument();
+  });
+
+  it('Perbesar Radius sets radius to 20', async () => {
+    (publicApi.providers.search as any).mockResolvedValue({ data: { providers: [] } });
+    renderNearby();
+    await waitFor(() => {
+      expect(screen.getByText('Perbesar Radius')).toBeInTheDocument();
+    });
+    fireEvent.click(screen.getByText('Perbesar Radius'));
+    await waitFor(() => {
+      expect(publicApi.providers.search).toHaveBeenCalledWith(
+        expect.objectContaining({ radius: 20 }),
+      );
     });
   });
 });

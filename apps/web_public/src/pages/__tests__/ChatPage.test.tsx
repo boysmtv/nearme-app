@@ -15,13 +15,17 @@ vi.mock('../../lib/api', () => ({
 }));
 
 vi.mock('../../hooks/useChatWebSocket', () => ({
-  default: () => ({
+  default: (...args: unknown[]) => mockUseChatHook(...args),
+}));
+
+const { mockUseChatHook } = vi.hoisted(() => ({
+  mockUseChatHook: vi.fn(() => ({
     messages: [],
     sendMessage: vi.fn(),
     connected: false,
     loading: false,
     error: null,
-  }),
+  })),
 }));
 
 vi.mock('../../components/Header', () => ({
@@ -58,6 +62,13 @@ describe('ChatPage', () => {
     vi.clearAllMocks();
     mockList.mockResolvedValue({ data: [] });
     mockGetMessages.mockResolvedValue({ data: [] });
+    mockUseChatHook.mockReturnValue({
+      messages: [],
+      sendMessage: vi.fn(),
+      connected: false,
+      loading: false,
+      error: null,
+    });
   });
 
   it('renders chat page with header', async () => {
@@ -211,6 +222,62 @@ describe('ChatPage', () => {
     await user.click(screen.getByText('Test Chat'));
     await waitFor(() => {
       expect(screen.getByText(/lampiran foto atau file/i)).toBeInTheDocument();
+    });
+  });
+
+  it('renders provider messages left-aligned with attachment', async () => {
+    const user = userEvent.setup();
+    mockList.mockResolvedValue({
+      data: [{ id: 'c1', subject: 'Test Chat', status: 'OPEN', updatedAt: '2026-09-14T10:00:00' }],
+    });
+    mockUseChatHook.mockReturnValue({
+      messages: [
+        { id: 'm1', body: 'Halo kak', senderId: 'staff1', senderRole: 'PROVIDER', createdAt: '2026-09-14T10:00:00', attachmentUrl: 'https://x.test/f.png' },
+      ],
+      sendMessage: vi.fn(),
+      connected: true,
+      loading: false,
+      error: null,
+    });
+    renderPage();
+    await waitFor(() => { expect(screen.getByText('Test Chat')).toBeInTheDocument(); });
+    await user.click(screen.getByText('Test Chat'));
+    await waitFor(() => {
+      expect(screen.getByText('Halo kak')).toBeInTheDocument();
+    });
+    expect(screen.getByText('📎 Lampiran')).toBeInTheDocument();
+    expect(screen.getByText('Live')).toBeInTheDocument();
+  });
+
+  it('selecting file shows file name', async () => {
+    const user = userEvent.setup();
+    mockList.mockResolvedValue({
+      data: [{ id: 'c1', subject: 'Test Chat', status: 'OPEN', updatedAt: '2026-09-14T10:00:00' }],
+    });
+    renderPage();
+    await waitFor(() => { expect(screen.getByText('Test Chat')).toBeInTheDocument(); });
+    await user.click(screen.getByText('Test Chat'));
+    await waitFor(() => { expect(screen.getByPlaceholderText(/ketik pesan/i)).toBeInTheDocument(); });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['isi'], 'nota.png', { type: 'image/png' });
+    await user.upload(fileInput, file);
+    expect(screen.getByText(/File: nota.png/)).toBeInTheDocument();
+  });
+
+  it('typing indicator hides after clearing input', async () => {
+    const user = userEvent.setup();
+    mockList.mockResolvedValue({
+      data: [{ id: 'c1', subject: 'Test Chat', status: 'OPEN', updatedAt: '2026-09-14T10:00:00' }],
+    });
+    renderPage();
+    await waitFor(() => { expect(screen.getByText('Test Chat')).toBeInTheDocument(); });
+    await user.click(screen.getByText('Test Chat'));
+    const input = await screen.findByPlaceholderText(/ketik pesan/i);
+    await user.type(input, 'halo');
+    expect(screen.getByText('Mengetik...')).toBeInTheDocument();
+    await user.clear(input);
+    await waitFor(() => {
+      expect(screen.queryByText('Mengetik...')).not.toBeInTheDocument();
     });
   });
 });

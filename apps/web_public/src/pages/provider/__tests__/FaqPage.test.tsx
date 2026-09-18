@@ -212,7 +212,37 @@ describe('FaqPage', () => {
     await waitFor(() => { expect(screen.getByText('Belum ada FAQ')).toBeInTheDocument(); });
     fireEvent.click(screen.getByText(/tambah faq/i));
     await waitFor(() => { expect(screen.getByText('Tambah FAQ')).toBeInTheDocument(); });
-    fireEvent.click(screen.getByText('\u00d7'));
+    fireEvent.click(screen.getByText('×'));
     await waitFor(() => { expect(screen.queryByText('Tambah FAQ')).not.toBeInTheDocument(); });
+  });
+
+  it('FAQ modal Batal button closes form', async () => {
+    renderPage();
+    await waitFor(() => { expect(screen.getByText('Belum ada FAQ')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText(/tambah faq/i));
+    await waitFor(() => { expect(screen.getByText('Tambah FAQ')).toBeInTheDocument(); });
+    const batalBtns = screen.getAllByText('Batal');
+    fireEvent.click(batalBtns[batalBtns.length - 1]);
+    await waitFor(() => { expect(screen.queryByText('Tambah FAQ')).not.toBeInTheDocument(); });
+  });
+
+  it('policy modal Batal button closes form', async () => {
+    renderPage();
+    await waitFor(() => { expect(screen.getByText('Belum ada FAQ')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText(/tambah kebijakan/i));
+    await waitFor(() => { expect(screen.getByText('Tambah Kebijakan')).toBeInTheDocument(); });
+    const batalBtns = screen.getAllByText('Batal');
+    fireEvent.click(batalBtns[batalBtns.length - 1]);
+    await waitFor(() => { expect(screen.queryByText('Tambah Kebijakan')).not.toBeInTheDocument(); });
+  });
+
+  it('policy modal X button closes form', async () => {
+    renderPage();
+    await waitFor(() => { expect(screen.getByText('Belum ada FAQ')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText(/tambah kebijakan/i));
+    await waitFor(() => { expect(screen.getByText('Tambah Kebijakan')).toBeInTheDocument(); });
+    const closeBtns = screen.getAllByText('×');
+    fireEvent.click(closeBtns[closeBtns.length - 1]);
+    await waitFor(() => { expect(screen.queryByText('Tambah Kebijakan')).not.toBeInTheDocument(); });
   });
 });

@@ -213,4 +213,27 @@ describe('CustomerNotificationsPage', () => {
     });
     expect(screen.queryByText('0')).not.toBeInTheDocument();
   });
+
+  it('groups old notifications under Lebih Lama', async () => {
+    (publicApi.notifications.list as any).mockResolvedValue({
+      data: [
+        ...mockNotifications,
+        { id: 'n9', title: 'Notifikasi Lama', message: 'Sudah lama sekali', type: 'BOOKING', read: true, createdAt: new Date(Date.now() - 86400000 * 10).toISOString() },
+      ],
+    });
+    renderNotifications();
+    await waitFor(() => {
+      expect(screen.getByText('Lebih Lama')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Notifikasi Lama')).toBeInTheDocument();
+  });
+
+  it('matchesType returns true for unknown tab (fallback)', async () => {
+    const { matchesType, getDateGroup } = await import('../CustomerNotificationsPage');
+    const n = { id: 'x', title: 't', message: 'm', type: 'BOOKING', read: false, createdAt: new Date().toISOString() } as any;
+    expect(matchesType(n, 'ALL' as any)).toBe(true);
+    expect(matchesType(n, 'BOGUS' as any)).toBe(true);
+    expect(getDateGroup(new Date(Date.now() - 86400000 * 10).toISOString())).toBe('Lebih Lama');
+    expect(getDateGroup(new Date(Date.now() - 86400000 * 5).toISOString())).toBe('Minggu Lalu');
+  });
 });

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -77,5 +77,46 @@ describe('AboutPage', () => {
     expect(screen.getByText('Transparan')).toBeInTheDocument();
     expect(screen.getByText('Real-time')).toBeInTheDocument();
     expect(screen.getByText('Provider-First')).toBeInTheDocument();
+  });
+
+  it('expands FAQ answer and collapses on second click, shows category', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({
+      data: [{ id: '1', question: 'Bagaimana cara booking?', answer: 'Pilih layanan lalu jadwal.', category: 'Booking' }],
+    });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    renderAbout();
+    await waitFor(() => {
+      expect(screen.getByText('Bagaimana cara booking?')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Booking')).toBeInTheDocument();
+    expect(screen.queryByText('Pilih layanan lalu jadwal.')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('Bagaimana cara booking?'));
+    expect(screen.getByText('Pilih layanan lalu jadwal.')).toBeInTheDocument();
+    fireEvent.click(screen.getByText('Bagaimana cara booking?'));
+    await waitFor(() => {
+      expect(screen.queryByText('Pilih layanan lalu jadwal.')).not.toBeInTheDocument();
+    });
+  });
+
+  it('renders policies list and empty policies message', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({
+      data: [{ id: 'p1', title: 'Kebijakan Refund', body: 'Refund penuh sebelum 24 jam.', type: 'refund' }],
+    });
+    renderAbout();
+    await waitFor(() => {
+      expect(screen.getByText('Kebijakan Refund')).toBeInTheDocument();
+    });
+    expect(screen.getByText('refund')).toBeInTheDocument();
+    expect(screen.getByText('Refund penuh sebelum 24 jam.')).toBeInTheDocument();
+  });
+
+  it('shows empty policies message when no policies', async () => {
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    renderAbout();
+    await waitFor(() => {
+      expect(screen.getByText('Belum ada kebijakan.')).toBeInTheDocument();
+    });
   });
 });

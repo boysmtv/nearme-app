@@ -98,6 +98,11 @@ describe('CustomerReviewsPage', () => {
     expect(screen.getByText('Barber Shop')).toBeInTheDocument();
     expect(screen.getByText('Terulas')).toBeInTheDocument();
     expect(screen.getByText('Great!')).toBeInTheDocument();
+    // Click back to Belum Diulas tab
+    fireEvent.click(screen.getByText('Belum Diulas'));
+    await waitFor(() => {
+      expect(screen.getByText(/Semua booking sudah diulas/i)).toBeInTheDocument();
+    });
   });
 
   it('shows average rating in stats', async () => {

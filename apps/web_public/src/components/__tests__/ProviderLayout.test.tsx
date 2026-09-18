@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { describe, it, expect, vi } from 'vitest';
 import ProviderLayout from '../ProviderLayout';
@@ -40,5 +40,16 @@ describe('ProviderLayout', () => {
   it('renders logout button', () => {
     renderProviderLayout();
     expect(screen.getByText('Keluar')).toBeInTheDocument();
+  });
+
+  it('navigates home when clicking Lihat Publik', () => {
+    renderProviderLayout();
+    fireEvent.click(screen.getByText('Lihat Publik'));
+    expect(screen.getByTestId('child')).toBeInTheDocument();
+  });
+
+  it('calls logout when clicking Keluar', () => {
+    renderProviderLayout();
+    fireEvent.click(screen.getByText('Keluar'));
   });
 });

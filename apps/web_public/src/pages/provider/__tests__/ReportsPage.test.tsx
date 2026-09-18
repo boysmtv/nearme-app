@@ -30,12 +30,24 @@ vi.mock('recharts', () => ({
   BarChart: ({ children }: any) => <div>{children}</div>,
   Bar: () => null,
   PieChart: ({ children }: any) => <div>{children}</div>,
-  Pie: () => null,
+  Pie: (props: any) => {
+    if (typeof props?.label === 'function') props.label({ name: 'Lihat', value: 10 });
+    return <div>{props?.children}</div>;
+  },
   Cell: () => null,
-  XAxis: () => null,
-  YAxis: () => null,
+  XAxis: (props: any) => {
+    if (typeof props?.tickFormatter === 'function') props.tickFormatter('2026-09-15');
+    return null;
+  },
+  YAxis: (props: any) => {
+    if (typeof props?.tickFormatter === 'function') props.tickFormatter(5000);
+    return null;
+  },
   CartesianGrid: () => null,
-  Tooltip: () => null,
+  Tooltip: (props: any) => {
+    if (typeof props?.formatter === 'function') props.formatter(75000);
+    return null;
+  },
   Legend: () => null,
 }));
 

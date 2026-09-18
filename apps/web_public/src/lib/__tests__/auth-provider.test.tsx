@@ -536,4 +536,25 @@ describe('auth-provider', () => {
 
     expect(result.current.user?.role).toBe('ROLE_UNKNOWN');
   });
+
+  it('refreshUser with malformed token payload falls back to defaults', async () => {
+    localStorage.setItem('auth_token', 'aaa.%%%.ccc');
+    mockGetProfile.mockRejectedValue(new Error('nope'));
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    act(() => {
+      result.current.refreshUser();
+    });
+    expect(result.current.user?.id).toBe('');
+    expect(result.current.user?.role).toBe('ROLE_CUSTOMER');
+  });
+
+  it('refreshUser with two-part token returns null payload safely', async () => {
+    localStorage.setItem('auth_token', 'onlyonepart');
+    mockGetProfile.mockRejectedValue(new Error('nope'));
+    const { result } = renderHook(() => useAuth(), { wrapper });
+    act(() => {
+      result.current.refreshUser();
+    });
+    expect(result.current.user?.email).toBe('');
+  });
 });

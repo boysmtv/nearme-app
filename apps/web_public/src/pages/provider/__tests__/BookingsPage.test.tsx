@@ -272,4 +272,111 @@ describe('BookingsPage (provider)', () => {
       expect(screen.getByText('Data tidak ditemukan')).toBeInTheDocument();
     });
   });
+
+  it('opens detail modal when clicking table row', async () => {
+    const user = userEvent.setup();
+    mockGetById.mockResolvedValue({
+      data: { ...bookings[0], customerPhone: '081234567890', confirmationPin: '123456' },
+    });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('DKT-001')).toBeInTheDocument();
+    });
+    const row = screen.getByText('DKT-001').closest('tr') as HTMLElement;
+    await user.click(row);
+    await waitFor(() => {
+      expect(screen.getByText('Detail Booking')).toBeInTheDocument();
+    });
+    expect(mockGetById).toHaveBeenCalledWith('b1');
+  });
+
+  it('navigates to previous page when clicking Sebelumnya', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText(/Halaman/)).toBeInTheDocument();
+    });
+    await user.click(screen.getByRole('button', { name: /berikutnya/i }));
+    await waitFor(() => {
+      expect(mockList).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }));
+    });
+    await user.click(screen.getByRole('button', { name: /sebelumnya/i }));
+    await waitFor(() => {
+      expect(mockList).toHaveBeenCalledWith(expect.objectContaining({ page: 1 }));
+    });
+  });
+
+  it('closes detail modal when clicking backdrop', async () => {
+    const user = userEvent.setup();
+    mockGetById.mockResolvedValue({
+      data: { ...bookings[0], customerPhone: '081234567890', confirmationPin: '123456' },
+    });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('DKT-001')).toBeInTheDocument();
+    });
+    await user.click(screen.getAllByText('Detail')[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Detail Booking')).toBeInTheDocument();
+    });
+    const backdrop = document.querySelector('.fixed.inset-0') as HTMLElement;
+    await user.click(backdrop);
+    await waitFor(() => {
+      expect(screen.queryByText('Detail Booking')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows Selesai button for IN_PROGRESS booking', async () => {
+    const user = userEvent.setup();
+    mockGetById.mockResolvedValue({
+      data: { id: 'b5', bookingCode: 'DKT-005', status: 'IN_PROGRESS', customerName: 'Fajar', serviceName: 'Haircut', staffName: 'Andi', totalAmount: 60000, slotTime: '2026-09-15T10:00:00+07:00', customerPhone: '0812', confirmationPin: '999999' },
+    });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('DKT-001')).toBeInTheDocument();
+    });
+    await user.click(screen.getAllByText('Detail')[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Detail Booking')).toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', { name: /selesai/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /mulai/i })).not.toBeInTheDocument();
+  });
+
+  it('shows Batalkan button for PENDING_PAYMENT booking', async () => {
+    const user = userEvent.setup();
+    mockGetById.mockResolvedValue({
+      data: { ...bookings[1], customerPhone: '081234567890', confirmationPin: '123456' },
+    });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('DKT-001')).toBeInTheDocument();
+    });
+    await user.click(screen.getAllByText('Detail')[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Detail Booking')).toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', { name: /batalkan/i })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /mulai/i })).not.toBeInTheDocument();
+  });
+
+  it('shows no status buttons for COMPLETED booking', async () => {
+    const user = userEvent.setup();
+    mockGetById.mockResolvedValue({
+      data: { ...bookings[2], customerPhone: '081234567890', confirmationPin: '123456' },
+    });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('DKT-001')).toBeInTheDocument();
+    });
+    await user.click(screen.getAllByText('Detail')[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Detail Booking')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Update Status:')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /mulai/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /selesai/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /batalkan/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /tidak hadir/i })).not.toBeInTheDocument();
+  });
 });

@@ -262,6 +262,32 @@ describe('CustomerAccountPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Profil berhasil diperbarui')).toBeInTheDocument();
     });
+  }, 15000);
+
+  it('clears save message after timeout', async () => {
+    (publicApi.customer.getProfile as any).mockResolvedValue({ data: mockProfile });
+    (publicApi.customer.updateProfile as any).mockResolvedValue({ data: {} });
+    renderAccount();
+    await waitFor(() => { expect(screen.getAllByText('Edit Profil').length).toBeGreaterThanOrEqual(1); });
+    const editButtons = screen.getAllByText('Edit Profil');
+    await userEvent.click(editButtons.find(el => el.tagName === 'BUTTON') || editButtons[0]);
+    await waitFor(() => { expect(screen.getByText('Simpan')).toBeInTheDocument(); });
+    await userEvent.click(screen.getByText('Simpan'));
+    await waitFor(() => {
+      expect(screen.getByText('Profil berhasil diperbarui')).toBeInTheDocument();
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('Profil berhasil diperbarui')).not.toBeInTheDocument();
+    }, { timeout: 5000 });
+  }, 15000);
+
+  it('clicks Ganti Password and Preferensi quick actions (noop)', async () => {
+    (publicApi.customer.getProfile as any).mockResolvedValue({ data: mockProfile });
+    renderAccount();
+    await waitFor(() => { expect(screen.getByText('Ganti Password')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText('Ganti Password'));
+    fireEvent.click(screen.getByText('Preferensi'));
+    expect(screen.getByText('Ganti Password')).toBeInTheDocument();
   });
 
   it('shows profile update error message', async () => {

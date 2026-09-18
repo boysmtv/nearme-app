@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -476,6 +476,198 @@ describe('PromotionsPage', () => {
       });
       expect(screen.getByText('5')).toBeInTheDocument();
       expect(screen.getByText('Rp 250.000')).toBeInTheDocument();
+    });
+
+    it('renders all loyalty history entry types with styles', async () => {
+      const user = userEvent.setup();
+      mockLoyaltyHistory.mockResolvedValue({
+        data: [
+          { createdAt: '2026-09-01T10:00:00', type: 'EXPIRE', points: 5, description: 'Kadaluarsa' },
+          { createdAt: '2026-09-02T10:00:00', type: 'ADJUST', points: 7, description: 'Penyesuaian' },
+          { createdAt: null, type: 'UNKNOWN', points: 0, description: '' },
+        ],
+      });
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Loyalitas' }));
+      await waitFor(() => {
+        expect(screen.getByText('Siti')).toBeInTheDocument();
+      });
+      await user.click(screen.getAllByText('Lihat Riwayat')[0]);
+      await waitFor(() => {
+        expect(screen.getByText('EXPIRE')).toBeInTheDocument();
+      });
+      expect(screen.getByText('ADJUST')).toBeInTheDocument();
+      expect(screen.getAllByText('-').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('edits earn form fields and cancels', async () => {
+      const user = userEvent.setup();
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Loyalitas' }));
+      await waitFor(() => {
+        expect(screen.getByText('Siti')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /beri poin/i }));
+      const pointsInput = screen.getByDisplayValue('10') as HTMLInputElement;
+      fireEvent.change(pointsInput, { target: { value: '25' } });
+      expect(pointsInput.value).toBe('25');
+      const descInput = screen.getByPlaceholderText('Booking selesai');
+      fireEvent.change(descInput, { target: { value: 'Bonus' } });
+      expect(descInput).toHaveValue('Bonus');
+      await user.click(screen.getByText('Batal'));
+      expect(screen.queryByText('Beri Poin Loyalitas')).not.toBeInTheDocument();
+    });
+
+    it('closes loyalty history modal', async () => {
+      const user = userEvent.setup();
+      mockLoyaltyHistory.mockResolvedValue({ data: [] });
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Loyalitas' }));
+      await waitFor(() => {
+        expect(screen.getByText('Siti')).toBeInTheDocument();
+      });
+      await user.click(screen.getAllByText('Lihat Riwayat')[0]);
+      await waitFor(() => {
+        expect(screen.getByText('Belum ada riwayat poin')).toBeInTheDocument();
+      });
+      await user.click(screen.getByText('✕'));
+      await waitFor(() => {
+        expect(screen.queryByText('Riwayat Loyalitas')).not.toBeInTheDocument();
+      });
+    });
+
+    it('shows earn pending state', async () => {
+      const user = userEvent.setup();
+      mockLoyaltyEarn.mockReturnValue(new Promise(() => {}));
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Loyalitas' }));
+      await waitFor(() => {
+        expect(screen.getByText('Siti')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /beri poin/i }));
+      const customerSelect = screen.getAllByRole('combobox')[0];
+      await user.selectOptions(customerSelect, 'cust1');
+      await user.click(screen.getAllByText('Simpan')[0]);
+      await waitFor(() => {
+        expect(screen.getByText('Menyimpan...')).toBeInTheDocument();
+      });
+    });
+
+    it('edits coupon type and numeric fields in edit form', async () => {
+      const user = userEvent.setup();
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getAllByText('Edit')[0]);
+      const selects = screen.getAllByRole('combobox');
+      await user.selectOptions(selects[selects.length - 1], 'FIXED');
+      const numInputs = screen.getAllByPlaceholderText('20');
+      fireEvent.change(numInputs[0], { target: { value: '30' } });
+      const maxInputs = screen.getAllByPlaceholderText('100');
+      fireEvent.change(maxInputs[0], { target: { value: '200' } });
+      expect(numInputs[0]).toHaveValue(30);
+    });
+
+    it('cancels edit coupon form', async () => {
+      const user = userEvent.setup();
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getAllByText('Edit')[0]);
+      expect(screen.getByText('Edit Kupon')).toBeInTheDocument();
+      const batalBtns = screen.getAllByText('Batal');
+      await user.click(batalBtns[batalBtns.length - 1]);
+      await waitFor(() => {
+        expect(screen.queryByText('Edit Kupon')).not.toBeInTheDocument();
+      });
+    });
+
+    it('changes campaign type and dates then cancels', async () => {
+      const user = userEvent.setup();
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Kampanye' }));
+      await waitFor(() => {
+        expect(screen.getByText('Promo Lebaran')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /buat kampanye/i }));
+      const typeSelect = screen.getByDisplayValue('Diskon');
+      await user.selectOptions(typeSelect, 'REFERRAL');
+      const dateInputs = document.querySelectorAll('input[type="date"]');
+      fireEvent.change(dateInputs[0], { target: { value: '2026-10-01' } });
+      fireEvent.change(dateInputs[1], { target: { value: '2026-10-31' } });
+      expect((dateInputs[0] as HTMLInputElement).value).toBe('2026-10-01');
+      const batalBtns = screen.getAllByText('Batal');
+      await user.click(batalBtns[batalBtns.length - 1]);
+      await waitFor(() => {
+        expect(screen.queryByText('Kampanye Baru')).not.toBeInTheDocument();
+      });
+    });
+
+    it('shows campaign create pending state', async () => {
+      const user = userEvent.setup();
+      mockCampaignsCreate.mockReturnValue(new Promise(() => {}));
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Kampanye' }));
+      await waitFor(() => {
+        expect(screen.getByText('Promo Lebaran')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: /buat kampanye/i }));
+      await user.type(screen.getByPlaceholderText('Promo Lebaran'), 'X');
+      await user.click(screen.getAllByText('Simpan')[0]);
+      await waitFor(() => {
+        expect(screen.getByText('Menyimpan...')).toBeInTheDocument();
+      });
+    });
+
+    it('shows campaigns loading skeletons', async () => {
+      const user = userEvent.setup();
+      mockCampaignsList.mockReturnValue(new Promise(() => {}));
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Kampanye' }));
+      await waitFor(() => {
+        expect(screen.getByText('Kelola kampanye promosi aktif')).toBeInTheDocument();
+      });
+      expect(document.querySelectorAll('.animate-pulse').length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('shows empty history on loyalty history failure', async () => {
+      const user = userEvent.setup();
+      mockLoyaltyHistory.mockRejectedValue(new Error('gagal'));
+      renderPage();
+      await waitFor(() => {
+        expect(screen.getByText('DISKON20')).toBeInTheDocument();
+      });
+      await user.click(screen.getByRole('button', { name: 'Loyalitas' }));
+      await waitFor(() => {
+        expect(screen.getByText('Siti')).toBeInTheDocument();
+      });
+      await user.click(screen.getAllByText('Lihat Riwayat')[0]);
+      await waitFor(() => {
+        expect(screen.getByText('Belum ada riwayat poin')).toBeInTheDocument();
+      });
     });
   });
 });

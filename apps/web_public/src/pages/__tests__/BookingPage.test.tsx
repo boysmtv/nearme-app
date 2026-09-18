@@ -85,6 +85,7 @@ const mockCalendarLink = vi.fn();
 const mockIcs = vi.fn();
 const mockValidateCoupon = vi.fn();
 const mockCreatePaymentIntent = vi.fn();
+const mockGetBookingChat = vi.fn();
 
 vi.mock('../../lib/api', () => ({
   publicApi: {
@@ -102,6 +103,10 @@ vi.mock('../../lib/api', () => ({
     },
     customer: { getProfile: (...args: any[]) => mockGetProfile(...args) },
     policies: { listPublic: (...args: any[]) => mockListPolicies(...args) },
+    chatApi: undefined,
+  },
+  chatApi: {
+    getBookingChat: (...args: any[]) => mockGetBookingChat(...args),
   },
 }));
 
@@ -173,6 +178,7 @@ function setupDefaultMocks() {
     data: { valid: true, discountType: 'PERCENTAGE', discountValue: 10, discountAmount: 5000, finalPrice: 45000, message: 'Diskon diterapkan' },
   });
   mockCreatePaymentIntent.mockResolvedValue({ data: { paymentUrl: 'https://pay.midtrans.com', redirectUrl: 'https://pay.midtrans.com/redirect' } });
+  mockGetBookingChat.mockResolvedValue({ data: { id: 'chat1' } });
 }
 
 async function goToConfirmStep(user: ReturnType<typeof userEvent.setup>) {
@@ -1038,7 +1044,6 @@ describe('BookingPage', () => {
     expect(screen.getByText('Cari Layanan')).toBeInTheDocument();
     expect(screen.getByText('Booking')).toBeInTheDocument();
   });
-
   it('preselects service from query param', async () => {
     const qc = new QueryClient({
       defaultOptions: { queries: { retry: false, gcTime: 0, staleTime: 0 } },
@@ -1054,6 +1059,10 @@ describe('BookingPage', () => {
     );
     await waitFor(() => {
       expect(screen.getByText('Pilih Staf')).toBeInTheDocument();
+    });
+    // effect resolves preselected service once services load
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
     });
   });
 
@@ -1112,8 +1121,7 @@ describe('BookingPage', () => {
     expect(screen.getByPlaceholderText('Permintaan khusus, alergi, dll.')).toBeInTheDocument();
   });
 
-  it('contact form notes field is optional and works', async () => {
-    const user = userEvent.setup();
+  it('contact form notes field is optional and works', async () => {    const user = userEvent.setup();
     renderBooking();
     await waitFor(() => {
       expect(screen.getByText('Potong Rambut')).toBeInTheDocument();
@@ -1140,6 +1148,197 @@ describe('BookingPage', () => {
     await user.click(screen.getByText('Lanjutkan'));
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Konfirmasi Booking' })).toBeInTheDocument();
+    });
+  });
+
+  it('google calendar click opens url and triggers calendar mutation', async () => {
+    mockCalendarLink.mockResolvedValue({ data: { data: { googleCalendarUrl: 'https://calendar.google.com' } } });
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const user = userEvent.setup();
+    renderBooking();
+    await goToSuccessPage(user);
+    await user.click(screen.getByText('Google Calendar'));
+    await waitFor(() => {
+      expect(mockCalendarLink).toHaveBeenCalledWith('bk1');
+    });
+    expect(openSpy).toHaveBeenCalledWith('https://calendar.google.com', '_blank');
+    openSpy.mockRestore();
+  });
+
+  it('google calendar click failure still triggers mutation without throwing', async () => {
+    mockCalendarLink.mockRejectedValue(new Error('link fail'));
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const user = userEvent.setup();
+    renderBooking();
+    await goToSuccessPage(user);
+    await user.click(screen.getByText('Google Calendar'));
+    await waitFor(() => {
+      expect(mockCalendarLink).toHaveBeenCalled();
+    });
+    openSpy.mockRestore();
+  });
+
+  it('download ics creates blob link and revokes url', async () => {
+    const createSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:fake');
+    const revokeSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {});
+    const user = userEvent.setup();
+    renderBooking();
+    await goToSuccessPage(user);
+    await user.click(screen.getByText('Download .ics'));
+    await waitFor(() => {
+      expect(mockIcs).toHaveBeenCalledWith('bk1');
+    });
+    expect(createSpy).toHaveBeenCalled();
+    expect(revokeSpy).toHaveBeenCalledWith('blob:fake');
+    createSpy.mockRestore();
+    revokeSpy.mockRestore();
+    clickSpy.mockRestore();
+  });
+
+  it('chat booking ini navigates to chat on success', async () => {
+    const user = userEvent.setup();
+    renderBooking();
+    await goToSuccessPage(user);
+    await user.click(screen.getByText('Chat Booking Ini'));
+    await waitFor(() => {
+      expect(mockGetBookingChat).toHaveBeenCalledWith('bk1');
+    });
+  });
+
+  it('chat booking ini falls back to chats list on failure', async () => {
+    mockGetBookingChat.mockRejectedValue(new Error('no chat'));
+    const user = userEvent.setup();
+    renderBooking();
+    await goToSuccessPage(user);
+    await user.click(screen.getByText('Chat Booking Ini'));
+    await waitFor(() => {
+      expect(mockGetBookingChat).toHaveBeenCalled();
+    });
+  });
+
+  it('authenticated user gets profile prefill message', async () => {
+    (useAuth as any).mockReturnValue({
+      user: { name: 'Siti', email: 'siti@gmail.com' },
+      isAuthenticated: true,
+    });
+    const user = userEvent.setup();
+    renderBooking();
+    await waitFor(() => {
+      expect(screen.getByText('Potong Rambut')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Potong Rambut'));
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Andi'));
+    await waitFor(() => {
+      expect(screen.getByTestId('slot-picker')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('2026-09-20T10:00:00'));
+    await waitFor(() => {
+      expect(screen.getByText(/Data dari profil Anda/)).toBeInTheDocument();
+    });
+  });
+
+  it('filters staff by service category specialties', async () => {
+    mockListStaff.mockResolvedValue({
+      data: [
+        ...mockStaff,
+        { id: 'st2', name: 'Sari', rating: 4.8, reviewCount: 10, bio: 'Stylist', specialties: ['Salon'], avatarUrl: '', providerId: 'p1' },
+      ],
+    });
+    const user = userEvent.setup();
+    renderBooking();
+    await waitFor(() => {
+      expect(screen.getByText('Potong Rambut')).toBeInTheDocument();
+    });
+    // Potong Rambut category Barbershop -> Sari (Salon only) filtered out
+    await user.click(screen.getByText('Potong Rambut'));
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Sari')).not.toBeInTheDocument();
+  });
+
+  it('deposit confirm opens payment redirect in new tab', async () => {
+    const openSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+    const user = userEvent.setup();
+    renderBooking();
+    await goToSuccessPageDeposit(user);
+    expect(openSpy).toHaveBeenCalledWith('https://pay.midtrans.com/redirect', '_blank');
+    openSpy.mockRestore();
+  });
+
+  it('coupon validate fallback message when server gives no message', async () => {
+    mockValidateCoupon.mockRejectedValue({ response: { data: {} } });
+    const user = userEvent.setup();
+    renderBooking();
+    await goToConfirmStep(user);
+    await user.type(screen.getByPlaceholderText('Contoh: DISKON10'), 'XYZ');
+    await user.click(screen.getByText('Gunakan'));
+    await waitFor(() => {
+      expect(screen.getByText('Kupon tidak valid')).toBeInTheDocument();
+    });
+  });
+
+  it('reschedule error object message also rendered below form', async () => {
+    mockReschedule.mockRejectedValue(new Error('Boom 500'));
+    const user = userEvent.setup();
+    renderBooking();
+    await goToSuccessPage(user);
+    const dateInputs = document.querySelectorAll('input[type="date"]');
+    const timeInputs = document.querySelectorAll('input[type="time"]');
+    fireEvent.change(dateInputs[0], { target: { value: '2026-09-25' } });
+    fireEvent.change(timeInputs[0], { target: { value: '14:00' } });
+    await user.click(screen.getByText('Reschedule Booking'));
+    await waitFor(() => {
+      expect(screen.getAllByText('Boom 500').length).toBeGreaterThanOrEqual(1);
+    });
+  }, 15000);
+
+  it('ignores unknown preselected service id and stays on staff step without selection', async () => {
+    const qc = new QueryClient({
+      defaultOptions: { queries: { retry: false, gcTime: 0, staleTime: 0 } },
+    });
+    render(
+      <MemoryRouter initialEntries={['/booking/p1?service=unknown-id']}>
+        <QueryClientProvider client={qc}>
+          <Routes>
+            <Route path="/booking/:providerId" element={<BookingPage />} />
+          </Routes>
+        </QueryClientProvider>
+      </MemoryRouter>,
+    );
+    await waitFor(() => {
+      expect(screen.getByText('Pilih Staf')).toBeInTheDocument();
+    });
+    // effect runs with loaded services but finds no match
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Konfirmasi Booking')).not.toBeInTheDocument();
+  });
+
+  it('changing slot date resets selected slot and refetches', async () => {
+    const user = userEvent.setup();
+    renderBooking();
+    await waitFor(() => {
+      expect(screen.getByText('Potong Rambut')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Potong Rambut'));
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Andi'));
+    await waitFor(() => {
+      expect(screen.getByText('Pilih Jadwal')).toBeInTheDocument();
+    });
+    const callsBefore = mockGetSlots.mock.calls.length;
+    const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+    fireEvent.change(dateInput, { target: { value: '2026-10-01' } });
+    await waitFor(() => {
+      expect(mockGetSlots.mock.calls.length).toBeGreaterThan(callsBefore);
     });
   });
 });

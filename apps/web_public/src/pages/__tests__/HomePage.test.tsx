@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -104,6 +104,20 @@ describe('HomePage', () => {
     renderHome();
     await waitFor(() => {
       expect(screen.getByText(/belum ada provider unggulan/i)).toBeInTheDocument();
+    });
+  });
+
+  it('shows categories error with retry button', async () => {
+    (publicApi.categories.list as any).mockRejectedValue(new Error('gagal'));
+    (publicApi.providers.getFeatured as any).mockResolvedValue({ data: [] });
+    renderHome();
+    await waitFor(() => {
+      expect(screen.getByText('Gagal memuat kategori')).toBeInTheDocument();
+    });
+    (publicApi.categories.list as any).mockResolvedValue({ data: [] });
+    fireEvent.click(screen.getByText('Coba Lagi'));
+    await waitFor(() => {
+      expect(publicApi.categories.list).toHaveBeenCalled();
     });
   });
 });

@@ -69,7 +69,7 @@ const AdminFaqsPage = lazy(() => import('./pages/admin/FaqsPage'));
 const AdminRolesPage = lazy(() => import('./pages/admin/RolesPage'));
 const AdminChatPage = lazy(() => import('./pages/admin/ChatPage'));
 
-class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+export class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
   state: { hasError: boolean; error: Error | null } = { hasError: false, error: null };
   static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
   render() {
@@ -87,7 +87,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
 }
 
-function LoadingFallback() {
+export function LoadingFallback() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary-500 border-t-transparent" />
@@ -95,7 +95,7 @@ function LoadingFallback() {
   );
 }
 
-function NotFound() {
+export function NotFound() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4 text-center">
       <p className="text-6xl font-bold text-primary-600">404</p>
@@ -111,14 +111,14 @@ function NotFound() {
   );
 }
 
-function ProfileCompleteGuard({ children }: { children: React.ReactNode }) {
+export function ProfileCompleteGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth();
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (user?.hasProfile) return <Navigate to="/" replace />;
   return <>{children}</>;
 }
 
-function CustomerDashboardOrHome() {
+export function CustomerDashboardOrHome() {
   const { isAuthenticated, user } = useAuth();
   if (isAuthenticated && user?.role === 'ROLE_CUSTOMER') {
     return <CustomerDashboardPage />;
@@ -126,7 +126,7 @@ function CustomerDashboardOrHome() {
   return <HomePage />;
 }
 
-function RequireProfileGuard({ children }: { children: React.ReactNode }) {
+export function RequireProfileGuard({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, user } = useAuth();
   if (isAuthenticated && user && !user.hasProfile && user.role === 'ROLE_CUSTOMER') {
     return <Navigate to="/profile/complete" replace />;

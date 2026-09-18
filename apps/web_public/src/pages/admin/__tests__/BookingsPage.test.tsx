@@ -141,4 +141,42 @@ describe('web_public admin BookingsPage', () => {
       expect(screen.getByText('Export CSV')).toBeInTheDocument();
     });
   });
+
+  it('exports CSV via downloadBlob', async () => {
+    (adminApi.bookings.list as any).mockResolvedValue({ data: { data: [], pagination: { page: 1, totalPages: 1, total: 0, limit: 20 } } });
+    (adminApi.export.bookings as any).mockResolvedValue(new Blob(['a,b'], { type: 'text/csv' }));
+    const createSpy = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:bookings');
+    const revokeSpy = vi.spyOn(URL, 'revokeObjectURL').mockImplementation(() => {});
+    const clickSpy = vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(function (this: HTMLAnchorElement) {});
+    const user = userEvent.setup();
+    renderBookingsPage();
+    await waitFor(() => {
+      expect(screen.getByText('Export CSV')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Export CSV'));
+    await waitFor(() => {
+      expect(adminApi.export.bookings).toHaveBeenCalledWith('csv');
+    });
+    expect(createSpy).toHaveBeenCalled();
+    expect(revokeSpy).toHaveBeenCalledWith('blob:bookings');
+    createSpy.mockRestore();
+    revokeSpy.mockRestore();
+    clickSpy.mockRestore();
+  });
+
+  it('export failure logs error and resets button', async () => {
+    (adminApi.bookings.list as any).mockResolvedValue({ data: { data: [], pagination: { page: 1, totalPages: 1, total: 0, limit: 20 } } });
+    (adminApi.export.bookings as any).mockRejectedValue(new Error('gagal'));
+    const errSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const user = userEvent.setup();
+    renderBookingsPage();
+    await waitFor(() => {
+      expect(screen.getByText('Export CSV')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Export CSV'));
+    await waitFor(() => {
+      expect(screen.getByText('Export CSV')).toBeInTheDocument();
+    });
+    errSpy.mockRestore();
+  });
 });

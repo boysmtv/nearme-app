@@ -218,4 +218,54 @@ describe('RecurringBookingsPage', () => {
     const select = screen.getByRole('combobox');
     expect(select).toBeInTheDocument();
   });
+
+  it('selects booking and creates recurring entry', async () => {
+    const user = userEvent.setup();
+    mockBookingsList.mockResolvedValue({ data: [{ id: 'b1', serviceName: 'Haircut', providerName: 'Barber', bookingCode: 'DKT-001' }] });
+    mockPost.mockResolvedValue({ data: { id: 'rb9' } });
+    renderPage();
+    await waitFor(() => { expect(screen.getByText(/belum ada booking berulang/i)).toBeInTheDocument(); });
+    await user.click(screen.getByRole('button', { name: /buat baru/i }));
+    const select = screen.getByRole('combobox');
+    await user.selectOptions(select, 'b1');
+    const submitBtn = screen.getByRole('button', { name: /buat berulang/i });
+    expect(submitBtn).not.toBeDisabled();
+    await user.click(submitBtn);
+    await waitFor(() => {
+      expect(mockPost).toHaveBeenCalledWith('/customer/recurring-bookings', { bookingId: 'b1', frequency: 'WEEKLY' });
+    });
+    await waitFor(() => {
+      expect(screen.queryByText('Buat Booking Berulang')).not.toBeInTheDocument();
+    });
+  });
+
+  it('shows pending state while creating', async () => {
+    const user = userEvent.setup();
+    mockBookingsList.mockResolvedValue({ data: [{ id: 'b1', serviceName: 'Haircut', providerName: 'Barber', bookingCode: 'DKT-001' }] });
+    mockPost.mockReturnValue(new Promise(() => {}));
+    renderPage();
+    await waitFor(() => { expect(screen.getByText(/belum ada booking berulang/i)).toBeInTheDocument(); });
+    await user.click(screen.getByRole('button', { name: /buat baru/i }));
+    await user.selectOptions(screen.getByRole('combobox'), 'b1');
+    await user.click(screen.getByRole('button', { name: /buat berulang/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Membuat...')).toBeInTheDocument();
+    });
+  });
+
+  it('closes create modal via X button', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => { expect(screen.getByText(/belum ada booking berulang/i)).toBeInTheDocument(); });
+    await user.click(screen.getByRole('button', { name: /buat baru/i }));
+    await waitFor(() => { expect(screen.getByText('Buat Booking Berulang')).toBeInTheDocument(); });
+    const closeBtn = Array.from(document.querySelectorAll('button')).find(b =>
+      b.innerHTML.includes('M6 18L18 6M6 6l12 12'),
+    ) as HTMLElement;
+    expect(closeBtn).not.toBeUndefined();
+    await user.click(closeBtn);
+    await waitFor(() => {
+      expect(screen.queryByText('Buat Booking Berulang')).not.toBeInTheDocument();
+    });
+  });
 });

@@ -250,4 +250,74 @@ describe('ServiceBundlesPage', () => {
     const skeletonPulse = document.querySelectorAll('.animate-pulse');
     expect(skeletonPulse.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('computes FIXED discount final price', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Paket Hemat')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByRole('button', { name: /buat paket/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Buat Paket Layanan')).toBeInTheDocument();
+    });
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    fireEvent.click(checkboxes[0]);
+    fireEvent.click(checkboxes[1]);
+    // s1 + s2 = Rp 200.000 normal
+    fireEvent.change(screen.getByPlaceholderText('10'), { target: { value: '50000' } });
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'FIXED' } });
+    await waitFor(() => {
+      expect(screen.getByText('Rp 150.000')).toBeInTheDocument();
+    });
+  });
+
+  it('updates bundle description field', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Paket Hemat')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByRole('button', { name: /buat paket/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Buat Paket Layanan')).toBeInTheDocument();
+    });
+    const desc = screen.getByPlaceholderText('Deskripsi singkat paket') as HTMLTextAreaElement;
+    fireEvent.change(desc, { target: { value: 'Deskripsi paket baru' } });
+    expect(desc.value).toBe('Deskripsi paket baru');
+  });
+
+  it('deselects a service when unchecked', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Paket Hemat')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByRole('button', { name: /buat paket/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Pilih Layanan')).toBeInTheDocument();
+    });
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]') as NodeListOf<HTMLInputElement>;
+    fireEvent.click(checkboxes[0]);
+    fireEvent.click(checkboxes[1]);
+    await waitFor(() => {
+      expect(screen.getByText(/Total Harga Normal/)).toBeInTheDocument();
+    });
+    fireEvent.click(checkboxes[1]);
+    expect(checkboxes[1].checked).toBe(false);
+    expect(checkboxes[0].checked).toBe(true);
+  });
+
+  it('closes form when clicking backdrop', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Paket Hemat')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByRole('button', { name: /buat paket/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Buat Paket Layanan')).toBeInTheDocument();
+    });
+    const backdrop = document.querySelector('.fixed.inset-0') as HTMLElement;
+    fireEvent.click(backdrop);
+    await waitFor(() => {
+      expect(screen.queryByText('Buat Paket Layanan')).not.toBeInTheDocument();
+    });
+  });
 });

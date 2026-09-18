@@ -137,4 +137,33 @@ describe('NotificationsPage (provider)', () => {
     renderPage();
     await waitFor(() => { expect(screen.getByText('Tidak ada notifikasi')).toBeInTheDocument(); });
   });
+
+  it('marks unread notification as read on click', async () => {
+    const user = userEvent.setup();
+    mockList.mockResolvedValue({ data: { data: [
+      { id: 'n1', title: 'Unread notif', message: 'Msg', type: 'BOOKING_NEW', read: false, createdAt: new Date().toISOString() },
+    ] } });
+    (providerApi.notifications.markRead as ReturnType<typeof vi.fn>).mockResolvedValue({ data: {} });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Unread notif')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Unread notif'));
+    await waitFor(() => {
+      expect(providerApi.notifications.markRead).toHaveBeenCalledWith('n1');
+    });
+  });
+
+  it('clicking read notification does not call markRead', async () => {
+    const user = userEvent.setup();
+    mockList.mockResolvedValue({ data: { data: [
+      { id: 'n1', title: 'Read notif', message: 'Msg', type: 'BOOKING_NEW', read: true, createdAt: new Date().toISOString() },
+    ] } });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Read notif')).toBeInTheDocument();
+    });
+    await user.click(screen.getByText('Read notif'));
+    expect(providerApi.notifications.markRead).not.toHaveBeenCalled();
+  });
 });

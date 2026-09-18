@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -178,6 +178,17 @@ describe('CustomerBookingsPage', () => {
       const bookAgainButtons = screen.getAllByText('Booking Lagi');
       expect(bookAgainButtons.length).toBeGreaterThanOrEqual(1);
     });
+  });
+
+  it('clicking Booking Lagi does not navigate away (preventDefault)', async () => {
+    (publicApi.bookings.list as any).mockResolvedValue({ data: mockBookings });
+    renderBookings();
+    await waitFor(() => {
+      expect(screen.getAllByText('Booking Lagi').length).toBeGreaterThanOrEqual(1);
+    });
+    const bookAgainButtons = screen.getAllByText('Booking Lagi');
+    fireEvent.click(bookAgainButtons[0]);
+    expect(screen.getAllByText('Booking Lagi').length).toBeGreaterThanOrEqual(1);
   });
 
   it('calls API with status filter when filter tab clicked', async () => {

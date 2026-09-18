@@ -81,7 +81,7 @@ describe('ProviderRegisterPage', () => {
   });
 
   it('auto-generates slug from name', async () => {
-    authState = { user: { email: 'budi@test.com' }, isAuthenticated: true };
+    authState = { user: { email: 'budi@test.com' }, isAuthenticated: true } as any;
     renderProviderRegister();
     const nameInput = screen.getByPlaceholderText('Barbershop Central');
     await userEvent.type(nameInput, 'Barbershop Central');
@@ -193,5 +193,17 @@ describe('ProviderRegisterPage', () => {
       expect(screen.getByText('Mengirim...')).toBeInTheDocument();
     });
     expect(screen.getByRole('button', { name: /mengirim/i })).toBeDisabled();
+  });
+
+  it('allows manual slug and email edits', async () => {
+    authState = { user: { email: 'budi@test.com' }, isAuthenticated: true };
+    renderProviderRegister();
+    const slugInput = screen.getByPlaceholderText('barbershop-central') as HTMLInputElement;
+    fireEvent.change(slugInput, { target: { value: 'custom-slug' } });
+    expect(slugInput.value).toBe('custom-slug');
+    expect(screen.getByText(/URL: \/provider\/custom-slug/)).toBeInTheDocument();
+    const emailInput = screen.getByPlaceholderText('info@barbershop.com') as HTMLInputElement;
+    fireEvent.change(emailInput, { target: { value: 'owner@bisnis.id' } });
+    expect(emailInput.value).toBe('owner@bisnis.id');
   });
 });

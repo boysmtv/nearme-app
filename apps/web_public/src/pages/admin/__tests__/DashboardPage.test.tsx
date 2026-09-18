@@ -80,4 +80,30 @@ describe('web_public admin DashboardPage', () => {
       expect(screen.getByText('Total Revenue')).toBeInTheDocument();
     });
   });
+
+  it('renders recent bookings rows', async () => {
+    (adminApi.dashboard.getStats as any).mockResolvedValue({ data: {} });
+    (adminApi.bookings.list as any).mockResolvedValue({
+      data: { data: [{ id: 'b1', code: 'DKT-001', customerName: 'Siti' }] },
+    });
+    (adminApi.cases.list as any).mockResolvedValue({ data: { data: [] } });
+    renderDashboard();
+    await waitFor(() => {
+      expect(screen.getByText(/DKT-001/)).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Belum ada booking di platform.')).not.toBeInTheDocument();
+  });
+
+  it('renders open cases rows', async () => {
+    (adminApi.dashboard.getStats as any).mockResolvedValue({ data: {} });
+    (adminApi.bookings.list as any).mockResolvedValue({ data: { data: [] } });
+    (adminApi.cases.list as any).mockResolvedValue({
+      data: { data: [{ id: 'c1', caseNumber: 'CASE-1', subject: 'Refund saya', status: 'OPEN' }] },
+    });
+    renderDashboard();
+    await waitFor(() => {
+      expect(screen.getByText(/CASE-1/)).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Tidak ada kasus yang perlu ditangani.')).not.toBeInTheDocument();
+  });
 });

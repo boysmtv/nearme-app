@@ -399,4 +399,40 @@ describe('SupportPage', () => {
     const bookingLabels = screen.getAllByText('Booking');
     expect(bookingLabels.length).toBeGreaterThanOrEqual(1);
   });
+
+  it('updates file name when file is selected', async () => {
+    const { fireEvent } = await import('@testing-library/react');
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByText('Pilih file untuk dilampirkan')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['content'], 'bukti.png', { type: 'image/png' });
+    fireEvent.change(fileInput, { target: { files: [file] } });
+    await waitFor(() => {
+      expect(screen.getByText('bukti.png')).toBeInTheDocument();
+    });
+  });
+
+  it('clears file name when no file is selected', async () => {
+    const { fireEvent } = await import('@testing-library/react');
+    (publicApi.faqs.listPublic as any).mockResolvedValue({ data: [] });
+    (publicApi.policies.listPublic as any).mockResolvedValue({ data: [] });
+    renderSupport();
+    await waitFor(() => {
+      expect(screen.getByText('Pilih file untuk dilampirkan')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['content'], 'doc.pdf', { type: 'application/pdf' });
+    fireEvent.change(fileInput, { target: { files: [file] } });
+    await waitFor(() => {
+      expect(screen.getByText('doc.pdf')).toBeInTheDocument();
+    });
+    fireEvent.change(fileInput, { target: { files: [] } });
+    await waitFor(() => {
+      expect(screen.getByText('Pilih file untuk dilampirkan')).toBeInTheDocument();
+    });
+  });
 });

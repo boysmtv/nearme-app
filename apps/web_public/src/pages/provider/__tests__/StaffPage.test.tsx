@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -249,5 +249,27 @@ describe('StaffPage', () => {
     expect(screen.getByText('Atur Jadwal Staf')).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /tutup/i }));
     expect(screen.queryByText('Atur Jadwal Staf')).not.toBeInTheDocument();
+  });
+
+  it('toggles day off and edits shift times', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Andi')).toBeInTheDocument();
+    });
+    const scheduleButtons = screen.getAllByText('Jadwal');
+    await user.click(scheduleButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Atur Jadwal Staf')).toBeInTheDocument();
+    });
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    expect(checkboxes.length).toBeGreaterThan(0);
+    fireEvent.click(checkboxes[0]);
+    const timeInputs = document.querySelectorAll('input[type="time"]');
+    if (timeInputs.length >= 2) {
+      fireEvent.change(timeInputs[0], { target: { value: '08:00' } });
+      fireEvent.change(timeInputs[1], { target: { value: '17:00' } });
+      expect((timeInputs[0] as HTMLInputElement).value).toBe('08:00');
+    }
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -208,5 +208,20 @@ describe('WaitlistPage', () => {
     });
     expect(screen.getByText('2')).toBeInTheDocument();
     expect(screen.getByText('3')).toBeInTheDocument();
+  });
+
+  it('fills preferred date and time in form', async () => {
+    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    renderWaitlist();
+    await userEvent.click(screen.getByRole('button', { name: /tambah ke daftar tunggu/i }));
+    await waitFor(() => {
+      expect(screen.getByPlaceholderText('Nama Pelanggan')).toBeInTheDocument();
+    });
+    const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+    const timeInput = document.querySelector('input[type="time"]') as HTMLInputElement;
+    fireEvent.change(dateInput, { target: { value: '2026-10-10' } });
+    fireEvent.change(timeInput, { target: { value: '09:30' } });
+    expect(dateInput.value).toBe('2026-10-10');
+    expect(timeInput.value).toBe('09:30');
   });
 });

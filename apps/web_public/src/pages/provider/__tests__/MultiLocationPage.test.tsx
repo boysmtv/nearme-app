@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -170,5 +170,17 @@ describe('MultiLocationPage', () => {
     await user.type(screen.getByPlaceholderText('Alamat lengkap'), 'W');
     await user.click(screen.getByText('Simpan'));
     await waitFor(() => expect(screen.getByText('Menyimpan...')).toBeInTheDocument());
+  });
+
+  it('closes form when clicking backdrop overlay', async () => {
+    const user = userEvent.setup();
+    renderPage();
+    await waitFor(() => expect(screen.getByText(/belum ada lokasi tambahan/i)).toBeInTheDocument());
+    await user.click(screen.getByRole('button', { name: /tambah lokasi/i }));
+    expect(screen.getByText('Tambah Lokasi', { selector: 'h3' })).toBeInTheDocument();
+    const overlay = document.querySelector('div.fixed.inset-0') as HTMLElement;
+    expect(overlay).not.toBeNull();
+    fireEvent.click(overlay);
+    await waitFor(() => expect(screen.queryByPlaceholderText('Contoh: Cabang Utama')).not.toBeInTheDocument());
   });
 });

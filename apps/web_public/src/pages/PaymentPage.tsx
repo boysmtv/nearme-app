@@ -29,6 +29,7 @@ export default function PaymentPage() {
         const res = await publicApi.bookings.getById(bookingId);
         return res.data;
       }
+      /* v8 ignore next -- unreachable: query only enabled when paymentId or bookingId is set */
       throw new Error('No payment or booking ID provided');
     },
     enabled: !!(paymentId || bookingId),

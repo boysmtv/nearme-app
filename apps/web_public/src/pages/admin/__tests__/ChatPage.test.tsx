@@ -141,6 +141,23 @@ describe('AdminChatPage', () => {
     });
   });
 
+  it('sends message on Enter key', async () => {
+    mockList.mockResolvedValue({
+      data: [
+        { id: 'conv-1', subject: 'Test', status: 'OPEN', updatedAt: '2026-09-14T10:00:00Z', customerId: 'c1', providerId: 'p1', lastMessage: null },
+      ],
+    });
+    renderPage();
+    await waitFor(() => { expect(screen.getByText('Test')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText('Test'));
+    const input = await screen.findByPlaceholderText(/ketik sebagai admin/i);
+    fireEvent.change(input, { target: { value: 'Balasan cepat' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    await waitFor(() => {
+      expect(mockSendMessage).toHaveBeenCalledWith('Balasan cepat');
+    });
+  });
+
   it('shows loading skeleton when fetching conversations', async () => {
     mockList.mockReturnValue(new Promise(() => {})); // never resolves
     renderPage();

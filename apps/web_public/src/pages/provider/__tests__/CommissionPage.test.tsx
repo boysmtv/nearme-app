@@ -73,4 +73,28 @@ describe('CommissionPage', () => {
       expect(screen.getByText('Belum ada data')).toBeInTheDocument();
     });
   });
+
+  it('renders breakdown rows when data exists', async () => {
+    mockFetch.mockImplementation((url: string) => {
+      if (url.includes('commission/config')) return Promise.resolve({ json: () => ({ data: { rate: 5 } }) });
+      return Promise.resolve({
+        json: () => ({
+          data: {
+            totalRevenue: 2000000,
+            totalCommission: 100000,
+            netPayout: 1900000,
+            breakdown: [
+              { date: '2026-09-10', revenue: 1000000, commission: 50000 },
+              { date: '2026-09-11', revenue: 1000000, commission: 50000 },
+            ],
+          },
+        }),
+      });
+    });
+    renderCommission();
+    await waitFor(() => {
+      expect(screen.getByText(/Rp\s*2\.000\.000/)).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Belum ada data')).not.toBeInTheDocument();
+  });
 });

@@ -191,4 +191,21 @@ describe('ServicesImportPage', () => {
       expect(screen.getByText('Potong rambut pria')).toBeInTheDocument();
     });
   });
+
+  it('ignores file change with no file selected', async () => {
+    renderPage();
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    Object.defineProperty(fileInput, 'files', { value: [] });
+    fireEvent.change(fileInput);
+    expect(screen.queryByText('Pratinjau')).not.toBeInTheDocument();
+  });
+
+  it('opens file dialog when Pilih File CSV clicked', async () => {
+    renderPage();
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const clickSpy = vi.spyOn(fileInput, 'click').mockImplementation(() => {});
+    await userEvent.click(screen.getByText('Pilih File CSV'));
+    expect(clickSpy).toHaveBeenCalled();
+    clickSpy.mockRestore();
+  });
 });

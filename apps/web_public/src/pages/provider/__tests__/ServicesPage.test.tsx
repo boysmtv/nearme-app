@@ -177,7 +177,75 @@ describe('ServicesPage', () => {
     await waitFor(() => { expect(screen.getByText(/belum ada layanan/i)).toBeInTheDocument(); });
     fireEvent.click(screen.getByText(/tambah layanan/i));
     await waitFor(() => { expect(screen.getByText('Tambah Layanan')).toBeInTheDocument(); });
-    fireEvent.click(screen.getByText('\u00d7'));
+    fireEvent.click(screen.getByText('×'));
+    await waitFor(() => { expect(screen.queryByText('Tambah Layanan')).not.toBeInTheDocument(); });
+  });
+
+  it('addon duration input change works', async () => {
+    mockServiceList.mockResolvedValue({
+      data: [{ id: '1', name: 'Haircut', price: 50000, duration: 30, active: true, description: 'Potong rapi' }],
+    });
+    renderServices();
+    await waitFor(() => { expect(screen.getByText('Haircut')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText('Add-on'));
+    await waitFor(() => { expect(screen.getByText('Atur Add-on Layanan')).toBeInTheDocument(); });
+    const durInput = screen.getByPlaceholderText('Dur (min)') as HTMLInputElement;
+    fireEvent.change(durInput, { target: { value: '45' } });
+    expect(durInput.value).toBe('45');
+  });
+
+  it('does not add addon when name is empty', async () => {
+    mockServiceList.mockResolvedValue({
+      data: [{ id: '1', name: 'Haircut', price: 50000, duration: 30, active: true, description: 'Potong rapi' }],
+    });
+    renderServices();
+    await waitFor(() => { expect(screen.getByText('Haircut')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText('Add-on'));
+    await waitFor(() => { expect(screen.getByText('Atur Add-on Layanan')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText(/\+ tambah$/i));
+    expect(screen.getByText('Belum ada add-on')).toBeInTheDocument();
+  });
+
+  it('saves addons via Simpan Add-ons', async () => {
+    mockServiceList.mockResolvedValue({
+      data: [{ id: '1', name: 'Haircut', price: 50000, duration: 30, active: true, description: 'Potong rapi' }],
+    });
+    mockServiceUpdate.mockResolvedValue({ success: true });
+    renderServices();
+    await waitFor(() => { expect(screen.getByText('Haircut')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText('Add-on'));
+    await waitFor(() => { expect(screen.getByText('Atur Add-on Layanan')).toBeInTheDocument(); });
+    fireEvent.change(screen.getByPlaceholderText('Nama add-on'), { target: { value: 'Hair Wax' } });
+    fireEvent.change(screen.getByPlaceholderText('Harga'), { target: { value: '25000' } });
+    fireEvent.click(screen.getByText(/\+ tambah$/i));
+    await waitFor(() => { expect(screen.getByText(/hair wax/i)).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText('Simpan Add-ons'));
+    await waitFor(() => {
+      expect(mockServiceUpdate).toHaveBeenCalledWith('1', expect.objectContaining({
+        addons: expect.arrayContaining([expect.objectContaining({ name: 'Hair Wax' })]),
+      }));
+    });
+  });
+
+  it('cancels addon panel via Batal', async () => {
+    mockServiceList.mockResolvedValue({
+      data: [{ id: '1', name: 'Haircut', price: 50000, duration: 30, active: true, description: 'Potong rapi' }],
+    });
+    renderServices();
+    await waitFor(() => { expect(screen.getByText('Haircut')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText('Add-on'));
+    await waitFor(() => { expect(screen.getByText('Atur Add-on Layanan')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText('Batal'));
+    await waitFor(() => { expect(screen.queryByText('Atur Add-on Layanan')).not.toBeInTheDocument(); });
+  });
+
+  it('modal Batal button closes form', async () => {
+    mockServiceList.mockResolvedValue({ data: [] });
+    renderServices();
+    await waitFor(() => { expect(screen.getByText(/belum ada layanan/i)).toBeInTheDocument(); });
+    fireEvent.click(screen.getByText(/tambah layanan/i));
+    await waitFor(() => { expect(screen.getByText('Tambah Layanan')).toBeInTheDocument(); });
+    fireEvent.click(screen.getByRole('button', { name: /^batal$/i }));
     await waitFor(() => { expect(screen.queryByText('Tambah Layanan')).not.toBeInTheDocument(); });
   });
 });

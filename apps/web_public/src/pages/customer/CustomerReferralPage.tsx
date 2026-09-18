@@ -35,14 +35,6 @@ function CheckCircleIcon({ className }: { className?: string }) {
   );
 }
 
-function ClockIcon({ className }: { className?: string }) {
-  return (
-    <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={1.5}>
-      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-    </svg>
-  );
-}
-
 function WhatsAppIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="currentColor">
@@ -140,7 +132,7 @@ export default function CustomerReferralPage() {
     },
   ];
 
-  const sampleHistory: { name: string; date: string; status: 'rewarded' | 'pending' }[] = [];
+  // Riwayat referral akan diisi dari API saat endpoint tersedia.
 
   return (
     <CustomerLayout>
@@ -270,51 +262,16 @@ export default function CustomerReferralPage() {
               </div>
             </div>
 
-            {/* Referral History */}
+            {/* Referral History (diisi dari API saat tersedia) */}
             <div className="rounded-xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
               <h2 className="text-lg font-semibold text-gray-900">Riwayat Referral</h2>
-              {sampleHistory.length === 0 ? (
-                <div className="mt-6 flex flex-col items-center py-12 text-center">
-                  <EmptyReferralIcon className="h-16 w-16 text-gray-300" />
-                  <p className="mt-4 text-base font-medium text-gray-900">Belum Ada Referral</p>
-                  <p className="mt-1 max-w-sm text-sm text-gray-500">
-                    Bagikan kode referral Anda kepada teman untuk mulai mendapatkan poin loyalitas.
-                  </p>
-                </div>
-              ) : (
-                <div className="mt-4 overflow-x-auto">
-                  <table className="w-full text-left text-sm">
-                    <thead>
-                      <tr className="border-b text-xs font-medium uppercase text-gray-500">
-                        <th className="pb-3 pr-4">Nama</th>
-                        <th className="pb-3 pr-4">Tanggal</th>
-                        <th className="pb-3">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sampleHistory.map((item, i) => (
-                        <tr key={i} className="border-b last:border-0">
-                          <td className="py-3 pr-4 font-medium text-gray-900">{item.name}</td>
-                          <td className="py-3 pr-4 text-gray-500">{item.date}</td>
-                          <td className="py-3">
-                            {item.status === 'rewarded' ? (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-medium text-green-700">
-                                <CheckCircleIcon className="h-3.5 w-3.5" />
-                                Berhasil
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center gap-1 rounded-full bg-yellow-50 px-2.5 py-0.5 text-xs font-medium text-yellow-700">
-                                <ClockIcon className="h-3.5 w-3.5" />
-                                Pending
-                              </span>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
+              <div className="mt-6 flex flex-col items-center py-12 text-center">
+                <EmptyReferralIcon className="h-16 w-16 text-gray-300" />
+                <p className="mt-4 text-base font-medium text-gray-900">Belum Ada Referral</p>
+                <p className="mt-1 max-w-sm text-sm text-gray-500">
+                  Bagikan kode referral Anda kepada teman untuk mulai mendapatkan poin loyalitas.
+                </p>
+              </div>
             </div>
           </>
         )}

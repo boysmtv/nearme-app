@@ -18,8 +18,6 @@ export function useChatWebSocket(conversationId: string | null) {
       const data = (res as unknown as { data: ChatMessage[] })?.data ?? (res as unknown as ChatMessage[]);
       if (Array.isArray(data)) {
         setMessages(data as ChatMessage[]);
-      } else if (Array.isArray((res as unknown as { data: ChatMessage[] }).data)) {
-        setMessages((res as unknown as { data: ChatMessage[] }).data);
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));

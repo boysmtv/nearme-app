@@ -81,4 +81,22 @@ describe('CustomerDashboardPage', () => {
       expect(screen.getByText('Belum ada booking.')).toBeInTheDocument();
     });
   });
+
+  it('renders recent bookings with formatted date and unknown status fallback', async () => {
+    (publicApi.bookings.list as any).mockResolvedValue({
+      data: [
+        { id: 'b1', providerName: 'Barber Shop', startsAt: '2026-09-20T10:00:00+07:00', status: 'CONFIRMED' },
+        { id: 'b2', serviceName: 'Massage', startsAt: null, status: 'WEIRD_STATUS' },
+      ],
+    });
+    (publicApi.customer.getProfile as any).mockResolvedValue({ data: { loyaltyPoints: 0 } });
+    (publicApi.favorites.list as any).mockResolvedValue({ data: [] });
+    renderDashboard();
+    await waitFor(() => {
+      expect(screen.getByText('Barber Shop')).toBeInTheDocument();
+    });
+    expect(screen.getByText('Massage')).toBeInTheDocument();
+    expect(screen.getByText('Tanggal belum diatur')).toBeInTheDocument();
+    expect(screen.getByText('WEIRD STATUS')).toBeInTheDocument();
+  });
 });

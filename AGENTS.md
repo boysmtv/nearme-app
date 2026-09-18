@@ -316,12 +316,12 @@ pnpm install && pnpm dev
 - **Profile completion race condition FIXED**: `ProfileCompletePage` uses `useEffect` to navigate after `hasProfile` state is confirmed updated, avoiding redirect loop with `RequireProfileGuard`
 
 ### Testing
-- **Total: ~1489 tests** web_public (93 files) — all green. Lines 93.18% (2637/2830), Statements 88.61%, Branches 81.74%, Functions 84.78%. Verified 2026-09-18
+- **Total: ~1625 tests** web_public (93 files) — all green. Lines **100% (2824/2824)**, Statements 96.79%, Branches 87.11%, Functions 94.39%. Verified 2026-09-18
 - Backend: 222 tests — JUnit 5 + Mockito
 - web_admin: 123 tests (20 files) — Vitest + @testing-library/react
 - E2E Playwright: 41 tests — screenshots + functional
 - Run commands: `pnpm test` (React), `flutter test` (Dart), `.\gradlew.bat :api:test` (backend)
-- **Flaky fix 2026-09-18**: BookingPage reschedule tests used `user.type` on date/time inputs (char-by-char, >5s) → replaced with `fireEvent.change` + 15s timeout. 66/66 pass.
+- **100% lines reached 2026-09-18**: fixed flaky BookingPage reschedule (`user.type` → `fireEvent.change` + 15s), expanded 30+ test files, removed 2 dead code blocks (`useChatWebSocket` unreachable else-if, `CustomerReferralPage` never-filled history table + `ClockIcon`), exported pure helpers for unit tests (`ProtectedRoute` branches, `matchesType`/`getDateGroup`, `formatDate`/`formatTime`), recharts `Tooltip`/`XAxis` formatter invocation via mock components, `/* v8 ignore next */` only for provably-unreachable defensive throw (`PaymentPage` no-ID).
 
 ### Backend Runtime (verified 2026-08-27)
 - Migrations V15–V20: bookings status CHECK widened, categories seeded, booking_holds expiry CHECK fixed, hold status CHECK includes CONVERTED/CANCELLED, ghost ddl-auto columns dropped, confirmation_pin+pin_verified added
@@ -394,22 +394,13 @@ pnpm install && pnpm dev
   - **mobile_customer Clean Architecture refactoring 2026-09-16** — Full refactoring of `mobile_customer` from feature-first flat presentation to Clean Architecture + MVVM across all 12 features (availability, booking, chat, notification, provider_profile, account, authentication, payment, support, favorites, discovery, shared). Each feature now has `domain/` (entities, use cases, repository interfaces), `data/` (repository impls, DTOs), `presentation/` (viewmodel with AsyncNotifier, pages as UI only). New core layer: `core/error/` (AppException, Failure, ErrorHandler), `core/usecases/` (UseCase<T, Params>), `core/auth/` (AuthState, AuthNotifier), `core/di/` (providers.dart), `core/router/` (app_router.dart ~170 lines). Deleted dead code: `shared/models/rows.dart` (395 lines), `discovery_providers.dart`, `favorites_repository.dart`. Fixed 52 `withOpacity()` → `.withValues(alpha:)`. Fixed info hints (Type→T, string interpolation, deprecated params). Test cleanup: deleted 7 obsolete files, rewrote 2, fixed imports in 4. `flutter analyze lib/`: 0 errors, 0 warnings, 2 info (Radio deprecation). `flutter test`: 83/83 pass. Added `mounted` guards to 6 pages missing safety checks before `setState` after async operations.
   - **6-file coverage boost 2026-09-17** — SubscriptionUpgradePage (28 tests), useChatWebSocket (24), AuditLogPage (20), LeafletMap (26), NotificationPreferencesPage (13), SupportPage (26). Overall 90.31% → 92.12% lines, 1391 → 1476 tests, all green.
   - **Flaky fix + MultiLocation/Customers coverage 2026-09-18** — BookingPage 5 reschedule tests `user.type` → `fireEvent.change` + 15s timeout (was 1/66 timeout flaky, now 66/66). MultiLocationPage 4→13 tests (loading, Utama badge, add/edit/delete, validation, pending). CustomersPage 4→8 tests (loading, null lastBookingAt, search, pagination). Overall 92.12% → 93.18% lines (2637/2830), 1476 → 1489 tests, 93/93 files green.
+  - **100% lines 2026-09-18** — 93.18% → 100% (2824/2824), 1489 → 1625 tests. BookingPage calendar/ics/chat/auth/filter/deposit (+12), PromotionsPage loyalty-history/campaign (+11), CustomerBookingDetail reschedule/PIN/backdrop (+6), FaqsPage update/cancel/validation/× (+10), ProviderPage photo-upload/rating/success (+6), provider Dashboard copy/clipboard, Nearby geolocation-fallback/radius/map-click, CustomerDashboard/Loyalty/Notifications/Bookings/Reviews/Referral/Account, admin Dashboard/Analytics/Bookings/Users/AuditLog/Chat, Settings/Services/Reports/Faq/Notifications/Staff/Waitlist/Commission/Import/Scheduling, App ErrorBoundary/guards, Header/ProviderLayout/ProtectedRoute/theme/auth. Dead code removed: `useChatWebSocket` else-if, Referral history table + `ClockIcon`.
 
 ## What's Next
 
-### Coverage Improvement (sisa ~6.8% → 100%)
-- **Current**: web_public 93.18% lines (2637/2830, 193 lines uncovered). Statements 88.61%, Branches 81.74%, Functions 84.78%
-- **Top impact files** (lines uncovered):
-  1. `src/pages/BookingPage.tsx` — 87.02% (24 uncovered)
-  2. `src/pages/provider/PromotionsPage.tsx` — 84.11% (17 uncovered)
-  3. `src/pages/customer/CustomerBookingDetailPage.tsx` — 85.34% (17 uncovered)
-  4. `src/pages/admin/FaqsPage.tsx` — 82.5% (14 uncovered)
-  5. `src/pages/ProviderPage.tsx` — 87.5% (12 uncovered)
-  6. `src/App.tsx` — 89.15% (9 uncovered, router branches)
-  7. `src/pages/customer/RecurringBookingsPage.tsx` — 80% (8 uncovered)
-  8. `src/pages/provider/ServicesPage.tsx` — 83.78% (6 uncovered)
-  9. `src/pages/provider/ServiceBundlesPage.tsx` — 89.09% (6 uncovered)
-  10. `src/pages/provider/DashboardPage.tsx` — 81.48% (5 uncovered)
+### Coverage: 100% lines ACHIEVED ✅
+- **Current**: web_public 100% lines (2824/2824). Statements 96.79%, Branches 87.11%, Functions 94.39%
+- **Optional follow-up** (branches/functions, diminishing returns): recharts `Tooltip`/`XAxis` formatters now invoked via mocks; remaining branch gaps mostly defensive fallbacks (`?? []`, `|| 0`, optional chaining) and recharts internals
 
 ### Key Lessons from Today's Session
 - **`vi.hoisted()` is mandatory** when mock variables are used inside `vi.mock()` factories — without it, mocks reference `undefined` due to hoisting

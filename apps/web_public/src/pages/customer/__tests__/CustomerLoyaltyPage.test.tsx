@@ -225,4 +225,28 @@ describe('CustomerLoyaltyPage', () => {
       expect(screen.getByText(/Dapatkan 50 poin untuk setiap referral/)).toBeInTheDocument();
     });
   });
+
+  it('shows Gold tier as current for 2000 points', async () => {
+    (publicApi.customer.getProfile as any).mockResolvedValue({ data: { ...mockProfile, loyaltyPoints: 2000 } });
+    (api.get as any).mockResolvedValue({ data: mockLoyaltyData });
+    renderLoyalty();
+    await waitFor(() => {
+      expect(screen.getByText('Tier Gold')).toBeInTheDocument();
+    });
+  });
+
+  it('redeems option and refreshes on success', async () => {
+    const user = userEvent.setup();
+    (publicApi.customer.getProfile as any).mockResolvedValue({ data: { ...mockProfile, loyaltyPoints: 2000 } });
+    (api.get as any).mockResolvedValue({ data: mockLoyaltyData });
+    (api.post as any).mockResolvedValue({ data: { success: true } });
+    renderLoyalty();
+    await waitFor(() => {
+      expect(screen.getAllByText('Tukarkan').length).toBeGreaterThanOrEqual(1);
+    });
+    await user.click(screen.getAllByText('Tukarkan')[0]);
+    await waitFor(() => {
+      expect(api.post).toHaveBeenCalledWith('/customer/loyalty/redeem', expect.objectContaining({ points: expect.any(Number) }));
+    });
+  });
 });

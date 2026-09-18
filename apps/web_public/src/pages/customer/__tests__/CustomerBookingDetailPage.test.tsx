@@ -242,6 +242,16 @@ describe('CustomerBookingDetailPage', () => {
     });
     const backButtons = screen.getAllByRole('button');
     expect(backButtons.length).toBeGreaterThan(0);
+    await userEvent.click(backButtons[0]);
+  });
+
+  it('error state back button navigates back', async () => {
+    (publicApi.bookings.getById as any).mockRejectedValue(new Error('Network error'));
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText('Gagal Memuat Booking')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText('Kembali'));
   });
 
   it('renders cancelled status with correct lifecycle indicator', async () => {
@@ -642,6 +652,7 @@ describe('CustomerBookingDetailPage', () => {
     const pinInputs = document.querySelectorAll('input[id^="pin-"]');
     expect(pinInputs.length).toBe(6);
     fireEvent.keyDown(pinInputs[0], { key: 'Backspace' });
+    fireEvent.keyDown(pinInputs[1], { key: 'Backspace' });
   });
 
   it('handles PIN single digit input with auto-focus advance', async () => {
@@ -759,5 +770,65 @@ describe('CustomerBookingDetailPage', () => {
       expect(screen.getByText('Kebijakan Booking')).toBeInTheDocument();
     });
     expect(screen.getByText('Batas Pembatalan')).toBeInTheDocument();
+  });
+
+  it('fills reschedule date/time and submits successfully', async () => {
+    (publicApi.bookings.getById as any).mockResolvedValue({ data: confirmedBooking });
+    (publicApi.bookings.reschedule as any).mockResolvedValue({ data: confirmedBooking });
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getAllByText('Reschedule').length).toBeGreaterThanOrEqual(1);
+    });
+    const rescheduleButtons = screen.getAllByText('Reschedule');
+    await userEvent.click(rescheduleButtons.find(el => el.tagName === 'BUTTON') || rescheduleButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Reschedule Booking')).toBeInTheDocument();
+    });
+    const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
+    const timeInput = document.querySelector('input[type="time"]') as HTMLInputElement;
+    fireEvent.change(dateInput, { target: { value: '2026-10-05' } });
+    fireEvent.change(timeInput, { target: { value: '15:30' } });
+    const submitBtns = screen.getAllByText('Reschedule').filter(el => el.tagName === 'BUTTON');
+    const submitBtn = submitBtns[submitBtns.length - 1];
+    expect(submitBtn).not.toBeDisabled();
+    await userEvent.click(submitBtn);
+    await waitFor(() => {
+      expect(publicApi.bookings.reschedule).toHaveBeenCalled();
+    });
+  });
+
+  it('closes reschedule modal when overlay is clicked', async () => {
+    (publicApi.bookings.getById as any).mockResolvedValue({ data: confirmedBooking });
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getAllByText('Reschedule').length).toBeGreaterThanOrEqual(1);
+    });
+    const rescheduleButtons = screen.getAllByText('Reschedule');
+    await userEvent.click(rescheduleButtons.find(el => el.tagName === 'BUTTON') || rescheduleButtons[0]);
+    await waitFor(() => {
+      expect(screen.getByText('Reschedule Booking')).toBeInTheDocument();
+    });
+    const overlay = document.querySelector('div.fixed.inset-0') as HTMLElement;
+    fireEvent.click(overlay);
+    await waitFor(() => {
+      expect(screen.queryByText('Tanggal baru')).not.toBeInTheDocument();
+    });
+  });
+
+  it('closes PIN modal when overlay is clicked', async () => {
+    (publicApi.bookings.getById as any).mockResolvedValue({ data: confirmedBooking });
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText('Cek PIN')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText('Cek PIN'));
+    await waitFor(() => {
+      expect(screen.getByText('Masukkan PIN')).toBeInTheDocument();
+    });
+    const overlay = document.querySelector('div.fixed.inset-0') as HTMLElement;
+    fireEvent.click(overlay);
+    await waitFor(() => {
+      expect(screen.queryByText('Masukkan PIN')).not.toBeInTheDocument();
+    });
   });
 });

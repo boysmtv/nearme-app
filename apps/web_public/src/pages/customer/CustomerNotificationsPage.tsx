@@ -64,7 +64,7 @@ function getTypeConfig(type?: string): TypeConfig {
   return TYPE_CONFIG.DEFAULT!;
 }
 
-function getDateGroup(dateStr: string): string {
+export function getDateGroup(dateStr: string): string {
   const now = new Date();
   const date = new Date(dateStr);
   const diffMs = now.getTime() - date.getTime();
@@ -76,7 +76,7 @@ function getDateGroup(dateStr: string): string {
   return 'Lebih Lama';
 }
 
-function matchesType(n: Notification, tab: FilterTab): boolean {
+export function matchesType(n: Notification, tab: FilterTab): boolean {
   if (tab === 'ALL') return true;
   if (tab === 'UNREAD') return !n.read;
   if (tab === 'BOOKING') return n.type === 'BOOKING' || n.type === 'BOOKING_CONFIRMED' || n.type === 'BOOKING_CANCELLED';

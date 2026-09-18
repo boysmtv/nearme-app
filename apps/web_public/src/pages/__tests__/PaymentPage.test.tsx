@@ -88,4 +88,48 @@ describe('PaymentPage', () => {
       expect(screen.getByText('Menunggu Pembayaran')).toBeInTheDocument();
     });
   });
+
+  it('fetches by paymentId when provided', async () => {
+    mockGetById.mockResolvedValue({
+      data: {
+        id: 'p1',
+        bookingCode: 'DKT-003',
+        status: 'SETTLEMENT',
+        totalAmount: 75000,
+        depositAmount: 25000,
+        confirmationPin: '654321',
+        createdAt: '2026-09-14T10:00:00',
+      },
+    });
+    renderPage('paymentId=p1');
+    await waitFor(() => {
+      expect(screen.getByText('Pembayaran Berhasil')).toBeInTheDocument();
+    });
+    expect(mockGetById).toHaveBeenCalledWith('p1');
+    expect(screen.getByText('654321')).toBeInTheDocument();
+  });
+
+  it('shows failed payment status with error details', async () => {
+    mockGetById.mockResolvedValue({
+      data: {
+        id: 'b3',
+        bookingCode: 'DKT-004',
+        status: 'FAILED',
+        totalAmount: 30000,
+        createdAt: null,
+      },
+    });
+    renderPage('bookingId=b3');
+    await waitFor(() => {
+      expect(screen.getByText('Pembayaran Gagal')).toBeInTheDocument();
+    });
+  });
+
+  it('shows query error state when fetch fails', async () => {
+    mockGetById.mockRejectedValue(new Error('not found'));
+    renderPage('bookingId=bad');
+    await waitFor(() => {
+      expect(screen.getByText('Gagal Memuat')).toBeInTheDocument();
+    });
+  });
 });

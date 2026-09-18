@@ -77,4 +77,20 @@ describe('ProtectedRoute', () => {
     );
     expect(screen.getByText('Provider Content')).toBeInTheDocument();
   });
+
+  it('redirects admin to /admin/dashboard when accessing provider route', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, user: { role: 'ROLE_PLATFORM_ADMIN' } });
+    const { container } = renderWithRouter(
+      <ProtectedRoute requiredRole="ROLE_PROVIDER_OWNER"><div>Provider Content</div></ProtectedRoute>
+    );
+    expect(container.innerHTML).not.toContain('Provider Content');
+  });
+
+  it('redirects unknown role to / as final fallback', () => {
+    mockUseAuth.mockReturnValue({ isAuthenticated: true, user: { role: 'ROLE_GHOST' } });
+    const { container } = renderWithRouter(
+      <ProtectedRoute requiredRole="ROLE_PLATFORM_ADMIN"><div>Admin Content</div></ProtectedRoute>
+    );
+    expect(container.innerHTML).not.toContain('Admin Content');
+  });
 });

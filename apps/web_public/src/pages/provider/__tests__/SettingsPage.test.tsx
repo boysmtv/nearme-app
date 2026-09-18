@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -229,5 +229,21 @@ describe('SettingsPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Belum ada tanggal diblokir')).toBeInTheDocument();
     });
+  });
+
+  it('toggles day open/closed and edits shift times', async () => {
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByDisplayValue('Barbershop Central')).toBeInTheDocument();
+    });
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    expect(checkboxes.length).toBeGreaterThanOrEqual(1);
+    fireEvent.click(checkboxes[1]);
+    const timeInputs = document.querySelectorAll('input[type="time"]');
+    expect(timeInputs.length).toBeGreaterThanOrEqual(2);
+    fireEvent.change(timeInputs[0], { target: { value: '08:00' } });
+    fireEvent.change(timeInputs[1], { target: { value: '20:00' } });
+    expect((timeInputs[0] as HTMLInputElement).value).toBe('08:00');
+    expect((timeInputs[1] as HTMLInputElement).value).toBe('20:00');
   });
 });

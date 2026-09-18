@@ -44,7 +44,7 @@ function formatPrice(amount: number) {
   return `Rp ${amount.toLocaleString('id-ID')}`;
 }
 
-function formatDate(iso: string | undefined) {
+export function formatDate(iso: string | undefined) {
   if (!iso) return '-';
   return new Date(iso).toLocaleDateString('id-ID', {
     weekday: 'long',
@@ -54,7 +54,7 @@ function formatDate(iso: string | undefined) {
   });
 }
 
-function formatTime(iso: string | undefined) {
+export function formatTime(iso: string | undefined) {
   if (!iso) return '';
   return new Date(iso).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
 }

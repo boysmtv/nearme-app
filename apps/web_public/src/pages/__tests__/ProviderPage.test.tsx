@@ -38,7 +38,7 @@ vi.mock('../../components/ServiceCard', () => ({
 }));
 
 import ProviderPage from '../ProviderPage';
-import { publicApi } from '../../lib/api';
+import { publicApi, mediaApi } from '../../lib/api';
 
 const providerData = {
   id: 'p1',
@@ -133,6 +133,7 @@ describe('ProviderPage', () => {
     (publicApi.reviews.create as any).mockResolvedValue({ data: true });
     (publicApi.favorites.add as any).mockResolvedValue({ data: true });
     (publicApi.favorites.remove as any).mockResolvedValue({ data: true });
+    (mediaApi.upload as any).mockResolvedValue({ data: { id: 'up1' } });
   });
 
   it('shows loading skeleton initially', () => {
@@ -1135,6 +1136,140 @@ describe('ProviderPage', () => {
     await userEvent.click(screen.getByText('Kirim Ulasan'));
     await waitFor(() => {
       expect(screen.getByText('Mengirim...')).toBeInTheDocument();
+    });
+  });
+
+  it('star hover highlights and title input updates', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByLabelText('Rate 3')).toBeInTheDocument();
+    });
+    fireEvent.mouseEnter(screen.getByLabelText('Rate 4'));
+    fireEvent.mouseLeave(screen.getByLabelText('Rate 4'));
+    const titleInput = screen.getByPlaceholderText('Ringkasan pengalaman Anda');
+    fireEvent.change(titleInput, { target: { value: 'Judul bagus' } });
+    expect(titleInput).toHaveValue('Judul bagus');
+  });
+
+  it('uploads review photo and shows count', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Foto Ulasan (maks 8)')).toBeInTheDocument();
+    });
+    const bookingInput = screen.getByPlaceholderText(/3fa85f64/);
+    await userEvent.type(bookingInput, 'bk-1');
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const file = new File(['x'], 'foto.jpg', { type: 'image/jpeg' });
+    fireEvent.change(fileInput, { target: { files: [file] } });
+    await waitFor(() => {
+      expect(mediaApi.upload).toHaveBeenCalled();
+    });
+    await waitFor(() => {
+      expect(screen.getByText('1/8 foto terupload')).toBeInTheDocument();
+    });
+    expect(fileInput.value).toBe('');
+  });
+
+  it('rejects oversized photo with alert', async () => {
+    const alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Foto Ulasan (maks 8)')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    const big = new File([new ArrayBuffer(11 * 1024 * 1024)], 'big.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(big, 'size', { value: 11 * 1024 * 1024 });
+    fireEvent.change(fileInput, { target: { files: [big] } });
+    expect(alertSpy).toHaveBeenCalledWith('File too large max 10MB');
+    expect(mediaApi.upload).not.toHaveBeenCalled();
+    alertSpy.mockRestore();
+  });
+
+  it('shows uploading and upload error states', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    (mediaApi.upload as any).mockReturnValue(new Promise(() => {}));
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Foto Ulasan (maks 8)')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, { target: { files: [new File(['x'], 'a.jpg', { type: 'image/jpeg' })] } });
+    await waitFor(() => {
+      expect(screen.getByText('Uploading...')).toBeInTheDocument();
+    });
+  });
+
+  it('shows upload error message on failure', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    (mediaApi.upload as any).mockRejectedValue(new Error('upload gagal'));
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Foto Ulasan (maks 8)')).toBeInTheDocument();
+    });
+    const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
+    fireEvent.change(fileInput, { target: { files: [new File(['x'], 'a.jpg', { type: 'image/jpeg' })] } });
+    await waitFor(() => {
+      expect(screen.getByText('upload gagal')).toBeInTheDocument();
+    });
+  });
+
+  it('shows success message after review submit', async () => {
+    mockUseAuth.mockReturnValue({
+      user: { id: '1', name: 'User', role: 'ROLE_CUSTOMER' },
+      isAuthenticated: true,
+    });
+    renderProvider();
+    await waitFor(() => {
+      expect(screen.getByText('Barbershop Central')).toBeInTheDocument();
+    });
+    await userEvent.click(screen.getByText(/Ulasan/));
+    await waitFor(() => {
+      expect(screen.getByText('Kirim Ulasan')).toBeInTheDocument();
+    });
+    await userEvent.type(screen.getByPlaceholderText(/3fa85f64/), 'bk-9');
+    await userEvent.click(screen.getByLabelText('Rate 5'));
+    await userEvent.type(screen.getByPlaceholderText('Bagaimana pengalaman Anda?'), 'Luar biasa sekali');
+    await userEvent.click(screen.getByText('Kirim Ulasan'));
+    await waitFor(() => {
+      expect(screen.getByText('Ulasan berhasil dikirim. Terima kasih!')).toBeInTheDocument();
     });
   });
 });

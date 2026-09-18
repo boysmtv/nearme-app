@@ -261,4 +261,46 @@ describe('SocialFeedPage', () => {
     const avatar = screen.getByRole('img', { name: 'Shop' });
     expect(avatar).toHaveAttribute('src', 'https://example.com/avatar.jpg');
   });
+
+  it('shows UPDATE type badge', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/social/feed') return Promise.resolve({
+        data: [{ id: '1', providerId: 'p1', providerName: 'Shop', type: 'UPDATE', title: 'Update Post', body: 'Body', likes: 1, comments: 0, isLiked: false, isFollowing: false, createdAt: new Date().toISOString() }],
+      });
+      if (url === '/social/trending') return Promise.resolve({ data: [] });
+      return Promise.resolve({ data: [] });
+    });
+    renderFeed();
+    await waitFor(() => {
+      expect(screen.getByText('UPDATE')).toBeInTheDocument();
+    });
+  });
+
+  it('shows GALLERY type badge', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/social/feed') return Promise.resolve({
+        data: [{ id: '1', providerId: 'p1', providerName: 'Shop', type: 'GALLERY', title: 'Gallery Post', body: 'Body', likes: 1, comments: 0, isLiked: false, isFollowing: false, createdAt: new Date().toISOString() }],
+      });
+      if (url === '/social/trending') return Promise.resolve({ data: [] });
+      return Promise.resolve({ data: [] });
+    });
+    renderFeed();
+    await waitFor(() => {
+      expect(screen.getByText('GALLERY')).toBeInTheDocument();
+    });
+  });
+
+  it('shows default badge for unknown type', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url === '/social/feed') return Promise.resolve({
+        data: [{ id: '1', providerId: 'p1', providerName: 'Shop', type: 'UNKNOWN', title: 'Mystery Post', body: 'Body', likes: 1, comments: 0, isLiked: false, isFollowing: false, createdAt: new Date().toISOString() }],
+      });
+      if (url === '/social/trending') return Promise.resolve({ data: [] });
+      return Promise.resolve({ data: [] });
+    });
+    renderFeed();
+    await waitFor(() => {
+      expect(screen.getByText('UNKNOWN')).toBeInTheDocument();
+    });
+  });
 });

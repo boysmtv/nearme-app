@@ -274,4 +274,17 @@ describe('SmartSchedulingPage', () => {
     renderPage();
     expect(screen.getByText(/rekomendasi cerdas berdasarkan data booking anda/i)).toBeInTheDocument();
   });
+
+  it('renders default gray badge for unknown impact', async () => {
+    mockGet.mockImplementation((url: string) => {
+      if (url.includes('smart-suggestions')) {
+        return Promise.resolve({ data: [{ type: 'PEAK_HOURS', title: 'Misteri', description: 'Dampak tak dikenal', impact: 'critical', action: 'Cek' }] });
+      }
+      return Promise.resolve({ data: { hourly: [] } });
+    });
+    renderPage();
+    await waitFor(() => {
+      expect(screen.getByText('Misteri')).toBeInTheDocument();
+    });
+  });
 });

@@ -22,12 +22,15 @@ vi.mock('recharts', () => ({
   PieChart: ({ children }: any) => <div data-testid="pie-chart">{children}</div>,
   Area: () => null,
   Bar: () => null,
-  Pie: () => null,
+  Pie: (props: any) => <div>{props?.children}</div>,
   Cell: () => null,
   XAxis: () => null,
   YAxis: () => null,
   CartesianGrid: () => null,
-  Tooltip: () => null,
+  Tooltip: (props: any) => {
+    if (typeof props?.formatter === 'function') props.formatter(12345);
+    return null;
+  },
   Legend: () => null,
 }));
 

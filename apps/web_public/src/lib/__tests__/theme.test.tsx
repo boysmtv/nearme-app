@@ -64,6 +64,24 @@ describe('ThemeProvider', () => {
     fireEvent.click(screen.getByText('Light'));
     expect(document.documentElement.classList.contains('dark')).toBe(false);
   });
+
+  it('default context setTheme is a safe noop outside provider', () => {
+    function NoProviderCaller() {
+      const { theme, setTheme, resolvedTheme } = useTheme();
+      return (
+        <div>
+          <span data-testid="dtheme">{theme}</span>
+          <span data-testid="dresolved">{resolvedTheme}</span>
+          <button onClick={() => setTheme('dark')}>SetDefault</button>
+        </div>
+      );
+    }
+    render(<NoProviderCaller />);
+    expect(screen.getByTestId('dtheme')).toHaveTextContent('system');
+    expect(screen.getByTestId('dresolved')).toHaveTextContent('light');
+    fireEvent.click(screen.getByText('SetDefault'));
+    expect(screen.getByTestId('dtheme')).toHaveTextContent('system');
+  });
 });
 
 
