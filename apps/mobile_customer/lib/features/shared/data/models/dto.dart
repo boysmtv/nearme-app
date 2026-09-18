@@ -34,12 +34,13 @@ class ProviderDto {
 
 class ServiceDto {
   static ServiceEntity fromJson(Map<String, dynamic> json) {
+    final durationRaw = json['duration'] ?? json['durationMinutes'];
     return ServiceEntity(
       id: json['id'] as String,
       name: json['name'] as String,
       description: json['description'] as String?,
       price: (json['price'] as num?)?.toInt() ?? 0,
-      durationMinutes: (json['duration'] as num?)?.toInt() ?? 0,
+      durationMinutes: (durationRaw as num?)?.toInt() ?? 0,
       currency: (json['currency'] ?? 'IDR') as String,
       imageUrl: json['imageUrl'] as String?,
       depositAmount: _toInt(json['depositAmount'] ?? json['deposit_amount']),

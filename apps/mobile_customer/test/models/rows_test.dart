@@ -118,6 +118,33 @@ void main() {
       expect(entity.price, 0);
       expect(entity.durationMinutes, 0);
     });
+
+    test('parses public-API duration key (regression: booking 400)', () {
+      // Endpoint publik /providers/{id}/services mengirim `duration`,
+      // bukan `durationMinutes`. Tanpa fallback ini durasi = 0 sehingga
+      // endsAt == startsAt dan backend menolak dengan
+      // "Start time must be before end time".
+      final json = {
+        'id': 's4',
+        'name': 'Cukur Jenggot',
+        'price': 30000,
+        'duration': 20,
+      };
+      final entity = ServiceEntity.fromJson(json);
+      expect(entity.durationMinutes, 20);
+      expect(entity.durationMinutes, greaterThan(0));
+    });
+
+    test('durationMinutes key takes precedence when both present', () {
+      final json = {
+        'id': 's5',
+        'name': 'Fade',
+        'price': 45000,
+        'duration': 20,
+        'durationMinutes': 45,
+      };
+      expect(ServiceEntity.fromJson(json).durationMinutes, 45);
+    });
   });
 
   group('BookingEntity.fromJson', () {

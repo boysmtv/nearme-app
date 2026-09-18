@@ -5,44 +5,9 @@ import 'package:dio/dio.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
-import '../../../provider_profile/domain/entities/service_entity.dart';
+import '../viewmodel/booking_viewmodel.dart' show bookingSummaryProvider;
 import '../../../../shared/utils/format_rupiah.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
-
-class BookingSummary {
-  final ServiceEntity service;
-  final String providerName;
-  final String? staffName;
-  const BookingSummary({required this.service, required this.providerName, this.staffName});
-}
-
-final bookingSummaryProvider =
-    FutureProvider.autoDispose.family<BookingSummary, String>((ref, key) async {
-  final parts = key.split('|');
-  final providerId = parts[0];
-  final serviceId = parts.length > 1 ? parts[1] : '';
-  final staffId = parts.length > 2 ? parts[2] : null;
-  final servicesRes = await ApiService().getProviderServices(providerId);
-  final services = ((servicesRes.data['data'] ?? []) as List)
-      .map((e) => ServiceEntity.fromJson(e as Map<String, dynamic>))
-      .toList();
-  final service = services.firstWhere(
-    (s) => s.id == serviceId,
-    orElse: () => throw Exception('Selected service not found'),
-  );
-  String? staffName;
-  if (staffId != null && staffId.isNotEmpty) {
-    try {
-      final staffRes = await ApiService().getProviderStaff(providerId);
-      final staffList = ((staffRes.data['data'] ?? []) as List).cast<Map<String, dynamic>>();
-      final match = staffList.where((s) => s['id'] == staffId);
-      if (match.isNotEmpty) {
-        staffName = match.first['displayName'] as String? ?? match.first['name'] as String?;
-      }
-    } catch (_) {}
-  }
-  return BookingSummary(service: service, providerName: 'Provider', staffName: staffName);
-});
 
 class BookingFormPage extends ConsumerStatefulWidget {
   final String providerId;
@@ -261,13 +226,27 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
 
   Future<void> _handleBooking() async {
     final summary = ref.read(bookingSummaryProvider('${widget.providerId}|${widget.serviceId!}|${widget.staffId ?? ''}')).valueOrNull;
+    // Guard: jangan kirim hold yang pasti ditolak backend (400
+    // "Start time must be before end time"). Dulu durasi 0 lolos karena
+    // parser salah key → user bingung. Gagal cepat dengan pesan jelas.
+    final durationMinutes = summary?.service.durationMinutes ?? 0;
+    if (summary == null || durationMinutes <= 0) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Booking failed: durasi layanan tidak valid, coba lagi'),
+          backgroundColor: Colors.red,
+          duration: Duration(seconds: 4),
+        ));
+      }
+      return;
+    }
     setState(() => _isLoading = true);
     try {
       final customerId = await SecureStorageService.read(StorageKeys.userId);
       final api = ApiService();
       final startsAt = _wibDateTime(widget.date!, widget.time!);
       final endDateTime = DateTime.parse('${widget.date}T${widget.time}:00')
-          .add(Duration(minutes: summary?.service.durationMinutes ?? 60));
+          .add(Duration(minutes: durationMinutes));
       final endsAt = '${endDateTime.year.toString().padLeft(4, '0')}-'
           '${endDateTime.month.toString().padLeft(2, '0')}-${endDateTime.day.toString().padLeft(2, '0')}T'
           '${endDateTime.hour.toString().padLeft(2, '0')}:${endDateTime.minute.toString().padLeft(2, '0')}:00+07:00';
@@ -286,12 +265,12 @@ class _BookingFormPageState extends ConsumerState<BookingFormPage> {
         'tenantId': widget.providerId,
         'locationId': widget.locationId,
         'customerId': customerId,
-        'currency': summary?.service.currency ?? 'IDR',
+        'currency': summary.service.currency,
         'notes': _notesController.text,
         'paymentMethod': _selectedPaymentMethod,
         'items': [
           {
-            'serviceId': summary!.service.id,
+            'serviceId': summary.service.id,
             'nameSnapshot': summary.service.name,
             'priceSnapshot': summary.service.price,
             'durationSnapshot': summary.service.durationMinutes,
