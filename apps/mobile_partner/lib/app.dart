@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'core/router/app_router.dart';
+
+// Poppins dibundel lokal (assets/fonts) agar tidak diunduh saat startup.
+const _fontFamily = 'Poppins';
 
 final lightTheme = ThemeData(
   useMaterial3: true,
+  fontFamily: _fontFamily,
   colorScheme: DEKATColorScheme.lightColorScheme,
-  textTheme: GoogleFonts.poppinsTextTheme(),
-  appBarTheme: AppBarTheme(
+  textTheme: ThemeData.light().textTheme.apply(fontFamily: _fontFamily),
+  appBarTheme: const AppBarTheme(
     elevation: 0, centerTitle: true, backgroundColor: Colors.transparent,
-    titleTextStyle: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
+    titleTextStyle: TextStyle(fontFamily: _fontFamily, fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black87),
   ),
   inputDecorationTheme: InputDecorationTheme(
     filled: true, fillColor: Colors.grey[100],
@@ -24,7 +27,7 @@ final lightTheme = ThemeData(
       backgroundColor: DEKATColors.primary, foregroundColor: Colors.white, elevation: 0,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+      textStyle: const TextStyle(fontFamily: _fontFamily, fontSize: 16, fontWeight: FontWeight.w600),
     ),
   ),
   cardTheme: CardThemeData(elevation: 2, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),
@@ -32,11 +35,12 @@ final lightTheme = ThemeData(
 
 final darkTheme = ThemeData(
   useMaterial3: true,
+  fontFamily: _fontFamily,
   colorScheme: DEKATColorScheme.darkColorScheme,
-  textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
-  appBarTheme: AppBarTheme(
+  textTheme: ThemeData.dark().textTheme.apply(fontFamily: _fontFamily),
+  appBarTheme: const AppBarTheme(
     elevation: 0, centerTitle: true, backgroundColor: Colors.transparent,
-    titleTextStyle: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
+    titleTextStyle: TextStyle(fontFamily: _fontFamily, fontSize: 18, fontWeight: FontWeight.w600, color: Colors.white),
   ),
   inputDecorationTheme: InputDecorationTheme(
     filled: true, fillColor: Colors.grey[800],
@@ -50,7 +54,7 @@ final darkTheme = ThemeData(
       backgroundColor: DEKATColors.primary, foregroundColor: Colors.white, elevation: 0,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      textStyle: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+      textStyle: const TextStyle(fontFamily: _fontFamily, fontSize: 16, fontWeight: FontWeight.w600),
     ),
   ),
   cardTheme: CardThemeData(elevation: 2, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)),

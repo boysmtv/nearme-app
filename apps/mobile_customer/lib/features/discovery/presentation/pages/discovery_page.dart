@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -375,7 +376,7 @@ class _FeaturedCardState extends State<_FeaturedCard> {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(12),
                             child: widget.imageUrl != null && widget.imageUrl!.isNotEmpty
-                                ? Image.network(widget.imageUrl!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.store_rounded, color: Colors.grey))
+                                ? CachedNetworkImage(imageUrl: widget.imageUrl!, fit: BoxFit.cover, placeholder: (_, __) => Container(color: Colors.grey[100]), errorWidget: (_, __, ___) => const Icon(Icons.store_rounded, color: Colors.grey))
                                 : const Icon(Icons.store_rounded, color: Colors.grey),
                           ),
                         ),

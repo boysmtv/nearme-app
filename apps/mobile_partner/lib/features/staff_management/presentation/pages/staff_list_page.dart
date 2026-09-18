@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
@@ -145,7 +146,7 @@ class StaffListPage extends ConsumerWidget {
                                     ClipRRect(
                                       borderRadius: BorderRadius.circular(8),
                                       child: url.isNotEmpty
-                                          ? Image.network(url, width: 70, height: 70, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 20, color: Colors.grey)))
+                                          ? CachedNetworkImage(imageUrl: url, width: 70, height: 70, fit: BoxFit.cover, placeholder: (_, __) => Container(width: 70, height: 70, color: Colors.grey[200]), errorWidget: (_, __, ___) => Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.broken_image, size: 20, color: Colors.grey)))
                                           : Container(width: 70, height: 70, color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
                                     ),
                                     Positioned(

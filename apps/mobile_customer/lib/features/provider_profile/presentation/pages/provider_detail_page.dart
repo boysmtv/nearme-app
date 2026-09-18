@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -68,7 +69,7 @@ class ProviderDetailPage extends ConsumerWidget {
                           gradient: LinearGradient(colors: [DEKATColors.primary.withValues(alpha:0.15), DEKATColors.primary.withValues(alpha:0.05)], begin: Alignment.topCenter, end: Alignment.bottomCenter),
                         ),
                         child: provider.imageUrl != null && provider.imageUrl!.isNotEmpty
-                            ? Image.network(provider.imageUrl!, fit: BoxFit.cover, errorBuilder: (_, __, ___) => const Icon(Icons.store_rounded, size: 80, color: Colors.grey))
+                            ? CachedNetworkImage(imageUrl: provider.imageUrl!, fit: BoxFit.cover, placeholder: (_, __) => Container(color: Colors.grey[200]), errorWidget: (_, __, ___) => const Icon(Icons.store_rounded, size: 80, color: Colors.grey))
                             : const Center(child: Icon(Icons.store_rounded, size: 72, color: Colors.grey)),
                       ),
                       Container(
@@ -198,7 +199,7 @@ class ProviderDetailPage extends ConsumerWidget {
                                   return ClipRRect(
                                     borderRadius: BorderRadius.circular(12),
                                     child: url.isNotEmpty
-                                        ? Image.network(url, width: 120, height: 120, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(width: 120, height: 120, color: Colors.grey[200], child: const Icon(Icons.broken_image, color: Colors.grey)))
+                                        ? CachedNetworkImage(imageUrl: url, width: 120, height: 120, fit: BoxFit.cover, placeholder: (_, __) => Container(width: 120, height: 120, color: Colors.grey[200]), errorWidget: (_, __, ___) => Container(width: 120, height: 120, color: Colors.grey[200], child: const Icon(Icons.broken_image, color: Colors.grey)))
                                         : Container(width: 120, height: 120, color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
                                   );
                                 },
@@ -217,7 +218,7 @@ class ProviderDetailPage extends ConsumerWidget {
                                 return ClipRRect(
                                   borderRadius: BorderRadius.circular(12),
                                   child: url.isNotEmpty
-                                      ? Image.network(url, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(color: Colors.grey[200], child: const Icon(Icons.broken_image, color: Colors.grey)))
+                                      ? CachedNetworkImage(imageUrl: url, fit: BoxFit.cover, placeholder: (_, __) => Container(color: Colors.grey[200]), errorWidget: (_, __, ___) => Container(color: Colors.grey[200], child: const Icon(Icons.broken_image, color: Colors.grey)))
                                       : Container(color: Colors.grey[200], child: const Icon(Icons.image, color: Colors.grey)),
                                 );
                               },
@@ -283,7 +284,7 @@ class ProviderDetailPage extends ConsumerWidget {
                                         itemBuilder: (context, idx) {
                                           final p = portfolio[idx];
                                           final url = p['url'] as String? ?? '';
-                                          return ClipRRect(borderRadius: BorderRadius.circular(8), child: url.isNotEmpty ? Image.network(url, width: 60, height: 60, fit: BoxFit.cover, errorBuilder: (_, __, ___) => Container(width: 60, height: 60, color: Colors.grey[200])) : Container(width: 60, height: 60, color: Colors.grey[200]));
+                                          return ClipRRect(borderRadius: BorderRadius.circular(8), child: url.isNotEmpty ? CachedNetworkImage(imageUrl: url, width: 60, height: 60, fit: BoxFit.cover, placeholder: (_, __) => Container(width: 60, height: 60, color: Colors.grey[200]), errorWidget: (_, __, ___) => Container(width: 60, height: 60, color: Colors.grey[200])) : Container(width: 60, height: 60, color: Colors.grey[200]));
                                         },
                                       ),
                                     ),
