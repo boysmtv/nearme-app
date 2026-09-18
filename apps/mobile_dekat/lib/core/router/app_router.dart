@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_core/flutter_core.dart';
@@ -20,7 +21,6 @@ import '../../features/booking/presentation/pages/booking_history_page.dart';
 import '../../features/booking/presentation/pages/booking_detail_page.dart';
 import '../../features/payment/presentation/pages/payment_page.dart';
 import '../../features/payment/presentation/pages/payment_success_page.dart';
-import '../../features/payment/presentation/pages/partner_payment_detail_page.dart';
 import '../../features/notification/presentation/pages/notification_page.dart';
 import '../../features/support/presentation/pages/support_page.dart';
 import '../../features/account/presentation/pages/account_page.dart';
@@ -40,34 +40,86 @@ import '../../features/provider_profile/presentation/pages/provider_reviews_page
 import '../../shared/widgets/main_scaffold.dart';
 import '../../shared/widgets/partner_scaffold.dart';
 import '../../shared/widgets/admin_scaffold.dart';
-import '../../features/calendar/presentation/pages/calendar_page.dart';
+
+// Deferred imports — provider + admin pages (loaded only when needed)
+import '../../features/payment/presentation/pages/partner_payment_detail_page.dart'
+    deferred as partner_payment;
+import '../../features/calendar/presentation/pages/calendar_page.dart'
+    deferred as provider_calendar;
 import '../../features/booking_management/presentation/pages/booking_list_page.dart'
-    as provider_bookings;
+    deferred as provider_bookings;
 import '../../features/booking_management/presentation/pages/booking_detail_page.dart'
-    as provider_booking_detail;
-import '../../features/payment/presentation/pages/earnings_page.dart';
-import '../../features/staff_management/presentation/pages/staff_list_page.dart';
-import '../../features/reports/presentation/pages/reports_page.dart';
-import '../../features/service_management/presentation/pages/services_page.dart';
-import '../../features/review_management/presentation/pages/reviews_page.dart';
-import '../../features/promotion/presentation/pages/promotions_page.dart';
-import '../../features/notification/presentation/pages/notification_inbox_page.dart';
-import '../../features/faq_management/presentation/pages/faq_page.dart';
-import '../../features/settings/presentation/pages/settings_page.dart';
-import '../../features/settings/presentation/pages/blocked_dates_page.dart';
-import '../../features/customer_management/presentation/pages/customers_page.dart';
-import '../../features/staff/presentation/pages/staff_checkin_page.dart';
-// Admin pages
-import '../../features/admin/presentation/pages/admin_dashboard_page.dart';
-import '../../features/admin/presentation/pages/admin_users_page.dart';
-import '../../features/admin/presentation/pages/admin_tenants_page.dart';
-import '../../features/admin/presentation/pages/admin_bookings_page.dart';
+    deferred as provider_booking_detail;
+import '../../features/payment/presentation/pages/earnings_page.dart'
+    deferred as provider_earnings;
+import '../../features/staff_management/presentation/pages/staff_list_page.dart'
+    deferred as provider_staff;
+import '../../features/reports/presentation/pages/reports_page.dart'
+    deferred as provider_reports;
+import '../../features/service_management/presentation/pages/services_page.dart'
+    deferred as provider_services;
+import '../../features/review_management/presentation/pages/reviews_page.dart'
+    deferred as provider_reviews;
+import '../../features/promotion/presentation/pages/promotions_page.dart'
+    deferred as provider_promotions;
+import '../../features/notification/presentation/pages/notification_inbox_page.dart'
+    deferred as provider_notifications;
+import '../../features/faq_management/presentation/pages/faq_page.dart'
+    deferred as provider_faq;
+import '../../features/settings/presentation/pages/settings_page.dart'
+    deferred as provider_settings;
+import '../../features/settings/presentation/pages/blocked_dates_page.dart'
+    deferred as provider_blocked_dates;
+import '../../features/customer_management/presentation/pages/customers_page.dart'
+    deferred as provider_customers;
+import '../../features/staff/presentation/pages/staff_checkin_page.dart'
+    deferred as provider_staff_checkin;
+import '../../features/admin/presentation/pages/admin_dashboard_page.dart'
+    deferred as admin_dashboard;
+import '../../features/admin/presentation/pages/admin_users_page.dart'
+    deferred as admin_users;
+import '../../features/admin/presentation/pages/admin_tenants_page.dart'
+    deferred as admin_tenants;
+import '../../features/admin/presentation/pages/admin_bookings_page.dart'
+    deferred as admin_bookings;
 
 class GoRouterRefresh extends ChangeNotifier {
   GoRouterRefresh(this.ref) {
     ref.listen(authProvider, (_, __) => notifyListeners());
   }
   final Ref ref;
+}
+
+/// Wraps a deferred-loaded page so its library is loaded on first visit.
+class _DeferredPage extends StatefulWidget {
+  final Future<void> Function() loader;
+  final Widget child;
+  const _DeferredPage({required this.loader, required this.child});
+
+  @override
+  State<_DeferredPage> createState() => _DeferredPageState();
+}
+
+class _DeferredPageState extends State<_DeferredPage> {
+  bool _loaded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.loader().then((_) {
+      if (mounted) setState(() => _loaded = true);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_loaded) {
+      return const Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+    return widget.child;
+  }
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -162,24 +214,33 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: '/provider/calendar',
               name: 'providerCalendar',
-              builder: (_, __) => const CalendarPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_calendar.loadLibrary,
+                  child: provider_calendar.CalendarPage())),
           GoRoute(
               path: '/provider/bookings',
               name: 'providerBookings',
-              builder: (_, __) =>
-                  const provider_bookings.BookingListPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_bookings.loadLibrary,
+                  child: provider_bookings.BookingListPage())),
           GoRoute(
               path: '/provider/payments',
               name: 'providerPayments',
-              builder: (_, __) => const EarningsPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_earnings.loadLibrary,
+                  child: provider_earnings.EarningsPage())),
           GoRoute(
               path: '/provider/staff',
               name: 'providerStaff',
-              builder: (_, __) => const StaffListPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_staff.loadLibrary,
+                  child: provider_staff.StaffListPage())),
           GoRoute(
               path: '/provider/reports',
               name: 'providerReports',
-              builder: (_, __) => const ReportsPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_reports.loadLibrary,
+                  child: provider_reports.ReportsPage())),
           GoRoute(
               path: '/provider/chats',
               name: 'providerChats',
@@ -187,39 +248,71 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: '/provider/services',
               name: 'providerServices',
-              builder: (_, __) => const ServicesPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_services.loadLibrary,
+                  child: provider_services.ServicesPage())),
           GoRoute(
               path: '/provider/reviews',
               name: 'providerReviewsList',
-              builder: (_, __) => const ReviewsPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_reviews.loadLibrary,
+                  child: provider_reviews.ReviewsPage())),
           GoRoute(
               path: '/provider/promotions',
               name: 'providerPromotions',
-              builder: (_, __) => const PromotionsPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_promotions.loadLibrary,
+                  child: provider_promotions.PromotionsPage())),
           GoRoute(
               path: '/provider/notifications',
               name: 'providerNotifications',
-              builder: (_, __) => const NotificationInboxPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_notifications.loadLibrary,
+                  child: provider_notifications.NotificationInboxPage())),
           GoRoute(
               path: '/provider/faq',
               name: 'providerFaq',
-              builder: (_, __) => const ProviderFaqPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_faq.loadLibrary,
+                  child: provider_faq.ProviderFaqPage())),
           GoRoute(
               path: '/provider/settings',
               name: 'providerSettings',
-              builder: (_, __) => const SettingsPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_settings.loadLibrary,
+                  child: provider_settings.SettingsPage())),
           GoRoute(
               path: '/provider/blocked-dates',
               name: 'providerBlockedDates',
-              builder: (_, __) => const BlockedDatesPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_blocked_dates.loadLibrary,
+                  child: provider_blocked_dates.BlockedDatesPage())),
           GoRoute(
               path: '/provider/customers',
               name: 'providerCustomers',
-              builder: (_, __) => const CustomersPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_customers.loadLibrary,
+                  child: provider_customers.CustomersPage())),
           GoRoute(
               path: '/provider/staff-checkin',
               name: 'providerStaffCheckin',
-              builder: (_, __) => const StaffCheckInPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: provider_staff_checkin.loadLibrary,
+                  child: provider_staff_checkin.StaffCheckInPage())),
+          GoRoute(
+              path: '/provider/payment/:id',
+              name: 'providerPaymentDetail',
+              builder: (_, state) => _DeferredPage(
+                  loader: partner_payment.loadLibrary,
+                  child: partner_payment.PartnerPaymentDetailPage(
+                      paymentId: state.pathParameters['id']!))),
+          GoRoute(
+              path: '/provider/booking/:id',
+              name: 'providerBookingDetail',
+              builder: (_, state) => _DeferredPage(
+                  loader: provider_booking_detail.loadLibrary,
+                  child: provider_booking_detail.BookingDetailPage(
+                      bookingId: state.pathParameters['id']!))),
         ],
       ),
       // ── Admin shell ──
@@ -229,19 +322,27 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
               path: '/admin/dashboard',
               name: 'adminDashboard',
-              builder: (_, __) => const AdminDashboardPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: admin_dashboard.loadLibrary,
+                  child: admin_dashboard.AdminDashboardPage())),
           GoRoute(
               path: '/admin/users',
               name: 'adminUsers',
-              builder: (_, __) => const AdminUsersPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: admin_users.loadLibrary,
+                  child: admin_users.AdminUsersPage())),
           GoRoute(
               path: '/admin/tenants',
               name: 'adminTenants',
-              builder: (_, __) => const AdminTenantsPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: admin_tenants.loadLibrary,
+                  child: admin_tenants.AdminTenantsPage())),
           GoRoute(
               path: '/admin/bookings',
               name: 'adminBookings',
-              builder: (_, __) => const AdminBookingsPage()),
+              builder: (_, __) => _DeferredPage(
+                  loader: admin_bookings.loadLibrary,
+                  child: admin_bookings.AdminBookingsPage())),
         ],
       ),
       // ── Customer detail routes ──
@@ -355,63 +456,26 @@ final routerProvider = Provider<GoRouter>((ref) {
           path: '/feed',
           name: 'socialFeed',
           builder: (_, __) => const SocialFeedPage()),
-      // ── Provider detail routes ──
+      // ── Provider detail routes (outside ShellRoute for direct navigation) ──
       GoRoute(
           path: '/provider/booking/:id',
           name: 'providerBookingDetail',
-          builder: (_, state) =>
-              provider_booking_detail.BookingDetailPage(
-                  bookingId: state.pathParameters['id']!)),
+          builder: (_, state) => _DeferredPage(
+              loader: provider_booking_detail.loadLibrary,
+              child: provider_booking_detail.BookingDetailPage(
+                  bookingId: state.pathParameters['id']!))),
       GoRoute(
           path: '/provider/payment/:id',
           name: 'providerPaymentDetail',
-          builder: (_, state) => PartnerPaymentDetailPage(
-              paymentId: state.pathParameters['id']!)),
+          builder: (_, state) => _DeferredPage(
+              loader: partner_payment.loadLibrary,
+              child: partner_payment.PartnerPaymentDetailPage(
+                  paymentId: state.pathParameters['id']!))),
       GoRoute(
           path: '/provider/chat/:id',
           name: 'providerChatDetail',
           builder: (_, state) =>
               ChatDetailPage(chatId: state.pathParameters['id']!)),
-      GoRoute(
-          path: '/provider/chats',
-          name: 'providerChats',
-          builder: (_, __) => const ChatListPage()),
-      GoRoute(
-          path: '/provider/services',
-          name: 'providerServices',
-          builder: (_, __) => const ServicesPage()),
-      GoRoute(
-          path: '/provider/reviews',
-          name: 'providerReviews',
-          builder: (_, __) => const ReviewsPage()),
-      GoRoute(
-          path: '/provider/promotions',
-          name: 'providerPromotions',
-          builder: (_, __) => const PromotionsPage()),
-      GoRoute(
-          path: '/provider/notifications',
-          name: 'providerNotifications',
-          builder: (_, __) => const NotificationInboxPage()),
-      GoRoute(
-          path: '/provider/faq',
-          name: 'providerFaq',
-          builder: (_, __) => const ProviderFaqPage()),
-      GoRoute(
-          path: '/provider/settings',
-          name: 'providerSettings',
-          builder: (_, __) => const SettingsPage()),
-      GoRoute(
-          path: '/provider/blocked-dates',
-          name: 'providerBlockedDates',
-          builder: (_, __) => const BlockedDatesPage()),
-      GoRoute(
-          path: '/provider/customers',
-          name: 'providerCustomers',
-          builder: (_, __) => const CustomersPage()),
-      GoRoute(
-          path: '/provider/staff-checkin',
-          name: 'providerStaffCheckin',
-          builder: (_, __) => const StaffCheckInPage()),
     ],
     redirect: (context, state) {
       final auth = ref.read(authProvider);
