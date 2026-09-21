@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '../../lib/api';
 import ProviderLayout from '../../components/ProviderLayout';
 
 export default function WaitlistPage() {
@@ -9,21 +10,16 @@ export default function WaitlistPage() {
 
   const { data: waitlistRes, isLoading } = useQuery({
     queryKey: ['provider', 'waitlist'],
-    queryFn: () => fetch('/api/v1/provider/waitlist', { headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` } }).then(r => r.json()),
+    queryFn: () => api.get('/provider/waitlist'),
   });
 
   const joinMutation = useMutation({
-    mutationFn: (data: any) => fetch('/api/v1/provider/waitlist', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
-      body: JSON.stringify(data),
-    }).then(r => r.json()),
+    mutationFn: (data: any) => api.post('/provider/waitlist', data),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['provider', 'waitlist'] }); setShowForm(false); setForm({ customerName: '', customerPhone: '', serviceId: '', preferredDate: '', preferredTime: '' }); },
   });
 
   const notifyMutation = useMutation({
-    mutationFn: (entryId: string) => fetch(`/api/v1/provider/waitlist/${entryId}/notify`, {
-      method: 'POST', headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
-    }).then(r => r.json()),
+    mutationFn: (entryId: string) => api.post(`/provider/waitlist/${entryId}/notify`),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['provider', 'waitlist'] }),
   });
 

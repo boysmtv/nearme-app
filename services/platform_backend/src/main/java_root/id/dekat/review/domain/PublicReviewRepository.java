@@ -14,6 +14,8 @@ public interface PublicReviewRepository extends JpaRepository<PublicReview, UUID
 
     Page<PublicReview> findByTenantIdAndStatusOrderByCreatedAtDesc(UUID tenantId, PublicReview.ReviewStatus status, Pageable pageable);
 
+    Page<PublicReview> findByCustomerIdOrderByCreatedAtDesc(UUID customerId, Pageable pageable);
+
     long countByTenantIdAndStatus(UUID tenantId, PublicReview.ReviewStatus status);
 
     @Query("""

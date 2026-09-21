@@ -42,11 +42,10 @@ class Endpoints {
 
   // Support
   static const String supportCases = '/support/cases';
-  static const String supportTickets = '/support/tickets';
 
   // Notifications (device tokens)
   static const String notifications = '/notifications';
-  static const String fcmToken = '/devices/token';
+  static const String fcmToken = '/notifications/device-tokens';
 
   // Media & gallery
   static const String mediaUpload = '/media/upload';

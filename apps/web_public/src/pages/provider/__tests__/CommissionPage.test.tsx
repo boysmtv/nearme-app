@@ -12,8 +12,10 @@ vi.mock('../../../components/ProviderLayout', () => ({
   default: ({ children }: { children: React.ReactNode }) => <div data-testid="provider-layout">{children}</div>,
 }));
 
-const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);
+const mockGet = vi.fn();
+vi.mock('../../../lib/api', () => ({
+  api: { get: (...args: any[]) => mockGet(...args) },
+}));
 
 function renderCommission() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -30,7 +32,7 @@ describe('CommissionPage', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
   it('renders heading', async () => {
-    mockFetch.mockResolvedValue({ json: () => ({ data: { totalRevenue: 0, totalCommission: 0, netPayout: 0, breakdown: [] } }) });
+    mockGet.mockResolvedValue({ data: { totalRevenue: 0, totalCommission: 0, netPayout: 0, breakdown: [] } });
     renderCommission();
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /komisi platform/i })).toBeInTheDocument();
@@ -38,7 +40,7 @@ describe('CommissionPage', () => {
   });
 
   it('renders ProviderLayout', async () => {
-    mockFetch.mockResolvedValue({ json: () => ({ data: { totalRevenue: 0, totalCommission: 0, netPayout: 0, breakdown: [] } }) });
+    mockGet.mockResolvedValue({ data: { totalRevenue: 0, totalCommission: 0, netPayout: 0, breakdown: [] } });
     renderCommission();
     await waitFor(() => {
       expect(screen.getByTestId('provider-layout')).toBeInTheDocument();
@@ -46,15 +48,13 @@ describe('CommissionPage', () => {
   });
 
   it('shows commission stats when data loads', async () => {
-    mockFetch.mockResolvedValue({
-      json: () => ({
-        data: {
-          totalRevenue: 1000000,
-          totalCommission: 50000,
-          netPayout: 950000,
-          breakdown: [],
-        },
-      }),
+    mockGet.mockResolvedValue({
+      data: {
+        totalRevenue: 1000000,
+        totalCommission: 50000,
+        netPayout: 950000,
+        breakdown: [],
+      },
     });
     renderCommission();
     await waitFor(() => {
@@ -65,9 +65,7 @@ describe('CommissionPage', () => {
   });
 
   it('shows empty breakdown message', async () => {
-    mockFetch.mockResolvedValue({
-      json: () => ({ data: { totalRevenue: 0, totalCommission: 0, netPayout: 0, breakdown: [] } }),
-    });
+    mockGet.mockResolvedValue({ data: { totalRevenue: 0, totalCommission: 0, netPayout: 0, breakdown: [] } });
     renderCommission();
     await waitFor(() => {
       expect(screen.getByText('Belum ada data')).toBeInTheDocument();
@@ -75,20 +73,18 @@ describe('CommissionPage', () => {
   });
 
   it('renders breakdown rows when data exists', async () => {
-    mockFetch.mockImplementation((url: string) => {
-      if (url.includes('commission/config')) return Promise.resolve({ json: () => ({ data: { rate: 5 } }) });
+    mockGet.mockImplementation((url: string) => {
+      if (url.includes('commission/config')) return Promise.resolve({ data: { rate: 5 } });
       return Promise.resolve({
-        json: () => ({
-          data: {
-            totalRevenue: 2000000,
-            totalCommission: 100000,
-            netPayout: 1900000,
-            breakdown: [
-              { date: '2026-09-10', revenue: 1000000, commission: 50000 },
-              { date: '2026-09-11', revenue: 1000000, commission: 50000 },
-            ],
-          },
-        }),
+        data: {
+          totalRevenue: 2000000,
+          totalCommission: 100000,
+          netPayout: 1900000,
+          breakdown: [
+            { date: '2026-09-10', revenue: 1000000, commission: 50000 },
+            { date: '2026-09-11', revenue: 1000000, commission: 50000 },
+          ],
+        },
       });
     });
     renderCommission();

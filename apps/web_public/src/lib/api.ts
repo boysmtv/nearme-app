@@ -173,8 +173,8 @@ export const publicApi = {
 
     hold: (providerId: string, slotId: string, serviceId: string) =>
       apiClient.post<ApiResponse<{ holdId: string; expiresAt: string }>>(
-        `/public/providers/${providerId}/slots/${slotId}/hold`,
-        { serviceId },
+        `/bookings/holds`,
+        { tenantId: providerId, serviceId, resourceId: slotId },
       ),
     validateCoupon: (code: string, providerId: string, serviceId: string) =>
       apiClient.get<ApiResponse<{ valid: boolean; discountType: string; discountValue: number; discountAmount: number; finalPrice: number; message?: string }>>(

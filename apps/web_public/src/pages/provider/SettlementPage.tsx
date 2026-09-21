@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { api } from '../../lib/api';
 import ProviderLayout from '../../components/ProviderLayout';
 
 function formatPrice(amount: number): string {
@@ -13,14 +14,11 @@ export default function SettlementPage() {
 
   const { data: settlementsRes, isLoading } = useQuery({
     queryKey: ['provider', 'settlements'],
-    queryFn: () => fetch('/api/v1/provider/settlement?limit=20', { headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` } }).then(r => r.json()),
+    queryFn: () => api.get('/provider/settlement?limit=20'),
   });
 
   const requestMutation = useMutation({
-    mutationFn: (amount: number) => fetch('/api/v1/provider/settlement/request', {
-      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('auth_token')}` },
-      body: JSON.stringify({ amount }),
-    }).then(r => r.json()),
+    mutationFn: (amount: number) => api.post('/provider/settlement/request', { amount }),
     onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['provider', 'settlements'] }); setShowRequestForm(false); setRequestAmount(''); },
   });
 

@@ -4,6 +4,9 @@ import id.dekat.customer.application.CustomerService;
 import id.dekat.customer.domain.CustomerProfile;
 import id.dekat.identity.domain.User;
 import id.dekat.identity.domain.UserRepository;
+import id.dekat.review.domain.PublicReview;
+import id.dekat.review.domain.PublicReviewRepository;
+import id.dekat.review.domain.PublicReviewRepository;
 import id.dekat.sharedkernel.web.ApiResponse;
 import id.dekat.tenant.domain.ProviderListingRepository;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +28,7 @@ public class CustomerController {
     private final CustomerService customerService;
     private final UserRepository userRepository;
     private final ProviderListingRepository providerListingRepository;
+    private final PublicReviewRepository publicReviewRepository;
 
     @GetMapping("/customer/profile")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getMyProfile(
@@ -69,6 +73,25 @@ public class CustomerController {
             result.put("name", u.getName());
             result.put("phone", u.getPhone());
         });
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
+
+    @GetMapping("/customer/reviews")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> getMyReviews(
+            @RequestHeader(value = "X-User-Id", required = false) UUID headerUserId,
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        UUID userId = resolveUserId(headerUserId, jwt);
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ApiResponse.error("Unauthorized"));
+        }
+        var reviews = publicReviewRepository.findByCustomerIdOrderByCreatedAtDesc(userId,
+                org.springframework.data.domain.PageRequest.of(page, size));
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("content", reviews.getContent());
+        result.put("totalElements", reviews.getTotalElements());
+        result.put("totalPages", reviews.getTotalPages());
         return ResponseEntity.ok(ApiResponse.ok(result));
     }
 

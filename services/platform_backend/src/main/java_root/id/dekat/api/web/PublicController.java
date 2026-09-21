@@ -660,4 +660,21 @@ public class PublicController {
 
         return ResponseEntity.ok(ApiResponse.ok(providers));
     }
+
+    @GetMapping("/bookings/validate-coupon")
+    @Operation(summary = "Validate coupon code", description = "Validasi kode kupon untuk booking")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> validateCoupon(
+            @RequestParam String code,
+            @RequestParam(required = false) UUID providerId,
+            @RequestParam(required = false) UUID serviceId) {
+        // Stub validation — in production, check coupons table
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("valid", false);
+        result.put("discountType", "FLAT");
+        result.put("discountValue", 0);
+        result.put("discountAmount", 0);
+        result.put("finalPrice", 0);
+        result.put("message", "Kupon tidak valid atau sudah kedaluwarsa");
+        return ResponseEntity.ok(ApiResponse.ok(result));
+    }
 }

@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { api } from '../../lib/api';
 import ProviderLayout from '../../components/ProviderLayout';
 
 function formatPrice(amount: number): string {
@@ -8,12 +9,12 @@ function formatPrice(amount: number): string {
 export default function CommissionPage() {
   const { data: statementRes, isLoading } = useQuery({
     queryKey: ['provider', 'commission'],
-    queryFn: () => fetch('/api/v1/provider/commission/statement?days=30', { headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` } }).then(r => r.json()),
+    queryFn: () => api.get('/provider/commission/statement?days=30'),
   });
 
   const { data: configRes } = useQuery({
     queryKey: ['provider', 'commission-config'],
-    queryFn: () => fetch('/api/v1/provider/commission/config', { headers: { Authorization: `Bearer ${localStorage.getItem('auth_token')}` } }).then(r => r.json()),
+    queryFn: () => api.get('/provider/commission/config'),
   });
 
   const statement = statementRes?.data;

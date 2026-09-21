@@ -391,7 +391,7 @@ describe('publicApi.bookings', () => {
     mockFetch.mockResolvedValueOnce(mockResponse({ success: true, data: { holdId: 'h1', expiresAt: '2026-08-27T10:15:00Z' } }));
     await publicApi.bookings.hold('prov-1', 'slot-1', 'svc-1');
     const [url, opts] = mockFetch.mock.calls[0];
-    expect(url).toContain('/public/providers/prov-1/slots/slot-1/hold');
+    expect(url).toContain('/bookings/holds');
     expect(opts.method).toBe('POST');
   });
 

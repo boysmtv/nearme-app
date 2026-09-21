@@ -13,8 +13,14 @@ vi.mock('../../../components/ProviderLayout', () => ({
   default: ({ children }: { children: React.ReactNode }) => <div data-testid="provider-layout">{children}</div>,
 }));
 
-const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);
+const mockGet = vi.fn();
+const mockPost = vi.fn();
+vi.mock('../../../lib/api', () => ({
+  api: {
+    get: (...args: any[]) => mockGet(...args),
+    post: (...args: any[]) => mockPost(...args),
+  },
+}));
 
 function renderWaitlist() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -33,15 +39,11 @@ const waitlistEntries = [
   { id: 'w3', position: 3, customerName: 'Rudi', customerPhone: '08789', preferredDate: '2026-09-16', preferredTime: '09:00', status: 'SERVED' },
 ];
 
-function wrapJson(data) {
-  return { json: () => ({ data }) };
-}
-
 describe('WaitlistPage', () => {
   beforeEach(() => { vi.clearAllMocks(); });
 
   it('renders heading', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    mockGet.mockResolvedValue({ data: [] });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: /daftar tunggu/i })).toBeInTheDocument();
@@ -49,7 +51,7 @@ describe('WaitlistPage', () => {
   });
 
   it('renders ProviderLayout', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    mockGet.mockResolvedValue({ data: [] });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByTestId('provider-layout')).toBeInTheDocument();
@@ -57,7 +59,7 @@ describe('WaitlistPage', () => {
   });
 
   it('shows empty state when no entries', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    mockGet.mockResolvedValue({ data: [] });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('Belum ada daftar tunggu')).toBeInTheDocument();
@@ -65,7 +67,7 @@ describe('WaitlistPage', () => {
   });
 
   it('renders waitlist entries when data is available', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson(waitlistEntries)));
+    mockGet.mockResolvedValue({ data: waitlistEntries });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('Andi')).toBeInTheDocument();
@@ -74,7 +76,7 @@ describe('WaitlistPage', () => {
   });
 
   it('shows phone numbers', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson(waitlistEntries)));
+    mockGet.mockResolvedValue({ data: waitlistEntries });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('08123')).toBeInTheDocument();
@@ -84,7 +86,7 @@ describe('WaitlistPage', () => {
   });
 
   it('shows dates and times', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson(waitlistEntries)));
+    mockGet.mockResolvedValue({ data: waitlistEntries });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getAllByText('2026-09-15').length).toBeGreaterThanOrEqual(1);
@@ -94,7 +96,7 @@ describe('WaitlistPage', () => {
   });
 
   it('shows NOTIFIED status badge', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson(waitlistEntries)));
+    mockGet.mockResolvedValue({ data: waitlistEntries });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('Diberitahu')).toBeInTheDocument();
@@ -102,7 +104,7 @@ describe('WaitlistPage', () => {
   });
 
   it('shows SERVED status badge', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson(waitlistEntries)));
+    mockGet.mockResolvedValue({ data: waitlistEntries });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('Selesai')).toBeInTheDocument();
@@ -110,7 +112,7 @@ describe('WaitlistPage', () => {
   });
 
   it('shows notify button for WAITING entries', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson(waitlistEntries)));
+    mockGet.mockResolvedValue({ data: waitlistEntries });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('Andi')).toBeInTheDocument();
@@ -120,23 +122,20 @@ describe('WaitlistPage', () => {
   });
 
   it('calls notify endpoint when Beritahu is clicked', async () => {
-    mockFetch.mockImplementationOnce(() => Promise.resolve(wrapJson(waitlistEntries)));
-    mockFetch.mockImplementationOnce(() => Promise.resolve(wrapJson(true)));
+    mockGet.mockResolvedValue({ data: waitlistEntries });
+    mockPost.mockResolvedValue({ data: true });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('Andi')).toBeInTheDocument();
     });
     await userEvent.click(screen.getByText('Beritahu'));
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/v1/provider/waitlist/w1/notify',
-        expect.objectContaining({ method: 'POST' })
-      );
+      expect(mockPost).toHaveBeenCalledWith('/provider/waitlist/w1/notify');
     });
   });
 
   it('opens add form when Tambah ke Daftar Tunggu is clicked', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    mockGet.mockResolvedValue({ data: [] });
     renderWaitlist();
     await userEvent.click(screen.getByRole('button', { name: /tambah ke daftar tunggu/i }));
     await waitFor(() => {
@@ -147,7 +146,7 @@ describe('WaitlistPage', () => {
   });
 
   it('closes form when Batal is clicked', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    mockGet.mockResolvedValue({ data: [] });
     renderWaitlist();
     await userEvent.click(screen.getByRole('button', { name: /tambah ke daftar tunggu/i }));
     await waitFor(() => {
@@ -160,8 +159,8 @@ describe('WaitlistPage', () => {
   });
 
   it('submits form data when Tambahkan is clicked', async () => {
-    mockFetch.mockImplementationOnce(() => Promise.resolve(wrapJson([])));
-    mockFetch.mockImplementationOnce(() => Promise.resolve(wrapJson({ id: 'w4' })));
+    mockGet.mockResolvedValue({ data: [] });
+    mockPost.mockResolvedValue({ data: { id: 'w4' } });
     renderWaitlist();
     await userEvent.click(screen.getByRole('button', { name: /tambah ke daftar tunggu/i }));
     await waitFor(() => {
@@ -171,15 +170,12 @@ describe('WaitlistPage', () => {
     await userEvent.type(screen.getByPlaceholderText('Telepon'), '081111');
     await userEvent.click(screen.getByRole('button', { name: /tambahkan/i }));
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/api/v1/provider/waitlist',
-        expect.objectContaining({ method: 'POST' })
-      );
+      expect(mockPost).toHaveBeenCalledWith('/provider/waitlist', expect.objectContaining({ customerName: 'Siti', customerPhone: '081111' }));
     });
   });
 
   it('shows table headers', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    mockGet.mockResolvedValue({ data: [] });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('#')).toBeInTheDocument();
@@ -193,7 +189,7 @@ describe('WaitlistPage', () => {
   });
 
   it('shows loading state', async () => {
-    mockFetch.mockReturnValue(new Promise(() => {}));
+    mockGet.mockReturnValue(new Promise(() => {}));
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('Memuat...')).toBeInTheDocument();
@@ -201,7 +197,7 @@ describe('WaitlistPage', () => {
   });
 
   it('shows position numbers', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson(waitlistEntries)));
+    mockGet.mockResolvedValue({ data: waitlistEntries });
     renderWaitlist();
     await waitFor(() => {
       expect(screen.getByText('1')).toBeInTheDocument();
@@ -211,7 +207,7 @@ describe('WaitlistPage', () => {
   });
 
   it('fills preferred date and time in form', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    mockGet.mockResolvedValue({ data: [] });
     renderWaitlist();
     await userEvent.click(screen.getByRole('button', { name: /tambah ke daftar tunggu/i }));
     await waitFor(() => {

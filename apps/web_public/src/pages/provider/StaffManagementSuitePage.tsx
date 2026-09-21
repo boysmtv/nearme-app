@@ -28,7 +28,7 @@ export default function StaffManagementSuitePage() {
 
   const { data: statsRes } = useQuery({
     queryKey: ['staff-performance'],
-    queryFn: () => api.get('/provider/staff/performance'),
+    queryFn: () => api.get('/provider/analytics/staff-performance'),
   });
 
   const checkInMutation = useMutation({

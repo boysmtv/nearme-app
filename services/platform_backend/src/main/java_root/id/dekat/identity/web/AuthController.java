@@ -49,6 +49,17 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.ok(response));
     }
 
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Forgot password", description = "Kirim OTP ke email untuk reset password (delegates to OTP request)")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(@RequestBody java.util.Map<String, String> body) {
+        String email = body.getOrDefault("email", "");
+        if (email.isBlank()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Email is required"));
+        }
+        authService.requestOtp(new OtpRequest(email, null, "RESET_PASSWORD"));
+        return ResponseEntity.accepted().body(ApiResponse.ok(null, "Password reset OTP sent"));
+    }
+
     @PostMapping("/refresh")
     @Operation(summary = "Refresh token", description = "Mendapatkan accessToken baru menggunakan refreshToken")
     public ResponseEntity<ApiResponse<TokenResponse>> refresh(@RequestParam String refreshToken) {

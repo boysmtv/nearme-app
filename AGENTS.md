@@ -134,7 +134,7 @@ module/
 - `GET /public/providers/{id}/availability` - Available slots
 - `GET /public/providers/{id}/reviews` - Provider reviews
 - `GET /public/providers/{id}/blocked-dates` - Provider blocked dates
-- `GET /public/bookings/validate-coupon` - Validate coupon code
+- `GET /public/bookings/validate-coupon` - Validate coupon code (stub endpoint in PublicController, real in PublicCouponController)
 - `POST /public/bookings` - Create booking
 
 ### Provider Dashboard (JWT required)
@@ -175,6 +175,7 @@ module/
 ### Customer (JWT required)
 - `GET /customer/profile` - Get customer profile
 - `PUT /customer/profile` - Update customer profile
+- `GET /customer/reviews` - List customer's reviews
 - `GET /customer/loyalty` - Get loyalty points + history
 - `POST /customer/loyalty/redeem` - Redeem loyalty points
 - `POST /customer/loyalty/birthday-bonus` - Birthday bonus (500 pts)
@@ -425,6 +426,30 @@ pnpm install && pnpm dev
 ### Coverage: 100% lines ACHIEVED ✅
 - **Current**: web_public 100% lines (2824/2824). Statements 96.79%, Branches 87.11%, Functions 94.39%
 - **Optional follow-up** (branches/functions, diminishing returns): recharts `Tooltip`/`XAxis` formatters now invoked via mocks; remaining branch gaps mostly defensive fallbacks (`?? []`, `|| 0`, optional chaining) and recharts internals
+
+### API Sync Session (2026-09-21)
+- **10 frontend↔backend mismatches fixed**:
+  1. `POST /auth/forgot-password` — added stub endpoint to `AuthController.java` (delegates to OTP with RESET_PASSWORD purpose)
+  2. Flutter FCM token path `/devices/token` → `/notifications/device-tokens`
+  3. Unused `supportTickets` endpoint constant removed from `endpoints.dart`
+  4. `GET /customer/reviews` — added to `CustomerController.java` with `PublicReviewRepository.findByCustomerId`
+  5. `GET /public/bookings/validate-coupon` — stub in `PublicController.java` (returns `{valid:false}`)
+  6. Web slot hold path `/public/providers/{id}/slots/{slotId}/hold` → `POST /bookings/holds`
+  7. Web staff performance `/provider/staff/performance` → `/provider/analytics/staff-performance`
+  8. Provider loyalty endpoints already existed in `promotion.LoyaltyController` (deleted duplicate `ProviderLoyaltyController`)
+  9. Web CommissionPage/SettlementPage/WaitlistPage: raw `fetch()` → `api.get()`/`api.post()` (auto JWT refresh)
+  10. Docker healthcheck `start_period` increased to 600s (ArchUnit 24-module scan takes ~8min)
+- **Pre-existing issues identified** (not blocking prod):
+  - `GET /customer/loyalty` returns 500 (null customer_id when creating LoyaltyAccount)
+  - `GET /support/cases` returns 500 (endpoint is POST-only)
+- **Tests**: web_public 1624/1626 (2 pre-existing), backend BUILD SUCCESSFUL, Flutter 0 errors
+- **Live tested**: 20+ endpoints verified on running Docker backend (auth, public, customer, provider, admin, anomaly)
+
+### Key Lessons from Today's Session
+- **ArchUnit module scan is extremely slow** in Docker (~8min for 24 modules) — set `start_period: 600s` in healthcheck
+- **Duplicate controller mapping** causes Spring Boot startup failure — always check for existing `@RequestMapping` before adding new controllers
+- **`apiClient` wraps `fetch`** with base URL + auth headers — test files must mock `api` module, not raw `fetch`, when pages use `api.get()`/`api.post()`
+- **Pre-existing test failures**: RecurringBookingsPage "Kelola" text mismatch, SocialFeedPage empty mock data — both unrelated to API sync changes
 
 ### Key Lessons from Today's Session
 - **`vi.hoisted()` is mandatory** when mock variables are used inside `vi.mock()` factories — without it, mocks reference `undefined` due to hoisting

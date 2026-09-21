@@ -5,12 +5,22 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import SettlementPage from '../SettlementPage';
 
+vi.mock('../../../lib/auth', () => ({
+  useAuth: () => ({ user: { name: 'Budi', role: 'ROLE_PROVIDER_OWNER' }, logout: vi.fn() }),
+}));
+
 vi.mock('../../../components/ProviderLayout', () => ({
   default: ({ children }: { children: React.ReactNode }) => <div data-testid="provider-layout">{children}</div>,
 }));
 
-const mockFetch = vi.fn();
-vi.stubGlobal('fetch', mockFetch);
+const mockGet = vi.fn();
+const mockPost = vi.fn();
+vi.mock('../../../lib/api', () => ({
+  api: {
+    get: (...args: any[]) => mockGet(...args),
+    post: (...args: any[]) => mockPost(...args),
+  },
+}));
 
 function renderPage() {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -29,14 +39,10 @@ const settlementsData = [
   { id: 's3', period: 'Jul 2026', totalRevenue: 4000000, commission: 200000, netPayout: 3800000, status: 'PROCESSING', paidAt: null },
 ];
 
-function wrapJson(data) {
-  return { json: () => ({ data }) };
-}
-
 describe('SettlementPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson(settlementsData)));
+    mockGet.mockResolvedValue({ data: settlementsData });
   });
 
   it('renders heading', async () => {
@@ -51,7 +57,7 @@ describe('SettlementPage', () => {
   });
 
   it('shows empty state when no settlements', async () => {
-    mockFetch.mockImplementation(() => Promise.resolve(wrapJson([])));
+    mockGet.mockResolvedValue({ data: [] });
     renderPage();
     await waitFor(() => {
       expect(screen.getByText(/belum ada settlement/i)).toBeInTheDocument();
@@ -165,7 +171,7 @@ describe('SettlementPage', () => {
   });
 
   it('shows loading state', async () => {
-    mockFetch.mockReturnValue(new Promise(() => {}));
+    mockGet.mockReturnValue(new Promise(() => {}));
     renderPage();
     await waitFor(() => {
       expect(screen.getByText('Memuat...')).toBeInTheDocument();
@@ -173,8 +179,7 @@ describe('SettlementPage', () => {
   });
 
   it('submits payout request with amount', async () => {
-    mockFetch.mockImplementationOnce(() => Promise.resolve(wrapJson(settlementsData)));
-    mockFetch.mockImplementationOnce(() => Promise.resolve(wrapJson({ id: 'p1' })));
+    mockPost.mockResolvedValue({ data: { id: 'p1' } });
     renderPage();
     await userEvent.click(screen.getByRole('button', { name: /request payout/i }));
     await waitFor(() => {
@@ -184,7 +189,7 @@ describe('SettlementPage', () => {
     await userEvent.type(amountInput, '1000000');
     await userEvent.click(screen.getByRole('button', { name: /ajukan/i }));
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledTimes(3);
+      expect(mockPost).toHaveBeenCalledWith('/provider/settlement/request', { amount: 1000000 });
     });
   });
 });
