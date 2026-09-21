@@ -3,6 +3,7 @@ package id.dekat.support.web;
 import id.dekat.support.application.SupportService;
 import id.dekat.support.domain.CaseEvent;
 import id.dekat.support.domain.SupportCase;
+import id.dekat.support.domain.SupportRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.UUID;
 public class SupportController {
 
     private final SupportService supportService;
+    private final SupportRepository supportRepository;
 
     @PostMapping
     public ResponseEntity<SupportCase> createCase(
@@ -31,9 +33,9 @@ public class SupportController {
 
     @GetMapping("/{id}")
     public ResponseEntity<SupportCase> getCase(@PathVariable UUID id) {
-        return supportService.getCaseEvents(id).isEmpty()
-                ? ResponseEntity.notFound().build()
-                : ResponseEntity.ok(supportService.resolveCase(id, null));
+        return supportRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @GetMapping("/{id}/events")

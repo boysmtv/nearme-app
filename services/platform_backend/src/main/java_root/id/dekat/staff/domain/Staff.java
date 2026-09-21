@@ -50,6 +50,12 @@ public class Staff {
     @Builder.Default
     private Integer sortOrder = 0;
 
+    @Column(name = "checked_in_at")
+    private Instant checkedInAt;
+
+    @Column(name = "checked_out_at")
+    private Instant checkedOutAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

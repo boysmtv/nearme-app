@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_core/flutter_core.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
@@ -101,8 +103,14 @@ class _BookingDetailPageState extends ConsumerState<BookingDetailPage> {
     try {
       final res = await ApiService().getBookingIcs(widget.bookingId);
       final content = res.data as String;
+      final dir = await getApplicationDocumentsDirectory();
+      final file = File('${dir.path}/${booking.bookingCode}.ics');
+      await file.writeAsString(content);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Kalender tersimpan (${content.length} karakter) - ${booking.bookingCode}.ics'), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Tersimpan: ${file.path.split('/').last}'),
+          backgroundColor: Colors.green,
+        ));
       }
     } catch (e) {
       if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Kalender gagal: $e'), backgroundColor: Colors.red));

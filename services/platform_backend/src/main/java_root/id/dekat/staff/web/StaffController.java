@@ -70,10 +70,13 @@ public class StaffController {
         if (staff == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Staff not found"));
         }
+        staff.setCheckedInAt(java.time.Instant.now());
+        staff.setCheckedOutAt(null);
+        staffService.updateStaff(id, staff);
         return ResponseEntity.ok(ApiResponse.ok(Map.of(
                 "staffId", id.toString(),
                 "status", "CHECKED_IN",
-                "checkedInAt", OffsetDateTime.now().toString()
+                "checkedInAt", staff.getCheckedInAt().toString()
         )));
     }
 
@@ -83,10 +86,12 @@ public class StaffController {
         if (staff == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ApiResponse.error("Staff not found"));
         }
+        staff.setCheckedOutAt(java.time.Instant.now());
+        staffService.updateStaff(id, staff);
         return ResponseEntity.ok(ApiResponse.ok(Map.of(
                 "staffId", id.toString(),
                 "status", "CHECKED_OUT",
-                "checkedOutAt", OffsetDateTime.now().toString()
+                "checkedOutAt", staff.getCheckedOutAt().toString()
         )));
     }
 

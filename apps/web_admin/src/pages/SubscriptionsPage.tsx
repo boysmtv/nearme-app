@@ -48,11 +48,13 @@ export default function SubscriptionsPage() {
   const cancelSubMut = useMutation({
     mutationFn: (id: string) => adminApi.subscriptions.cancel(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'subscriptions'] }),
+    onError: (e: Error) => alert(`Gagal: ${e.message}`),
   });
 
   const reactivateSubMut = useMutation({
     mutationFn: (id: string) => adminApi.subscriptions.reactivate(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'subscriptions'] }),
+    onError: (e: Error) => alert(`Gagal: ${e.message}`),
   });
 
   const loading = plansLoading || subsLoading;
@@ -141,12 +143,12 @@ export default function SubscriptionsPage() {
                       <td className="px-4 py-3 text-sm text-gray-600">{sub.currentPeriodEnd ? new Date(sub.currentPeriodEnd).toLocaleDateString('id-ID') : '-'}</td>
                       <td className="px-4 py-3 text-sm space-x-2">
                         {sub.status !== 'CANCELLED' && (
-                          <button onClick={() => cancelSubMut.mutate(sub.id)}
-                            className="font-medium text-red-600 hover:text-red-800 transition-colors">Cancel</button>
+                          <button disabled={cancelSubMut.isPending} onClick={() => { if (confirm('Batalkan langganan ini?')) cancelSubMut.mutate(sub.id); }}
+                            className="font-medium text-red-600 hover:text-red-800 transition-colors disabled:opacity-50">Cancel</button>
                         )}
                         {sub.status === 'CANCELLED' && (
-                          <button onClick={() => reactivateSubMut.mutate(sub.id)}
-                            className="font-medium text-green-600 hover:text-green-800 transition-colors">Reactivate</button>
+                          <button disabled={reactivateSubMut.isPending} onClick={() => { if (confirm('Aktifkan kembali langganan ini?')) reactivateSubMut.mutate(sub.id); }}
+                            className="font-medium text-green-600 hover:text-green-800 transition-colors disabled:opacity-50">Reactivate</button>
                         )}
                       </td>
                     </tr>

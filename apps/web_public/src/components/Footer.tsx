@@ -9,9 +9,9 @@ const exploreLinks = [
 ];
 
 const infoLinks = [
-  { label: 'Syarat & Ketentuan', to: '/about' },
-  { label: 'Kebijakan Privasi', to: '/about' },
-  { label: 'Bantuan & FAQ', to: '/about' },
+  { label: 'Syarat & Ketentuan', to: '/about#terms' },
+  { label: 'Kebijakan Privasi', to: '/about#privacy' },
+  { label: 'Bantuan & FAQ', to: '/about#faq' },
 ];
 
 export default function Footer() {

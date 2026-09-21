@@ -16,7 +16,7 @@ export default function CasesPage() {
     queryFn: () => adminApi.cases.list({ page, limit: 20, severity, status: caseStatus }),
   });
 
-  const statusMut = useMutation({ mutationFn: ({ id, status }: { id: string; status: string }) => adminApi.cases.updateStatus(id, status), onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'cases'] }) });
+  const statusMut = useMutation({ mutationFn: ({ id, status }: { id: string; status: string }) => adminApi.cases.updateStatus(id, status), onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'cases'] }), onError: (e: Error) => alert(`Gagal: ${e.message}`) });
 
   const severityColors: Record<string, string> = { P0: 'bg-red-100 text-red-700', P1: 'bg-orange-100 text-orange-700', P2: 'bg-yellow-100 text-yellow-700', P3: 'bg-gray-100 text-gray-600' };
 

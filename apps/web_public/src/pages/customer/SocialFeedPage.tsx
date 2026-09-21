@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '../../lib/api';
+import { useNavigate } from 'react-router-dom';
 
 interface FeedPost {
   id: string;
@@ -21,6 +22,7 @@ interface FeedPost {
 export default function SocialFeedPage() {
   const [postText, setPostText] = useState('');
   const qc = useQueryClient();
+  const navigate = useNavigate();
 
   const { data: feedRes, isLoading } = useQuery({
     queryKey: ['social-feed'],
@@ -53,7 +55,13 @@ export default function SocialFeedPage() {
     },
   });
 
+  const { data: suggestedRes } = useQuery({
+    queryKey: ['suggested-providers'],
+    queryFn: () => api.get('/public/providers/featured'),
+  });
+
   const trending = (trendingRes as any)?.data ?? [];
+  const suggested = (suggestedRes as any)?.data ?? [];
 
   const getTypeBadge = (type: string) => {
     switch (type) {
@@ -87,8 +95,8 @@ export default function SocialFeedPage() {
                 />
                 <div className="flex justify-between items-center mt-2">
                   <div className="flex gap-2">
-                    <button className="text-gray-400 hover:text-primary-600">📷 Foto</button>
-                    <button className="text-gray-400 hover:text-primary-600">📍 Lokasi</button>
+                    <button type="button" onClick={() => alert('Fitur foto akan segera tersedia')} className="text-gray-400 hover:text-primary-600">📷 Foto</button>
+                    <button type="button" onClick={() => alert('Fitur lokasi akan segera tersedia')} className="text-gray-400 hover:text-primary-600">📍 Lokasi</button>
                   </div>
                   <button
                     onClick={() => createPostMutation.mutate({ title: postText.slice(0, 50), body: postText, type: 'REVIEW' })}
@@ -124,7 +132,7 @@ export default function SocialFeedPage() {
                           className="w-10 h-10 rounded-full"
                         />
                         <div>
-                          <p className="font-semibold text-gray-900">{post.providerName}</p>
+                          <p className="font-semibold text-gray-900 hover:text-primary-600 cursor-pointer" onClick={() => navigate(`/provider/${post.providerId}`)}>{post.providerName}</p>
                           <p className="text-xs text-gray-400">
                             {new Date(post.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
                           </p>
@@ -166,10 +174,10 @@ export default function SocialFeedPage() {
                       >
                         ❤️ {post.likes}
                       </button>
-                      <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600">
+                      <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600" onClick={() => alert('Komentar akan segera tersedia')}>
                         💬 {post.comments}
                       </button>
-                      <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600">
+                      <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-primary-600" onClick={() => { navigator.clipboard.writeText(`${post.title}\n\n${post.body}\n\n— DEKAT Platform`); alert('Link tersalin ke clipboard'); }}>
                         🔗 Share
                       </button>
                     </div>
@@ -203,19 +211,21 @@ export default function SocialFeedPage() {
           <div className="bg-white rounded-xl shadow-sm ring-1 ring-gray-100 p-4">
             <h3 className="font-semibold text-gray-900 mb-3">💡 Disarankan</h3>
             <div className="space-y-3">
-              {[
-                { name: 'Nail Art Studio', category: 'Kecantikan', rating: 4.8 },
-                { name: 'Hair Colorist Pro', category: 'Salon', rating: 4.7 },
-                { name: 'Massage & Spa', category: 'Spa', rating: 4.9 },
-              ].map((p) => (
-                <div key={p.name} className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-900">{p.name}</p>
-                    <p className="text-xs text-gray-400">{p.category} ★ {p.rating}</p>
+              {suggested.length === 0 ? (
+                <p className="text-xs text-gray-400">Belum ada rekomendasi</p>
+              ) : (
+                suggested.slice(0, 5).map((p: any) => (
+                  <div key={p.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{p.name}</p>
+                      <p className="text-xs text-gray-400">{p.categoryName || p.category} ★ {p.rating?.toFixed(1) || '-'}</p>
+                    </div>
+                    <button onClick={() => followMutation.mutate(p.id)} className="text-xs text-primary-600 font-medium hover:underline">
+                      {p.isFollowing ? 'Mengikuti' : 'Ikuti'}
+                    </button>
                   </div>
-                  <button className="text-xs text-primary-600 font-medium hover:underline">Ikuti</button>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
         </div>

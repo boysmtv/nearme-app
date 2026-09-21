@@ -364,6 +364,10 @@ class ApiService {
     return _dio.get('/customer/loyalty');
   }
 
+  Future<Response> redeemLoyaltyPoints(Map<String, dynamic> data) {
+    return _dio.post('/customer/loyalty/redeem', data: data);
+  }
+
   // Provider booking detail (provider-scoped)
   Future<Response> getProviderBooking(String id) {
     return _dio.get('${Endpoints.providerBookings}/$id');
@@ -376,6 +380,10 @@ class ApiService {
 
   Future<Response> createCoupon(Map<String, dynamic> data) {
     return _dio.post(Endpoints.providerCoupons, data: data);
+  }
+
+  Future<Response> updateCoupon(String id, Map<String, dynamic> data) {
+    return _dio.put('${Endpoints.providerCoupons}/$id', data: data);
   }
 
   Future<Response> deleteCoupon(String id) {
@@ -411,6 +419,10 @@ class ApiService {
 
   Future<Response> getTrendingProviders() {
     return _dio.get('/social/trending');
+  }
+
+  Future<Response> createSocialPost(Map<String, dynamic> data) {
+    return _dio.post('/social/feed', data: data);
   }
 
   Future<Response> likePost(String postId) {

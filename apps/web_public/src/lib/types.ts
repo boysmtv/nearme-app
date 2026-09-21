@@ -213,6 +213,7 @@ export interface DashboardStats {
 export interface Booking {
   id: string;
   bookingCode: string;
+  providerId?: string;
   customerName: string;
   customerEmail: string;
   customerPhone: string;

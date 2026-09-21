@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
@@ -232,7 +233,11 @@ class _ReferralPageState extends ConsumerState<ReferralPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: _copyCode,
+                      onPressed: () {
+                        Share.share(
+                          'Yuk gabung DEKAT! Gunakan kode referral $_referralCode untuk dapat 50 poin gratis: https://dekat.id/ref/$_referralCode',
+                        );
+                      },
                       icon: const Icon(Icons.share_outlined, size: 20),
                       label: const Text('Bagikan ke Teman',
                           style: TextStyle(

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation } from '@tanstack/react-query';
-import { adminApi } from '../lib/api';
+import { useAuth } from '../lib/auth';
 
 const schema = z.object({
   email: z.string().email('Email tidak valid'),
@@ -14,21 +14,17 @@ const schema = z.object({
 type FormData = z.infer<typeof schema>;
 
 export default function LoginPage() {
-  const navigate = useNavigate();
+  const { login: authLogin } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [requiresMfa, setRequiresMfa] = useState(false);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<FormData>({ resolver: zodResolver(schema) });
 
   const loginMut = useMutation({
-    mutationFn: (d: FormData) => adminApi.auth.login(d.email, d.password, d.mfaCode),
-    onSuccess: (res) => {
-      if (res.data.requiresMfa && !requiresMfa) { setRequiresMfa(true); return; }
-      localStorage.setItem('auth_token', res.data.accessToken);
-      if (res.data.refreshToken) {
-        localStorage.setItem('auth_refresh', res.data.refreshToken);
-      }
-      navigate('/dashboard');
+    mutationFn: async (d: FormData) => {
+      const result = await authLogin(d.email, d.password, d.mfaCode);
+      if (!result) setRequiresMfa(true);
+      return result;
     },
     onError: () => setError(requiresMfa ? 'Kode MFA salah' : 'Email atau password salah'),
   });

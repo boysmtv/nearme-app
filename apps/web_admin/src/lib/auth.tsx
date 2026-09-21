@@ -30,11 +30,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const role = roles[0] ?? 'ROLE_PLATFORM_ADMIN';
     // Single login handling: if not admin, redirect to appropriate portal (web_public)
     if (role === 'ROLE_CUSTOMER') {
-      window.location.href = 'http://localhost:4100';
+      window.location.href = `${window.location.origin}`;
       return true;
     }
     if (role.startsWith('ROLE_PROVIDER')) {
-      window.location.href = 'http://localhost:4100/provider/dashboard';
+      window.location.href = `${window.location.origin}/provider/dashboard`;
       return true;
     }
     const u: AdminUser = { id: (payload.sub ?? '') as string, email: (payload.email ?? email) as string, name: (payload.name ?? '') as string, role, mfaVerified: !!mfaCode };

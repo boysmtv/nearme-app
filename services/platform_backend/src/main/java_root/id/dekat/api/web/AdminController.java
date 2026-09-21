@@ -267,7 +267,7 @@ public class AdminController {
             @PathVariable UUID id, @RequestBody Map<String, String> body) {
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
-            return ResponseEntity.ok(ApiResponse.ok(Map.of("error", "User not found")));
+            return ResponseEntity.status(404).body(ApiResponse.error("User not found"));
         }
         User user = userOpt.get();
         String newStatus = body.getOrDefault("status", "ACTIVE");
@@ -282,12 +282,12 @@ public class AdminController {
             @PathVariable UUID id, @RequestBody Map<String, String> body) {
         Optional<User> userOpt = userRepository.findById(id);
         if (userOpt.isEmpty()) {
-            return ResponseEntity.ok(ApiResponse.ok(Map.of("error", "User not found")));
+            return ResponseEntity.status(404).body(ApiResponse.error("User not found"));
         }
         String roleName = body.getOrDefault("role", "ROLE_CUSTOMER");
         Optional<id.dekat.access.domain.Role> roleOpt = roleRepository.findByName(roleName);
         if (roleOpt.isEmpty()) {
-            return ResponseEntity.ok(ApiResponse.ok(Map.of("error", "Role not found: " + roleName)));
+            return ResponseEntity.status(404).body(ApiResponse.error("Role not found: " + roleName));
         }
         List<RoleAssignment> existing = roleAssignmentRepository.findByUserId(id);
         for (RoleAssignment ra : existing) {
@@ -344,7 +344,7 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> approveTenant(@PathVariable UUID id) {
         Optional<Tenant> tenantOpt = tenantRepository.findById(id);
         if (tenantOpt.isEmpty()) {
-            return ResponseEntity.ok(ApiResponse.ok(Map.of("error", "Tenant not found")));
+            return ResponseEntity.status(404).body(ApiResponse.error("Tenant not found"));
         }
         Tenant tenant = tenantOpt.get();
         tenant.setVerificationStatus("VERIFIED");
@@ -358,7 +358,7 @@ public class AdminController {
             @PathVariable UUID id, @RequestBody Map<String, String> body) {
         Optional<Tenant> tenantOpt = tenantRepository.findById(id);
         if (tenantOpt.isEmpty()) {
-            return ResponseEntity.ok(ApiResponse.ok(Map.of("error", "Tenant not found")));
+            return ResponseEntity.status(404).body(ApiResponse.error("Tenant not found"));
         }
         Tenant tenant = tenantOpt.get();
         tenant.setVerificationStatus("REJECTED");
@@ -570,7 +570,7 @@ public class AdminController {
             @PathVariable UUID id, @RequestBody Map<String, String> body) {
         Optional<SupportCase> caseOpt = supportRepository.findById(id);
         if (caseOpt.isEmpty()) {
-            return ResponseEntity.ok(ApiResponse.ok(Map.of("error", "Case not found")));
+            return ResponseEntity.status(404).body(ApiResponse.error("Case not found"));
         }
         SupportCase sc = caseOpt.get();
         String newStatus = body.getOrDefault("status", "OPEN");
@@ -578,22 +578,5 @@ public class AdminController {
         supportRepository.save(sc);
         Map<String, Object> result = Map.of("id", id.toString(), "status", newStatus);
         return ResponseEntity.ok(ApiResponse.ok(result, "Case status updated"));
-    }
-
-    @GetMapping("/config/flags")
-    public ResponseEntity<ApiResponse<List<Map<String, Object>>>> getConfigFlags() {
-        List<Map<String, Object>> flags = List.of(
-            Map.of("id", "ff-001", "name", "Maintenance Mode", "description", "Platform maintenance mode", "enabled", false),
-            Map.of("id", "ff-002", "name", "New Registration", "description", "Allow new user registration", "enabled", true),
-            Map.of("id", "ff-003", "name", "Payment Gateway", "description", "Enable payment processing", "enabled", true)
-        );
-        return ResponseEntity.ok(ApiResponse.ok(flags));
-    }
-
-    @PutMapping("/config/flags/{id}")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> toggleFlag(
-            @PathVariable UUID id, @RequestBody Map<String, Object> body) {
-        Map<String, Object> flag = Map.of("id", id.toString(), "enabled", body.getOrDefault("enabled", true));
-        return ResponseEntity.ok(ApiResponse.ok(flag, "Feature flag updated"));
     }
 }

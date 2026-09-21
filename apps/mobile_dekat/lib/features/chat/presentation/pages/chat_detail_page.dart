@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../chat/presentation/viewmodel/chat_viewmodel.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
@@ -107,7 +108,7 @@ class _ChatDetailPageState extends ConsumerState<ChatDetailPage> {
                       ),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Text(m.body, style: TextStyle(color: isCustomer ? Colors.white : Colors.black87)),
-                        if (m.attachmentUrl != null) Padding(padding: const EdgeInsets.only(top: 6), child: GestureDetector(onTap: () {}, child: Text('📎 ${m.attachmentUrl}', style: TextStyle(fontSize: 11, color: isCustomer ? Colors.white70 : Colors.blue, decoration: TextDecoration.underline)))),
+                        if (m.attachmentUrl != null) Padding(padding: const EdgeInsets.only(top: 6), child: GestureDetector(onTap: () async { final uri = Uri.parse(m.attachmentUrl!); if (await canLaunchUrl(uri)) { await launchUrl(uri, mode: LaunchMode.externalApplication); } }, child: Text('📎 ${m.attachmentUrl}', style: TextStyle(fontSize: 11, color: isCustomer ? Colors.white70 : Colors.blue, decoration: TextDecoration.underline)))),
                         const SizedBox(height: 4),
                         Text(m.createdAt != null ? '${m.createdAt!.hour}:${m.createdAt!.minute.toString().padLeft(2, '0')}' : '', style: TextStyle(fontSize: 10, color: isCustomer ? Colors.white70 : Colors.grey[600])),
                       ]),

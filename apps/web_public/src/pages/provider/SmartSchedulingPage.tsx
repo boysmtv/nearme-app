@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../../lib/api';
 
 interface SmartSuggestion {
@@ -13,6 +14,7 @@ interface SmartSuggestion {
 
 export default function SmartSchedulingPage() {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+  const navigate = useNavigate();
 
   const { data: suggestionsRes, isLoading } = useQuery({
     queryKey: ['smart-suggestions', selectedDate],
@@ -150,9 +152,18 @@ export default function SmartSchedulingPage() {
                     </div>
                     <p className="text-sm text-gray-600 mt-1">{s.description}</p>
                   </div>
-                  <button className="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-sm font-medium hover:bg-primary-100">
-                    {s.action}
-                  </button>
+                   <button
+                     onClick={() => {
+                       if (s.type === 'STAFF_ALLOCATION') navigate('/provider/staff');
+                       else if (s.type === 'PRICING') navigate('/provider/services');
+                       else if (s.type === 'PROMOTION') navigate('/provider/promotions');
+                       else if (s.type === 'PEAK_HOURS') navigate('/provider/staff');
+                       else alert('Aksi akan segera tersedia');
+                     }}
+                     className="px-3 py-1.5 bg-primary-50 text-primary-700 rounded-lg text-sm font-medium hover:bg-primary-100"
+                   >
+                     {s.action}
+                   </button>
                 </div>
               </div>
             ))}

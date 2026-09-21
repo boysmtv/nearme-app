@@ -18,6 +18,7 @@ export default function FeatureFlagsPage() {
   const toggleMut = useMutation({
     mutationFn: ({ id, enabled }: { id: string; enabled: boolean }) => adminApi.config.toggleFlag(id, enabled),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'feature-flags'] }),
+    onError: (e: Error) => alert(`Gagal: ${e.message}`),
   });
 
   const createMut = useMutation({
@@ -27,11 +28,13 @@ export default function FeatureFlagsPage() {
       setShowCreate(false);
       setNewFlag({ name: '', key: '', description: '', enabled: false, environment: 'development' });
     },
+    onError: (e: Error) => alert(`Gagal: ${e.message}`),
   });
 
   const deleteMut = useMutation({
     mutationFn: (id: string) => adminApi.config.deleteFlag(id),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'feature-flags'] }),
+    onError: (e: Error) => alert(`Gagal: ${e.message}`),
   });
 
   return (
@@ -63,9 +66,9 @@ export default function FeatureFlagsPage() {
                 className="col-span-2 rounded-lg border border-gray-200 px-3 py-2 text-sm focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500" />
             </div>
             <div className="flex gap-2">
-              <button onClick={() => createMut.mutate(newFlag)}
-                className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors">
-                Save
+              <button onClick={() => createMut.mutate(newFlag)} disabled={!newFlag.name || !newFlag.key || createMut.isPending}
+                className="rounded-lg bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700 transition-colors disabled:opacity-50">
+                {createMut.isPending ? 'Menyimpan...' : 'Save'}
               </button>
               <button onClick={() => setShowCreate(false)}
                 className="rounded-lg border border-gray-200 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../../shared/widgets/shimmer_loading.dart';
 
 final feedFutureProvider = FutureProvider.autoDispose<List<dynamic>>((ref) async {
@@ -38,11 +39,28 @@ class SocialFeedPage extends ConsumerStatefulWidget {
 
 class _SocialFeedPageState extends ConsumerState<SocialFeedPage> {
   final _postController = TextEditingController();
+  bool _posting = false;
 
   @override
   void dispose() {
     _postController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submitPost() async {
+    final text = _postController.text.trim();
+    if (text.isEmpty) return;
+    setState(() => _posting = true);
+    try {
+      await ApiService().createSocialPost({'title': text.length > 50 ? text.substring(0, 50) : text, 'body': text, 'type': 'UPDATE'});
+      _postController.clear();
+      ref.invalidate(feedFutureProvider);
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Postingan berhasil dibuat')));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal posting: $e')));
+    } finally {
+      if (mounted) setState(() => _posting = false);
+    }
   }
 
   Color _getTypeColor(String type) {
@@ -137,6 +155,12 @@ class _SocialFeedPageState extends ConsumerState<SocialFeedPage> {
                           filled: true,
                           fillColor: const Color(0xFFF1F2F6),
                           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                          suffixIcon: _posting
+                              ? const Padding(padding: EdgeInsets.all(12), child: SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)))
+                              : IconButton(
+                                  icon: const Icon(Icons.send_rounded, color: DEKATColors.primary, size: 20),
+                                  onPressed: _submitPost,
+                                ),
                         ),
                       ),
                     ),
@@ -499,32 +523,48 @@ class _SocialFeedPageState extends ConsumerState<SocialFeedPage> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.chat_bubble_outline_rounded, color: Colors.grey[600], size: 16),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${p['comments'] ?? 0}',
-                        style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w700, fontSize: 12),
-                      ),
-                    ],
+                InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Komentar akan segera tersedia'), behavior: SnackBarBehavior.floating),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.chat_bubble_outline_rounded, color: Colors.grey[600], size: 16),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${p['comments'] ?? 0}',
+                          style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w700, fontSize: 12),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 const Spacer(),
-                Container(
-                  padding: const EdgeInsets.all(7),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[100],
-                    shape: BoxShape.circle,
+                InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    final title = p['title']?.toString() ?? '';
+                    final body = p['body']?.toString() ?? '';
+                    Share.share('$title\n\n$body\n\n— DEKAT Platform');
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(7),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(Icons.share_outlined, color: Colors.grey[600], size: 16),
                   ),
-                  child: Icon(Icons.share_outlined, color: Colors.grey[600], size: 16),
                 ),
               ],
             ),

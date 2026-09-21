@@ -330,14 +330,27 @@ class _RedeemGrid extends StatelessWidget {
         final affordable = points >= cost;
         return RepaintBoundary(
           child: GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                      'Tukarkan "${opt['title']}" saat pembayaran — tunjukkan halaman ini ke kasir.'),
-                ),
-              );
-            },
+            onTap: affordable
+                ? () async {
+                    try {
+                      await ApiService().redeemLoyaltyPoints({
+                        'points': cost,
+                        'description': opt['title'],
+                      });
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Berhasil menukarkan ${opt['title']}!'), backgroundColor: Colors.green),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Gagal: $e'), backgroundColor: Colors.red),
+                        );
+                      }
+                    }
+                  }
+                : null,
             child: Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(

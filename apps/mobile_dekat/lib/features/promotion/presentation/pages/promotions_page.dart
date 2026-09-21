@@ -233,6 +233,14 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 TextButton.icon(
+                                  icon: const Icon(Icons.edit_outlined,
+                                      size: 18, color: DEKATColors.primary),
+                                  label: const Text('Edit',
+                                      style: TextStyle(color: DEKATColors.primary)),
+                                  onPressed: () =>
+                                      _showEditCouponDialog(coupon),
+                                ),
+                                TextButton.icon(
                                   icon: const Icon(Icons.delete_outline,
                                       size: 18, color: Colors.red),
                                   label: const Text('Hapus',
@@ -459,7 +467,7 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
               TextField(controller: codeCtrl, decoration: const InputDecoration(labelText: 'Kode Kupon', hintText: 'DISKON10'), textCapitalization: TextCapitalization.characters),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
-                initialValue: 'FLAT',
+                value: 'FLAT',
                 items: const [
                   DropdownMenuItem(value: 'FLAT', child: Text('Flat (Rp)')),
                   DropdownMenuItem(value: 'PERCENTAGE', child: Text('Persen (%)')),
@@ -544,6 +552,70 @@ class _PromotionsPageState extends ConsumerState<PromotionsPage> with SingleTick
                 });
                 Navigator.pop(context);
                 ref.invalidate(campaignsProvider);
+              } catch (e) {
+                if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: DEKATColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Simpan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showEditCouponDialog(Map<String, dynamic> coupon) {
+    final codeCtrl = TextEditingController(text: coupon['code'] ?? '');
+    final discountTypeCtrl = TextEditingController(text: coupon['discountType'] ?? 'FLAT');
+    final discountValueCtrl = TextEditingController(text: '${coupon['discountValue'] ?? ''}');
+    final minOrderCtrl = TextEditingController(text: coupon['minOrder'] != null ? '${coupon['minOrder']}' : '');
+    final maxDiscountCtrl = TextEditingController(text: coupon['maxDiscount'] != null ? '${coupon['maxDiscount']}' : '');
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Edit Kupon'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(controller: codeCtrl, decoration: const InputDecoration(labelText: 'Kode Kupon'), textCapitalization: TextCapitalization.characters),
+              const SizedBox(height: 8),
+              DropdownButtonFormField<String>(
+                value: discountTypeCtrl.text,
+                items: const [
+                  DropdownMenuItem(value: 'FLAT', child: Text('Flat (Rp)')),
+                  DropdownMenuItem(value: 'PERCENTAGE', child: Text('Persen (%)')),
+                ],
+                onChanged: (v) => discountTypeCtrl.text = v!,
+                decoration: const InputDecoration(labelText: 'Tipe Diskon'),
+              ),
+              const SizedBox(height: 8),
+              TextField(controller: discountValueCtrl, decoration: const InputDecoration(labelText: 'Nilai Diskon'), keyboardType: TextInputType.number),
+              const SizedBox(height: 8),
+              TextField(controller: minOrderCtrl, decoration: const InputDecoration(labelText: 'Min. Order (opsional)'), keyboardType: TextInputType.number),
+              const SizedBox(height: 8),
+              TextField(controller: maxDiscountCtrl, decoration: const InputDecoration(labelText: 'Maks. Diskon (opsional)'), keyboardType: TextInputType.number),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Batal')),
+          ElevatedButton(
+            onPressed: () async {
+              try {
+                await ApiService().updateCoupon(coupon['id'], {
+                  'code': codeCtrl.text.toUpperCase(),
+                  'discountType': discountTypeCtrl.text,
+                  'discountValue': int.tryParse(discountValueCtrl.text) ?? 0,
+                  if (minOrderCtrl.text.isNotEmpty) 'minOrder': int.tryParse(minOrderCtrl.text) ?? 0,
+                  if (maxDiscountCtrl.text.isNotEmpty) 'maxDiscount': int.tryParse(maxDiscountCtrl.text) ?? 0,
+                });
+                Navigator.pop(context);
+                ref.invalidate(couponsProvider);
               } catch (e) {
                 if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Gagal: $e')));
               }

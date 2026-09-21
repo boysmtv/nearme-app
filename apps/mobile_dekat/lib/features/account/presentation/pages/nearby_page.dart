@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:flutter_api_client/flutter_api_client.dart';
 import 'package:flutter_design_system/flutter_design_system.dart';
 import 'package:latlong2/latlong.dart' as latlng;
@@ -27,8 +28,31 @@ class _NearbyPageState extends State<NearbyPage> {
   @override
   void initState() {
     super.initState();
-    _userLocation = const latlng.LatLng(-6.2088, 106.8456);
-    _loadNearby();
+    _initLocation();
+  }
+
+  Future<void> _initLocation() async {
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        _userLocation = const latlng.LatLng(-6.2088, 106.8456);
+        _loadNearby();
+        return;
+      }
+      final pos = await Geolocator.getCurrentPosition(
+          locationSettings: const LocationSettings(
+              accuracy: LocationAccuracy.high, timeLimit: Duration(seconds: 10)));
+      if (!mounted) return;
+      _userLocation = latlng.LatLng(pos.latitude, pos.longitude);
+      _loadNearby();
+    } catch (e) {
+      _userLocation = const latlng.LatLng(-6.2088, 106.8456);
+      _loadNearby();
+    }
   }
 
   Future<void> _loadNearby() async {
@@ -36,7 +60,7 @@ class _NearbyPageState extends State<NearbyPage> {
     try {
       final api = ApiService();
       final res = await api.dio.get(
-        '/public/providers?q=&radius=$_radius&lat=${_userLocation?.latitude ?? -6.2088}&lng=${_userLocation?.longitude ?? 106.8456}',
+        '/public/providers?q=&radius=$_radius&lat=${_userLocation!.latitude}&lng=${_userLocation!.longitude}',
       );
       if (!mounted) return;
       if (res.data['success'] == true) {

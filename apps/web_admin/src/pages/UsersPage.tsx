@@ -31,6 +31,7 @@ export default function UsersPage() {
     mutationFn: ({ id, status }: { id: string; status: string }) =>
       adminApi.users.updateStatus(id, status),
     onSuccess: () => qc.invalidateQueries({ queryKey: ['admin', 'users'] }),
+    onError: (e: Error) => alert(`Gagal: ${e.message}`),
   });
 
   const handleExport = async () => {

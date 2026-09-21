@@ -337,6 +337,7 @@ pnpm install && pnpm dev
 
 ### Backend Runtime (verified 2026-08-27)
 - Migrations V15–V20: bookings status CHECK widened, categories seeded, booking_holds expiry CHECK fixed, hold status CHECK includes CONVERTED/CANCELLED, ghost ddl-auto columns dropped, confirmation_pin+pin_verified added
+- V31: adds `checked_in_at`/`checked_out_at` columns to `staff` table
 - `spring.jpa.hibernate.ddl-auto: none` in ALL profiles — update mode corrupts schema (adds NOT NULL columns to seeded tables)
 - Healthcheck: image has NO curl → use `wget -q -O /dev/null http://localhost:8080/api/v1/actuator/health`
 - Mail health indicator disabled in dev (no local SMTP); SmtpEmailAdapter catches RuntimeException on send
@@ -354,8 +355,8 @@ pnpm install && pnpm dev
 - **Auto review request**: ReviewRequestService cron (1hr) sends review request 2h after booking completes
 - **Walk-in check-in**: WalkInController creates instant booking + QR code for walk-in customers
 - **Waitlist**: WaitlistController with CRUD + notify flow
-- **Commission**: 5% platform commission statement + config
-- **Settlement**: Payout requests + history
+- **Commission**: 5% platform commission statement + config (real DB via `LedgerEntryRepository`)
+- **Settlement**: Payout requests + history (real DB via `SettlementBatchRepository` + `SettlementBatch` entity)
 - **Subscription**: ProviderSubscriptionController for plan upgrade/cancel
 - **Recurring bookings**: RecurringBookingController with CRUD (in-memory, V27 migration created for DB backing)
 
@@ -417,6 +418,7 @@ pnpm install && pnpm dev
   - **Flaky fix + MultiLocation/Customers coverage 2026-09-18** — BookingPage 5 reschedule tests `user.type` → `fireEvent.change` + 15s timeout (was 1/66 timeout flaky, now 66/66). MultiLocationPage 4→13 tests (loading, Utama badge, add/edit/delete, validation, pending). CustomersPage 4→8 tests (loading, null lastBookingAt, search, pagination). Overall 92.12% → 93.18% lines (2637/2830), 1476 → 1489 tests, 93/93 files green.
   - **100% lines 2026-09-18** — 93.18% → 100% (2824/2824), 1489 → 1625 tests. BookingPage calendar/ics/chat/auth/filter/deposit (+12), PromotionsPage loyalty-history/campaign (+11), CustomerBookingDetail reschedule/PIN/backdrop (+6), FaqsPage update/cancel/validation/× (+10), ProviderPage photo-upload/rating/success (+6), provider Dashboard copy/clipboard, Nearby geolocation-fallback/radius/map-click, CustomerDashboard/Loyalty/Notifications/Bookings/Reviews/Referral/Account, admin Dashboard/Analytics/Bookings/Users/AuditLog/Chat, Settings/Services/Reports/Faq/Notifications/Staff/Waitlist/Commission/Import/Scheduling, App ErrorBoundary/guards, Header/ProviderLayout/ProtectedRoute/theme/auth. Dead code removed: `useChatWebSocket` else-if, Referral history table + `ClockIcon`.
   - **Unified mobile_dekat app 2026-09-18** — Created `apps/mobile_dekat` (id.dekat.app) by copying `mobile_customer` + 17 partner feature folders. Router rewritten with 3 shell routes: customer (`MainScaffold`), provider (`PartnerScaffold` with drawer), admin (`AdminScaffold` with bottom nav). JWT role claims (`ROLE_CUSTOMER`, `ROLE_PROVIDER_OWNER`, `ROLE_PLATFORM_ADMIN`) drive shell selection via `auth_provider.dart`. Fixed: broken `partner_payment_detail_page.dart` (reverted bad rename, re-created from partner source), `google-services.json` package_name → `id.dekat.app`, `fl_chart` dep added, `partnerScaffoldKey` global key + imports in 5 partner pages, `DekaCustomerApp` → `DekaApp` rename. 114/114 tests pass, 61.6MB release APK installed on Mi A1. Committed `5a79fd1`.
+  - **Full feature audit + MEDIUM fixes 2026-09-20** — Comprehensive audit of all buttons, features, pages across 4 platforms. 13 CRITICAL + 18 MEDIUM fixes applied. **Flutter fixes (5)**: Nearby GPS real location via `geolocator` (was hardcoded Jakarta -6.2088,106.8456), ICS download saves to device via `path_provider` (was snackbar-only), loyalty redeem calls real API `POST /customer/loyalty/redeem` (was snackbar), referral "Bagikan" uses `Share.share()` native share (was copy-only), promotions coupon edit via `updateCoupon()` API + pre-filled dialog. **web_public fixes (2)**: Recurring "Kelola" button now toggles active/inactive (was no-op), Footer info links → `/about#terms`, `/about#privacy`, `/about#faq`. **web_admin fixes (8)**: `onError` handlers on all 5 mutation hooks, loading states on destructive buttons (disabled + loading text), removed ConfigPage duplicate route, confirmation `confirm()` dialogs on approve/reject/cancel/reactivate, `ErrorBoundary` wrapper in `App.tsx`, `ProtectedRoute` decodes JWT and checks `roles` claim, mobile hamburger nav with full sidebar overlay. **Backend fixes (3)**: AdminController 4 endpoints return `404` status (was 200+error body), Staff `checkedInAt`/`checkedOutAt` persisted to DB + V31 migration, notification scheduler already real (`@Scheduled` every 5min). **New deps**: `geolocator: ^13.0.2`, `path_provider: ^2.1.5` in mobile_dekat. Build verified: Flutter 0 errors, web_public 0 errors, web_admin 0 errors, backend BUILD SUCCESSFUL. Release APK: `--split-per-abi` → arm64 21.9MB, armeabi 19.7MB (was universal 61.9MB).
 
 ## What's Next
 
@@ -436,7 +438,7 @@ pnpm install && pnpm dev
 - **`getByText(/Enterprise/)` matches multiple elements** — use `getAllByText` when text appears in heading + button (SubscriptionUpgradePage 9 failures)
 
 ### Other Tasks
-- **Device testing (mobile_dekat)**: Run unified app on Mi A1 — verify customer/provider/admin shell routing, FCM push notifications, booking flow end-to-end
+- **Device testing (mobile_dekat)**: App installed on Mi A1 (21.9MB arm64) — verify customer/provider/admin shell routing, FCM push notifications, booking flow end-to-end
 - **Payment gateway sandbox testing**: Configure real Midtrans sandbox keys
 - **Production deployment**: Docker Compose with real Midtrans production keys
 - **Optional enhancements**: Push notification campaign, advanced analytics, multi-language support
